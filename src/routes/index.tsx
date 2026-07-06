@@ -244,14 +244,15 @@ function About() {
         </SectionReveal>
         <SectionReveal className="md:col-span-9">
           <p className="font-serif text-3xl leading-snug md:text-4xl">
-            I build small, useful things — mostly for people I know. A CLI that acts like a
-            founding team. A learning map with no straight lines. An Arabic drill for the pharmacy
-            counter. A world in a browser tab.
+            I don't know a lot of things. But I know my wife is a pharmacist, so I built her
+            PharmaRab. I know my friends are physios, so I built them PhysioArab. I know I'm
+            curious about AI agents, so I built Incubator. I know learning shouldn't be a straight
+            line, so I built NoVibe.
           </p>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-soft">
-            Nothing here is a product deck. Each piece was made because a friend, a family member,
-            or my own curiosity was pulling on a thread. The through-line is the pull, not the
-            stack.
+            Seven small things for people I know. Nothing here is a product deck. Each piece exists
+            because a real person — usually someone I love — was stuck on something a spreadsheet
+            couldn't fix. The through-line is the pull, not the stack.
           </p>
         </SectionReveal>
       </Container>
