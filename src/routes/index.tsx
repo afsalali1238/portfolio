@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ArrowUpRight, Github, Plus } from "lucide-react";
 import {
   motion,
@@ -7,7 +7,6 @@ import {
   useScroll,
   useTransform,
   useSpring,
-  useMotionValue,
 } from "motion/react";
 
 export const Route = createFileRoute("/")({
@@ -27,25 +26,21 @@ type Project = {
 };
 
 const projects: Project[] = [
-  { no: "01", name: "Source", year: "2026", for: "Live", tags: ["CLI", "Claude Code", "Agents"], blurb: "Incubator that acts as CEO — researches markets, hires agent teams, ships startups.", detail: "A Claude Code skill that role-plays a founding team. You hand it a hunch; it interrogates the market, sketches a company, and spawns specialist agents to build the first version. The interesting part is the org chart — how instruction, dissent, and review flow between agents without collapsing into noise.", github: "https://github.com" },
-  { no: "02", name: "NoVibe", year: "2025", for: "Learning", tags: ["Non-linear", "AI literacy", "Map"], blurb: "Non-linear AI literacy map — 30 nodes across 6 clusters, learn in any order.", detail: "Most curricula insist on a straight line. NoVibe is a map: pick a node that itches, follow the threads that pull you. Thirty concepts, six clusters, no gate-keeping. Built for people who learn by wandering.", live: "https://novibe.lovable.app", github: "https://github.com" },
-  { no: "03", name: "PharmaRab", year: "2025", for: "Branded — Friends", tags: ["Bilingual", "Gamified", "Pharma"], blurb: "Medical Arabic for pharmacists — gamified, bilingual, XP-driven drills.", detail: "A quiet drill app for expats behind the counter. Bilingual scripts, spaced repetition, XP for showing up. Built with pharmacist friends who kept forgetting the same twenty phrases.", github: "https://github.com" },
-  { no: "04", name: "PhysioArab", year: "2025", for: "Branded — Friends", tags: ["Bilingual", "Clinical", "Physio"], blurb: "The physio sibling: clinical Arabic drills for assessment and rehab.", detail: "Same engine as PharmaRab, retuned for the physio clinic — palpation, ROM, pain scales, discharge advice. Written with therapists who wanted their patients to feel heard in their own language.", live: "https://physioarab.vercel.app", github: "https://github.com" },
-  { no: "05", name: "JobHunter OS", year: "2025", for: "Wife", tags: ["Career", "Tracker"], blurb: "A career operating system — track applications, stages, follow-ups, and moods.", detail: "Built one evening because a spreadsheet wasn't kind enough. Applications as cards, stages as columns, a small ritual for logging what actually happened in each conversation.", github: "https://github.com" },
-  { no: "06", name: "Medical Coding Mastery", year: "2025", for: "Wife", tags: ["AAPC CPC", "DHA", "Exam prep"], blurb: "10-week AAPC CPC exam prep aligned with Dubai DHA requirements.", detail: "A calm ten-week path through the CPC syllabus with DHA-specific detours. Weekly plans, timed drills, and just enough encouragement to make the coding chapters bearable.", live: "https://code-calm-path.lovable.app" },
-  { no: "07", name: "Terrarium", year: "2025", for: "Fun", tags: ["God-game", "Cozy", "Browser"], blurb: "Cozy browser god-game — warm a world, answer prayers, watch myths grow.", detail: "A small warm world in a tab. You nudge the weather, listen to tiny prayers, and slowly a mythology forms around your choices. There is no lose state, only weather.", live: "https://tiny-world-keeper.vercel.app", github: "https://github.com" },
-  { no: "08", name: "NxtDoor Chef", year: "2025", for: "Live", tags: ["Marketplace", "Food"], blurb: "Home cooks next door — order the dish your neighbour is already making.", detail: "A neighbourhood marketplace for home kitchens. Discovery is by street, not algorithm. Pickup windows are honest, portions are generous.", live: "https://nxtdoorchef.vercel.app" },
-  { no: "09", name: "PROVIA CV", year: "2025", for: "Live", tags: ["CV", "Résumé", "AI"], blurb: "A résumé builder that writes like a person, not a keyword machine.", detail: "PROVIA CV drafts résumés in your voice, then trims them to a page without stripping personality. Templates are quiet on purpose; recruiters can read.", live: "https://proviacv.vercel.app" },
-  { no: "10", name: "PROVIA AP", year: "2025", for: "Live", tags: ["Applications", "AI"], blurb: "The application companion — cover letters, follow-ups, and honest tracking.", detail: "The sibling to PROVIA CV. Generates cover letters that don't sound generated, drafts follow-ups a week later, and keeps a small honest log of what you sent where.", live: "https://proviaap.vercel.app" },
-  { no: "11", name: "Cr8un8", year: "2025", for: "Live", tags: ["Creative", "Community"], blurb: "A small studio for one-of-eight creative drops — limited, dated, done.", detail: "Every drop is a run of eight. Once they're claimed, the piece is done. A quiet argument against infinite feeds.", live: "https://cr8un8.vercel.app" },
+  { no: "01", name: "Incubator", year: "2025", for: "Me", tags: ["AI Agents", "Claude Code", "CLI"], blurb: "Claude Code skill that becomes a domain-expert CEO — interviews you, researches the market, then hires a sequenced team of specialist agents.", detail: "Idea in, company out. A Claude Code plugin that role-plays a founding team: it interviews you about the hunch, spends a few hours researching the market on its own, ships a findings report, then spawns a sequenced team of specialist agents to build the first version. The interesting part is the org chart — how instruction, dissent, and review flow between agents without collapsing into noise.", github: "https://github.com/afsalali1238/Incubator" },
+  { no: "02", name: "NoVibe", year: "2025", for: "Learning", tags: ["EdTech", "AI literacy", "Non-linear"], blurb: "A non-linear AI literacy map — 30 nodes across 6 clusters, learn in any order. No streaks, no XP, no locks.", detail: "Most curricula insist on a straight line. NoVibe is a map: pick a node that itches, follow the threads that pull you. Thirty concepts across six clusters — from 'what is an LLM' to 'agent orchestration'. Built for people who learn by wandering, not by grinding.", live: "https://novibe.lovable.app", github: "https://github.com/afsalali1238/novibe" },
+  { no: "03", name: "PharmaRab", year: "2025", for: "Wife", tags: ["Healthcare", "Bilingual", "Gamified"], blurb: "Gamified Medical Arabic for pharmacists — clinical phrases, vocab bank, XP, progression. Built for my wife.", detail: "My wife is a pharmacist. Medical Arabic at the counter is hard. So I built PharmaRab — a gamified conversational course with a syllabus, a clinical phrase dictionary, a vocabulary bank, and XP for showing up. Arabic and English side by side, Tajawal and Inter, no gate-keeping.", live: "https://pharmarab.vercel.app", github: "https://github.com/afsalali1238/med-arabic-hub" },
+  { no: "04", name: "PhysioArab", year: "2025", for: "Friends", tags: ["Healthcare", "Bilingual", "Physio"], blurb: "8-week Medical Arabic course for physiotherapists — assessment terms, movement commands, discharge dialogue.", detail: "Same engine as PharmaRab, retuned for the physio clinic. Eight weeks of greetings, assessment vocabulary, ROM and movement commands, and honest discharge dialogue. Built with therapist friends who wanted their patients to feel heard in their own language.", live: "https://physioarab.vercel.app", github: "https://github.com/afsalali1238/learn-med-arab" },
+  { no: "05", name: "JobHunter OS", year: "2025", for: "Wife", tags: ["Productivity", "Career"], blurb: "A job hunting operating system — applications, stages, follow-ups, outcomes, moods.", detail: "Built one evening because a spreadsheet wasn't kind enough. Applications as cards, stages as columns, a small ritual for logging what actually happened in each conversation — including the mood, because job hunting is emotional labour.", github: "https://github.com/afsalali1238/jobhunter-os" },
+  { no: "06", name: "Medical Coding Mastery", year: "2025", for: "Wife", tags: ["Healthcare", "AAPC CPC", "DHA"], blurb: "Self-paced 10-week AAPC CPC prep aligned with Dubai DHA and eClaimLink — weekly plans, drills, curated resources.", detail: "A calm ten-week path through the CPC syllabus with DHA and eClaimLink-specific detours. Weekly assignments, checkpoints, curated videos and articles, and clinical scenario drills. Just enough encouragement to make the coding chapters bearable.", live: "https://code-calm-path.lovable.app" },
+  { no: "07", name: "Terrarium", year: "2025", for: "Fun", tags: ["Browser game", "Cozy", "Generative"], blurb: "A cozy tiny-planet god-game — warm a small world, answer its prayers, watch the myths people write about you.", detail: "A small warm world in a browser tab. You nudge the weather, answer tiny prayers, and slowly a mythology forms around your choices. Animated SVG doodles, no lose state — only weather.", live: "https://tiny-world-keeper.vercel.app", github: "https://github.com/afsalali1238/terrarium" },
 ];
+
 
 function Index() {
   return (
     <div className="min-h-screen bg-paper text-ink grain">
       <div className="pointer-events-none fixed inset-0 grain-overlay opacity-40" />
       <ReadingProgress />
-      <Cursor />
       <div className="relative">
         <Nav />
         <Hero />
@@ -70,33 +65,6 @@ function ReadingProgress() {
   );
 }
 
-function Cursor() {
-  const x = useMotionValue(-100);
-  const y = useMotionValue(-100);
-  const sx = useSpring(x, { stiffness: 400, damping: 40 });
-  const sy = useSpring(y, { stiffness: 400, damping: 40 });
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
-    if (!mq.matches) return;
-    const move = (e: MouseEvent) => {
-      x.set(e.clientX);
-      y.set(e.clientY);
-      setVisible(true);
-    };
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
-  }, [x, y]);
-  return (
-    <motion.div
-      aria-hidden
-      style={{ x: sx, y: sy, opacity: visible ? 1 : 0 }}
-      className="pointer-events-none fixed left-0 top-0 z-40 -ml-3 -mt-3 h-6 w-6 rounded-full mix-blend-multiply"
-    >
-      <div className="h-full w-full rounded-full border border-ink/60" />
-    </motion.div>
-  );
-}
 
 function Container({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <div className={`mx-auto w-full max-w-6xl px-6 md:px-10 ${className}`}>{children}</div>;
@@ -197,10 +165,10 @@ function Hero() {
             variants={{ show: { transition: { staggerChildren: 0.08 } } }}
             className="mt-16 grid grid-cols-2 gap-6 border-t rule-hair pt-6 text-sm md:grid-cols-4"
           >
-            <Stat label="Projects shipped" value="11" />
-            <Stat label="For friends & family" value="04" />
-            <Stat label="Live in the world" value="07" />
-            <Stat label="Working alone" value="'25" />
+            <Stat label="Projects shipped" value="07" />
+            <Stat label="For wife, friends, me" value="06" />
+            <Stat label="Live on the internet" value="05" />
+            <Stat label="Shipped solo" value="Since '25" />
           </motion.div>
         </Container>
       </motion.div>
@@ -276,14 +244,15 @@ function About() {
         </SectionReveal>
         <SectionReveal className="md:col-span-9">
           <p className="font-serif text-3xl leading-snug md:text-4xl">
-            I build small, useful things — mostly for people I know. A CLI that acts like a
-            founding team. A learning map with no straight lines. An Arabic drill for the pharmacy
-            counter. A world in a browser tab.
+            I don't know a lot of things. But I know my wife is a pharmacist, so I built her
+            PharmaRab. I know my friends are physios, so I built them PhysioArab. I know I'm
+            curious about AI agents, so I built Incubator. I know learning shouldn't be a straight
+            line, so I built NoVibe.
           </p>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-soft">
-            Nothing here is a product deck. Each piece was made because a friend, a family member,
-            or my own curiosity was pulling on a thread. The through-line is the pull, not the
-            stack.
+            Seven small things for people I know. Nothing here is a product deck. Each piece exists
+            because a real person — usually someone I love — was stuck on something a spreadsheet
+            couldn't fix. The through-line is the pull, not the stack.
           </p>
         </SectionReveal>
       </Container>
@@ -340,7 +309,7 @@ function Works() {
               <h2 className="mt-2 font-serif text-5xl md:text-6xl">Selected pieces.</h2>
             </div>
             <div className="hidden text-right text-[11px] uppercase tracking-[0.24em] text-ink-mute md:block">
-              Eleven entries<br />Click a row to read
+              Seven entries<br />Click a row to read
             </div>
           </div>
         </SectionReveal>
@@ -485,27 +454,39 @@ function Colophon() {
         <SectionReveal className="md:col-span-9">
           <h2 className="font-serif text-5xl md:text-6xl">Say hello.</h2>
           <p className="mt-4 max-w-xl text-base text-ink-soft">
-            Best way to reach me is email. I answer slowly, but I answer.
+            Best found on GitHub or LinkedIn. I answer slowly, but I answer.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <motion.a
               whileHover={{ y: -3 }}
               whileTap={{ y: 0 }}
-              href="mailto:hello@afsal.dev"
+              href="https://github.com/afsalali1238"
+              target="_blank"
+              rel="noreferrer"
               className="group inline-flex items-center gap-2 border rule-hair bg-ink px-5 py-3 text-sm text-paper"
             >
-              hello@afsal.dev
-              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              GitHub · @afsalali1238
+              <Github className="h-4 w-4" />
             </motion.a>
             <motion.a
               whileHover={{ y: -3 }}
               whileTap={{ y: 0 }}
-              href="https://github.com"
+              href="https://www.linkedin.com/in/afsalali1238/"
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 border rule-hair px-5 py-3 text-sm hover:bg-paper-deep"
             >
-              GitHub <Github className="h-4 w-4" />
+              LinkedIn <ArrowUpRight className="h-4 w-4" />
+            </motion.a>
+            <motion.a
+              whileHover={{ y: -3 }}
+              whileTap={{ y: 0 }}
+              href="https://medium.com/@afsalali1238"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 border rule-hair px-5 py-3 text-sm hover:bg-paper-deep"
+            >
+              Medium <ArrowUpRight className="h-4 w-4" />
             </motion.a>
           </div>
           <div className="mt-16 flex flex-wrap items-end justify-between gap-4 border-t rule-hair pt-6 text-[11px] uppercase tracking-[0.24em] text-ink-mute">
