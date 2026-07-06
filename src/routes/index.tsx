@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { ArrowUpRight, Github, Plus } from "lucide-react";
+import posturePoster from "@/assets/posture.png.asset.json";
 import {
   motion,
   AnimatePresence,
