@@ -454,27 +454,39 @@ function Colophon() {
         <SectionReveal className="md:col-span-9">
           <h2 className="font-serif text-5xl md:text-6xl">Say hello.</h2>
           <p className="mt-4 max-w-xl text-base text-ink-soft">
-            Best way to reach me is email. I answer slowly, but I answer.
+            Best found on GitHub or LinkedIn. I answer slowly, but I answer.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <motion.a
               whileHover={{ y: -3 }}
               whileTap={{ y: 0 }}
-              href="mailto:hello@afsal.dev"
+              href="https://github.com/afsalali1238"
+              target="_blank"
+              rel="noreferrer"
               className="group inline-flex items-center gap-2 border rule-hair bg-ink px-5 py-3 text-sm text-paper"
             >
-              hello@afsal.dev
-              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              GitHub · @afsalali1238
+              <Github className="h-4 w-4" />
             </motion.a>
             <motion.a
               whileHover={{ y: -3 }}
               whileTap={{ y: 0 }}
-              href="https://github.com"
+              href="https://www.linkedin.com/in/afsalali1238/"
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 border rule-hair px-5 py-3 text-sm hover:bg-paper-deep"
             >
-              GitHub <Github className="h-4 w-4" />
+              LinkedIn <ArrowUpRight className="h-4 w-4" />
+            </motion.a>
+            <motion.a
+              whileHover={{ y: -3 }}
+              whileTap={{ y: 0 }}
+              href="https://medium.com/@afsalali1238"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 border rule-hair px-5 py-3 text-sm hover:bg-paper-deep"
+            >
+              Medium <ArrowUpRight className="h-4 w-4" />
             </motion.a>
           </div>
           <div className="mt-16 flex flex-wrap items-end justify-between gap-4 border-t rule-hair pt-6 text-[11px] uppercase tracking-[0.24em] text-ink-mute">
