@@ -300,6 +300,82 @@ function Curious() {
   );
 }
 
+function Posture() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const [revealed, setRevealed] = useState(false);
+
+  const onMove = (e: React.MouseEvent) => {
+    const r = ref.current?.getBoundingClientRect();
+    if (!r) return;
+    setPos({ x: e.clientX - r.left, y: e.clientY - r.top });
+  };
+
+  const cx = pos?.x ?? -9999;
+  const cy = pos?.y ?? -9999;
+  const mask = `radial-gradient(circle 180px at ${cx}px ${cy}px, #000 0%, #000 55%, transparent 100%)`;
+
+  return (
+    <section id="posture" className="border-b rule-hair">
+      <Container className="grid grid-cols-1 gap-10 py-16 md:grid-cols-12 md:py-24">
+        <SectionReveal className="md:col-span-4">
+          <div className="text-[11px] uppercase tracking-[0.28em] text-ink-mute">§ 03 · Confession</div>
+          <h2 className="mt-3 font-serif text-4xl leading-[1.05] md:text-5xl">
+            The line I'd never<br />say out loud.
+          </h2>
+          <p className="mt-6 max-w-sm font-serif text-lg italic text-ink-soft">
+            Move your cursor across the paper. The rest is between us.
+          </p>
+          <button
+            onClick={() => setRevealed((v) => !v)}
+            className="mt-8 inline-flex items-center gap-2 border-b border-ink pb-1 text-[11px] uppercase tracking-[0.24em] text-ink transition-opacity hover:opacity-60"
+          >
+            {revealed ? "Hide it again" : "Or just show me"}
+            <Plus className={`h-3 w-3 transition-transform duration-500 ${revealed ? "rotate-45" : ""}`} />
+          </button>
+        </SectionReveal>
+
+        <div className="md:col-span-8">
+          <motion.div
+            ref={ref}
+            onMouseMove={onMove}
+            onMouseLeave={() => setPos(null)}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="relative aspect-[1024/1408] w-full overflow-hidden border rule-hair bg-paper-deep/40"
+            style={{ cursor: revealed ? "default" : "crosshair" }}
+          >
+            {/* Faint base — barely visible */}
+            <img
+              src={posturePoster.url}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 h-full w-full object-cover opacity-[0.06]"
+            />
+            {/* Revealed layer — spotlight-masked or fully shown */}
+            <img
+              src={posturePoster.url}
+              alt="Posture — a hand-drawn confession about sitting too long and thinking too much."
+              className="absolute inset-0 h-full w-full object-cover transition-opacity duration-700"
+              style={{
+                opacity: revealed ? 1 : pos ? 1 : 0,
+                WebkitMaskImage: revealed ? "none" : mask,
+                maskImage: revealed ? "none" : mask,
+              }}
+            />
+            {/* Hint watermark */}
+            <div className="pointer-events-none absolute bottom-4 right-5 text-[10px] uppercase tracking-[0.28em] text-ink-mute">
+              {revealed ? "posture.err · 200 ok" : "hover to develop"}
+            </div>
+          </motion.div>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
 function Works() {
   return (
     <section id="works" className="border-b rule-hair">
