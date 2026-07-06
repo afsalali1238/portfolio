@@ -90,6 +90,7 @@ function Nav() {
         <nav className="flex items-center gap-6 text-xs uppercase tracking-[0.2em] text-ink-soft">
           {[
             ["About", "#about"],
+            ["Posture", "#posture"],
             ["Works", "#works"],
             ["Contact", "#colophon"],
           ].map(([label, href]) => (
