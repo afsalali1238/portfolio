@@ -383,7 +383,7 @@ function Works() {
         <SectionReveal>
           <div className="flex items-end justify-between">
             <div>
-              <div className="text-[11px] uppercase tracking-[0.28em] text-ink-mute">§ 03 · Works</div>
+              <div className="text-[11px] uppercase tracking-[0.28em] text-ink-mute">§ 04 · Works</div>
               <h2 className="mt-2 font-serif text-5xl md:text-6xl">Selected pieces.</h2>
             </div>
             <div className="hidden text-right text-[11px] uppercase tracking-[0.24em] text-ink-mute md:block">
