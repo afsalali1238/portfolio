@@ -353,13 +353,13 @@ function Posture() {
               src={posturePoster.url}
               alt=""
               aria-hidden
-              className="absolute inset-0 h-full w-full object-cover opacity-[0.06]"
+              className="absolute inset-0 h-full w-full object-contain opacity-[0.10]"
             />
             {/* Revealed layer — spotlight-masked or fully shown */}
             <img
               src={posturePoster.url}
               alt="Posture — a hand-drawn confession about sitting too long and thinking too much."
-              className="absolute inset-0 h-full w-full object-cover transition-opacity duration-700"
+              className="absolute inset-0 h-full w-full object-contain transition-opacity duration-700"
               style={{
                 opacity: revealed ? 1 : pos ? 1 : 0,
                 WebkitMaskImage: revealed ? "none" : mask,
