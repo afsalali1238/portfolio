@@ -66,33 +66,6 @@ function ReadingProgress() {
   );
 }
 
-function Cursor() {
-  const x = useMotionValue(-100);
-  const y = useMotionValue(-100);
-  const sx = useSpring(x, { stiffness: 400, damping: 40 });
-  const sy = useSpring(y, { stiffness: 400, damping: 40 });
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
-    if (!mq.matches) return;
-    const move = (e: MouseEvent) => {
-      x.set(e.clientX);
-      y.set(e.clientY);
-      setVisible(true);
-    };
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
-  }, [x, y]);
-  return (
-    <motion.div
-      aria-hidden
-      style={{ x: sx, y: sy, opacity: visible ? 1 : 0 }}
-      className="pointer-events-none fixed left-0 top-0 z-40 -ml-3 -mt-3 h-6 w-6 rounded-full mix-blend-multiply"
-    >
-      <div className="h-full w-full rounded-full border border-ink/60" />
-    </motion.div>
-  );
-}
 
 function Container({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <div className={`mx-auto w-full max-w-6xl px-6 md:px-10 ${className}`}>{children}</div>;
