@@ -48,6 +48,7 @@ function Index() {
         <Marquee />
         <About />
         <Curious />
+        <Posture />
         <Works />
         <Colophon />
       </div>
