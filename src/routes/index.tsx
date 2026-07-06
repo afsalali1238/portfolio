@@ -165,10 +165,10 @@ function Hero() {
             variants={{ show: { transition: { staggerChildren: 0.08 } } }}
             className="mt-16 grid grid-cols-2 gap-6 border-t rule-hair pt-6 text-sm md:grid-cols-4"
           >
-            <Stat label="Projects shipped" value="11" />
-            <Stat label="For friends & family" value="04" />
-            <Stat label="Live in the world" value="07" />
-            <Stat label="Working alone" value="'25" />
+            <Stat label="Projects shipped" value="07" />
+            <Stat label="For wife, friends, me" value="06" />
+            <Stat label="Live on the internet" value="05" />
+            <Stat label="Shipped solo" value="Since '25" />
           </motion.div>
         </Container>
       </motion.div>
