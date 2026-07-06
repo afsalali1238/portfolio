@@ -42,7 +42,6 @@ function Index() {
     <div className="min-h-screen bg-paper text-ink grain">
       <div className="pointer-events-none fixed inset-0 grain-overlay opacity-40" />
       <ReadingProgress />
-      <Cursor />
       <div className="relative">
         <Nav />
         <Hero />
