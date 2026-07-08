@@ -83,7 +83,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Afsal Ali — The Curious Issue" },
       { property: "og:description", content: "A small press of experiments: AI tools, learning maps, cozy games, and quiet software." },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: "/og-image.png" },
+      { property: "og:url", content: "https://afsalali.dev" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "/og-image.png" },
     ],
     links: [
       {

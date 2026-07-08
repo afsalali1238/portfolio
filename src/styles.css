@@ -75,9 +75,42 @@
   --ring: var(--ink-mute);
 }
 
+.dark {
+  --paper: oklch(0.15 0.012 60);
+  --paper-deep: oklch(0.18 0.012 60);
+  --ink: oklch(0.97 0.008 90);
+  --ink-soft: oklch(0.8 0.01 80);
+  --ink-mute: oklch(0.6 0.01 70);
+  --rule: oklch(0.25 0.01 60);
+  --accent-ink: oklch(0.7 0.14 42);
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--paper);
+  --card-foreground: var(--ink);
+  --popover: var(--paper);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper);
+  --secondary: var(--paper-deep);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-deep);
+  --muted-foreground: var(--ink-mute);
+  --accent: var(--paper-deep);
+  --accent-foreground: var(--ink);
+  --destructive: oklch(0.5 0.2 27);
+  --destructive-foreground: var(--paper);
+  --border: var(--rule);
+  --input: var(--rule);
+  --ring: var(--ink-mute);
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
+  }
+  html {
+    scroll-behavior: smooth;
   }
   html, body {
     background-color: var(--color-paper);
@@ -99,6 +132,6 @@
   position: relative;
 }
 @utility grain-overlay {
-  background-image: radial-gradient(oklch(0.18 0.012 60 / 0.06) 1px, transparent 1px);
+  background-image: radial-gradient(color-mix(in oklch, var(--color-ink) 6%, transparent) 1px, transparent 1px);
   background-size: 3px 3px;
 }
