@@ -99,10 +99,7 @@ function ProjectRow({ p, index }: { p: Project; index: number }) {
           </motion.div>
           <div className="mt-1 text-sm text-ink-soft md:hidden">{p.blurb}</div>
         </div>
-        <div className="hidden text-sm text-ink-soft md:col-span-4 md:block">{p.blurb}</div>
-        <div className="hidden text-right text-[11px] uppercase tracking-[0.24em] text-ink-mute md:col-span-1 md:block">
-          {p.year}
-        </div>
+        <div className="hidden text-sm text-ink-soft md:col-span-5 md:block">{p.blurb}</div>
         <div className="col-span-12 flex items-center justify-end md:col-span-1">
           <motion.div animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.3 }}>
             <Plus className="h-4 w-4" />
@@ -166,10 +163,7 @@ function ProjectRow({ p, index }: { p: Project; index: number }) {
                       ))}
                     </dd>
                   </div>
-                  <div>
-                    <dt className="text-[11px] uppercase tracking-[0.24em] text-ink-mute">Year</dt>
-                    <dd className="mt-1 font-serif text-lg">{p.year}</dd>
-                  </div>
+
                 </dl>
               </div>
             </div>
