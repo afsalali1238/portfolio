@@ -89,9 +89,9 @@ export function Hero() {
             variants={{ show: { transition: { staggerChildren: 0.08 } } }}
             className="mt-16 grid grid-cols-2 gap-6 border-t rule-hair pt-6 text-sm md:grid-cols-4"
           >
-            <Stat label="Projects shipped" value="13" />
-            <Stat label="For wife, friends, me" value="12" />
-            <Stat label="Live on the internet" value="11" />
+            <Stat label="Projects shipped" value="15" />
+            <Stat label="For wife, friends, me" value="14" />
+            <Stat label="Live on the internet" value="13" />
             <Stat label="Shipped solo" value="Since '25" />
           </motion.div>
         </Container>
