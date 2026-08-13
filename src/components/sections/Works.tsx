@@ -28,6 +28,8 @@ const projects: Project[] = [
   { no: "09", name: "JobHunter OS", year: "2025", for: "Wife", tags: ["Productivity", "Career"], blurb: "A job hunting operating system — applications, stages, follow-ups, outcomes, moods.", detail: "Built one evening because a spreadsheet wasn't kind enough. Applications as cards, stages as columns, a small ritual for logging what actually happened in each conversation — including the mood, because job hunting is emotional labour.", github: "https://github.com/afsalali1238/jobhunter-os" },
   { no: "10", name: "Medical Coding Mastery", year: "2025", for: "Wife", tags: ["Healthcare", "AAPC CPC", "DHA"], blurb: "Self-paced 10-week AAPC CPC prep aligned with Dubai DHA and eClaimLink — weekly plans, drills, curated resources.", detail: "A calm ten-week path through the CPC syllabus with DHA and eClaimLink-specific detours. Weekly assignments, checkpoints, curated videos and articles, and clinical scenario drills. Just enough encouragement to make the coding chapters bearable.", live: "https://code-calm-path.lovable.app" },
   { no: "11", name: "Terrarium", year: "2025", for: "Fun", tags: ["Browser game", "Cozy", "Generative"], blurb: "A cozy tiny-planet god-game — warm a small world, answer its prayers, watch the myths people write about you.", detail: "A small warm world in a browser tab. You nudge the weather, answer tiny prayers, and slowly a mythology forms around your choices. Animated SVG doodles, no lose state — only weather.", live: "https://tiny-world-keeper.vercel.app", github: "https://github.com/afsalali1238/terrarium" },
+  { no: "12", name: "GTM-OS", year: "2025", for: "Founders", tags: ["Open-source", "GTM", "AI Skills", "CLI"], blurb: "Open-source go-to-market operating system — 16 pillars, 87 sections, 16 AI skills, CLI scaffolding + progress tracking.", detail: "You can build the product but the GTM is a fog. GTM-OS is the opinionated system that takes you from 'who do we even sell to' to a repeatable revenue motion. Sixteen pillars from Foundation to Scale, eighty-seven sections with key questions and concrete deliverables, sixteen Claude Code AI skills, fillable templates, and CLI scaffolding that tracks your progress. Works for B2B SaaS and D2C alike. Sourced benchmarks, real case studies, no fluff.", github: "https://github.com/afsalali1238/gtm-os" },
+  { no: "13", name: "Parallel Perspective", year: "2025", for: "Me", tags: ["Philosophy", "Fashion", "Editorial"], blurb: "A philosophy that happens to use garments as the medium — written for the person wearing it, not the person selling it.", detail: "Parallel Perspective is not a clothing brand — it's a lens. A quiet editorial exploring how garments carry meaning, identity, and intention. 'You are the pattern the inputs made.' Built as a manifesto-first experience with minimal design, Space Grotesk typography, and a circle of ideas rather than a catalogue of products.", live: "https://parallelperspective.vercel.app" },
 ];
 
 export function Works() {
@@ -41,7 +43,7 @@ export function Works() {
               <h2 className="mt-2 font-serif text-5xl md:text-6xl">Selected pieces.</h2>
             </div>
             <div className="hidden text-right text-[11px] uppercase tracking-[0.24em] text-ink-mute md:block">
-              Eleven entries<br />Click a row to read
+              Thirteen entries<br />Click a row to read
             </div>
           </div>
         </SectionReveal>
