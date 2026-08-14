@@ -1,6 +1,7 @@
 import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { Container } from "../layout/Container";
+import { projectCount, liveCount, forPeopleCount, sourceCount } from "../../data/projects";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -89,10 +90,10 @@ export function Hero() {
             variants={{ show: { transition: { staggerChildren: 0.08 } } }}
             className="mt-16 grid grid-cols-2 gap-6 border-t rule-hair pt-6 text-sm md:grid-cols-4"
           >
-            <Stat label="Projects shipped" value="15" />
-            <Stat label="For wife, friends, me" value="14" />
-            <Stat label="Live on the internet" value="13" />
-            <Stat label="Shipped solo" value="Since '25" />
+            <Stat label="Projects shipped" value={String(projectCount)} />
+            <Stat label="Live on the internet" value={String(liveCount)} />
+            <Stat label="Open source" value={String(sourceCount)} />
+            <Stat label="For wife, friends, me" value={String(forPeopleCount)} />
           </motion.div>
         </Container>
       </motion.div>

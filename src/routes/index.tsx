@@ -1,5 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useScroll, useSpring, motion, AnimatePresence, useMotionValueEvent } from "motion/react";
+import {
+  useScroll,
+  useSpring,
+  motion,
+  AnimatePresence,
+  useMotionValueEvent,
+  MotionConfig,
+} from "motion/react";
 import { useState } from "react";
 import { ArrowUp } from "lucide-react";
 import { Nav } from "../components/sections/Nav";
@@ -17,26 +24,34 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="min-h-screen bg-paper text-ink grain"
-    >
-      <div className="pointer-events-none fixed inset-0 grain-overlay opacity-40" />
-      <ReadingProgress />
-      <div className="relative">
-        <Nav />
-        <Hero />
-        <Marquee />
-        <About />
-        <Curious />
-        <Posture />
-        <Works />
-        <Colophon />
-      </div>
-      <BackToTop />
-    </motion.div>
+    // reducedMotion="user" makes every Motion animation below defer to the OS setting.
+    <MotionConfig reducedMotion="user">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        className="min-h-screen bg-paper text-ink grain"
+      >
+        <a href="#works" className="skip-link">
+          Skip to works
+        </a>
+        <div className="pointer-events-none fixed inset-0 grain-overlay opacity-40" />
+        <ReadingProgress />
+        <div className="relative">
+          <Nav />
+          <main id="main">
+            <Hero />
+            <Marquee />
+            <About />
+            <Curious />
+            <Posture />
+            <Works />
+            <Colophon />
+          </main>
+        </div>
+        <BackToTop />
+      </motion.div>
+    </MotionConfig>
   );
 }
 

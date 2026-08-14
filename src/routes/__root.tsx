@@ -12,6 +12,13 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
+/**
+ * Single source of truth for the canonical origin. Social scrapers (LinkedIn, WhatsApp,
+ * Slack) will not resolve relative og:image paths, so every URL below is absolute.
+ * Change this one line if the site moves to a custom domain.
+ */
+const SITE_URL = "https://portfolioafz.vercel.app";
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -80,19 +87,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Afsal Ali — Curious builder, indie shipper" },
       { name: "description", content: "The Curious Issue — a small press of experiments by Afsal Ali. AI tools, learning maps, cozy games, and quiet software." },
       { name: "author", content: "Afsal Ali" },
+      { property: "og:site_name", content: "Afsal Ali — The Curious Issue" },
       { property: "og:title", content: "Afsal Ali — The Curious Issue" },
       { property: "og:description", content: "A small press of experiments: AI tools, learning maps, cozy games, and quiet software." },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "/og-image.png" },
-      { property: "og:url", content: "https://afsalali.dev" },
+      { property: "og:image", content: `${SITE_URL}/og-image.png` },
+      { property: "og:image:alt", content: "The Curious Issue — portfolio of Afsal Ali" },
+      { property: "og:url", content: SITE_URL },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "/og-image.png" },
+      { name: "twitter:title", content: "Afsal Ali — The Curious Issue" },
+      { name: "twitter:description", content: "A small press of experiments: AI tools, learning maps, cozy games, and quiet software." },
+      { name: "twitter:image", content: `${SITE_URL}/og-image.png` },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "canonical", href: SITE_URL },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
       { rel: "apple-touch-icon", href: "/favicon.png" },
@@ -104,11 +116,39 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+/**
+ * Runs before first paint so dark-mode visitors never see a white flash.
+ * Must stay inline and blocking — a useEffect runs too late.
+ */
+const THEME_SCRIPT = `(function(){try{var s=localStorage.getItem("theme");var d=s==="dark"||(!s&&window.matchMedia("(prefers-color-scheme: dark)").matches);if(d)document.documentElement.classList.add("dark");}catch(e){}})();`;
+
+const PERSON_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Afsal Ali",
+  url: SITE_URL,
+  image: `${SITE_URL}/og-image.png`,
+  jobTitle: "Indie builder",
+  description:
+    "Curious builder and indie shipper. AI tools, learning maps, cozy games, and quiet software.",
+  email: "mailto:afsalali1238@gmail.com",
+  sameAs: [
+    "https://github.com/afsalali1238",
+    "https://www.linkedin.com/in/afsalali1238/",
+    "https://medium.com/@afsalali1238",
+  ],
+};
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <HeadContent />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(PERSON_SCHEMA) }}
+        />
       </head>
       <body>
         {children}

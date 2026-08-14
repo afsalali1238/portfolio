@@ -1,5 +1,6 @@
 import { Container } from "../layout/Container";
 import { SectionReveal } from "../animations/SectionReveal";
+import { projectCount, numberWord } from "../../data/projects";
 
 export function About() {
   return (
@@ -17,7 +18,7 @@ export function About() {
             Incubator.
           </p>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-soft">
-            Eleven small things for people I know. Nothing here is a product deck. Each piece exists
+            {numberWord(projectCount)} small things for people I know. Nothing here is a product deck. Each piece exists
             because a real person — usually someone I love — was stuck on something a spreadsheet
             couldn't fix. The through-line is the pull, not the stack.
           </p>

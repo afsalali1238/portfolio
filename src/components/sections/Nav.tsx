@@ -5,7 +5,7 @@ import { Container } from "../layout/Container";
 
 const NAV_LINKS = [
   ["About", "#about"],
-  ["Posture", "#posture"],
+  ["Confession", "#posture"],
   ["Works", "#works"],
   ["Contact", "#colophon"],
 ] as const;
@@ -15,19 +15,10 @@ export function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
 
-  // Dark mode: read from localStorage on mount, respect system preference as fallback
+  // The blocking script in __root.tsx already applied the class before paint.
+  // All we do here is sync React state to whatever it decided.
   useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    if (stored === "dark") {
-      document.documentElement.classList.add("dark");
-      setIsDark(true);
-    } else if (stored === "light") {
-      document.documentElement.classList.remove("dark");
-      setIsDark(false);
-    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      document.documentElement.classList.add("dark");
-      setIsDark(true);
-    }
+    setIsDark(document.documentElement.classList.contains("dark"));
   }, []);
 
   const toggleTheme = () => {
@@ -70,6 +61,24 @@ export function Nav() {
     setMobileOpen(false);
   };
 
+  // While the mobile panel is open: Escape closes it and the page behind stops scrolling.
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [mobileOpen]);
+
   return (
     <>
       <motion.header
@@ -105,7 +114,7 @@ export function Nav() {
             <button
               onClick={toggleTheme}
               className="group relative flex items-center justify-center h-6 w-6 rounded-full hover:bg-paper-deep transition-colors"
-              aria-label="Toggle theme"
+              aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
             >
               {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
@@ -116,14 +125,16 @@ export function Nav() {
             <button
               onClick={toggleTheme}
               className="flex items-center justify-center h-8 w-8 rounded-full hover:bg-paper-deep transition-colors"
-              aria-label="Toggle theme"
+              aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
             >
               {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
             <button
               onClick={() => setMobileOpen((v) => !v)}
               className="flex items-center justify-center h-8 w-8 rounded-full hover:bg-paper-deep transition-colors"
-              aria-label="Toggle menu"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-nav"
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -146,6 +157,8 @@ export function Nav() {
             />
             {/* Panel */}
             <motion.nav
+              id="mobile-nav"
+              aria-label="Site"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}

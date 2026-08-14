@@ -1,38 +1,10 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowUpRight, Github, Plus } from "lucide-react";
 import { Container } from "../layout/Container";
 import { SectionReveal } from "../animations/SectionReveal";
+import { projects, projectCount, numberWord, type Project } from "../../data/projects";
 
-export type Project = {
-  no: string;
-  name: string;
-  year: string;
-  tags: string[];
-  blurb: string;
-  detail: string;
-  live?: string;
-  github?: string;
-  for: string;
-};
-
-const projects: Project[] = [
-  { no: "01", name: "Incubator", year: "2025", for: "Me", tags: ["AI Agents", "Claude Code", "CLI"], blurb: "Claude Code skill that becomes a domain-expert CEO — interviews you, researches the market, then hires a sequenced team of specialist agents.", detail: "Idea in, company out. A Claude Code plugin that role-plays a founding team: it interviews you about the hunch, spends a few hours researching the market on its own, ships a findings report, then spawns a sequenced team of specialist agents to build the first version. The interesting part is the org chart — how instruction, dissent, and review flow between agents without collapsing into noise.", github: "https://github.com/afsalali1238/Incubator" },
-  { no: "02", name: "NoVibe", year: "2025", for: "Learning", tags: ["EdTech", "AI literacy", "Non-linear"], blurb: "A non-linear AI literacy map — 30 nodes across 6 clusters, learn in any order. No streaks, no XP, no locks.", detail: "Most curricula insist on a straight line. NoVibe is a map: pick a node that itches, follow the threads that pull you. Thirty concepts across six clusters — from 'what is an LLM' to 'agent orchestration'. Built for people who learn by wandering, not by grinding.", live: "https://novibe.lovable.app", github: "https://github.com/afsalali1238/novibe" },
-  { no: "03", name: "NxtDoorChef", year: "2025", for: "Dubai", tags: ["Marketplace", "Food", "Community"], blurb: "Find home chefs near you — authentic homemade food from real kitchens across Dubai.", detail: "The best meal in town is next door. NxtDoorChef connects neighbours with home cooks making exactly what they feed their own families. Browse the map, tap 'Say hello' to connect on WhatsApp, walk over with a tiffin, and taste the cultures cooking right next door. From Karama to Dubai Marina.", live: "https://nxtdoorchef.vercel.app" },
-  { no: "04", name: "CraftersUnited", year: "2025", for: "Makers", tags: ["Marketplace", "Handcraft", "India"], blurb: "Zero-fee marketplace for handcrafted goods — direct WhatsApp connection between makers and buyers.", detail: "No algorithms. No middlemen. No fees. CraftersUnited connects handmade stories with people who value them. Makers list their work in minutes, buyers browse a curated feed of local talent, and every transaction happens directly — no platform commission. Built because craft deserves to keep every rupee.", live: "https://cr8un8.vercel.app" },
-  { no: "05", name: "Kasper", year: "2025", for: "Industry", tags: ["Logistics", "B2B", "UAE"], blurb: "Digital iron — UAE construction & port logistics. Search, book, and track a 150+ truck network instantly.", detail: "Kasper digitises the messy world of UAE construction and port logistics. Equipment rental marketplace with real-time availability, instant freight booking with 2-hour confirmation, published rate cards with no negotiation, GPS tracking with WhatsApp alerts, and digital ePOD. Fixed-rate capacity contracts for enterprise clients. Built for the Khor Fakkan–Jebel Ali corridor.", live: "https://kaslo-liard.vercel.app" },
-  { no: "06", name: "Provia", year: "2025", for: "Wife", tags: ["Healthcare", "Gamified", "PWA"], blurb: "Gamified 45-day exam prep for Gulf pharmacy licensing — DHA, MOH, DOH mastery in structured sprints.", detail: "Provia turns the daunting Gulf pharmacy licensing exam into a 45-day game. Progressive difficulty, structured daily sprints, spaced repetition, and enough encouragement to keep going when the pharmacology chapters get heavy. Built as a PWA so it works offline — because studying happens on the bus.", live: "https://proviaap.vercel.app" },
-  { no: "07", name: "PharmaRab", year: "2025", for: "Wife", tags: ["Healthcare", "Bilingual", "Gamified"], blurb: "Gamified Medical Arabic for pharmacists — clinical phrases, vocab bank, XP, progression. Built for my wife.", detail: "My wife is a pharmacist. Medical Arabic at the counter is hard. So I built PharmaRab — a gamified conversational course with a syllabus, a clinical phrase dictionary, a vocabulary bank, and XP for showing up. Arabic and English side by side, Tajawal and Inter, no gate-keeping.", live: "https://pharmarab.vercel.app", github: "https://github.com/afsalali1238/med-arabic-hub" },
-  { no: "08", name: "PhysioArab", year: "2025", for: "Friends", tags: ["Healthcare", "Bilingual", "Physio"], blurb: "8-week Medical Arabic course for physiotherapists — assessment terms, movement commands, discharge dialogue.", detail: "Same engine as PharmaRab, retuned for the physio clinic. Eight weeks of greetings, assessment vocabulary, ROM and movement commands, and honest discharge dialogue. Built with therapist friends who wanted their patients to feel heard in their own language.", live: "https://physioarab.vercel.app", github: "https://github.com/afsalali1238/learn-med-arab" },
-  { no: "09", name: "JobHunter OS", year: "2025", for: "Wife", tags: ["Productivity", "Career"], blurb: "A job hunting operating system — applications, stages, follow-ups, outcomes, moods.", detail: "Built one evening because a spreadsheet wasn't kind enough. Applications as cards, stages as columns, a small ritual for logging what actually happened in each conversation — including the mood, because job hunting is emotional labour.", github: "https://github.com/afsalali1238/jobhunter-os" },
-  { no: "10", name: "Medical Coding Mastery", year: "2025", for: "Wife", tags: ["Healthcare", "AAPC CPC", "DHA"], blurb: "Self-paced 10-week AAPC CPC prep aligned with Dubai DHA and eClaimLink — weekly plans, drills, curated resources.", detail: "A calm ten-week path through the CPC syllabus with DHA and eClaimLink-specific detours. Weekly assignments, checkpoints, curated videos and articles, and clinical scenario drills. Just enough encouragement to make the coding chapters bearable.", live: "https://code-calm-path.lovable.app" },
-  { no: "11", name: "Terrarium", year: "2025", for: "Fun", tags: ["Browser game", "Cozy", "Generative"], blurb: "A cozy tiny-planet god-game — warm a small world, answer its prayers, watch the myths people write about you.", detail: "A small warm world in a browser tab. You nudge the weather, answer tiny prayers, and slowly a mythology forms around your choices. Animated SVG doodles, no lose state — only weather.", live: "https://tiny-world-keeper.vercel.app", github: "https://github.com/afsalali1238/terrarium" },
-  { no: "12", name: "GTM-OS", year: "2026", for: "Founders", tags: ["Open-source", "GTM", "AI Skills", "CLI"], blurb: "Open-source go-to-market operating system — 16 pillars, 87 sections, 16 AI skills, CLI scaffolding + progress tracking.", detail: "You can build the product but the GTM is a fog. GTM-OS is the opinionated system that takes you from 'who do we even sell to' to a repeatable revenue motion. Sixteen pillars from Foundation to Scale, eighty-seven sections with key questions and concrete deliverables, sixteen Claude Code AI skills, fillable templates, and CLI scaffolding that tracks your progress. Works for B2B SaaS and D2C alike. Sourced benchmarks, real case studies, no fluff.", github: "https://github.com/afsalali1238/gtm-os" },
-  { no: "13", name: "Parallel Perspective", year: "2026", for: "Me", tags: ["Philosophy", "Fashion", "Editorial"], blurb: "A philosophy that happens to use garments as the medium — written for the person wearing it, not the person selling it.", detail: "Parallel Perspective is not a clothing brand — it's a lens. A quiet editorial exploring how garments carry meaning, identity, and intention. 'You are the pattern the inputs made.' Built as a manifesto-first experience with minimal design, Space Grotesk typography, and a circle of ideas rather than a catalogue of products.", live: "https://parallelperspective.vercel.app" },
-  { no: "14", name: "Nadan Chayakada", year: "2026", for: "Kerala", tags: ["Radio", "Nostalgia", "Malayalam", "Cozy"], blurb: "Kerala monsoon radio — nostalgic Malayalam melodies, old radio classics, and rainy-day tea shop vibes in a cinematic experience.", detail: "A digital chayakada for the diaspora. Tune into nostalgic Malayalam melodies, old All India Radio classics, and the ambient hum of a rainy-day tea shop — all wrapped in a warm, cinematic radio interface. No algorithms, no playlists, just monsoon vibes and the kind of music that makes you miss home. Built because some feelings don't have a Spotify playlist.", live: "https://chayakadai.vercel.app", github: "https://github.com/afsalali1238/Chayakada" },
-  { no: "15", name: "Unknown", year: "2026", for: "Learning", tags: ["EdTech", "Ideas", "Spaced Repetition", "Audio"], blurb: "A latticework of powerful ideas — audio-narrated, cross-linked map with spaced repetition. Learn in layers.", detail: "An idea feed tuned to what you care about. Unknown maps the world's most powerful ideas into a cross-linked latticework — browse the feed, skim summaries, explore connections, and retain with spaced repetition quizzes. Audio narration for every concept. Feed, Skim, Explore, You — four modes for four moods. Built for people who collect mental models the way others collect bookmarks.", live: "https://unknowng.vercel.app", github: "https://github.com/afsalali1238/unknown" },
-];
 
 export function Works() {
   return (
@@ -45,7 +17,7 @@ export function Works() {
               <h2 className="mt-2 font-serif text-5xl md:text-6xl">Selected pieces.</h2>
             </div>
             <div className="hidden text-right text-[11px] uppercase tracking-[0.24em] text-ink-mute md:block">
-              Fifteen entries<br />Click a row to read
+              {numberWord(projectCount)} entries<br />Click a row to read
             </div>
           </div>
         </SectionReveal>
@@ -62,6 +34,7 @@ export function Works() {
 function ProjectRow({ p, index }: { p: Project; index: number }) {
   const [open, setOpen] = useState(false);
   const [hover, setHover] = useState(false);
+  const panelId = `${useId()}-panel`;
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -86,9 +59,11 @@ function ProjectRow({ p, index }: { p: Project; index: number }) {
       </AnimatePresence>
       <button
         onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-controls={panelId}
         className="relative grid w-full grid-cols-12 items-baseline gap-4 py-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-mute focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
       >
-        <div className={`col-span-2 font-serif text-xl md:col-span-1 ${index < 2 ? "text-accent-ink" : "text-ink-mute"}`}>{p.no}</div>
+        <div className="col-span-2 font-serif text-xl md:col-span-1 text-ink-mute">{p.no}</div>
         <div className="col-span-10 md:col-span-5">
           <motion.div
             animate={{ x: hover ? 8 : 0 }}
@@ -97,9 +72,9 @@ function ProjectRow({ p, index }: { p: Project; index: number }) {
           >
             {p.name}
           </motion.div>
-          <div className="mt-1 text-sm text-ink-soft md:hidden">{p.blurb}</div>
         </div>
-        <div className="hidden text-sm text-ink-soft md:col-span-5 md:block">{p.blurb}</div>
+        {/* One copy only: sits under the name on mobile, in its own column on desktop. */}
+        <div className="col-span-12 -mt-2 text-sm text-ink-soft md:col-span-5 md:mt-0">{p.blurb}</div>
         <div className="col-span-12 flex items-center justify-end md:col-span-1">
           <motion.div animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.3 }}>
             <Plus className="h-4 w-4" />
@@ -114,6 +89,7 @@ function ProjectRow({ p, index }: { p: Project; index: number }) {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="relative overflow-hidden"
+            id={panelId}
           >
             <div className="grid grid-cols-12 gap-4 pb-8 pl-0 md:pl-[8.333%]">
               <div className="col-span-12 md:col-span-8">
@@ -149,6 +125,10 @@ function ProjectRow({ p, index }: { p: Project; index: number }) {
                   <div>
                     <dt className="text-[11px] uppercase tracking-[0.24em] text-ink-mute">Built for</dt>
                     <dd className="mt-1 font-serif text-lg">{p.for}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] uppercase tracking-[0.24em] text-ink-mute">Year</dt>
+                    <dd className="mt-1 font-serif text-lg">{p.year}</dd>
                   </div>
                   <div>
                     <dt className="text-[11px] uppercase tracking-[0.24em] text-ink-mute">Tags</dt>
