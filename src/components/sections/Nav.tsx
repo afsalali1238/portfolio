@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { Container } from "../layout/Container";
 
 const NAV_LINKS = [
-  ["About", "#about"],
+  ["Origin", "#about"],
+  ["Thesis", "#thesis"],
   ["Confession", "#posture"],
   ["Works", "#works"],
   ["Contact", "#colophon"],
@@ -53,7 +54,7 @@ export function Nav() {
 
   // Active section tracking via Intersection Observer
   useEffect(() => {
-    const sectionIds = ["about", "posture", "works", "colophon"];
+    const sectionIds = ["about", "thesis", "posture", "works", "colophon"];
     const observers: IntersectionObserver[] = [];
 
     sectionIds.forEach((id) => {

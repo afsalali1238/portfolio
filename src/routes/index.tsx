@@ -13,7 +13,7 @@ import { Nav } from "../components/sections/Nav";
 import { Hero } from "../components/sections/Hero";
 import { Marquee } from "../components/sections/Marquee";
 import { About } from "../components/sections/About";
-import { Curious } from "../components/sections/Curious";
+import { Thesis } from "../components/sections/Thesis";
 import { Posture } from "../components/sections/Posture";
 import { Works } from "../components/sections/Works";
 import { Colophon } from "../components/sections/Colophon";
@@ -43,7 +43,7 @@ function Index() {
             <Hero />
             <Marquee />
             <About />
-            <Curious />
+            <Thesis />
             <Posture />
             <Works />
             <Colophon />

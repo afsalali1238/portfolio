@@ -75,10 +75,10 @@ export function Hero() {
               className="flex flex-col justify-end md:col-span-3"
             >
               <p className="font-serif text-2xl leading-tight">
-                A small press of experiments by <span className="italic">Afsal Ali</span>.
+                Building for the tech. <span className="italic">forthe.tech</span>
               </p>
               <p className="mt-4 text-sm text-ink-soft">
-                AI tools, learning maps, cozy games, and quiet software — built for friends, family, and the odd stranger.
+                A public ledger of software built by Afsal Ali — documenting what happens when the wall between having an idea and building it disappears.
               </p>
             </motion.div>
           </div>

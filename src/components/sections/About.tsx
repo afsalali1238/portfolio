@@ -7,53 +7,56 @@ export function About() {
     <section id="about" className="border-b rule-hair">
       <Container className="grid grid-cols-1 gap-10 py-16 md:grid-cols-12 md:py-24">
         <SectionReveal className="md:col-span-3">
-          <div className="text-[11px] uppercase tracking-[0.28em] text-ink-mute">§ 01 · Manifesto</div>
-          <div className="mt-3 font-serif text-2xl italic text-ink-soft">The Energy Ledger</div>
+          <div className="text-[11px] uppercase tracking-[0.28em] text-ink-mute">§ 01 · Origin</div>
+          <div className="mt-3 font-serif text-2xl italic text-ink-soft">What is forthe.tech?</div>
           <p className="mt-4 text-xs text-ink-mute leading-relaxed">
-            On publishing, tokens as currency, and why every prompt is a debt to the grid.
+            The collapsing wall between imagining software and making it exist, documented in public.
           </p>
         </SectionReveal>
         <SectionReveal className="md:col-span-9 space-y-8">
           <p className="font-serif text-3xl leading-snug md:text-4xl text-ink">
-            The wall between imagining a tool and making it exist just collapsed.
-            Since then, I’ve been documenting the fallout. Literally:{" "}
+            The wall between having an idea and building it just came down.
+            Since then, I’ve been building for the tech. Literally:{" "}
             <span className="italic">forthe.tech</span>.
           </p>
 
           <div className="max-w-2xl space-y-5 text-base leading-relaxed text-ink-soft">
             <p>
-              For decades, the limiting factor was syntax. People had clear, painful visions for things that ought to exist, and were stopped dead by the compiler. That barrier is gone. It feels miraculous, and we have the strange privilege of standing inside the shift.
+              For years, people with ideas hit the exact same wall: they could see the product with complete clarity, but they couldn’t write the syntax to build it. They were stopped cold at the terminal.
             </p>
 
             <p>
-              It also arrives with an unspoken debt.
+              Now they can build. It feels like magic, and we are fortunate to live through the collapse of that barrier.
             </p>
 
             <p>
-              <strong className="font-medium text-ink">AI tokens are the new currency, and every token is an IOU on energy.</strong> A frontier model returning a breezy greeting burns the watt-hours that could have kept a reading lamp lit in your room for minutes. Silicon doesn’t run on magic; it runs on transformers, cooling towers, and diverted river water. We are transacting directly in joules.
+              It is also impossible to keep up with. Something &ldquo;revolutionary&rdquo; launches every morning; by dinner, it’s already irrelevant. An entire micro-industry gets wiped out by a Tuesday model checkpoint. Products built over five years become a forgotten checkbox in someone else’s release notes. Then comes the corporate cycle: panic layoffs, followed by quiet rehiring once the hallucinated code and astronomical AI bills arrive.
             </p>
 
             <p>
-              Which makes the current spectacle absurd. You cannot preach ESG and energy conservation in a quarterly slide deck while aimlessly firing millions of throwaway inference tokens to generate corporate noise. That is hypocrisy disguised as innovation.
+              Watching from the sidelines isn’t enough. But being online twenty-four hours a day isn’t an answer either.
             </p>
 
             <p>
-              If every generation is a withdrawal from the grid, then aimless generation is pollution. The only moral defense of using this much power is <strong className="font-medium text-ink">intention</strong>: building things that genuinely lighten the weight of someone’s day.
+              <strong className="font-medium text-ink">So I filter.</strong> Around a full-time job and family in Dubai, I follow what’s shipping. Then I talk it through with people who see further. Between them, I can sort what’s real from the noise.
             </p>
 
             <p>
-              So around a full-time job and family in Dubai, I don’t just read release notes — I document real artifacts. I spent energy building Provia and PharmaRab because my wife was drowning in licensing exams. I spent it on PhysioArab and kinē because therapist friends needed clinical tools that didn’t exist. I spent it on Doomscholar to map ideas that matter.
+              And I don’t just read about new tools — I test them. When one launches, I build something with it that solves genuine friction in real life. That’s how I learn.
+            </p>
+
+            <p>
+              I’ve been building things with different tools for a while, so I started documenting them in one place. Not as an agency portfolio or a curated vanity deck, but as an <strong className="font-medium text-ink">open publishing ledger</strong>.
             </p>
 
             <div className="border-l-2 border-ink pl-4 py-1 my-6">
               <p className="font-serif text-xl italic text-ink">
-                Tech is never the moat. What it alters in someone’s real, physical day is.
-                Nobody remembers how complex your pipeline was; they only remember whether it helped.
+                For the tech. For better or worse.
               </p>
             </div>
 
             <p className="text-xs uppercase tracking-[0.24em] text-ink-mute pt-2">
-              {numberWord(projectCount)} documented builds · forthe.tech · Dubai
+              {numberWord(projectCount)} documented builds · forthe.tech · Dubai, UAE
             </p>
           </div>
         </SectionReveal>
