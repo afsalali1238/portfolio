@@ -17,7 +17,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
  * Slack) will not resolve relative og:image paths, so every URL below is absolute.
  * Change this one line if the site moves to a custom domain.
  */
-const SITE_URL = "https://portfolioafz.vercel.app";
+const SITE_URL = "https://forthe.tech";
 
 function NotFoundComponent() {
   return (

@@ -119,7 +119,7 @@ export function Nav() {
                 Afsal Ali
               </span>
               <span className="hidden text-xs uppercase tracking-[0.2em] text-ink-mute sm:inline">
-                The Curious Issue
+                forthe.tech
               </span>
             </div>
           </a>
