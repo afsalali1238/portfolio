@@ -35,8 +35,8 @@ export function Hero() {
                 Building <span className="italic">forthe.tech</span>
               </p>
               <p className="text-sm leading-relaxed text-ink-soft">
-                Ideas used to die at the syntax wall. Now they ship. A public dispatch of 16 live
-                tools, clinical systems, and quiet software built for real people.
+                Documenting what happens when the wall between having an idea and building it
+                disappears.
               </p>
 
               <div className="pt-2 flex flex-wrap items-center gap-3 text-sm">
