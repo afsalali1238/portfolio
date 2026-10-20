@@ -48,18 +48,7 @@ export function Hero() {
     <section ref={ref} className="py-16 md:py-24">
       <motion.div style={{ y, opacity }}>
         <Container>
-          <motion.div
-            initial="hidden"
-            animate="show"
-            variants={{ show: { transition: { staggerChildren: 0.06 } } }}
-            className="flex items-center justify-between text-sm font-medium text-ink-mute"
-          >
-            <motion.span variants={rise}>Dubai, UAE</motion.span>
-            <motion.span variants={rise}>Public Ledger</motion.span>
-            <motion.span variants={rise} className="hidden sm:inline">Afsal Ali</motion.span>
-          </motion.div>
-
-          <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-12">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
             <div className="md:col-span-8">
               <h1 className="font-serif text-[13vw] leading-[0.88] tracking-tight md:text-[6.5rem] lg:text-[8rem]">
                 <RevealWord delay={0.1}>For the</RevealWord>

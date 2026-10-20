@@ -111,16 +111,13 @@ export function Nav() {
           <a
             href="#"
             className="group flex items-center gap-3 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-mute"
-            aria-label="Afsal Ali - The Curious Issue"
+            aria-label="forthe.tech"
           >
             <div className="flex h-7 w-7 items-center justify-center rounded-md bg-ink text-paper shadow-xs transition-transform duration-300 group-hover:scale-105 group-hover:rotate-6">
               <LogoMark className="h-4 w-4" />
             </div>
-            <div className="flex items-baseline gap-2.5">
+            <div className="flex items-baseline gap-2">
               <span className="font-serif text-2xl leading-none transition-colors group-hover:text-ink-soft">
-                Afsal Ali
-              </span>
-              <span className="hidden text-sm text-ink-mute sm:inline">
                 forthe.tech
               </span>
             </div>
@@ -210,7 +207,7 @@ export function Nav() {
                 <div className="flex h-7 w-7 items-center justify-center rounded-md bg-ink text-paper shadow-xs">
                   <LogoMark className="h-4 w-4" />
                 </div>
-                <span className="font-serif text-2xl leading-none">Afsal Ali</span>
+                <span className="font-serif text-2xl leading-none">forthe.tech</span>
               </div>
               {NAV_LINKS.map(([label, href]) => (
                 <a
