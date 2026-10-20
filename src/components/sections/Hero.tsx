@@ -29,12 +29,9 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-col justify-end md:col-span-4 space-y-4"
+              className="flex flex-col justify-end md:col-span-4 space-y-5"
             >
-              <p className="font-serif text-2xl leading-tight">
-                Building <span className="italic">forthe.tech</span>
-              </p>
-              <p className="text-sm leading-relaxed text-ink-soft">
+              <p className="text-base leading-relaxed text-ink-soft">
                 Documenting what happens when the wall between having an idea and building it
                 disappears.
               </p>
