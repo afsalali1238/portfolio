@@ -62,8 +62,12 @@ export function Colophon() {
               Email <ArrowUpRight className="h-4 w-4" />
             </motion.a>
           </div>
-          <div className="mt-16 flex flex-wrap items-end justify-between gap-4 border-t rule-hair pt-6 text-xs text-ink-mute"> {/* taste-skill-ignore */}
-            <div>Set in Instrument Serif & Inter. Published to pixels, {new Date().getFullYear()}.</div>
+          <div className="mt-16 flex flex-wrap items-end justify-between gap-4 border-t rule-hair pt-6 text-xs text-ink-mute">
+            {" "}
+            {/* taste-skill-ignore */}
+            <div>
+              Set in Instrument Serif & Inter. Published to pixels, {new Date().getFullYear()}.
+            </div>
             <div>© Afsal Ali · forthe.tech</div>
           </div>
         </SectionReveal>

@@ -1,42 +1,10 @@
 import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
+import { ArrowDown, ArrowRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Container } from "../layout/Container";
 import { projectCount, liveCount, forPeopleCount, sourceCount } from "../../data/projects";
-
-const EASE = [0.22, 1, 0.36, 1] as const;
-
-export const rise = {
-  hidden: { y: 30, opacity: 0 },
-  show: (i = 0) => ({
-    y: 0,
-    opacity: 1,
-    transition: { duration: 0.8, delay: i * 0.08, ease: EASE },
-  }),
-} as const;
-
-export function RevealWord({ children, delay = 0, italic = false }: { children: React.ReactNode; delay?: number; italic?: boolean }) {
-  return (
-    <span className="inline-block overflow-hidden align-top">
-      <motion.span
-        initial={{ y: "110%" }}
-        animate={{ y: "0%" }}
-        transition={{ duration: 1, delay, ease: [0.22, 1, 0.36, 1] }}
-        className={`inline-block ${italic ? "italic" : ""}`}
-      >
-        {children}
-      </motion.span>
-    </span>
-  );
-}
-
-export function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <motion.div variants={rise}>
-      <div className="font-serif text-3xl leading-none">{value}</div>
-      <div className="mt-2 text-xs text-ink-mute">{label}</div>
-    </motion.div>
-  );
-}
+import { RevealWord, StatButton } from "./hero-helpers";
 
 export function Hero() {
   const ref = useRef<HTMLDivElement>(null);
@@ -48,7 +16,7 @@ export function Hero() {
     <section ref={ref} className="py-16 md:py-24">
       <motion.div style={{ y, opacity }}>
         <Container>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
             <div className="md:col-span-8">
               <h1 className="font-serif text-[13vw] leading-[0.88] tracking-tight md:text-[6.5rem] lg:text-[8rem]">
                 <RevealWord delay={0.1}>For the</RevealWord>
@@ -56,18 +24,35 @@ export function Hero() {
                 <RevealWord delay={0.25}>tech.</RevealWord>
               </h1>
             </div>
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-col justify-end md:col-span-4"
+              transition={{ duration: 0.8, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-col justify-end md:col-span-4 space-y-4"
             >
               <p className="font-serif text-2xl leading-tight">
                 Building <span className="italic">forthe.tech</span>
               </p>
-              <p className="mt-4 text-sm leading-relaxed text-ink-soft">
-                Documenting what happens when the wall between having an idea and building it disappears.
+              <p className="text-sm leading-relaxed text-ink-soft">
+                Ideas used to die at the syntax wall. Now they ship. A public dispatch of 16 live
+                tools, clinical systems, and quiet software built for real people.
               </p>
+
+              <div className="pt-2 flex flex-wrap items-center gap-3 text-sm">
+                <a
+                  href="#works"
+                  className="inline-flex items-center gap-2 rounded-md bg-ink px-4 py-2 text-paper transition-colors hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                >
+                  Explore Builds <ArrowDown className="h-4 w-4" />
+                </a>
+                <Link
+                  to="/thesis"
+                  className="inline-flex items-center gap-2 rounded-md border rule-hair bg-paper px-4 py-2 text-ink transition-colors hover:bg-paper-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                >
+                  The Thesis <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
             </motion.div>
           </div>
 
@@ -78,10 +63,14 @@ export function Hero() {
             variants={{ show: { transition: { staggerChildren: 0.08 } } }}
             className="mt-16 grid grid-cols-2 gap-6 rounded-lg bg-paper-deep/50 p-6 md:p-8 text-sm md:grid-cols-4"
           >
-            <Stat label="Projects shipped" value={String(projectCount)} />
-            <Stat label="Live on the internet" value={String(liveCount)} />
-            <Stat label="Open source" value={String(sourceCount)} />
-            <Stat label="For wife, friends, me" value={String(forPeopleCount)} />
+            <StatButton label="Total shipped" value={String(projectCount)} filterKey="all" />
+            <StatButton label="Live on the internet" value={String(liveCount)} filterKey="live" />
+            <StatButton label="Open source" value={String(sourceCount)} filterKey="oss" />
+            <StatButton
+              label="For wife, friends, me"
+              value={String(forPeopleCount)}
+              filterKey="for-people"
+            />
           </motion.div>
         </Container>
       </motion.div>

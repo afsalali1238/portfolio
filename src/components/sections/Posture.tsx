@@ -13,23 +13,18 @@ export function Posture() {
   const drawingY = useTransform(scrollYProgress, [0, 1], ["-4%", "4%"]);
 
   return (
-    <section
-      id="posture"
-      ref={ref}
-      className="py-20 md:py-28"
-    >
+    <section id="posture" ref={ref} className="py-20 md:py-28">
       <Container className="grid min-h-[60vh] grid-cols-1 items-center gap-10 md:grid-cols-12">
         <SectionReveal className="md:col-span-6">
-          <div className="text-sm font-medium text-ink-mute">
-            Confession
-          </div>
+          <div className="text-sm font-medium text-ink-mute">Confession</div>
           <h2 className="mt-4 font-serif text-5xl leading-[1.05] md:text-7xl">
             The line I'd never
             <br />
             say out loud.
           </h2>
           <p className="mt-8 max-w-md font-serif text-2xl italic leading-relaxed text-ink-soft">
-            I haven't moved in four hours. My spine has become a question mark. But the logic is pure.
+            I haven't moved in four hours. My spine has become a question mark. But the logic is
+            pure.
           </p>
           <p className="mt-6 text-sm text-ink-mute">
             Move to see. Sit to build. Repeat until the future arrives.

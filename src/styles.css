@@ -112,7 +112,8 @@
   html {
     scroll-behavior: smooth;
   }
-  html, body {
+  html,
+  body {
     background-color: var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
@@ -132,7 +133,10 @@
   position: relative;
 }
 @utility grain-overlay {
-  background-image: radial-gradient(color-mix(in oklch, var(--color-ink) 6%, transparent) 1px, transparent 1px); /* taste-skill-ignore */
+  background-image: radial-gradient(
+    color-mix(in oklch, var(--color-ink) 6%, transparent) 1px,
+    transparent 1px
+  ); /* taste-skill-ignore */
   background-size: 3px 3px;
 }
 

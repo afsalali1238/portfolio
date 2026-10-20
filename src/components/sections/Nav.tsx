@@ -66,7 +66,7 @@ export function Nav() {
             setActiveSection(`#${id}`);
           }
         },
-        { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+        { rootMargin: "-40% 0px -55% 0px", threshold: 0 },
       );
       observer.observe(el);
       observers.push(observer);
@@ -127,7 +127,9 @@ export function Nav() {
           <nav className="hidden items-center gap-7 text-sm font-medium text-ink-soft md:flex">
             {NAV_LINKS.map(([label, href]) => (
               <a key={href} href={href} className="group relative">
-                <span className={`transition-colors group-hover:text-ink ${activeSection === href ? "text-ink" : ""}`}>
+                <span
+                  className={`transition-colors group-hover:text-ink ${activeSection === href ? "text-ink" : ""}`}
+                >
                   {label}
                 </span>
                 {/* taste-skill-ignore */}

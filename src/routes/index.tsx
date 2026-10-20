@@ -18,6 +18,9 @@ import { Posture } from "../components/sections/Posture";
 import { Works } from "../components/sections/Works";
 import { Colophon } from "../components/sections/Colophon";
 
+// Cache for 24h; invalidate on deploy via router.invalidate()
+export const staleTime = 60 * 60 * 24;
+
 export const Route = createFileRoute("/")({
   component: Index,
 });

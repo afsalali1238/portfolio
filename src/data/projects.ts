@@ -9,6 +9,10 @@ export type Project = {
   github?: string;
   for: string;
   featured?: boolean;
+  problem?: string;
+  solution?: string;
+  stack?: string[];
+  highlights?: string[];
 };
 
 export const projects: Project[] = [
@@ -18,27 +22,370 @@ export const projects: Project[] = [
     year: "2026",
     for: "Learning",
     featured: true,
-    tags: ["EdTech", "Ideas", "Spaced Repetition", "Audio"],
-    blurb: "A latticework of powerful ideas — audio-narrated, cross-linked map with spaced repetition. Learn in layers. Headed for the app stores.",
-    detail: "A commonplace book for the ideas that run the world. Doomscholar maps powerful ideas into a cross-linked latticework — onboard around what you care about, skim a layer at a time, follow the edges between concepts, and keep them with spaced-repetition reviews. Audio narration for every node. Built for people who collect mental models the way others collect bookmarks, and being readied for Google Play and the App Store.",
+    tags: ["EdTech", "Mental Models", "Spaced Repetition", "Audio"],
+    blurb:
+      "A latticework of powerful ideas — audio-narrated, cross-linked map with spaced repetition. Learn in layers. Headed for the app stores.",
+    detail:
+      "A commonplace book for the ideas that run the world. Doomscholar maps powerful ideas into a cross-linked latticework — onboard around what you care about, skim a layer at a time, follow the edges between concepts, and keep them with spaced-repetition reviews. Audio narration for every node. Built for people who collect mental models the way others collect bookmarks, and being readied for Google Play and the App Store.",
     live: "https://www.doomscholar.com/",
-    github: "https://github.com/afsalali1238/doomscholar"
+    github: "https://github.com/afsalali1238/doomscholar",
+    problem:
+      "Most mental model collections are static lists or disjointed blog posts. People read a concept, nod along, and forget it within 48 hours. There was no interactive system that let you explore the graph of cognitive frameworks while retaining them through disciplined spaced repetition.",
+    solution:
+      "Designed a non-linear knowledge graph where every concept is a node linked to related models. Integrated layer-based learning (skim, understand, master), synchronized audio narration for commuter listening, and an adaptive spaced-repetition review queue based on the SM-2 algorithm.",
+    stack: [
+      "Next.js",
+      "TypeScript",
+      "Tailwind CSS",
+      "Web Audio API",
+      "PWA",
+      "Supabase",
+      "IndexedDB",
+    ],
+    highlights: [
+      "Cross-linked concept latticework with bidirectional relationship traversal",
+      "Studio-grade audio narration recorded for every mental model node",
+      "Automated spaced-repetition algorithm adapting to individual retention curves",
+      "Offline-first mobile PWA ready for iOS and Android app stores",
+    ],
   },
-  { id: "incubator", name: "Incubator", year: "2025", for: "Me", tags: ["AI Agents", "Claude Code", "CLI"], blurb: "Claude Code skill that becomes a domain-expert CEO — interviews you, researches the market, then hires a sequenced team of specialist agents.", detail: "Idea in, company out. A Claude Code plugin that role-plays a founding team: it interviews you about the hunch, spends a few hours researching the market on its own, ships a findings report, then spawns a sequenced team of specialist agents to build the first version. The interesting part is the org chart — how instruction, dissent, and review flow between agents without collapsing into noise.", github: "https://github.com/afsalali1238/Incubator" },
-  { id: "novibe", name: "NoVibe", year: "2025", for: "Learning", tags: ["EdTech", "AI literacy", "Non-linear"], blurb: "A non-linear AI literacy map — 30 nodes across 6 clusters, learn in any order. No streaks, no XP, no locks.", detail: "Most curricula insist on a straight line. NoVibe is a map: pick a node that itches, follow the threads that pull you. Thirty concepts across six clusters — from 'what is an LLM' to 'agent orchestration'. Built for people who learn by wandering, not by grinding.", live: "https://novibe.lovable.app", github: "https://github.com/afsalali1238/novibe" },
-  { id: "nxtdoorchef", name: "NxtDoorChef", year: "2025", for: "Dubai", tags: ["Marketplace", "Food", "Community"], blurb: "Find home chefs near you — authentic homemade food from real kitchens across Dubai.", detail: "The best meal in town is next door. NxtDoorChef connects neighbours with home cooks making exactly what they feed their own families. Browse the map, tap 'Say hello' to connect on WhatsApp, walk over with a tiffin, and taste the cultures cooking right next door. From Karama to Dubai Marina.", live: "https://nxtdoorchef.vercel.app" },
-  { id: "craftersunited", name: "CraftersUnited", year: "2025", for: "Makers", tags: ["Marketplace", "Handcraft", "India"], blurb: "Zero-fee marketplace for handcrafted goods — direct WhatsApp connection between makers and buyers.", detail: "No algorithms. No middlemen. No fees. CraftersUnited connects handmade stories with people who value them. Makers list their work in minutes, buyers browse a curated feed of local talent, and every transaction happens directly — no platform commission. Built because craft deserves to keep every rupee.", live: "https://cr8un8.vercel.app" },
-  { id: "provia", name: "Provia", year: "2025", for: "Wife", tags: ["Healthcare", "Gamified", "PWA"], blurb: "Gamified 45-day exam prep for Gulf pharmacy licensing — DHA, MOH, DOH mastery in structured sprints.", detail: "Provia turns the daunting Gulf pharmacy licensing exam into a 45-day game. Progressive difficulty, structured daily sprints, spaced repetition, and enough encouragement to keep going when the pharmacology chapters get heavy. Built as a PWA so it works offline — because studying happens on the bus.", live: "https://proviaap.vercel.app" },
-  { id: "pharmarab", name: "PharmaRab", year: "2025", for: "Wife", tags: ["Healthcare", "Bilingual", "Gamified"], blurb: "Gamified Medical Arabic for pharmacists — clinical phrases, vocab bank, XP, progression. Built for my wife.", detail: "My wife is a pharmacist. Medical Arabic at the counter is hard. So I built PharmaRab — a gamified conversational course with a syllabus, a clinical phrase dictionary, a vocabulary bank, and XP for showing up. Arabic and English side by side, Tajawal and Inter, no gate-keeping.", live: "https://pharmarab.vercel.app", github: "https://github.com/afsalali1238/med-arabic-hub" },
-  { id: "physioarab", name: "PhysioArab", year: "2025", for: "Friends", tags: ["Healthcare", "Bilingual", "Physio"], blurb: "8-week Medical Arabic course for physiotherapists — assessment terms, movement commands, discharge dialogue.", detail: "Same engine as PharmaRab, retuned for the physio clinic. Eight weeks of greetings, assessment vocabulary, ROM and movement commands, and honest discharge dialogue. Built with therapist friends who wanted their patients to feel heard in their own language.", live: "https://physioarab.vercel.app", github: "https://github.com/afsalali1238/learn-med-arab" },
-  { id: "jobhunter-os", name: "JobHunter OS", year: "2025", for: "Wife", tags: ["Productivity", "Career"], blurb: "A job hunting operating system — applications, stages, follow-ups, outcomes, moods.", detail: "Built one evening because a spreadsheet wasn't kind enough. Applications as cards, stages as columns, a small ritual for logging what actually happened in each conversation — including the mood, because job hunting is emotional labour.", github: "https://github.com/afsalali1238/jobhunter-os" },
-  { id: "medical-coding", name: "Medical Coding Mastery", year: "2025", for: "Wife", tags: ["Healthcare", "AAPC CPC", "DHA"], blurb: "Self-paced 10-week AAPC CPC prep aligned with Dubai DHA and eClaimLink — weekly plans, drills, curated resources.", detail: "A calm ten-week path through the CPC syllabus with DHA and eClaimLink-specific detours. Weekly assignments, checkpoints, curated videos and articles, and clinical scenario drills. Just enough encouragement to make the coding chapters bearable.", live: "https://code-calm-path.lovable.app" },
-  { id: "terrarium", name: "Terrarium", year: "2025", for: "Fun", tags: ["Browser game", "Cozy", "Generative"], blurb: "A cozy tiny-planet god-game — warm a small world, answer its prayers, watch the myths people write about you.", detail: "A small warm world in a browser tab. You nudge the weather, answer tiny prayers, and slowly a mythology forms around your choices. Animated SVG doodles, no lose state — only weather.", live: "https://tiny-world-keeper.vercel.app", github: "https://github.com/afsalali1238/terrarium" },
-  { id: "gtm-os", name: "GTM-OS", year: "2026", for: "Founders", tags: ["Open-source", "GTM", "AI Skills", "CLI"], blurb: "Open-source go-to-market operating system — 16 pillars, 87 sections, 16 AI skills, CLI scaffolding + progress tracking.", detail: "You can build the product but the GTM is a fog. GTM-OS is the opinionated system that takes you from 'who do we even sell to' to a repeatable revenue motion. Sixteen pillars from Foundation to Scale, eighty-seven sections with key questions and concrete deliverables, sixteen Claude Code AI skills, fillable templates, and CLI scaffolding that tracks your progress. Works for B2B SaaS and D2C alike. Sourced benchmarks, real case studies, no fluff.", github: "https://github.com/afsalali1238/gtm-os" },
-  { id: "parallel-perspective", name: "Parallel Perspective", year: "2026", for: "Me", tags: ["Philosophy", "Fashion", "Editorial"], blurb: "A philosophy that happens to use garments as the medium — written for the person wearing it, not the person selling it.", detail: "Parallel Perspective is not a clothing brand — it's a lens. A quiet editorial exploring how garments carry meaning, identity, and intention. 'You are the pattern the inputs made.' Built as a manifesto-first experience with minimal design, Space Grotesk typography, and a circle of ideas rather than a catalogue of products.", live: "https://parallelperspective.vercel.app" },
-  { id: "nadan-chayakada", name: "Nadan Chayakada", year: "2026", for: "Kerala", tags: ["Radio", "Nostalgia", "Malayalam", "Cozy"], blurb: "Kerala monsoon radio — nostalgic Malayalam melodies, old radio classics, and rainy-day tea shop vibes in a cinematic experience.", detail: "A digital chayakada for the diaspora. Tune into nostalgic Malayalam melodies, old All India Radio classics, and the ambient hum of a rainy-day tea shop — all wrapped in a warm, cinematic radio interface. No algorithms, no playlists, just monsoon vibes and the kind of music that makes you miss home. Built because some feelings don't have a Spotify playlist.", live: "https://chayakadai.vercel.app", github: "https://github.com/afsalali1238/Chayakada" },
-  { id: "bodhi-pomodoro", name: "Bodhi Pomodoro", year: "2026", for: "Me", tags: ["Desktop pet", "Focus", "Electron"], blurb: "A Buddha desktop pet that meditates under a Bodhi tree while you focus — and fires lasers when you drift to distractions.", detail: "Pomodoro apps hide in the menu bar. Bodhi lives on your screen. He sits under his tree and breathes with you while you work, stands up and walks out when it's time for a break, and if you slip off to YouTube mid-session he locks on with lasers after a short grace period. Three-click session start (duration, task, allowed apps), box-breathing and water breaks, idle poses when no timer runs, a tree that grows from sapling to canopy with every session, and an end-of-day focus report. Electron and vanilla JS.", live: "https://bodhipomodoro.vercel.app", github: "https://github.com/afsalali1238/BodhiPomodoro" },
-  { id: "kine", name: "kinē", year: "2026", for: "Patients", tags: ["Healthcare", "3D", "Physio", "Bilingual"], blurb: "Interactive 3D physio guide — pin your pain on a real anatomical body, get triaged, follow an adaptive rehab plan.", detail: "Point to where it hurts on a real 3D body, not a cartoon. kinē lets you rotate a male or female anatomical model, pin pain to a single point with a 0–10 severity slider, then walks you through a seven-step assessment with red-flag screening and transparent pattern matching. What comes out is a three-phase plan — Calm, Load, Capacity — capped at fifteen minutes a day, with a voice-guided exercise player, easier/harder swaps based on how it feels, and daily check-ins. English and Arabic with full RTL. Next.js, React Three Fiber, offline-first.", live: "https://kin-lac.vercel.app", github: "https://github.com/afsalali1238/kin" },
+  {
+    id: "kine",
+    name: "kinē",
+    year: "2026",
+    for: "Patients",
+    featured: true,
+    tags: ["Healthcare", "3D", "Physio", "Bilingual"],
+    blurb:
+      "Interactive 3D physio guide — pin your pain on a real anatomical body, get triaged, follow an adaptive rehab plan.",
+    detail:
+      "Point to where it hurts on a real 3D body, not a cartoon. kinē lets you rotate a male or female anatomical model, pin pain to a single point with a 0–10 severity slider, then walks you through a seven-step assessment with red-flag screening and transparent pattern matching. What comes out is a three-phase plan — Calm, Load, Capacity — capped at fifteen minutes a day, with a voice-guided exercise player, easier/harder swaps based on how it feels, and daily check-ins. English and Arabic with full RTL. Next.js, React Three Fiber, offline-first.",
+    live: "https://kin-lac.vercel.app",
+    github: "https://github.com/afsalali1238/kin",
+    problem:
+      "Patients struggle to describe musculoskeletal pain on 2D paper forms or flat drop-down menus. Clinical triage often fails because patients cannot pinpoint anatomical landmarks accurately, and exercise sheets are universally abandoned.",
+    solution:
+      "Engineered a real-time 3D anatomical model with raycasted ray-hit pain pinning. Built a rule-based clinical assessment engine that screens red flags, stratifies symptoms into clinical patterns, and outputs an adaptive 3-phase rehabilitation program with audio cues and RTL Arabic support.",
+    stack: [
+      "Next.js",
+      "React Three Fiber",
+      "Three.js",
+      "GLSL Shaders",
+      "Tailwind CSS",
+      "IndexedDB",
+    ],
+    highlights: [
+      "Interactive 3D male & female anatomical models with vertex-accurate pain pinning",
+      "Clinical triage engine with red-flag safety screening",
+      "Calm → Load → Capacity 3-phase progressive exercise regime capped at 15m/day",
+      "Complete English and Arabic bilingual support with native RTL layout",
+    ],
+  },
+  {
+    id: "provia",
+    name: "Provia",
+    year: "2025",
+    for: "Wife",
+    tags: ["Healthcare", "Gamified", "PWA"],
+    blurb:
+      "Gamified 45-day exam prep for Gulf pharmacy licensing — DHA, MOH, DOH mastery in structured sprints.",
+    detail:
+      "Provia turns the daunting Gulf pharmacy licensing exam into a 45-day game. Progressive difficulty, structured daily sprints, spaced repetition, and enough encouragement to keep going when the pharmacology chapters get heavy. Built as a PWA so it works offline — because studying happens on the bus.",
+    live: "https://proviaap.vercel.app",
+    problem:
+      "My wife was studying for the grueling Dubai Health Authority (DHA) pharmacist licensing exam. Commercial question banks are dry, intimidating PDF dumps with zero psychological pacing or offline capabilities for daily commutes.",
+    solution:
+      "Created a progressive 45-day sprint curriculum broken into bite-sized daily drills. Integrated pharmacology mnemonics, clinical calculations, instant explanation breakdowns, and offline PWA caching so practice continues uninterrupted anywhere.",
+    stack: ["React", "TypeScript", "Tailwind CSS", "PWA Service Worker", "Vite", "LocalForage"],
+    highlights: [
+      "Structured 45-day sprint calendar covering DHA, MOH, and DOH curriculums",
+      "Immediate rationale breakdowns for clinical pharmacology scenarios",
+      "Offline-first PWA caching allowing full test simulation without internet",
+      "Personalized mastery tracking identifying weak drug classes automatically",
+    ],
+  },
+  {
+    id: "pharmarab",
+    name: "PharmaRab",
+    year: "2025",
+    for: "Wife",
+    tags: ["Healthcare", "Bilingual", "Gamified"],
+    blurb:
+      "Gamified Medical Arabic for pharmacists — clinical phrases, vocab bank, XP, progression. Built for my wife.",
+    detail:
+      "My wife is a pharmacist. Medical Arabic at the counter is hard. So I built PharmaRab — a gamified conversational course with a syllabus, a clinical phrase dictionary, a vocabulary bank, and XP for showing up. Arabic and English side by side, Tajawal and Inter, no gate-keeping.",
+    live: "https://pharmarab.vercel.app",
+    github: "https://github.com/afsalali1238/med-arabic-hub",
+    problem:
+      "Pharmacists working in Gulf hospitals and retail pharmacies face severe language barriers with Arabic-speaking patients. General language apps teach formal tourist Arabic rather than clinical dosage, symptoms, and contraindication phrasing.",
+    solution:
+      "Curated a specialized conversational syllabus focused exclusively on the pharmacy counter. Paired Arabic audio, phonetic transliteration, and English clinical meaning with gamified progression to make daily 5-minute practice habitual.",
+    stack: ["React", "TypeScript", "Tailwind CSS", "Tajawal Font", "Web Audio API"],
+    highlights: [
+      "Clinical counter dialogues covering dosage, allergies, and chronic conditions",
+      "Native Arabic voice samples with phonetic English guides",
+      "Bilingual typography system balancing Tajawal Arabic and Inter English",
+      "Open-source and zero-fee for healthcare workers across the region",
+    ],
+  },
+  {
+    id: "physioarab",
+    name: "PhysioArab",
+    year: "2025",
+    for: "Friends",
+    tags: ["Healthcare", "Bilingual", "Physio"],
+    blurb:
+      "8-week Medical Arabic course for physiotherapists — assessment terms, movement commands, discharge dialogue.",
+    detail:
+      "Same engine as PharmaRab, retuned for the physio clinic. Eight weeks of greetings, assessment vocabulary, ROM and movement commands, and honest discharge dialogue. Built with therapist friends who wanted their patients to feel heard in their own language.",
+    live: "https://physioarab.vercel.app",
+    github: "https://github.com/afsalali1238/learn-med-arab",
+    problem:
+      "Physiotherapist friends in Dubai clinics struggled to instruct Arabic-speaking rehabilitation patients through range-of-motion assessments, posture corrections, and home exercise protocols.",
+    solution:
+      "Adapted the medical language engine to physical rehabilitation. Structured an 8-week curriculum covering gait analysis, joint biomechanics, movement instructions (flex, extend, relax, hold), and empathetic discharge discussions.",
+    stack: ["React", "TypeScript", "Tailwind CSS", "Audio Synthesis", "Vite"],
+    highlights: [
+      "8-week progressive clinical rehabilitation vocabulary curriculum",
+      "Movement command reference cards for bedside and gym instruction",
+      "Co-designed with practicing physiotherapists in Dubai",
+    ],
+  },
+  {
+    id: "nxtdoorchef",
+    name: "NxtDoorChef",
+    year: "2025",
+    for: "Dubai",
+    tags: ["Marketplace", "Food", "Community"],
+    blurb: "Find home chefs near you — authentic homemade food from real kitchens across Dubai.",
+    detail:
+      "The best meal in town is next door. NxtDoorChef connects neighbours with home cooks making exactly what they feed their own families. Browse the map, tap 'Say hello' to connect on WhatsApp, walk over with a tiffin, and taste the cultures cooking right next door. From Karama to Dubai Marina.",
+    live: "https://nxtdoorchef.vercel.app",
+    problem:
+      "Dubai is filled with incredible home cooks from dozens of cultures, but food delivery apps charge exorbitant 30% commissions and exclude domestic kitchens. Neighbors had no way to discover authentic home-cooked meals being made down their hall.",
+    solution:
+      "Created a hyper-local community discovery board. Cooks list their daily specials with photos, locations, and tiffin preferences. Buyers browse nearby kitchens and connect directly via WhatsApp with zero intermediary fees.",
+    stack: ["Next.js", "TypeScript", "Tailwind CSS", "Mapbox GL", "WhatsApp API"],
+    highlights: [
+      "Hyperlocal map discovery of authentic regional home kitchens",
+      "Zero commission direct WhatsApp connection between neighbors",
+      "Cultural culinary map covering Karama, Deira, Marina, and Barsha",
+    ],
+  },
+  {
+    id: "incubator",
+    name: "Incubator",
+    year: "2025",
+    for: "Me",
+    tags: ["AI Agents", "Claude Code", "CLI"],
+    blurb:
+      "Claude Code skill that becomes a domain-expert CEO — interviews you, researches the market, then hires a sequenced team of specialist agents.",
+    detail:
+      "Idea in, company out. A Claude Code plugin that role-plays a founding team: it interviews you about the hunch, spends a few hours researching the market on its own, ships a findings report, then spawns a sequenced team of specialist agents to build the first version. The interesting part is the org chart — how instruction, dissent, and review flow between agents without collapsing into noise.",
+    github: "https://github.com/afsalali1238/Incubator",
+    problem:
+      "Solo founders often lack specialized sparring partners when validating new concepts. Standard LLM prompts give generic cheerleader advice instead of rigorous stress-testing, dissent, and sequenced execution planning.",
+    solution:
+      "Engineered an autonomous agentic orchestration pipeline. The CEO agent interviews the founder through an adversarial framework, conducts autonomous competitor research, generates strategic PRDs, and delegates implementation tasks to specialized subagents with review gates.",
+    stack: ["Node.js", "TypeScript", "Claude Code SDK", "MCP", "CLI"],
+    highlights: [
+      "Adversarial interview protocol challenging unexamined founder assumptions",
+      "Autonomous web-search market synthesis generating strategic moat reports",
+      "Hierarchical agent orchestration with built-in dissenting review loops",
+    ],
+  },
+  {
+    id: "novibe",
+    name: "NoVibe",
+    year: "2025",
+    for: "Learning",
+    tags: ["EdTech", "AI literacy", "Non-linear"],
+    blurb:
+      "A non-linear AI literacy map — 30 nodes across 6 clusters, learn in any order. No streaks, no XP, no locks.",
+    detail:
+      "Most curricula insist on a straight line. NoVibe is a map: pick a node that itches, follow the threads that pull you. Thirty concepts across six clusters — from 'what is an LLM' to 'agent orchestration'. Built for people who learn by wandering, not by grinding.",
+    live: "https://novibe.lovable.app",
+    github: "https://github.com/afsalali1238/novibe",
+    problem:
+      "Most AI learning courses force users through linear chapter tracks padded with gamified streak counters, locking advanced concepts behind arbitrary beginner gates.",
+    solution:
+      "Built a non-linear conceptual atlas. 30 modular nodes grouped into 6 thematic clusters, allowing self-directed exploration without streaks, badges, or paywalls.",
+    stack: ["React", "TypeScript", "Tailwind CSS", "SVG Canvas"],
+    highlights: [
+      "Non-linear pedagogical atlas with 30 deep-dive conceptual nodes",
+      "Zero streak gimmicks or gating — jump directly to any concept",
+      "Cluster mapping from foundational transformers to multi-agent loops",
+    ],
+  },
+  {
+    id: "craftersunited",
+    name: "CraftersUnited",
+    year: "2025",
+    for: "Makers",
+    tags: ["Marketplace", "Handcraft", "India"],
+    blurb:
+      "Zero-fee marketplace for handcrafted goods — direct WhatsApp connection between makers and buyers.",
+    detail:
+      "No algorithms. No middlemen. No fees. CraftersUnited connects handmade stories with people who value them. Makers list their work in minutes, buyers browse a curated feed of local talent, and every transaction happens directly — no platform commission. Built because craft deserves to keep every rupee.",
+    live: "https://cr8un8.vercel.app",
+    problem:
+      "Independent artisanal craftspeople lose 20–40% of their earnings to ecommerce aggregators and algorithm ranking games.",
+    solution:
+      "A clean, direct directory allowing makers to showcase handcrafted pieces and connect immediately with buyers over WhatsApp, preserving 100% of the sale value for the artisan.",
+    stack: ["React", "Vite", "Tailwind CSS", "WhatsApp Integration"],
+    highlights: [
+      "100% direct-to-artisan commerce with zero commission fees",
+      "Mobile-first listing flow designed for non-technical makers",
+    ],
+  },
+  {
+    id: "jobhunter-os",
+    name: "JobHunter OS",
+    year: "2025",
+    for: "Wife",
+    tags: ["Productivity", "Career"],
+    blurb: "A job hunting operating system — applications, stages, follow-ups, outcomes, moods.",
+    detail:
+      "Built one evening because a spreadsheet wasn't kind enough. Applications as cards, stages as columns, a small ritual for logging what actually happened in each conversation — including the mood, because job hunting is emotional labour.",
+    github: "https://github.com/afsalali1238/jobhunter-os",
+    problem:
+      "Cold spreadsheets reduce job searching to clinical rows, ignoring the emotional toll and chaotic follow-up cycles of active career transitions.",
+    solution:
+      "Designed a compassionate Kanban board that captures not just company and status, but post-interview reflections, sentiment, and automated follow-up reminders.",
+    stack: ["React", "TypeScript", "Tailwind CSS", "LocalStorage"],
+    highlights: [
+      "Reflective ritual tracking recording emotional energy alongside stage progress",
+      "Dynamic follow-up calendar preventing opportunities from going cold",
+    ],
+  },
+  {
+    id: "medical-coding",
+    name: "Medical Coding Mastery",
+    year: "2025",
+    for: "Wife",
+    tags: ["Healthcare", "AAPC CPC", "DHA"],
+    blurb:
+      "Self-paced 10-week AAPC CPC prep aligned with Dubai DHA and eClaimLink — weekly plans, drills, curated resources.",
+    detail:
+      "A calm ten-week path through the CPC syllabus with DHA and eClaimLink-specific detours. Weekly assignments, checkpoints, curated videos and articles, and clinical scenario drills. Just enough encouragement to make the coding chapters bearable.",
+    live: "https://code-calm-path.lovable.app",
+    problem:
+      "Medical coding certifications (CPT, ICD-10-CM, HCPCS) are extraordinarily dense, and Gulf region candidates need specific knowledge of Dubai eClaimLink regulations.",
+    solution:
+      "Structured a calm 10-week curriculum combining standard AAPC CPC modules with Dubai-specific insurance claim scenarios.",
+    stack: ["React", "TypeScript", "Tailwind CSS"],
+    highlights: [
+      "10-week structured curriculum with eClaimLink billing detours",
+      "Interactive code lookup drills with rationales for tricky modifiers",
+    ],
+  },
+  {
+    id: "terrarium",
+    name: "Terrarium",
+    year: "2025",
+    for: "Fun",
+    tags: ["Browser game", "Cozy", "Generative"],
+    blurb:
+      "A cozy tiny-planet god-game — warm a small world, answer its prayers, watch the myths people write about you.",
+    detail:
+      "A small warm world in a browser tab. You nudge the weather, answer tiny prayers, and slowly a mythology forms around your choices. Animated SVG doodles, no lose state — only weather.",
+    live: "https://tiny-world-keeper.vercel.app",
+    github: "https://github.com/afsalali1238/terrarium",
+    problem: "Most web games demand aggressive reflexes, daily streaks, or microtransactions.",
+    solution:
+      "Crafted a meditative browser micro-world with zero failure states where players gently influence climate and observe emergent folklore.",
+    stack: ["React", "SVG Animation", "Generative Text", "Web Audio"],
+    highlights: [
+      "Procedural mythology generator chronicling civilization stories",
+      "Zero fail-state atmospheric weather physics simulation",
+    ],
+  },
+  {
+    id: "gtm-os",
+    name: "GTM-OS",
+    year: "2026",
+    for: "Founders",
+    tags: ["Open-source", "GTM", "AI Skills", "CLI"],
+    blurb:
+      "Open-source go-to-market operating system — 16 pillars, 87 sections, 16 AI skills, CLI scaffolding + progress tracking.",
+    detail:
+      "You can build the product but the GTM is a fog. GTM-OS is the opinionated system that takes you from 'who do we even sell to' to a repeatable revenue motion. Sixteen pillars from Foundation to Scale, eighty-seven sections with key questions and concrete deliverables, sixteen Claude Code AI skills, fillable templates, and CLI scaffolding that tracks your progress. Works for B2B SaaS and D2C alike. Sourced benchmarks, real case studies, no fluff.",
+    github: "https://github.com/afsalali1238/gtm-os",
+    problem:
+      "Technical founders frequently excel at writing code but fail at finding distribution and crafting predictable sales motions.",
+    solution:
+      "Engineered an open-source, CLI-scaffolded operating system with 16 foundational pillars, 87 tactical checklists, and automated agent prompts.",
+    stack: ["Node.js", "CLI", "Markdown Scaffolding", "Claude Code Skills"],
+    highlights: [
+      "16 end-to-end pillars covering ICP definition, messaging, pricing, and outbound motions",
+      "CLI scaffolding generating customized GTM workspaces with progress tracking",
+    ],
+  },
+  {
+    id: "parallel-perspective",
+    name: "Parallel Perspective",
+    year: "2026",
+    for: "Me",
+    tags: ["Philosophy", "Fashion", "Editorial"],
+    blurb:
+      "A philosophy that happens to use garments as the medium — written for the person wearing it, not the person selling it.",
+    detail:
+      "Parallel Perspective is not a clothing brand — it's a lens. A quiet editorial exploring how garments carry meaning, identity, and intention. 'You are the pattern the inputs made.' Built as a manifesto-first experience with minimal design, Space Grotesk typography, and a circle of ideas rather than a catalogue of products.",
+    live: "https://parallelperspective.vercel.app",
+    problem:
+      "Contemporary fashion ecommerce is driven by fast-fashion consumption cycles with zero conceptual resonance or philosophical depth.",
+    solution:
+      "Created a manifesto-first digital monograph that explores the semiotics of apparel, utility, and human memory.",
+    stack: ["React", "Tailwind CSS", "Editorial Layout"],
+    highlights: [
+      "Monograph layout blending essays with material documentation",
+      "Zero product checkout pressure — focused on conceptual perspective",
+    ],
+  },
+  {
+    id: "nadan-chayakada",
+    name: "Nadan Chayakada",
+    year: "2026",
+    for: "Kerala",
+    tags: ["Radio", "Nostalgia", "Malayalam", "Cozy"],
+    blurb:
+      "Kerala monsoon radio — nostalgic Malayalam melodies, old radio classics, and rainy-day tea shop vibes in a cinematic experience.",
+    detail:
+      "A digital chayakada for the diaspora. Tune into nostalgic Malayalam melodies, old All India Radio classics, and the ambient hum of a rainy-day tea shop — all wrapped in a warm, cinematic radio interface. No algorithms, no playlists, just monsoon vibes and the kind of music that makes you miss home. Built because some feelings don't have a Spotify playlist.",
+    live: "https://chayakadai.vercel.app",
+    github: "https://github.com/afsalali1238/Chayakada",
+    problem:
+      "Malayalam diaspora members living across the Gulf miss the ambient warmth and tactile memories of traditional Kerala tea shops and vintage radio broadcasts.",
+    solution:
+      "Synthesized an ambient web radio station with rain textures, tea-glass audio samples, and curated vintage Malayalam tracks in a retro analog tuner interface.",
+    stack: ["React", "Web Audio API", "Howler.js", "Tailwind CSS"],
+    highlights: [
+      "Interactive analog radio dial tuning into classic Malayalam broadcasts",
+      "Dynamic weather ambient generator blending rain, thunder, and tea shop sounds",
+    ],
+  },
+  {
+    id: "bodhi-pomodoro",
+    name: "Bodhi Pomodoro",
+    year: "2026",
+    for: "Me",
+    tags: ["Desktop pet", "Focus", "Electron"],
+    blurb:
+      "A Buddha desktop pet that meditates under a Bodhi tree while you focus — and fires lasers when you drift to distractions.",
+    detail:
+      "Pomodoro apps hide in the menu bar. Bodhi lives on your screen. He sits under his tree and breathes with you while you work, stands up and walks out when it's time for a break, and if you slip off to YouTube mid-session he locks on with lasers after a short grace period. Three-click session start (duration, task, allowed apps), box-breathing and water breaks, idle poses when no timer runs, a tree that grows from sapling to canopy with every session, and an end-of-day focus report. Electron and vanilla JS.",
+    live: "https://bodhipomodoro.vercel.app",
+    github: "https://github.com/afsalali1238/BodhiPomodoro",
+    problem:
+      "Standard pomodoro timers hide passively in system menus, making it trivially easy to open distraction tabs and break deep work flow.",
+    solution:
+      "Built a desktop companion that meditates on your screen, breathes in rhythm with work sprints, and visually intervenes when attention drifts to prohibited apps.",
+    stack: ["Electron", "Vanilla JavaScript", "CSS Keyframes", "Node OS APIs"],
+    highlights: [
+      "Always-on-top meditative avatar growing a procedural Bodhi tree",
+      "Active window tracking with gentle visual intervention on distraction triggers",
+    ],
+  },
 ];
 
 /** Everything user-facing counts off this list, so the copy can never drift from the data. */
@@ -49,10 +396,40 @@ export const sourceCount = projects.filter((p) => p.github).length;
 const PEOPLE = ["Wife", "Friends", "Me"];
 export const forPeopleCount = projects.filter((p) => PEOPLE.includes(p.for)).length;
 
+export function getProjectById(id: string): Project | undefined {
+  return projects.find((p) => p.id === id);
+}
+
+export function getNextAndPrevProjects(id: string): { prev?: Project; next?: Project } {
+  const index = projects.findIndex((p) => p.id === id);
+  if (index === -1) return {};
+  const prev = index > 0 ? projects[index - 1] : projects[projects.length - 1];
+  const next = index < projects.length - 1 ? projects[index + 1] : projects[0];
+  return { prev, next };
+}
+
 const NUMBER_WORDS = [
-  "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
-  "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
-  "Seventeen", "Eighteen", "Nineteen", "Twenty",
+  "Zero",
+  "One",
+  "Two",
+  "Three",
+  "Four",
+  "Five",
+  "Six",
+  "Seven",
+  "Eight",
+  "Nine",
+  "Ten",
+  "Eleven",
+  "Twelve",
+  "Thirteen",
+  "Fourteen",
+  "Fifteen",
+  "Sixteen",
+  "Seventeen",
+  "Eighteen",
+  "Nineteen",
+  "Twenty",
 ];
 
 /** "Fifteen" for 15, falls back to "21" past the table. */

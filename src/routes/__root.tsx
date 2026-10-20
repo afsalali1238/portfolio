@@ -85,18 +85,33 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "forthe.tech — For the tech" },
-      { name: "description", content: "Building forthe.tech. Documenting what happens when the wall between having an idea and building it disappears." },
+      {
+        name: "description",
+        content:
+          "Building forthe.tech. Documenting what happens when the wall between having an idea and building it disappears.",
+      },
       { name: "author", content: "Afsal Ali" },
       { property: "og:site_name", content: "forthe.tech" },
       { property: "og:title", content: "forthe.tech — For the tech" },
-      { property: "og:description", content: "Building forthe.tech. Documenting what happens when the wall between having an idea and building it disappears." },
+      {
+        property: "og:description",
+        content:
+          "Building forthe.tech. Documenting what happens when the wall between having an idea and building it disappears.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:image", content: `${SITE_URL}/og-image.png` },
-      { property: "og:image:alt", content: "forthe.tech — Public ledger of software and experiments" },
+      {
+        property: "og:image:alt",
+        content: "forthe.tech — Public ledger of software and experiments",
+      },
       { property: "og:url", content: SITE_URL },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "forthe.tech — For the tech" },
-      { name: "twitter:description", content: "Building forthe.tech. Documenting what happens when the wall between having an idea and building it disappears." },
+      {
+        name: "twitter:description",
+        content:
+          "Building forthe.tech. Documenting what happens when the wall between having an idea and building it disappears.",
+      },
       { name: "twitter:image", content: `${SITE_URL}/og-image.png` },
     ],
     links: [
@@ -150,6 +165,7 @@ function RootShell({ children }: { children: ReactNode }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(PERSON_SCHEMA) }}
         />
+        <script defer data-domain="forthe.tech" src="https://plausible.io/js/script.js" />
       </head>
       <body>
         {children}
