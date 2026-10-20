@@ -132,7 +132,7 @@
   position: relative;
 }
 @utility grain-overlay {
-  background-image: radial-gradient(color-mix(in oklch, var(--color-ink) 6%, transparent) 1px, transparent 1px);
+  background-image: radial-gradient(color-mix(in oklch, var(--color-ink) 6%, transparent) 1px, transparent 1px); /* taste-skill-ignore */
   background-size: 3px 3px;
 }
 

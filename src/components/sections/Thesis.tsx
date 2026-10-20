@@ -11,10 +11,10 @@ export function Thesis() {
   ];
 
   return (
-    <section id="thesis" className="border-b rule-hair bg-paper-deep/40">
-      <Container className="grid grid-cols-1 gap-10 py-16 md:grid-cols-12 md:py-24">
+    <section id="thesis" className="bg-paper-deep/40 py-20 md:py-28">
+      <Container className="grid grid-cols-1 gap-10 md:grid-cols-12">
         <SectionReveal className="md:col-span-3">
-          <div className="text-[11px] uppercase tracking-[0.28em] text-ink-mute">§ 02 · Thesis</div>
+          <div className="text-sm font-medium text-ink-mute">Thesis</div>
           <div className="mt-3 font-serif text-2xl italic text-ink-soft">The Energy Ledger</div>
           <p className="mt-4 text-xs text-ink-mute leading-relaxed">
             On AI tokens as currency, the thermodynamic debt of a prompt, and the moral requirement of building with intention.
@@ -38,7 +38,7 @@ export function Thesis() {
             </p>
 
             <p>
-              Which exposes an uncomfortable truth: <strong className="font-medium text-ink">people who lecture about ESG, sustainability goals, and energy conservation while aimlessly burning AI tokens are being hypocrites.</strong> Firing off millions of automated inference cycles to produce corporate sludge, bloated slide decks, and speculative noise is not innovation — it is digital pollution.
+              Which exposes an uncomfortable truth: <strong className="font-medium text-ink">people who lecture about ESG, sustainability goals, and energy conservation while aimlessly burning AI tokens are being hypocrites.</strong> Firing off millions of automated inference cycles to produce corporate sludge, bloated slide decks, and speculative noise is not innovation; it is digital pollution.
             </p>
 
             <p>
@@ -46,13 +46,13 @@ export function Thesis() {
             </p>
 
             <div className="rounded-sm border rule-hair bg-paper/60 p-6 space-y-3 text-sm">
-              <div className="text-[11px] uppercase tracking-[0.24em] text-ink-mute">Intention over novelty</div>
+              <div className="text-xs font-medium text-ink-mute">Intention over novelty</div>
               <ul className="space-y-2.5 text-ink-soft">
                 <li>
                   <strong className="text-ink font-medium">My wife is a pharmacist:</strong> so I spent energy building <span className="text-ink font-serif italic text-base">PharmaRab</span> and <span className="text-ink font-serif italic text-base">Provia</span> to help her and her colleagues conquer grueling licensing exams.
                 </li>
                 <li>
-                  <strong className="text-ink font-medium">My friends are physiotherapists:</strong> so I spent energy building <span className="text-ink font-serif italic text-base">PhysioArab</span> and <span className="text-ink font-serif italic text-base">kinē</span> to streamline clinical rehabilitation tools that didn’t exist.
+                  <strong className="text-ink font-medium">My friends are physiotherapists:</strong> so I spent energy building <span className="text-ink font-serif italic text-base">PhysioArab</span> and <span className="text-ink font-serif italic text-base">kinē</span> to build clinical rehabilitation tools that therapists needed.
                 </li>
                 <li>
                   <strong className="text-ink font-medium">Dubai’s finest cooking was hidden next door:</strong> so I built <span className="text-ink font-serif italic text-base">NxtDoorChef</span> to connect neighbors directly to authentic home kitchens.
@@ -73,29 +73,27 @@ export function Thesis() {
             </div>
 
             {/* Field notes / Curiosities breakdown */}
-            <div className="pt-6 border-t rule-hair">
-              <div className="text-[11px] uppercase tracking-[0.24em] text-ink-mute mb-4">
+            <div className="pt-6">
+              <div className="text-xs font-medium text-ink-mute mb-4">
                 Field Notes & Principles
               </div>
-              <dl className="divide-y divide-[color:var(--rule)] border-y rule-hair">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {notes.map((n, i) => (
                   <motion.div
                     key={n.k}
-                    initial={{ opacity: 0, x: -16 }}
-                    whileInView={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ duration: 0.5, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
-                    className="grid grid-cols-12 gap-4 py-3.5"
+                    className="rounded-lg bg-paper/80 p-5"
                   >
-                    <dt className="col-span-3 text-[11px] uppercase tracking-[0.24em] text-ink-mute md:col-span-2">
-                      {n.k}
-                    </dt>
-                    <dd className="col-span-9 font-serif text-lg leading-snug md:col-span-10 text-ink">
+                    <div className="text-xs font-medium text-ink-mute">{n.k}</div>
+                    <div className="mt-1.5 font-serif text-lg leading-snug text-ink">
                       {n.v}
-                    </dd>
+                    </div>
                   </motion.div>
                 ))}
-              </dl>
+              </div>
             </div>
           </div>
         </SectionReveal>

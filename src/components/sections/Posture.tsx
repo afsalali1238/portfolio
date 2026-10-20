@@ -16,12 +16,12 @@ export function Posture() {
     <section
       id="posture"
       ref={ref}
-      className="border-b rule-hair"
+      className="py-20 md:py-28"
     >
-      <Container className="grid min-h-[70vh] grid-cols-1 items-center gap-10 py-24 md:grid-cols-12">
+      <Container className="grid min-h-[60vh] grid-cols-1 items-center gap-10 md:grid-cols-12">
         <SectionReveal className="md:col-span-6">
-          <div className="text-[11px] uppercase tracking-[0.28em] text-ink-mute">
-            § 03 · Confession
+          <div className="text-sm font-medium text-ink-mute">
+            Confession
           </div>
           <h2 className="mt-4 font-serif text-5xl leading-[1.05] md:text-7xl">
             The line I'd never

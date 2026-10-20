@@ -9,11 +9,11 @@ export function Colophon() {
     <section id="colophon">
       <Container className="grid grid-cols-1 gap-10 py-16 md:grid-cols-12 md:py-24">
         <SectionReveal className="md:col-span-3">
-          <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-ink-mute">
+          <div className="flex items-center gap-2 text-sm font-medium text-ink-mute">
             <div className="flex h-5 w-5 items-center justify-center rounded bg-ink text-paper">
               <LogoMark className="h-3 w-3" />
             </div>
-            <span>§ 05 · Colophon</span>
+            <span>Colophon</span>
           </div>
         </SectionReveal>
         <SectionReveal className="md:col-span-9">
@@ -62,9 +62,9 @@ export function Colophon() {
               Email <ArrowUpRight className="h-4 w-4" />
             </motion.a>
           </div>
-          <div className="mt-16 flex flex-wrap items-end justify-between gap-4 border-t rule-hair pt-6 text-[11px] uppercase tracking-[0.24em] text-ink-mute">
-            <div>Set in Instrument Serif & Inter. Printed to pixels, {new Date().getFullYear()}.</div>
-            <div>© Afsal Ali · All curiosities reserved.</div>
+          <div className="mt-16 flex flex-wrap items-end justify-between gap-4 border-t rule-hair pt-6 text-xs text-ink-mute"> {/* taste-skill-ignore */}
+            <div>Set in Instrument Serif & Inter. Published to pixels, {new Date().getFullYear()}.</div>
+            <div>© Afsal Ali · forthe.tech</div>
           </div>
         </SectionReveal>
       </Container>

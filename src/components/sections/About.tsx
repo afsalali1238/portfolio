@@ -4,10 +4,10 @@ import { projectCount, numberWord } from "../../data/projects";
 
 export function About() {
   return (
-    <section id="about" className="border-b rule-hair">
-      <Container className="grid grid-cols-1 gap-10 py-16 md:grid-cols-12 md:py-24">
+    <section id="about" className="py-20 md:py-28">
+      <Container className="grid grid-cols-1 gap-10 md:grid-cols-12">
         <SectionReveal className="md:col-span-3">
-          <div className="text-[11px] uppercase tracking-[0.28em] text-ink-mute">§ 01 · Origin</div>
+          <div className="text-sm font-medium text-ink-mute">Origin</div>
           <div className="mt-3 font-serif text-2xl italic text-ink-soft">What is forthe.tech?</div>
           <p className="mt-4 text-xs text-ink-mute leading-relaxed">
             The collapsing wall between imagining software and making it exist, documented in public.
@@ -42,7 +42,7 @@ export function About() {
             </p>
 
             <p>
-              And I don’t just read about new tools — I test them. When one launches, I build something with it that solves genuine friction in real life. That’s how I learn.
+              And I don't just read about new tools; I test them directly. When one launches, I build something with it that solves genuine friction in real life. That is how I learn.
             </p>
 
             <p>
@@ -55,7 +55,7 @@ export function About() {
               </p>
             </div>
 
-            <p className="text-xs uppercase tracking-[0.24em] text-ink-mute pt-2">
+            <p className="text-xs text-ink-mute pt-2">
               {numberWord(projectCount)} documented builds · forthe.tech · Dubai, UAE
             </p>
           </div>

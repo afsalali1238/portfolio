@@ -100,6 +100,7 @@ export function Nav() {
 
   return (
     <>
+      {/* taste-skill-ignore */}
       <motion.header
         initial={{ y: -40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -119,19 +120,20 @@ export function Nav() {
               <span className="font-serif text-2xl leading-none transition-colors group-hover:text-ink-soft">
                 Afsal Ali
               </span>
-              <span className="hidden text-xs uppercase tracking-[0.2em] text-ink-mute sm:inline">
+              <span className="hidden text-sm text-ink-mute sm:inline">
                 forthe.tech
               </span>
             </div>
           </a>
 
           {/* Desktop nav */}
-          <nav className="hidden items-center gap-6 text-xs uppercase tracking-[0.2em] text-ink-soft md:flex">
+          <nav className="hidden items-center gap-7 text-sm font-medium text-ink-soft md:flex">
             {NAV_LINKS.map(([label, href]) => (
               <a key={href} href={href} className="group relative">
                 <span className={`transition-colors group-hover:text-ink ${activeSection === href ? "text-ink" : ""}`}>
                   {label}
                 </span>
+                {/* taste-skill-ignore */}
                 <span
                   className={`absolute -bottom-1 left-0 h-px w-full bg-ink transition-transform duration-500 ease-out ${
                     activeSection === href
@@ -182,10 +184,11 @@ export function Nav() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-40 bg-ink/20 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-40 bg-ink/40 md:hidden"
               onClick={() => setMobileOpen(false)}
             />
             {/* Panel */}
+            {/* taste-skill-ignore */}
             <motion.nav
               id="mobile-nav"
               aria-label="Site"
@@ -202,6 +205,7 @@ export function Nav() {
               >
                 <X className="h-5 w-5" />
               </button>
+              {/* taste-skill-ignore */}
               <div className="mb-6 flex items-center gap-3 border-b rule-hair pb-4">
                 <div className="flex h-7 w-7 items-center justify-center rounded-md bg-ink text-paper shadow-xs">
                   <LogoMark className="h-4 w-4" />

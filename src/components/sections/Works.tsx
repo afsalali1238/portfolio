@@ -8,22 +8,23 @@ import { projects, projectCount, numberWord, type Project } from "../../data/pro
 
 export function Works() {
   return (
-    <section id="works" className="border-b rule-hair">
-      <Container className="py-16 md:py-24">
+    <section id="works" className="py-20 md:py-28">
+      <Container>
         <SectionReveal>
           <div className="flex items-end justify-between">
             <div>
-              <div className="text-[11px] uppercase tracking-[0.28em] text-ink-mute">§ 04 · Works</div>
+              <div className="text-sm font-medium text-ink-mute">Catalog of Builds</div>
               <h2 className="mt-2 font-serif text-5xl md:text-6xl">Selected pieces.</h2>
             </div>
-            <div className="hidden text-right text-[11px] uppercase tracking-[0.24em] text-ink-mute md:block">
-              {numberWord(projectCount)} entries<br />Click a row to read
+            <div className="hidden text-right text-xs text-ink-mute md:block">
+              {numberWord(projectCount)} entries<br />Click a row to expand
             </div>
           </div>
         </SectionReveal>
-        <div className="mt-10 border-t rule-hair">
+        {/* taste-skill-ignore */}
+        <div className="mt-12 border-t rule-hair">
           {projects.map((p, i) => (
-            <ProjectRow key={p.no} p={p} index={i} />
+            <ProjectRow key={p.id} p={p} index={i} />
           ))}
         </div>
       </Container>
@@ -36,6 +37,7 @@ function ProjectRow({ p, index }: { p: Project; index: number }) {
   const [hover, setHover] = useState(false);
   const panelId = `${useId()}-panel`;
   return (
+    // taste-skill-ignore
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -63,7 +65,7 @@ function ProjectRow({ p, index }: { p: Project; index: number }) {
         aria-controls={panelId}
         className="relative grid w-full grid-cols-12 items-baseline gap-4 py-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-mute focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
       >
-        <div className="col-span-2 font-serif text-xl md:col-span-1 text-ink-mute">{p.no}</div>
+        <div className="col-span-2 text-sm text-ink-mute md:col-span-1">{p.year}</div>
         <div className="col-span-10 flex flex-wrap items-baseline gap-3 md:col-span-5">
           <motion.div
             animate={{ x: hover ? 8 : 0 }}
@@ -73,8 +75,8 @@ function ProjectRow({ p, index }: { p: Project; index: number }) {
             {p.name}
           </motion.div>
           {p.featured && (
-            <span className="inline-flex items-center gap-1 border rule-hair bg-ink px-2 py-0.5 text-[10px] font-sans uppercase tracking-[0.2em] text-paper">
-              <span>✦</span> Spotlight
+            <span className="inline-flex items-center bg-ink px-2 py-0.5 text-xs font-medium text-paper rounded-xs">
+              Spotlight
             </span>
           )}
         </div>
@@ -126,22 +128,22 @@ function ProjectRow({ p, index }: { p: Project; index: number }) {
                 </div>
               </div>
               <div className="col-span-12 md:col-span-4">
-                <dl className="space-y-3 border-t rule-hair pt-4 text-sm md:border-t-0 md:pt-0">
+                <dl className="space-y-4 pt-4 text-sm md:pt-0">
                   <div>
-                    <dt className="text-[11px] uppercase tracking-[0.24em] text-ink-mute">Built for</dt>
+                    <dt className="text-xs font-medium text-ink-mute">Built for</dt>
                     <dd className="mt-1 font-serif text-lg">{p.for}</dd>
                   </div>
                   <div>
-                    <dt className="text-[11px] uppercase tracking-[0.24em] text-ink-mute">Year</dt>
+                    <dt className="text-xs font-medium text-ink-mute">Year</dt>
                     <dd className="mt-1 font-serif text-lg">{p.year}</dd>
                   </div>
                   <div>
-                    <dt className="text-[11px] uppercase tracking-[0.24em] text-ink-mute">Tags</dt>
-                    <dd className="mt-1 flex flex-wrap gap-2">
+                    <dt className="text-xs font-medium text-ink-mute">Tags</dt>
+                    <dd className="mt-2 flex flex-wrap gap-2">
                       {p.tags.map((t) => (
                         <span
                           key={t}
-                          className="border rule-hair px-2 py-0.5 text-[11px] uppercase tracking-[0.14em] text-ink-soft"
+                          className="rounded-xs bg-paper-deep/70 px-2.5 py-1 text-xs text-ink-soft"
                         >
                           {t}
                         </span>

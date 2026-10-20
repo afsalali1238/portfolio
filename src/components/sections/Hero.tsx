@@ -33,7 +33,7 @@ export function Stat({ label, value }: { label: string; value: string }) {
   return (
     <motion.div variants={rise}>
       <div className="font-serif text-3xl leading-none">{value}</div>
-      <div className="mt-2 text-[11px] uppercase tracking-[0.24em] text-ink-mute">{label}</div>
+      <div className="mt-2 text-xs text-ink-mute">{label}</div>
     </motion.div>
   );
 }
@@ -45,39 +45,38 @@ export function Hero() {
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.2]);
 
   return (
-    <section ref={ref} className="border-b rule-hair">
+    <section ref={ref} className="py-16 md:py-24">
       <motion.div style={{ y, opacity }}>
-        <Container className="py-14 md:py-24">
+        <Container>
           <motion.div
             initial="hidden"
             animate="show"
             variants={{ show: { transition: { staggerChildren: 0.06 } } }}
-            className="flex items-center justify-between text-[11px] uppercase tracking-[0.28em] text-ink-mute"
+            className="flex items-center justify-between text-sm font-medium text-ink-mute"
           >
-            <motion.span variants={rise}>Vol. I · No. 01</motion.span>
-            <motion.span variants={rise}>Est. 2025</motion.span>
-            <motion.span variants={rise} className="hidden sm:inline">Independent</motion.span>
+            <motion.span variants={rise}>Dubai, UAE</motion.span>
+            <motion.span variants={rise}>Public Ledger</motion.span>
+            <motion.span variants={rise} className="hidden sm:inline">Afsal Ali</motion.span>
           </motion.div>
 
-          <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-12">
-            <div className="md:col-span-9">
-              <h1 className="font-serif text-[13vw] leading-[0.88] tracking-tight md:text-[7rem] lg:text-[9rem]">
-                <RevealWord delay={0.1}>The&nbsp;</RevealWord>
-                <RevealWord delay={0.2} italic>Curious</RevealWord>
+          <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-12">
+            <div className="md:col-span-8">
+              <h1 className="font-serif text-[13vw] leading-[0.88] tracking-tight md:text-[6.5rem] lg:text-[8rem]">
+                <RevealWord delay={0.1}>For the</RevealWord>
                 <br />
-                <RevealWord delay={0.35}>Issue.</RevealWord>
+                <RevealWord delay={0.25}>tech.</RevealWord>
               </h1>
             </div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-col justify-end md:col-span-3"
+              transition={{ duration: 0.8, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-col justify-end md:col-span-4"
             >
               <p className="font-serif text-2xl leading-tight">
                 Building <span className="italic">forthe.tech</span>
               </p>
-              <p className="mt-4 text-sm text-ink-soft">
+              <p className="mt-4 text-sm leading-relaxed text-ink-soft">
                 Documenting what happens when the wall between having an idea and building it disappears.
               </p>
             </motion.div>
@@ -88,7 +87,7 @@ export function Hero() {
             whileInView="show"
             viewport={{ once: true, margin: "-80px" }}
             variants={{ show: { transition: { staggerChildren: 0.08 } } }}
-            className="mt-16 grid grid-cols-2 gap-6 border-t rule-hair pt-6 text-sm md:grid-cols-4"
+            className="mt-16 grid grid-cols-2 gap-6 rounded-lg bg-paper-deep/50 p-6 md:p-8 text-sm md:grid-cols-4"
           >
             <Stat label="Projects shipped" value={String(projectCount)} />
             <Stat label="Live on the internet" value={String(liveCount)} />

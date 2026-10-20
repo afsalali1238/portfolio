@@ -30,7 +30,7 @@ function Index() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="min-h-screen bg-paper text-ink grain"
+        className="min-h-svh bg-paper text-ink grain"
       >
         <a href="#works" className="skip-link">
           Skip to works
@@ -89,7 +89,7 @@ function BackToTop() {
           whileHover={{ y: -3 }}
           whileTap={{ scale: 0.95 }}
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-40 flex h-10 w-10 items-center justify-center border rule-hair bg-paper backdrop-blur shadow-sm transition-colors hover:bg-paper-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-mute"
+          className="fixed bottom-6 right-6 z-40 flex h-10 w-10 items-center justify-center border rule-hair bg-paper transition-colors hover:bg-paper-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-mute"
           aria-label="Back to top"
         >
           <ArrowUp className="h-4 w-4" />
