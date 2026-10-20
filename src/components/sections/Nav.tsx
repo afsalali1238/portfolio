@@ -10,6 +10,24 @@ const NAV_LINKS = [
   ["Contact", "#colophon"],
 ] as const;
 
+export function LogoMark({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 32 32"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <path
+        d="M16 5.5 C16 11.5 16 11.5 22.5 16 C16 20.5 16 20.5 16 26.5 C16 20.5 16 20.5 9.5 16 C16 11.5 16 11.5 16 5.5 Z"
+        fill="currentColor"
+      />
+      <circle cx="16" cy="16" r="1.6" fill="var(--color-ink, #1a1a17)" />
+    </svg>
+  );
+}
+
 export function Nav() {
   const [isDark, setIsDark] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -88,12 +106,23 @@ export function Nav() {
         className="sticky top-0 z-30 border-b rule-hair backdrop-blur bg-paper/70"
       >
         <Container className="flex items-center justify-between py-4">
-          <div className="flex items-baseline gap-3">
-            <span className="font-serif text-2xl leading-none">Afsal Ali</span>
-            <span className="hidden text-xs uppercase tracking-[0.2em] text-ink-mute sm:inline">
-              The Curious Issue
-            </span>
-          </div>
+          <a
+            href="#"
+            className="group flex items-center gap-3 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-mute"
+            aria-label="Afsal Ali - The Curious Issue"
+          >
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-ink text-paper shadow-xs transition-transform duration-300 group-hover:scale-105 group-hover:rotate-6">
+              <LogoMark className="h-4 w-4" />
+            </div>
+            <div className="flex items-baseline gap-2.5">
+              <span className="font-serif text-2xl leading-none transition-colors group-hover:text-ink-soft">
+                Afsal Ali
+              </span>
+              <span className="hidden text-xs uppercase tracking-[0.2em] text-ink-mute sm:inline">
+                The Curious Issue
+              </span>
+            </div>
+          </a>
 
           {/* Desktop nav */}
           <nav className="hidden items-center gap-6 text-xs uppercase tracking-[0.2em] text-ink-soft md:flex">
@@ -172,6 +201,12 @@ export function Nav() {
               >
                 <X className="h-5 w-5" />
               </button>
+              <div className="mb-6 flex items-center gap-3 border-b rule-hair pb-4">
+                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-ink text-paper shadow-xs">
+                  <LogoMark className="h-4 w-4" />
+                </div>
+                <span className="font-serif text-2xl leading-none">Afsal Ali</span>
+              </div>
               {NAV_LINKS.map(([label, href]) => (
                 <a
                   key={href}

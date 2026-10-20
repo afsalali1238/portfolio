@@ -2,13 +2,19 @@ import { motion } from "motion/react";
 import { ArrowUpRight, Github } from "lucide-react";
 import { Container } from "../layout/Container";
 import { SectionReveal } from "../animations/SectionReveal";
+import { LogoMark } from "./Nav";
 
 export function Colophon() {
   return (
     <section id="colophon">
       <Container className="grid grid-cols-1 gap-10 py-16 md:grid-cols-12 md:py-24">
         <SectionReveal className="md:col-span-3">
-          <div className="text-[11px] uppercase tracking-[0.28em] text-ink-mute">§ 05 · Colophon</div>
+          <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-ink-mute">
+            <div className="flex h-5 w-5 items-center justify-center rounded bg-ink text-paper">
+              <LogoMark className="h-3 w-3" />
+            </div>
+            <span>§ 05 · Colophon</span>
+          </div>
         </SectionReveal>
         <SectionReveal className="md:col-span-9">
           <h2 className="font-serif text-5xl md:text-6xl">Say hello.</h2>
