@@ -1,9 +1,37 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, ArrowUpRight, Github, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Github } from "lucide-react";
 import { Container } from "../../components/layout/Container";
 import { SectionReveal } from "../../components/animations/SectionReveal";
-import { LogoMark } from "../../components/sections/Nav";
-import { getProjectById, getNextAndPrevProjects } from "../../data/projects";
+import { PageShell } from "../../components/site/PageShell";
+import { getProjectById, getNextAndPrevProjects, type Project } from "../../data/projects";
+import { seo, SITE_URL, AUTHOR } from "../../lib/site";
+
+/** schema.org category from the project's tags — a recipe board isn't a DeveloperApplication. */
+function appCategory(p: Project) {
+  const t = p.tags.join(" ").toLowerCase();
+  if (t.includes("game")) return "GameApplication";
+  if (t.includes("healthcare")) return "HealthApplication";
+  if (t.includes("edtech") || t.includes("literacy")) return "EducationalApplication";
+  if (t.includes("marketplace")) return "ShoppingApplication";
+  if (t.includes("ai agents") || t.includes("cli")) return "DeveloperApplication";
+  return "WebApplication";
+}
+
+function projectSchema(p: Project) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: p.name,
+    description: p.detail,
+    url: p.live ?? `${SITE_URL}/works/${p.id}`,
+    ...(p.github ? { codeRepository: p.github } : {}),
+    applicationCategory: appCategory(p),
+    operatingSystem: "Web",
+    author: { "@type": "Person", name: AUTHOR, url: SITE_URL },
+    dateCreated: p.year,
+    keywords: p.tags.join(", "),
+  };
+}
 
 export const Route = createFileRoute("/works/$id")({
   loader: ({ params }) => {
@@ -17,14 +45,17 @@ export const Route = createFileRoute("/works/$id")({
   head: ({ loaderData }) => {
     if (!loaderData?.project) return {};
     const { project } = loaderData;
+    const tags = seo({
+      title: `${project.name} · forthe.tech`,
+      description: project.blurb,
+      path: `/works/${project.id}`,
+      image: `/og/${project.id}.png`,
+      imageAlt: `${project.name} — ${project.blurb}`,
+      type: "article",
+    });
     return {
-      meta: [
-        { title: `${project.name} · forthe.tech` },
-        { name: "description", content: project.blurb },
-        { property: "og:title", content: `${project.name} · forthe.tech` },
-        { property: "og:description", content: project.detail },
-        { property: "og:type", content: "article" },
-      ],
+      ...tags,
+      scripts: [{ type: "application/ld+json", children: JSON.stringify(projectSchema(project)) }],
     };
   },
   component: ProjectCaseStudy,
@@ -35,30 +66,20 @@ function ProjectCaseStudy() {
   const { project, prev, next } = Route.useLoaderData();
 
   return (
-    <div className="min-h-svh bg-paper text-ink pb-24">
-      {/* Top back navigation */}
-      <header className="sticky top-0 z-30 border-b rule-hair backdrop-blur bg-paper/80 py-4">
-        <Container className="flex items-center justify-between">
-          <Link
-            to="/"
-            className="group inline-flex items-center gap-2 text-sm text-ink-soft hover:text-ink transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            <span>Back to ledger</span>
-          </Link>
-
-          <Link to="/" className="flex items-center gap-2 text-sm font-medium">
-            <div className="flex h-6 w-6 items-center justify-center rounded bg-ink text-paper">
-              <LogoMark className="h-3.5 w-3.5" />
-            </div>
-            <span className="font-serif text-lg">forthe.tech</span>
-          </Link>
-        </Container>
-      </header>
+    <PageShell>
+      <Container className="max-w-4xl pt-8">
+        <Link
+          to="/works"
+          className="group inline-flex min-h-11 items-center gap-2 text-sm text-ink-soft transition-colors hover:text-ink"
+        >
+          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+          All work
+        </Link>
+      </Container>
 
       {/* Main case study */}
-      <main>
-        <Container className="max-w-4xl pt-12 md:pt-20">
+      <article className="pb-24">
+        <Container className="max-w-4xl pt-6 md:pt-12">
           <SectionReveal>
             {/* Meta badges */}
             <div className="flex flex-wrap items-center gap-3 text-xs text-ink-mute">
@@ -94,7 +115,7 @@ function ProjectCaseStudy() {
                   href={project.live}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-md bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-0.5"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-0.5"
                 >
                   Visit Live Site <ArrowUpRight className="h-4 w-4" />
                 </a>
@@ -104,7 +125,7 @@ function ProjectCaseStudy() {
                   href={project.github}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-md border rule-hair bg-paper px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-paper-deep"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-md border rule-hair bg-paper px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-paper-deep"
                 >
                   Source Code <Github className="h-4 w-4" />
                 </a>
@@ -211,29 +232,31 @@ function ProjectCaseStudy() {
             )}
           </div>
         </Container>
-      </main>
-    </div>
+      </article>
+    </PageShell>
   );
 }
 
 function ProjectNotFound() {
   return (
-    <div className="min-h-svh flex items-center justify-center bg-paper px-4">
-      <div className="max-w-md text-center">
-        <h1 className="font-serif text-6xl text-ink">404</h1>
-        <h2 className="mt-2 font-serif text-2xl text-ink-soft">Build not found</h2>
-        <p className="mt-2 text-sm text-ink-mute">
-          The requested project does not exist in the public ledger.
-        </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 rounded-md bg-ink px-4 py-2 text-sm text-paper"
-          >
-            <ArrowLeft className="h-4 w-4" /> Return to ledger
-          </Link>
+    <PageShell>
+      <div className="flex min-h-[60svh] items-center justify-center px-4">
+        <div className="max-w-md text-center">
+          <h1 className="font-serif text-6xl text-ink">404</h1>
+          <h2 className="mt-2 font-serif text-2xl text-ink-soft">Build not found</h2>
+          <p className="mt-2 text-sm text-ink-mute">
+            The requested project does not exist in the public ledger.
+          </p>
+          <div className="mt-6">
+            <Link
+              to="/works"
+              className="inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-5 text-sm text-paper"
+            >
+              <ArrowLeft className="h-4 w-4" /> See all work
+            </Link>
+          </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }

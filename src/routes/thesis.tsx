@@ -1,81 +1,50 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowDown, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Container } from "../components/layout/Container";
 import { SectionReveal } from "../components/animations/SectionReveal";
-import { LogoMark } from "../components/sections/Nav";
+import { PageShell } from "../components/site/PageShell";
+import { seo, SITE_URL, SITE_NAME, AUTHOR } from "../lib/site";
+
+const ARTICLE_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  headline: "The Energy Ledger: AI Tokens as Currency",
+  description:
+    "On AI tokens as currency, the thermodynamic debt of a prompt, and the moral requirement of building with intention.",
+  author: {
+    "@type": "Person",
+    name: AUTHOR,
+    url: SITE_URL,
+  },
+  publisher: {
+    "@type": "Organization",
+    name: SITE_NAME,
+    url: SITE_URL,
+  },
+  datePublished: "2026-10-21",
+  inLanguage: "en-US",
+};
 
 export const Route = createFileRoute("/thesis")({
   head: () => ({
-    meta: [
-      { title: "The Energy Ledger: AI Tokens as Currency · forthe.tech" },
-      {
-        name: "description",
-        content:
-          "On AI tokens as currency, the thermodynamic debt of a prompt, and the moral requirement of building with intention.",
-      },
-      { property: "og:title", content: "The Energy Ledger: AI Tokens as Currency · forthe.tech" },
-      {
-        property: "og:description",
-        content:
-          "A frontier model saying hello back burns the watt-hours a reading lamp uses for minutes. Firing off millions of aimless prompts while preaching ESG is pure hypocrisy.",
-      },
-      { property: "og:type", content: "article" },
-      { property: "og:url", content: "https://forthe.tech/thesis" },
-    ],
+    ...seo({
+      title: "The Energy Ledger: AI tokens as currency · forthe.tech",
+      description:
+        "On AI tokens as currency, the thermodynamic debt of a prompt, and the moral requirement of building with intention.",
+      path: "/thesis",
+      image: "/og/thesis.png",
+      type: "article",
+    }),
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],
   }),
   component: ThesisPage,
 });
 
 function ThesisPage() {
-  const ARTICLE_SCHEMA = {
-    "@context": "https://schema.org",
-    "@type": "TechArticle",
-    headline: "The Energy Ledger: AI Tokens as Currency",
-    description:
-      "On AI tokens as currency, the thermodynamic debt of a prompt, and the moral requirement of building with intention.",
-    author: {
-      "@type": "Person",
-      name: "Afsal Ali",
-      url: "https://forthe.tech",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "forthe.tech",
-      url: "https://forthe.tech",
-    },
-    datePublished: "2026-10-21",
-    inLanguage: "en-US",
-  };
-
   return (
-    <div className="min-h-svh bg-paper text-ink pb-24">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ARTICLE_SCHEMA) }}
-      />
-
-      {/* Top back navigation */}
-      <header className="sticky top-0 z-30 border-b rule-hair backdrop-blur bg-paper/80 py-4">
-        <Container className="flex items-center justify-between">
-          <Link
-            to="/"
-            className="group inline-flex items-center gap-2 text-sm text-ink-soft hover:text-ink transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            <span>Back to ledger</span>
-          </Link>
-
-          <Link to="/" className="flex items-center gap-2 text-sm font-medium">
-            <div className="flex h-6 w-6 items-center justify-center rounded bg-ink text-paper">
-              <LogoMark className="h-3.5 w-3.5" />
-            </div>
-            <span className="font-serif text-lg">forthe.tech</span>
-          </Link>
-        </Container>
-      </header>
-
+    <PageShell readingProgress>
       {/* Article Content */}
-      <main>
+      <div className="pb-24">
         <Container className="max-w-3xl pt-14 md:pt-24">
           <SectionReveal>
             <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
@@ -225,10 +194,10 @@ function ThesisPage() {
 
             <div className="pt-8 border-t rule-hair mt-12 flex flex-col sm:flex-row items-center justify-between gap-4">
               <Link
-                to="/"
-                className="inline-flex items-center gap-2 rounded-md bg-ink px-5 py-2.5 text-sm font-medium text-paper"
+                to="/works"
+                className="inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-5 text-sm font-medium text-paper"
               >
-                <ArrowLeft className="h-4 w-4" /> Return to Ledger
+                See what got built <ArrowRight className="h-4 w-4" />
               </Link>
 
               <span className="text-xs text-ink-mute">
@@ -237,7 +206,7 @@ function ThesisPage() {
             </div>
           </article>
         </Container>
-      </main>
-    </div>
+      </div>
+    </PageShell>
   );
 }

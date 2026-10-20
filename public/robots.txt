@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://forthe.tech/sitemap.xml
+Sitemap: https://www.forthe.tech/sitemap.xml

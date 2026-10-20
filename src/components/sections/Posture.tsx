@@ -2,7 +2,7 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { Container } from "../layout/Container";
 import { SectionReveal } from "../animations/SectionReveal";
-import postureDrawing from "@/assets/posture-drawing.png";
+import postureDrawing from "@/assets/posture-drawing.webp";
 
 export function Posture() {
   const ref = useRef<HTMLDivElement>(null);
@@ -39,9 +39,14 @@ export function Posture() {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="flex items-center justify-center md:col-span-6"
         >
+          {/* Transparent line art in ink; invert flips it to a light line on the dark theme. */}
           <img
             src={postureDrawing}
-            className="w-full max-w-md"
+            width={448}
+            height={448}
+            loading="lazy"
+            decoding="async"
+            className="w-full max-w-md dark:invert"
             alt="Line drawing of a person sitting cross-legged on the floor, hunched over a laptop"
           />
         </motion.div>
