@@ -18,6 +18,14 @@ export function Hero() {
         <Container>
           <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
             <div className="md:col-span-8">
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
+                className="mb-3 font-serif text-lg italic text-ink-mute md:text-xl"
+              >
+                The Curious Issue — Vol. I
+              </motion.p>
               <h1 className="font-serif text-[13vw] leading-[0.88] tracking-tight md:text-[6.5rem] lg:text-[8rem]">
                 <RevealWord delay={0.1}>For the</RevealWord>
                 <br />
