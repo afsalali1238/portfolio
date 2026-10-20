@@ -1,6 +1,8 @@
 {
   "build": {
-    "env": {}
+    "env": {
+      "DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS": "1"
+    }
   },
   "github": {
     "enabled": true,
