@@ -8,32 +8,52 @@ export function About() {
       <Container className="grid grid-cols-1 gap-10 py-16 md:grid-cols-12 md:py-24">
         <SectionReveal className="md:col-span-3">
           <div className="text-[11px] uppercase tracking-[0.28em] text-ink-mute">§ 01 · Manifesto</div>
-          <div className="mt-3 font-serif text-2xl italic text-ink-soft">forthe.tech</div>
+          <div className="mt-3 font-serif text-2xl italic text-ink-soft">The Energy Ledger</div>
+          <p className="mt-4 text-xs text-ink-mute leading-relaxed">
+            On publishing, tokens as currency, and why every prompt is a debt to the grid.
+          </p>
         </SectionReveal>
-        <SectionReveal className="md:col-span-9 space-y-6">
-          <p className="font-serif text-3xl leading-snug md:text-4xl">
-            The wall between having an idea and building it just came down.
-            Since then, I’ve been building for the tech. Literally:{" "}
+        <SectionReveal className="md:col-span-9 space-y-8">
+          <p className="font-serif text-3xl leading-snug md:text-4xl text-ink">
+            The wall between imagining a tool and making it exist just collapsed.
+            Since then, I’ve been documenting the fallout. Literally:{" "}
             <span className="italic">forthe.tech</span>.
           </p>
-          <div className="max-w-2xl space-y-4 text-base leading-relaxed text-ink-soft">
+
+          <div className="max-w-2xl space-y-5 text-base leading-relaxed text-ink-soft">
             <p>
-              For years, people with ideas hit the same wall: they could see the thing, but couldn't build it. Now they can. It feels like magic, and we’re lucky to live through it.
+              For decades, the limiting factor was syntax. People had clear, painful visions for things that ought to exist, and were stopped dead by the compiler. That barrier is gone. It feels miraculous, and we have the strange privilege of standing inside the shift.
             </p>
+
             <p>
-              It's also impossible to keep up with. Something "revolutionary" launches every morning; by dinner, it's irrelevant. Watching from the sidelines isn’t enough — but neither is being online 24 hours a day.
+              It also arrives with an unspoken debt.
             </p>
+
             <p>
-              So around a full-time job and family in Dubai, I filter. I don’t just read about new tools — I test them by building real things that solve real friction.
+              <strong className="font-medium text-ink">AI tokens are the new currency, and every token is an IOU on energy.</strong> A frontier model returning a breezy greeting burns the watt-hours that could have kept a reading lamp lit in your room for minutes. Silicon doesn’t run on magic; it runs on transformers, cooling towers, and diverted river water. We are transacting directly in joules.
             </p>
+
             <p>
-              I know my wife is a pharmacist, so I built PharmaRab and Provia. My friends are physios, so I built PhysioArab and kinē. Dubai's best food is next door, so I built NxtDoorChef. I collect mental models, so I built Doomscholar.
+              Which makes the current spectacle absurd. You cannot preach ESG and energy conservation in a quarterly slide deck while aimlessly firing millions of throwaway inference tokens to generate corporate noise. That is hypocrisy disguised as innovation.
             </p>
-            <p className="font-serif text-xl italic text-ink pt-2">
-              Tech isn’t the moat. What it changes in someone’s daily life is. Nobody values how complex the build was; they value whether it actually helped.
+
+            <p>
+              If every generation is a withdrawal from the grid, then aimless generation is pollution. The only moral defense of using this much power is <strong className="font-medium text-ink">intention</strong>: building things that genuinely lighten the weight of someone’s day.
             </p>
-            <p className="text-xs uppercase tracking-[0.2em] text-ink-mute pt-2">
-              {numberWord(projectCount)} experiments · Built in public · Dubai
+
+            <p>
+              So around a full-time job and family in Dubai, I don’t just read release notes — I document real artifacts. I spent energy building Provia and PharmaRab because my wife was drowning in licensing exams. I spent it on PhysioArab and kinē because therapist friends needed clinical tools that didn’t exist. I spent it on Doomscholar to map ideas that matter.
+            </p>
+
+            <div className="border-l-2 border-ink pl-4 py-1 my-6">
+              <p className="font-serif text-xl italic text-ink">
+                Tech is never the moat. What it alters in someone’s real, physical day is.
+                Nobody remembers how complex your pipeline was; they only remember whether it helped.
+              </p>
+            </div>
+
+            <p className="text-xs uppercase tracking-[0.24em] text-ink-mute pt-2">
+              {numberWord(projectCount)} documented builds · forthe.tech · Dubai
             </p>
           </div>
         </SectionReveal>
