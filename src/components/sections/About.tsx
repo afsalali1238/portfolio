@@ -14,8 +14,8 @@ export function About() {
             I don't know a lot of things. But I know my wife is a pharmacist, so I built her
             PharmaRab and Provia. I know my friends are physios, so I built them PhysioArab. I know
             Dubai's best meals are homemade, so I built NxtDoorChef. I know craft deserves every
-            rupee, so I built CraftersUnited. I know I'm curious about AI agents, so I built
-            Incubator.
+            rupee, so I built CraftersUnited. I know I collect mental models, so I built
+            Doomscholar. I know I'm curious about AI agents, so I built Incubator.
           </p>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-soft">
             {numberWord(projectCount)} small things for people I know. Nothing here is a product deck. Each piece exists

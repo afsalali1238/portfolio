@@ -32,7 +32,7 @@ export function Works() {
 }
 
 function ProjectRow({ p, index }: { p: Project; index: number }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(Boolean(p.featured));
   const [hover, setHover] = useState(false);
   const panelId = `${useId()}-panel`;
   return (
@@ -41,7 +41,7 @@ function ProjectRow({ p, index }: { p: Project; index: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: Math.min(index * 0.04, 0.3), ease: [0.22, 1, 0.36, 1] }}
-      className="relative border-b rule-hair"
+      className={`relative border-b rule-hair ${p.featured ? "bg-paper-deep/30" : ""}`}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
@@ -64,7 +64,7 @@ function ProjectRow({ p, index }: { p: Project; index: number }) {
         className="relative grid w-full grid-cols-12 items-baseline gap-4 py-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-mute focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
       >
         <div className="col-span-2 font-serif text-xl md:col-span-1 text-ink-mute">{p.no}</div>
-        <div className="col-span-10 md:col-span-5">
+        <div className="col-span-10 flex flex-wrap items-baseline gap-3 md:col-span-5">
           <motion.div
             animate={{ x: hover ? 8 : 0 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
@@ -72,6 +72,11 @@ function ProjectRow({ p, index }: { p: Project; index: number }) {
           >
             {p.name}
           </motion.div>
+          {p.featured && (
+            <span className="inline-flex items-center gap-1 border rule-hair bg-ink px-2 py-0.5 text-[10px] font-sans uppercase tracking-[0.2em] text-paper">
+              <span>✦</span> Spotlight
+            </span>
+          )}
         </div>
         {/* One copy only: sits under the name on mobile, in its own column on desktop. */}
         <div className="col-span-12 -mt-2 text-sm text-ink-soft md:col-span-5 md:mt-0">{p.blurb}</div>
