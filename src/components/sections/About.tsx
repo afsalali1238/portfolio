@@ -45,9 +45,27 @@ export function About() {
               </p>
             </div>
 
-            <p className="text-xs text-ink-mute pt-2">
-              {numberWord(projectCount)} documented builds · forthe.tech · Dubai, UAE
-            </p>
+            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t rule-hair text-xs text-ink-mute">
+              <span>{numberWord(projectCount)} documented builds · forthe.tech · Dubai, UAE</span>
+              <div className="flex gap-4">
+                <a
+                  href="/brand/forthe.tech-brand-guidelines.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline hover:text-ink"
+                >
+                  Brand guidelines (PDF)
+                </a>
+                <a
+                  href="/brand/forthe.tech-logo-guide.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline hover:text-ink"
+                >
+                  Logo guide (PDF)
+                </a>
+              </div>
+            </div>
           </div>
         </SectionReveal>
       </Container>

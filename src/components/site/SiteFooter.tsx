@@ -63,6 +63,14 @@ export function SiteFooter() {
               <Link to="/about" className="inline-flex min-h-11 items-center hover:text-ink">
                 About
               </Link>
+              <a
+                href="/brand/forthe.tech-brand-guidelines.pdf"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-11 items-center hover:text-ink"
+              >
+                Brand
+              </a>
             </nav>
             <div>© {new Date().getFullYear()} Afsal Ali · forthe.tech</div>
           </div>
