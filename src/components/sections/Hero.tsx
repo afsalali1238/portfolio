@@ -4,6 +4,7 @@ import { Link } from "@tanstack/react-router";
 import { Container } from "../layout/Container";
 import { projectCount, liveCount, forPeopleCount, sourceCount } from "../../data/projects";
 import { RevealWord, StatLink } from "./hero-helpers";
+import { HeroPrism } from "./HeroPrism";
 
 export function Hero() {
   return (
@@ -48,6 +49,9 @@ export function Hero() {
             </div>
           </div>
         </div>
+
+        {/* The Pink Floyd Prism & Constellation */}
+        <HeroPrism />
 
         <motion.div
           initial="hidden"
