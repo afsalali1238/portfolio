@@ -133,7 +133,14 @@ function WhatsAppOSPage() {
                 to="/notes"
                 className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
               >
-                <span>Back to all dispatches</span>
+                <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                <span>All dispatches</span>
+              </Link>
+              <Link
+                to="/notes/the-reality-test"
+                className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
+              >
+                <span>Next: Dispatch No. 06 · The reality test</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>

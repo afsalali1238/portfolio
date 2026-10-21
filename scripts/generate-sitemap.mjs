@@ -26,6 +26,7 @@ function generateSitemap() {
     { path: "/notes/the-energy-ledger", priority: 0.8, changefreq: "monthly" },
     { path: "/notes/the-empathy-moat", priority: 0.8, changefreq: "monthly" },
     { path: "/notes/the-15-minute-rule", priority: 0.8, changefreq: "monthly" },
+    { path: "/notes/the-reality-test", priority: 0.8, changefreq: "monthly" },
     { path: "/notes/the-whatsapp-operating-system", priority: 0.8, changefreq: "monthly" },
     { path: "/about", priority: 0.6, changefreq: "monthly" },
   ];

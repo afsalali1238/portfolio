@@ -7,6 +7,15 @@ import { seo } from "../../lib/site";
 
 const DISPATCHES = [
   {
+    number: "06",
+    date: "October 2026",
+    title: "The reality test.",
+    subtitle:
+      "Building is easy because it only involves you. Finding customers is brutal because strangers have zero bias toward your baby.",
+    path: "/notes/the-reality-test",
+    readTime: "4 min read",
+  },
+  {
     number: "05",
     date: "October 2026",
     title: "The WhatsApp operating system.",

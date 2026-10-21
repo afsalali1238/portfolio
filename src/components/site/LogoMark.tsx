@@ -7,80 +7,26 @@
 export function LogoMark({ className = "h-4 w-4" }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" fill="none" className={className} aria-hidden="true">
-      {/* Smooth left half with horizontal line cut (curiosity cutting in) */}
-      <path d="M 16 4.8 A 11.2 11.2 0 0 0 5.08 13.5 L 16 13.5 Z" fill="currentColor" />
-      <path d="M 16 15.75 L 4.80 15.75 A 11.2 11.2 0 0 0 16 27.2 Z" fill="currentColor" />
-
-      {/* Right half: pixel grid (tech, building) */}
-      {/* Row 0: 2 pixels */}
-      <rect x="16.25" y="5.25" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-      <rect x="19.00" y="5.25" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-
-      {/* Row 1: 3 pixels */}
-      <rect x="16.25" y="8.00" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-      <rect x="19.00" y="8.00" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-      <rect x="21.75" y="8.00" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-
-      {/* Row 2: 4 pixels */}
-      <rect x="16.25" y="10.75" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-      <rect x="19.00" y="10.75" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-      <rect x="21.75" y="10.75" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-      <rect x="24.50" y="10.75" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-
-      {/* Row 3: 4 pixels in clay (the line becomes built) */}
-      <rect
-        x="16.25"
-        y="13.50"
-        width="2.25"
-        height="2.25"
-        rx="0.3"
-        fill="var(--color-mark-dot, #E67E54)"
-      />
-      <rect
-        x="19.00"
-        y="13.50"
-        width="2.25"
-        height="2.25"
-        rx="0.3"
-        fill="var(--color-mark-dot, #E67E54)"
-      />
-      <rect
-        x="21.75"
-        y="13.50"
-        width="2.25"
-        height="2.25"
-        rx="0.3"
-        fill="var(--color-mark-dot, #E67E54)"
-      />
-      <rect
-        x="24.50"
-        y="13.50"
-        width="2.25"
-        height="2.25"
-        rx="0.3"
-        fill="var(--color-mark-dot, #E67E54)"
-      />
-
-      {/* Row 4: 4 pixels */}
-      <rect x="16.25" y="16.25" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-      <rect x="19.00" y="16.25" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-      <rect x="21.75" y="16.25" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-      <rect x="24.50" y="16.25" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-
-      {/* Row 5: 4 pixels */}
-      <rect x="16.25" y="19.00" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-      <rect x="19.00" y="19.00" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-      <rect x="21.75" y="19.00" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-      <rect x="24.50" y="19.00" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-
-      {/* Row 6: 3 pixels */}
-      <rect x="16.25" y="21.75" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-      <rect x="19.00" y="21.75" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-      <rect x="21.75" y="21.75" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-
-      {/* Row 7: 2 pixels */}
-      <rect x="16.25" y="24.50" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
-      <rect x="19.00" y="24.50" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+      {/* Smooth left half with curiosity cut (the wall) and standard pixel blocks */}
+      <g fill="currentColor">
+        <path d="M16 4.8A11.2 11.2 0 0 0 5.329 12.6H16Z" />
+        <path d="M16 15.7H4.804A11.2 11.2 0 0 0 16 27.2Z" />
+        <rect x="16.3" y="5.2" width="3.1" height="3.1" rx="0.5" />
+        <rect x="16.3" y="8.9" width="3.1" height="3.1" rx="0.5" />
+        <rect x="16.3" y="16.3" width="3.1" height="3.1" rx="0.5" />
+        <rect x="16.3" y="20" width="3.1" height="3.1" rx="0.5" />
+        <rect x="16.3" y="23.7" width="3.1" height="3.1" rx="0.5" />
+        <rect x="20" y="8.9" width="3.1" height="3.1" rx="0.5" />
+        <rect x="20" y="16.3" width="3.1" height="3.1" rx="0.5" />
+        <rect x="20" y="20" width="3.1" height="3.1" rx="0.5" />
+        <rect x="23.7" y="16.3" width="3.1" height="3.1" rx="0.5" />
+      </g>
+      {/* Clay pixel row continuing through the cut gap */}
+      <g fill="var(--color-mark-dot, #E67E54)">
+        <rect x="16.3" y="12.6" width="3.1" height="3.1" rx="0.5" />
+        <rect x="20" y="12.6" width="3.1" height="3.1" rx="0.5" />
+        <rect x="23.7" y="12.6" width="3.1" height="3.1" rx="0.5" />
+      </g>
     </svg>
   );
 }

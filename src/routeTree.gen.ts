@@ -17,6 +17,7 @@ import { Route as NotesThe15MinuteRuleRouteImport } from './routes/notes/the-15-
 import { Route as NotesTheEmpathyMoatRouteImport } from './routes/notes/the-empathy-moat'
 import { Route as NotesTheEnergyLedgerRouteImport } from './routes/notes/the-energy-ledger'
 import { Route as NotesTheMoatMovedRouteImport } from './routes/notes/the-moat-moved'
+import { Route as NotesTheRealityTestRouteImport } from './routes/notes/the-reality-test'
 import { Route as NotesTheWhatsappOperatingSystemRouteImport } from './routes/notes/the-whatsapp-operating-system'
 import { Route as WorksIndexRouteImport } from './routes/works/index'
 import { Route as WorksIdRouteImport } from './routes/works/$id'
@@ -61,6 +62,11 @@ const NotesTheMoatMovedRoute = NotesTheMoatMovedRouteImport.update({
   path: '/notes/the-moat-moved',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NotesTheRealityTestRoute = NotesTheRealityTestRouteImport.update({
+  id: '/notes/the-reality-test',
+  path: '/notes/the-reality-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NotesTheWhatsappOperatingSystemRoute =
   NotesTheWhatsappOperatingSystemRouteImport.update({
     id: '/notes/the-whatsapp-operating-system',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/notes/the-empathy-moat': typeof NotesTheEmpathyMoatRoute
   '/notes/the-energy-ledger': typeof NotesTheEnergyLedgerRoute
   '/notes/the-moat-moved': typeof NotesTheMoatMovedRoute
+  '/notes/the-reality-test': typeof NotesTheRealityTestRoute
   '/notes/the-whatsapp-operating-system': typeof NotesTheWhatsappOperatingSystemRoute
   '/works/$id': typeof WorksIdRoute
   '/notes/': typeof NotesIndexRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/notes/the-empathy-moat': typeof NotesTheEmpathyMoatRoute
   '/notes/the-energy-ledger': typeof NotesTheEnergyLedgerRoute
   '/notes/the-moat-moved': typeof NotesTheMoatMovedRoute
+  '/notes/the-reality-test': typeof NotesTheRealityTestRoute
   '/notes/the-whatsapp-operating-system': typeof NotesTheWhatsappOperatingSystemRoute
   '/works/$id': typeof WorksIdRoute
   '/notes': typeof NotesIndexRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/notes/the-empathy-moat': typeof NotesTheEmpathyMoatRoute
   '/notes/the-energy-ledger': typeof NotesTheEnergyLedgerRoute
   '/notes/the-moat-moved': typeof NotesTheMoatMovedRoute
+  '/notes/the-reality-test': typeof NotesTheRealityTestRoute
   '/notes/the-whatsapp-operating-system': typeof NotesTheWhatsappOperatingSystemRoute
   '/works/$id': typeof WorksIdRoute
   '/notes/': typeof NotesIndexRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/notes/the-empathy-moat'
     | '/notes/the-energy-ledger'
     | '/notes/the-moat-moved'
+    | '/notes/the-reality-test'
     | '/notes/the-whatsapp-operating-system'
     | '/works/$id'
     | '/notes/'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/notes/the-empathy-moat'
     | '/notes/the-energy-ledger'
     | '/notes/the-moat-moved'
+    | '/notes/the-reality-test'
     | '/notes/the-whatsapp-operating-system'
     | '/works/$id'
     | '/notes'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/notes/the-empathy-moat'
     | '/notes/the-energy-ledger'
     | '/notes/the-moat-moved'
+    | '/notes/the-reality-test'
     | '/notes/the-whatsapp-operating-system'
     | '/works/$id'
     | '/notes/'
@@ -168,6 +180,7 @@ export interface RootRouteChildren {
   NotesTheEmpathyMoatRoute: typeof NotesTheEmpathyMoatRoute
   NotesTheEnergyLedgerRoute: typeof NotesTheEnergyLedgerRoute
   NotesTheMoatMovedRoute: typeof NotesTheMoatMovedRoute
+  NotesTheRealityTestRoute: typeof NotesTheRealityTestRoute
   NotesTheWhatsappOperatingSystemRoute: typeof NotesTheWhatsappOperatingSystemRoute
   WorksIdRoute: typeof WorksIdRoute
   NotesIndexRoute: typeof NotesIndexRoute
@@ -232,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NotesTheMoatMovedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/notes/the-reality-test': {
+      id: '/notes/the-reality-test'
+      path: '/notes/the-reality-test'
+      fullPath: '/notes/the-reality-test'
+      preLoaderRoute: typeof NotesTheRealityTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/notes/the-whatsapp-operating-system': {
       id: '/notes/the-whatsapp-operating-system'
       path: '/notes/the-whatsapp-operating-system'
@@ -264,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   NotesTheEmpathyMoatRoute: NotesTheEmpathyMoatRoute,
   NotesTheEnergyLedgerRoute: NotesTheEnergyLedgerRoute,
   NotesTheMoatMovedRoute: NotesTheMoatMovedRoute,
+  NotesTheRealityTestRoute: NotesTheRealityTestRoute,
   NotesTheWhatsappOperatingSystemRoute: NotesTheWhatsappOperatingSystemRoute,
   WorksIdRoute: WorksIdRoute,
   NotesIndexRoute: NotesIndexRoute,
