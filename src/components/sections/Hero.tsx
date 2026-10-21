@@ -24,12 +24,15 @@ export function Hero() {
                 transition={{ duration: 0.6, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
                 className="mb-3 font-serif text-lg italic text-ink-mute md:text-xl"
               >
-                The Curious Issue — Vol. I
+                The Curious Issue — Vol. I · Pure Curiosity
               </motion.p>
-              <h1 className="font-serif text-[13vw] leading-[0.88] tracking-tight md:text-[6.5rem] lg:text-[8rem]">
-                <RevealWord delay={0.1}>For the</RevealWord>
-                <br />
-                <RevealWord delay={0.25}>tech.</RevealWord>
+              <h1 className="font-serif tracking-tight">
+                <span className="block text-[12vw] leading-[0.88] md:text-[5.5rem] lg:text-[7rem]">
+                  <RevealWord delay={0.1}>For the tech.</RevealWord>
+                </span>
+                <span className="block mt-2 text-[7vw] leading-[1.02] italic text-ink-mute md:text-[3.2rem] lg:text-[4rem]">
+                  <RevealWord delay={0.25} italic>Not because anyone asked.</RevealWord>
+                </span>
               </h1>
             </div>
 
