@@ -31,6 +31,18 @@ export type Project = {
 export const projects: Project[] = [
   {
     id: "doomscholar",
+    media: {
+      kind: "mobile",
+      video: "/works/doomscholar/explainer.mp4",
+      poster: "/works/doomscholar/poster.jpg",
+      steps: [
+        "Pick interests in onboarding.",
+        "Skim ideas one layer at a time.",
+        "Follow edges to linked concepts.",
+        "Listen to studio-grade audio narration.",
+        "Retain via spaced-repetition review queue.",
+      ],
+    },
     status: "in daily use",
     outcome:
       "Personal knowledge latticework actively syncing cognitive frameworks and mental models.",
@@ -68,6 +80,18 @@ export const projects: Project[] = [
   },
   {
     id: "kine",
+    media: {
+      kind: "desktop",
+      video: "/works/kine/explainer.mp4",
+      poster: "/works/kine/poster.jpg",
+      steps: [
+        "Point to where it hurts on a real 3D body.",
+        "Pin one precise spot — here, the left knee.",
+        "Answer a few questions, red flags first.",
+        "Get a plan: Calm, Load, Capacity.",
+        "All of it in Arabic too, right-to-left.",
+      ],
+    },
     status: "live",
     outcome: "Validated by clinical physiotherapist friends for range-of-motion assessments.",
     learned:
@@ -97,6 +121,18 @@ export const projects: Project[] = [
   },
   {
     id: "provia",
+    media: {
+      kind: "mobile",
+      video: "/works/provia/explainer.mp4",
+      poster: "/works/provia/poster.jpg",
+      steps: [
+        "Open the 45-day exam countdown grid.",
+        "Jump straight into Day 1 pharmacology.",
+        "Answer scenario-based clinical questions.",
+        "Read instant explanations with citations.",
+        "Battle peer pharmacists in real time.",
+      ],
+    },
     status: "in daily use",
     outcome: "Used daily for 45-day sprint prep leading into the DHA pharmacist licensing exam.",
     learned: "Offline PWA caching is critical for exam study during daily metro and bus commutes.",
@@ -123,6 +159,17 @@ export const projects: Project[] = [
   },
   {
     id: "pharmarab",
+    media: {
+      kind: "mobile",
+      video: "/works/pharmarab/explainer.mp4",
+      poster: "/works/pharmarab/poster.jpg",
+      steps: [
+        "Browse clinical Arabic syllabus for pharmacists.",
+        "Learn pediatric counter contraindications.",
+        "Tap to hear native clinical pronunciation.",
+        "Practice real hospital counter dialogues.",
+      ],
+    },
     status: "live",
     outcome: "Open-source bilingual conversational hub used at pharmacy counters across the Gulf.",
     learned:
@@ -151,6 +198,17 @@ export const projects: Project[] = [
   },
   {
     id: "physioarab",
+    media: {
+      kind: "mobile",
+      video: "/works/physioarab/explainer.mp4",
+      poster: "/works/physioarab/poster.jpg",
+      steps: [
+        "Select clinical movement commands (flex, extend).",
+        "Direct patients in clear, precise Arabic.",
+        "Listen to bedside pronunciation audio.",
+        "Complete patient discharge dialogue drills.",
+      ],
+    },
     status: "live",
     outcome: "Adopted for bedside Arabic movement instruction protocols.",
     learned: "Therapists need rapid movement command audio cards during active patient sessions.",
@@ -177,6 +235,17 @@ export const projects: Project[] = [
   },
   {
     id: "nxtdoorchef",
+    media: {
+      kind: "mobile",
+      video: "/works/nxtdoorchef/explainer.mp4",
+      poster: "/works/nxtdoorchef/poster.jpg",
+      steps: [
+        "Discover home chefs cooking in your neighborhood.",
+        "Browse today's limited home-kitchen specials.",
+        "Tap to say hello directly on WhatsApp.",
+        "Zero platform take-rate, 100% chef profit.",
+      ],
+    },
     status: "live",
     outcome:
       "Direct neighbor-to-kitchen discovery connecting home cooks across Dubai with zero platform commissions.",
@@ -203,6 +272,17 @@ export const projects: Project[] = [
   },
   {
     id: "incubator",
+    media: {
+      kind: "desktop",
+      video: "/works/incubator/explainer.mp4",
+      poster: "/works/incubator/poster.jpg",
+      steps: [
+        "CLI command line interface for Claude Code.",
+        "Runs automated deep research interview.",
+        "Hires and orchestrates team of specialist AI agents.",
+        "Delivers full codebase scaffolding.",
+      ],
+    },
     status: "live",
     outcome:
       "Automated autonomous multi-agent validation loops for stress-testing new product theses.",
@@ -230,6 +310,17 @@ export const projects: Project[] = [
   },
   {
     id: "novibe",
+    media: {
+      kind: "desktop",
+      video: "/works/novibe/explainer.mp4",
+      poster: "/works/novibe/poster.jpg",
+      steps: [
+        "Interactive 30-node landscape of tech trends.",
+        "Click a node to inspect market friction.",
+        "Follow threads connecting clustered insights.",
+        "Filter signal from AI industry hype.",
+      ],
+    },
     status: "live",
     outcome:
       "Non-linear 30-node AI curriculum explored by self-directed learners without streak gating.",
@@ -257,6 +348,17 @@ export const projects: Project[] = [
   },
   {
     id: "craftersunited",
+    media: {
+      kind: "mobile",
+      video: "/works/craftersunited/explainer.mp4",
+      poster: "/works/craftersunited/poster.jpg",
+      steps: [
+        "Browse handmade crafts from local artisans.",
+        "Connect with makers directly via WhatsApp.",
+        "Order bespoke gifts without marketplace middlemen.",
+        "Simple listing flow for independent makers.",
+      ],
+    },
     status: "live",
     outcome:
       "Direct artisan directory connecting Indian handmade craftspeople to buyers over WhatsApp.",
@@ -283,6 +385,17 @@ export const projects: Project[] = [
   },
   {
     id: "jobhunter-os",
+    media: {
+      kind: "desktop",
+      video: "/works/jobhunter-os/explainer.mp4",
+      poster: "/works/jobhunter-os/poster.jpg",
+      steps: [
+        "AI agent scrapes and matches job openings.",
+        "Scores postings against a 100-point rubric.",
+        "Tailors ATS-optimized resume variants.",
+        "Kanban pipeline tracking every application.",
+      ],
+    },
     status: "in daily use",
     outcome:
       "Automated 100-point fit scoring and tailored ATS-safe markdown CV generation for active applications.",
@@ -309,6 +422,17 @@ export const projects: Project[] = [
   },
   {
     id: "medical-coding",
+    media: {
+      kind: "desktop",
+      video: "/works/medical-coding/explainer.mp4",
+      poster: "/works/medical-coding/poster.jpg",
+      steps: [
+        "Structured 10-week clinical coding syllabus.",
+        "Practice ICD-10 and CPT coding drills.",
+        "Review instant rationales for code selection.",
+        "Track exam readiness with checkpoint tests.",
+      ],
+    },
     status: "live",
     outcome: "Calm 10-week study path covering AAPC CPC syllabus with DHA eClaimLink compliance.",
     learned:
@@ -334,6 +458,17 @@ export const projects: Project[] = [
   },
   {
     id: "terrarium",
+    media: {
+      kind: "desktop",
+      video: "/works/terrarium/explainer.mp4",
+      poster: "/works/terrarium/poster.jpg",
+      steps: [
+        "Nudge climate and weather in a miniature biosphere.",
+        "Answer tiny prayers from digital organisms.",
+        "Discover evolving myths and emergent world states.",
+        "Watch the ecosystem thrive over days.",
+      ],
+    },
     status: "live",
     outcome:
       "Cozy generative browser sandbox played without failure states or notification fatigue.",
@@ -360,6 +495,17 @@ export const projects: Project[] = [
   },
   {
     id: "gtm-os",
+    media: {
+      kind: "desktop",
+      video: "/works/gtm-os/explainer.mp4",
+      poster: "/works/gtm-os/poster.jpg",
+      steps: [
+        "Run gtm init to scaffold product launch.",
+        "Generates 16 strategic go-to-market pillars.",
+        "Tracks progress from zero to first 100 users.",
+        "Automates marketing checklists and launch copy.",
+      ],
+    },
     status: "live",
     outcome: "Open-source 16-pillar go-to-market framework adopted by technical founders.",
     learned:
@@ -385,6 +531,16 @@ export const projects: Project[] = [
   },
   {
     id: "parallel-perspective",
+    media: {
+      kind: "mobile",
+      video: "/works/parallel-perspective/explainer.mp4",
+      poster: "/works/parallel-perspective/poster.jpg",
+      steps: [
+        "Editorial scroll on architecture and culture.",
+        "Explore curated garments and spatial ideas.",
+        "Read quiet observations from Dubai.",
+      ],
+    },
     status: "live",
     outcome: "Published digital monograph exploring apparel semiotics and personal philosophy.",
     learned:
@@ -410,6 +566,18 @@ export const projects: Project[] = [
   },
   {
     id: "nadan-chayakada",
+    media: {
+      kind: "desktop",
+      sound: true,
+      video: "/works/nadan-chayakada/explainer.mp4",
+      poster: "/works/nadan-chayakada/poster.jpg",
+      steps: [
+        "Turn the nostalgic radio tuner dial.",
+        "Stream soothing rain and Kerala tea-shop ambience.",
+        "Listen to curated retro audio streams.",
+        "Designed for deep coding flow.",
+      ],
+    },
     status: "live",
     outcome:
       "Ambient web radio delivering nostalgic Kerala monsoon tea shop soundscapes to the Gulf diaspora.",
@@ -436,6 +604,17 @@ export const projects: Project[] = [
   },
   {
     id: "bodhi-pomodoro",
+    media: {
+      kind: "desktop",
+      video: "/works/bodhi-pomodoro/explainer.mp4",
+      poster: "/works/bodhi-pomodoro/poster.jpg",
+      steps: [
+        "Set focus timer, task, and allowed apps.",
+        "Bodhi meditates quietly beneath the Bodhi tree.",
+        "Distracting apps trigger laser alarms after grace.",
+        "Grow the tree and review end-of-day focus logs.",
+      ],
+    },
     status: "live",
     outcome:
       "Personal daily focus companion tracking sessions and gently discouraging distracting tabs.",

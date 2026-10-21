@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, Github } from "lucide-react";
 import { Container } from "../../components/layout/Container";
 import { SectionReveal } from "../../components/animations/SectionReveal";
 import { PageShell } from "../../components/site/PageShell";
+import { ExplainerVideo } from "../../components/site/ExplainerVideo";
 import { getProjectById, getNextAndPrevProjects, type Project } from "../../data/projects";
 import { seo, SITE_URL, AUTHOR } from "../../lib/site";
 
@@ -139,6 +140,33 @@ function ProjectCaseStudy() {
                 </a>
               )}
             </div>
+
+            {/* Visual Explainer / Interactive Walkthrough */}
+            {project.media && (
+              <div className="mt-12 border-b rule-hair pb-12">
+                <ExplainerVideo
+                  media={project.media}
+                  title={project.name}
+                  stills={
+                    project.id === "kine"
+                      ? [
+                          "/works/kine/01.jpg",
+                          "/works/kine/02.jpg",
+                          "/works/kine/03.jpg",
+                          "/works/kine/04.jpg",
+                        ]
+                      : project.id === "provia"
+                        ? [
+                            "/works/provia/01.jpg",
+                            "/works/provia/02.jpg",
+                            "/works/provia/03.jpg",
+                            "/works/provia/04.jpg",
+                          ]
+                        : [project.media.poster]
+                  }
+                />
+              </div>
+            )}
           </SectionReveal>
 
           {/* Deep-dive sections */}
