@@ -130,11 +130,19 @@ function EnergyLedgerPage() {
               <li>
                 <strong className="text-ink">My wife is a pharmacist.</strong> So I spent energy
                 building{" "}
-                <Link to="/works/pharmarab" className="text-ink underline hover:text-ink-soft">
+                <Link
+                  to="/works/$id"
+                  params={{ id: "pharmarab" }}
+                  className="text-ink underline hover:text-ink-soft"
+                >
                   PharmaRab
                 </Link>{" "}
                 and{" "}
-                <Link to="/works/provia" className="text-ink underline hover:text-ink-soft">
+                <Link
+                  to="/works/$id"
+                  params={{ id: "provia" }}
+                  className="text-ink underline hover:text-ink-soft"
+                >
                   Provia
                 </Link>{" "}
                 to help her and her peers pass grueling DHA licensing exams and speak clinical
@@ -143,11 +151,19 @@ function EnergyLedgerPage() {
               <li>
                 <strong className="text-ink">My friends are physiotherapists.</strong> So I spent
                 energy building{" "}
-                <Link to="/works/physioarab" className="text-ink underline hover:text-ink-soft">
+                <Link
+                  to="/works/$id"
+                  params={{ id: "physioarab" }}
+                  className="text-ink underline hover:text-ink-soft"
+                >
                   PhysioArab
                 </Link>{" "}
                 and{" "}
-                <Link to="/works/kine" className="text-ink underline hover:text-ink-soft">
+                <Link
+                  to="/works/$id"
+                  params={{ id: "kine" }}
+                  className="text-ink underline hover:text-ink-soft"
+                >
                   kinē
                 </Link>{" "}
                 to give therapists clinical tools their patients actually use.
@@ -155,7 +171,11 @@ function EnergyLedgerPage() {
               <li>
                 <strong className="text-ink">Dubai&rsquo;s home cooking was invisible.</strong> So I
                 built{" "}
-                <Link to="/works/nxtdoorchef" className="text-ink underline hover:text-ink-soft">
+                <Link
+                  to="/works/$id"
+                  params={{ id: "nxtdoorchef" }}
+                  className="text-ink underline hover:text-ink-soft"
+                >
                   NxtDoorChef
                 </Link>{" "}
                 to connect neighbors directly to authentic home kitchens with zero platform tax.

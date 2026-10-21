@@ -57,14 +57,14 @@ export function SiteFooter() {
               <Link to="/works" className="inline-flex min-h-11 items-center hover:text-ink">
                 Work
               </Link>
-              <Link to="/thesis" className="inline-flex min-h-11 items-center hover:text-ink">
-                Thesis
+              <Link to="/notes" className="inline-flex min-h-11 items-center hover:text-ink">
+                Notes
               </Link>
               <Link to="/about" className="inline-flex min-h-11 items-center hover:text-ink">
                 About
               </Link>
             </nav>
-            <div>Set in Instrument Serif &amp; Inter · © Afsal Ali · Dubai</div>
+            <div>© {new Date().getFullYear()} Afsal Ali · forthe.tech</div>
           </div>
         </div>
       </Container>

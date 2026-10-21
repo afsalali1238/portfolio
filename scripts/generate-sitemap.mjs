@@ -21,7 +21,12 @@ function generateSitemap() {
   const staticRoutes = [
     { path: "/", priority: 1.0, changefreq: "weekly" },
     { path: "/works", priority: 0.9, changefreq: "weekly" },
-    { path: "/thesis", priority: 0.8, changefreq: "monthly" },
+    { path: "/notes", priority: 0.85, changefreq: "weekly" },
+    { path: "/notes/the-moat-moved", priority: 0.8, changefreq: "monthly" },
+    { path: "/notes/the-energy-ledger", priority: 0.8, changefreq: "monthly" },
+    { path: "/notes/the-empathy-moat", priority: 0.8, changefreq: "monthly" },
+    { path: "/notes/the-15-minute-rule", priority: 0.8, changefreq: "monthly" },
+    { path: "/notes/the-whatsapp-operating-system", priority: 0.8, changefreq: "monthly" },
     { path: "/about", priority: 0.6, changefreq: "monthly" },
   ];
 

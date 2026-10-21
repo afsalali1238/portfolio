@@ -7,6 +7,33 @@ import { seo } from "../../lib/site";
 
 const DISPATCHES = [
   {
+    number: "05",
+    date: "October 2026",
+    title: "The WhatsApp operating system.",
+    subtitle:
+      "What building NxtDoorChef in Dubai taught me about local trust, disintermediation, and the death of platform taxes.",
+    path: "/notes/the-whatsapp-operating-system",
+    readTime: "4 min read",
+  },
+  {
+    number: "04",
+    date: "October 2026",
+    title: "The 15-minute rule.",
+    subtitle:
+      "Why infinite-scroll habit and health apps get abandoned, and the case for bounded daily loops.",
+    path: "/notes/the-15-minute-rule",
+    readTime: "3 min read",
+  },
+  {
+    number: "03",
+    date: "October 2026",
+    title: "The empathy moat.",
+    subtitle:
+      "Why building for someone you love beats every synthetic product persona and corporate metrics deck.",
+    path: "/notes/the-empathy-moat",
+    readTime: "4 min read",
+  },
+  {
     number: "02",
     date: "October 2026",
     title: "The moat moved.",
@@ -29,7 +56,7 @@ export const Route = createFileRoute("/notes/")({
     ...seo({
       title: "Notes & Dispatches · forthe.tech",
       description:
-        "Essays on software, the collapsing build barrier, energy ledgers, and shifting moats.",
+        "Essays on software, the collapsing build barrier, energy ledgers, shifting moats, and building for real people.",
       path: "/notes",
       image: "/og/home.png",
     }),
@@ -50,8 +77,8 @@ function NotesIndexPage() {
               Notes on the shift.
             </h1>
             <p className="mt-4 max-w-xl text-base text-ink-mute">
-              Arguments and field notes on what happens when anyone can build software, what
-              constitutes a real moat, and the thermodynamic cost of intelligence.
+              Essays and field notes on what happens when anyone can build software, what
+              constitutes a real moat, and the discipline of solving friction for people you know.
             </p>
           </SectionReveal>
 
