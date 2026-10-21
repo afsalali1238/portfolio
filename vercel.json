@@ -37,6 +37,11 @@
   ],
   "redirects": [
     {
+      "source": "/thesis",
+      "destination": "/notes/the-energy-ledger",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [
         {

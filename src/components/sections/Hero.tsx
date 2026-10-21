@@ -19,9 +19,15 @@ export function Hero() {
                 <RevealWord delay={0.05}>For the tech.</RevealWord>
               </span>
               <span className="block mt-2 text-[7vw] leading-[1.02] italic text-ink-mute md:text-[3.2rem] lg:text-[4rem]">
-                <RevealWord delay={0.18} italic>Not because anyone asked.</RevealWord>
+                <RevealWord delay={0.18} italic>
+                  Not because anyone asked.
+                </RevealWord>
               </span>
             </h1>
+            <p className="mt-5 text-sm text-ink-mute">
+              Afsal Ali. Operations by day in Dubai; by night, small software for the people around
+              me.
+            </p>
           </div>
 
           <div className="flex flex-col justify-end space-y-5 md:col-span-4">
@@ -38,10 +44,10 @@ export function Hero() {
                 See the builds <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                to="/thesis"
+                to="/notes"
                 className="inline-flex min-h-11 items-center gap-2 rounded-md border rule-hair bg-paper px-5 text-ink transition-colors hover:bg-paper-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               >
-                The Thesis <ArrowRight className="h-4 w-4" />
+                Read the notes <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>

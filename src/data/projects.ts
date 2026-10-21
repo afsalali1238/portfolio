@@ -1,3 +1,5 @@
+export type ProjectStatus = "live" | "in daily use" | "paused" | "archived";
+
 export type Project = {
   id: string;
   name: string;
@@ -13,11 +15,27 @@ export type Project = {
   solution?: string;
   stack?: string[];
   highlights?: string[];
+  outcome?: string;
+  learned?: string;
+  status?: ProjectStatus;
+  media?: {
+    kind: "mobile" | "desktop";
+    video: string;
+    webm?: string;
+    poster: string;
+    steps: string[];
+    sound?: boolean;
+  };
 };
 
 export const projects: Project[] = [
   {
     id: "doomscholar",
+    status: "in daily use",
+    outcome:
+      "Personal knowledge latticework actively syncing cognitive frameworks and mental models.",
+    learned:
+      "Spaced repetition only works if layer skimming is friction-free with audio narration.",
     name: "Doomscholar",
     year: "2026",
     for: "Learning",
@@ -50,6 +68,10 @@ export const projects: Project[] = [
   },
   {
     id: "kine",
+    status: "live",
+    outcome: "Validated by clinical physiotherapist friends for range-of-motion assessments.",
+    learned:
+      "Real 3D anatomical raycasting clarifies patient pain localization far better than 2D diagrams.",
     name: "kinē",
     year: "2026",
     for: "Patients",
@@ -65,12 +87,7 @@ export const projects: Project[] = [
       "Patients struggle to describe musculoskeletal pain on 2D paper forms or flat drop-down menus. Clinical triage often fails because patients cannot pinpoint anatomical landmarks accurately, and exercise sheets are universally abandoned.",
     solution:
       "Engineered a real-time 3D anatomical model with raycasted ray-hit pain pinning. Built a rule-based clinical assessment engine that screens red flags, stratifies symptoms into clinical patterns, and outputs an adaptive 3-phase rehabilitation program with audio cues and RTL Arabic support.",
-    stack: [
-      "Next.js",
-      "React Three Fiber",
-      "Three.js",
-      "Tailwind CSS",
-    ],
+    stack: ["Next.js", "React Three Fiber", "Three.js", "Tailwind CSS"],
     highlights: [
       "Interactive 3D male & female anatomical models with vertex-accurate pain pinning",
       "Clinical triage engine with red-flag safety screening",
@@ -80,6 +97,9 @@ export const projects: Project[] = [
   },
   {
     id: "provia",
+    status: "in daily use",
+    outcome: "Used daily for 45-day sprint prep leading into the DHA pharmacist licensing exam.",
+    learned: "Offline PWA caching is critical for exam study during daily metro and bus commutes.",
     name: "Provia",
     year: "2025",
     for: "Wife",
@@ -103,6 +123,10 @@ export const projects: Project[] = [
   },
   {
     id: "pharmarab",
+    status: "live",
+    outcome: "Open-source bilingual conversational hub used at pharmacy counters across the Gulf.",
+    learned:
+      "Clinical phrasing requires exact phonetic transliteration and speech synthesis, not tourist vocab.",
     name: "PharmaRab",
     year: "2025",
     for: "Wife",
@@ -127,6 +151,9 @@ export const projects: Project[] = [
   },
   {
     id: "physioarab",
+    status: "live",
+    outcome: "Adopted for bedside Arabic movement instruction protocols.",
+    learned: "Therapists need rapid movement command audio cards during active patient sessions.",
     name: "PhysioArab",
     year: "2025",
     for: "Friends",
@@ -150,6 +177,11 @@ export const projects: Project[] = [
   },
   {
     id: "nxtdoorchef",
+    status: "live",
+    outcome:
+      "Direct neighbor-to-kitchen discovery connecting home cooks across Dubai with zero platform commissions.",
+    learned:
+      "Removing middleman fees creates trust; WhatsApp is the natural closing channel for local food.",
     name: "NxtDoorChef",
     year: "2025",
     for: "Dubai",
@@ -171,6 +203,11 @@ export const projects: Project[] = [
   },
   {
     id: "incubator",
+    status: "live",
+    outcome:
+      "Automated autonomous multi-agent validation loops for stress-testing new product theses.",
+    learned:
+      "Agents need adversarial dissent protocols, or they default to sycophantic cheerleader advice.",
     name: "Incubator",
     year: "2025",
     for: "Me",
@@ -193,6 +230,10 @@ export const projects: Project[] = [
   },
   {
     id: "novibe",
+    status: "live",
+    outcome:
+      "Non-linear 30-node AI curriculum explored by self-directed learners without streak gating.",
+    learned: "Adult learners retain more when they can jump straight to the node that itches.",
     name: "NoVibe",
     year: "2025",
     for: "Learning",
@@ -216,6 +257,11 @@ export const projects: Project[] = [
   },
   {
     id: "craftersunited",
+    status: "live",
+    outcome:
+      "Direct artisan directory connecting Indian handmade craftspeople to buyers over WhatsApp.",
+    learned:
+      "Artisans need zero-barrier mobile listing flows without complex ecommerce onboarding.",
     name: "CraftersUnited",
     year: "2025",
     for: "Makers",
@@ -237,6 +283,11 @@ export const projects: Project[] = [
   },
   {
     id: "jobhunter-os",
+    status: "in daily use",
+    outcome:
+      "Automated 100-point fit scoring and tailored ATS-safe markdown CV generation for active applications.",
+    learned:
+      "An AI-IDE workspace beats clinical spreadsheets by preserving emotional context and reflections.",
     name: "JobHunter OS",
     year: "2025",
     for: "Wife",
@@ -258,6 +309,10 @@ export const projects: Project[] = [
   },
   {
     id: "medical-coding",
+    status: "live",
+    outcome: "Calm 10-week study path covering AAPC CPC syllabus with DHA eClaimLink compliance.",
+    learned:
+      "Region-specific insurance guidelines are what make generic certification material actually usable.",
     name: "Medical Coding Mastery",
     year: "2025",
     for: "Wife",
@@ -279,6 +334,11 @@ export const projects: Project[] = [
   },
   {
     id: "terrarium",
+    status: "live",
+    outcome:
+      "Cozy generative browser sandbox played without failure states or notification fatigue.",
+    learned:
+      "Procedural climate and lore generation can turn an idle browser tab into a meditative ritual.",
     name: "Terrarium",
     year: "2025",
     for: "Fun",
@@ -300,6 +360,10 @@ export const projects: Project[] = [
   },
   {
     id: "gtm-os",
+    status: "live",
+    outcome: "Open-source 16-pillar go-to-market framework adopted by technical founders.",
+    learned:
+      "Engineers don't hate sales; they hate ambiguity. Structured checklists bridge the gap.",
     name: "GTM-OS",
     year: "2026",
     for: "Founders",
@@ -321,6 +385,10 @@ export const projects: Project[] = [
   },
   {
     id: "parallel-perspective",
+    status: "live",
+    outcome: "Published digital monograph exploring apparel semiotics and personal philosophy.",
+    learned:
+      "Editorial typography and long-form manifestos attract higher-intent resonance than catalogues.",
     name: "Parallel Perspective",
     year: "2026",
     for: "Me",
@@ -342,6 +410,10 @@ export const projects: Project[] = [
   },
   {
     id: "nadan-chayakada",
+    status: "live",
+    outcome:
+      "Ambient web radio delivering nostalgic Kerala monsoon tea shop soundscapes to the Gulf diaspora.",
+    learned: "Tactile retro interfaces and ambient rain audio evoke deep emotional connection.",
     name: "Nadan Chayakada",
     year: "2026",
     for: "Kerala",
@@ -364,6 +436,11 @@ export const projects: Project[] = [
   },
   {
     id: "bodhi-pomodoro",
+    status: "live",
+    outcome:
+      "Personal daily focus companion tracking sessions and gently discouraging distracting tabs.",
+    learned:
+      "Passive menu-bar timers get ignored; an on-screen companion creates genuine focus accountability.",
     name: "Bodhi Pomodoro",
     year: "2026",
     for: "Me",

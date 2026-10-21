@@ -1,0 +1,126 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
+import { PageShell } from "../../components/site/PageShell";
+import { Container } from "../../components/layout/Container";
+import { SectionReveal } from "../../components/animations/SectionReveal";
+import { seo } from "../../lib/site";
+
+const ARTICLE_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  headline: "The Moat Moved",
+  description: "Ideas were cheap. Then building was. Now even being first is.",
+  author: {
+    "@type": "Person",
+    name: "Afsal Ali",
+    url: "https://www.forthe.tech",
+  },
+  publisher: {
+    "@type": "Organization",
+    name: "forthe.tech",
+    url: "https://www.forthe.tech",
+  },
+  datePublished: "2026-10-21",
+  inLanguage: "en-US",
+};
+
+export const Route = createFileRoute("/notes/the-moat-moved")({
+  head: () => ({
+    ...seo({
+      title: "The Moat Moved: Dispatch No. 02 · forthe.tech",
+      description: "Ideas were cheap. Then building was. Now even being first is.",
+      path: "/notes/the-moat-moved",
+      image: "/og/home.png",
+      type: "article",
+    }),
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],
+  }),
+  component: TheMoatMovedPage,
+});
+
+function TheMoatMovedPage() {
+  return (
+    <PageShell readingProgress>
+      <div className="pb-24">
+        <Container className="max-w-3xl pt-14 md:pt-24">
+          <SectionReveal>
+            <Link
+              to="/notes"
+              className="mb-6 inline-flex items-center gap-1.5 text-xs text-ink-mute transition-colors hover:text-ink"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> Back to Notes
+            </Link>
+            <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
+              Dispatch No. 02 · October 2026
+            </div>
+            <h1 className="mt-3 font-serif text-5xl leading-[1.05] tracking-tight text-ink md:text-6xl">
+              The moat moved.
+            </h1>
+            <p className="mt-4 font-serif text-xl italic text-ink-mute">
+              Ideas were cheap. Then building was. Now even being first is.
+            </p>
+          </SectionReveal>
+
+          <article className="mt-12 space-y-6 text-base leading-relaxed text-ink-soft md:text-lg">
+            <p>
+              Everyone has a friend who says it. <em>&ldquo;I had that idea. Years ago.&rdquo;</em>{" "}
+              They didn&rsquo;t build it. Someone else did. Now it&rsquo;s a billion-dollar company.
+            </p>
+
+            <p>
+              For a long time that was fair. Ideas were cheap. Execution was hard. Building was the
+              moat.
+            </p>
+
+            <p>
+              Then the wall came down. AI made building cheap, and for a moment the moat moved one
+              step: to whoever got there first. Being first still took effort. Effort was the moat.
+            </p>
+
+            <div className="my-8 border-l-2 border-ink py-2 pl-6">
+              <p className="font-serif text-2xl italic text-ink">That moment is over.</p>
+            </div>
+
+            <p>
+              Now you can be first and it barely matters. Your big idea is someone else&rsquo;s
+              weekend. Anybody can copy it. What&rsquo;s hard isn&rsquo;t the build any more.
+              It&rsquo;s surviving the burn long enough for people to show up.
+            </p>
+
+            <p>
+              And they don&rsquo;t stay. When there are a hundred apps for the same thing, nobody is
+              loyal. Anyone could build their own. What holds is what always held, underneath the
+              noise: network effects. Profit.
+            </p>
+
+            <p>
+              So stop marrying the idea. The product isn&rsquo;t your baby. Another feature
+              isn&rsquo;t another customer.
+            </p>
+
+            <p>
+              And not every customer counts. Not the tourists. Not the ones who came for the
+              discount. The ones who pay full price, and keep paying. The ones who bring revenue,
+              and profit.
+            </p>
+
+            <p>
+              To keep them, you have to solve a real problem better than anyone else in the market,
+              in a way nobody can copy.
+            </p>
+
+            <p className="italic text-ink">And even then.</p>
+
+            <p>
+              The day you start making real money, the big pockets notice. A kid with an investor
+              for a father. A founder fresh off a billion-dollar exit. They build it bigger, ship it
+              louder, and get all the press.
+            </p>
+
+            <p className="pt-4 font-serif text-2xl italic text-ink">Yours is just a copy.</p>
+          </article>
+        </Container>
+      </div>
+    </PageShell>
+  );
+}

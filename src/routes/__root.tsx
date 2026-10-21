@@ -16,7 +16,6 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { PageShell } from "../components/site/PageShell";
 import { SITE_URL, SITE_NAME, AUTHOR, DEFAULT_DESCRIPTION } from "../lib/site";
 
-
 function NotFoundComponent() {
   return (
     <PageShell>

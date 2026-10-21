@@ -90,6 +90,14 @@ function ProjectCaseStudy() {
               <span className="rounded-full bg-paper-deep px-3 py-1 font-medium text-ink-soft">
                 Built for {project.for}
               </span>
+              {project.status && (
+                <>
+                  <span>·</span>
+                  <span className="rounded-full border rule-hair bg-paper px-3 py-1 font-medium capitalize text-ink">
+                    {project.status}
+                  </span>
+                </>
+              )}
               {project.featured && (
                 <>
                   <span>·</span>
@@ -157,15 +165,38 @@ function ProjectCaseStudy() {
               </p>
             </SectionReveal>
 
+            {/* Outcome */}
+            {project.outcome && (
+              <SectionReveal className="space-y-4">
+                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
+                  03 · What Changed (Outcome)
+                </div>
+                <h2 className="font-serif text-3xl text-ink">The Real Result.</h2>
+                <p className="text-base leading-relaxed text-ink md:text-lg">{project.outcome}</p>
+              </SectionReveal>
+            )}
+
+            {/* What I Learned */}
+            {project.learned && (
+              <SectionReveal className="space-y-4 border-l-2 border-ink py-2 pl-6">
+                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
+                  04 · What I Learned
+                </div>
+                <p className="font-serif text-2xl italic leading-snug text-ink">
+                  &ldquo;{project.learned}&rdquo;
+                </p>
+              </SectionReveal>
+            )}
+
             {/* Key Highlights */}
             {project.highlights && project.highlights.length > 0 && (
               <SectionReveal className="space-y-4">
                 <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-                  03 · Engineering Highlights
+                  05 · Engineering Highlights
                 </div>
                 <h2 className="font-serif text-3xl text-ink">Concrete Capabilities</h2>
                 <ul className="space-y-3 pt-2">
-                  {project.highlights.map((h, i) => (
+                  {project.highlights.map((h: string, i: number) => (
                     <li key={i} className="flex items-start gap-3 text-base text-ink-soft">
                       <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-ink shrink-0" />
                       <span>{h}</span>
@@ -181,7 +212,7 @@ function ProjectCaseStudy() {
                 04 · Technical Stack & Standards
               </div>
               <div className="flex flex-wrap gap-2 pt-2">
-                {(project.stack || project.tags).map((tech) => (
+                {((project.stack || project.tags) as string[]).map((tech: string) => (
                   <span
                     key={tech}
                     className="rounded-md border rule-hair bg-paper px-3 py-1.5 text-xs font-medium text-ink"

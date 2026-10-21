@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ThesisRouteImport } from './routes/thesis'
+import { Route as NotesIndexRouteImport } from './routes/notes/index'
+import { Route as NotesTheEnergyLedgerRouteImport } from './routes/notes/the-energy-ledger'
+import { Route as NotesTheMoatMovedRouteImport } from './routes/notes/the-moat-moved'
 import { Route as WorksIndexRouteImport } from './routes/works/index'
 import { Route as WorksIdRouteImport } from './routes/works/$id'
 
@@ -30,6 +33,21 @@ const ThesisRoute = ThesisRouteImport.update({
   path: '/thesis',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NotesIndexRoute = NotesIndexRouteImport.update({
+  id: '/notes/',
+  path: '/notes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotesTheEnergyLedgerRoute = NotesTheEnergyLedgerRouteImport.update({
+  id: '/notes/the-energy-ledger',
+  path: '/notes/the-energy-ledger',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotesTheMoatMovedRoute = NotesTheMoatMovedRouteImport.update({
+  id: '/notes/the-moat-moved',
+  path: '/notes/the-moat-moved',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WorksIndexRoute = WorksIndexRouteImport.update({
   id: '/works/',
   path: '/works/',
@@ -45,14 +63,20 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/thesis': typeof ThesisRoute
+  '/notes/the-energy-ledger': typeof NotesTheEnergyLedgerRoute
+  '/notes/the-moat-moved': typeof NotesTheMoatMovedRoute
   '/works/$id': typeof WorksIdRoute
+  '/notes/': typeof NotesIndexRoute
   '/works/': typeof WorksIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/thesis': typeof ThesisRoute
+  '/notes/the-energy-ledger': typeof NotesTheEnergyLedgerRoute
+  '/notes/the-moat-moved': typeof NotesTheMoatMovedRoute
   '/works/$id': typeof WorksIdRoute
+  '/notes': typeof NotesIndexRoute
   '/works': typeof WorksIndexRoute
 }
 export interface FileRoutesById {
@@ -60,22 +84,53 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/thesis': typeof ThesisRoute
+  '/notes/the-energy-ledger': typeof NotesTheEnergyLedgerRoute
+  '/notes/the-moat-moved': typeof NotesTheMoatMovedRoute
   '/works/$id': typeof WorksIdRoute
+  '/notes/': typeof NotesIndexRoute
   '/works/': typeof WorksIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/thesis' | '/works/$id' | '/works/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/thesis'
+    | '/notes/the-energy-ledger'
+    | '/notes/the-moat-moved'
+    | '/works/$id'
+    | '/notes/'
+    | '/works/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/thesis' | '/works/$id' | '/works'
-  id: '__root__' | '/' | '/about' | '/thesis' | '/works/$id' | '/works/'
+  to:
+    | '/'
+    | '/about'
+    | '/thesis'
+    | '/notes/the-energy-ledger'
+    | '/notes/the-moat-moved'
+    | '/works/$id'
+    | '/notes'
+    | '/works'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/thesis'
+    | '/notes/the-energy-ledger'
+    | '/notes/the-moat-moved'
+    | '/works/$id'
+    | '/notes/'
+    | '/works/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ThesisRoute: typeof ThesisRoute
+  NotesTheEnergyLedgerRoute: typeof NotesTheEnergyLedgerRoute
+  NotesTheMoatMovedRoute: typeof NotesTheMoatMovedRoute
   WorksIdRoute: typeof WorksIdRoute
+  NotesIndexRoute: typeof NotesIndexRoute
   WorksIndexRoute: typeof WorksIndexRoute
 }
 
@@ -102,6 +157,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ThesisRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/notes/': {
+      id: '/notes/'
+      path: '/notes'
+      fullPath: '/notes/'
+      preLoaderRoute: typeof NotesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notes/the-energy-ledger': {
+      id: '/notes/the-energy-ledger'
+      path: '/notes/the-energy-ledger'
+      fullPath: '/notes/the-energy-ledger'
+      preLoaderRoute: typeof NotesTheEnergyLedgerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notes/the-moat-moved': {
+      id: '/notes/the-moat-moved'
+      path: '/notes/the-moat-moved'
+      fullPath: '/notes/the-moat-moved'
+      preLoaderRoute: typeof NotesTheMoatMovedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/works/': {
       id: '/works/'
       path: '/works'
@@ -123,7 +199,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ThesisRoute: ThesisRoute,
+  NotesTheEnergyLedgerRoute: NotesTheEnergyLedgerRoute,
+  NotesTheMoatMovedRoute: NotesTheMoatMovedRoute,
   WorksIdRoute: WorksIdRoute,
+  NotesIndexRoute: NotesIndexRoute,
   WorksIndexRoute: WorksIndexRoute,
 }
 export const routeTree = rootRouteImport

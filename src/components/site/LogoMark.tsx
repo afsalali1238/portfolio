@@ -1,28 +1,29 @@
 /**
- * The "f." mark: Instrument Serif italic f with one clay full stop — the same full stop
- * that ends the headline and hinges the domain. Paths are the font's own outlines,
- * composed on a 32×32 grid so the same geometry ships as favicon.svg.
+ * Logo: Round 4 A — Through the Crack (Recommended).
+ * One line meets a wall, slips through its one gap, then branches 1 → 2 → 4
+ * and joins back up; the newest node is clay.
  */
-const F_PATH =
-  "M 9.41 27.71 Q 8.99 27.71 9.09 27.30 L 12.29 13.61 Q 12.58 12.43 11.53 12.43 H 10.86 Q 10.36 12.43 10.36 11.99 Q 10.36 11.55 10.93 11.55 Q 11.91 11.55 12.40 11.29 Q 12.89 11.04 13.05 10.28 Q 13.46 8.47 14.27 7.06 Q 15.08 5.65 16.22 4.82 Q 17.36 4.00 18.73 4.00 Q 19.84 4.00 20.52 4.52 Q 21.20 5.05 21.20 5.97 Q 21.20 6.66 20.83 7.09 Q 20.47 7.52 19.93 7.52 Q 19.27 7.52 19.06 7.14 Q 18.85 6.76 18.81 6.25 Q 18.76 5.74 18.60 5.36 Q 18.44 4.98 17.87 4.98 Q 17.14 4.98 16.59 5.70 Q 16.03 6.41 15.59 8.38 L 14.95 11.13 Q 14.86 11.55 15.30 11.55 H 17.84 Q 18.44 11.55 18.31 11.99 Q 18.22 12.43 17.74 12.43 H 14.99 Q 14.67 12.43 14.57 12.75 L 11.18 27.37 Q 11.09 27.71 10.74 27.71 Z";
-const DOT_PATH =
-  "M 21.29 28.00 Q 20.60 28.00 20.11 27.54 Q 19.61 27.08 19.61 26.32 Q 19.61 25.59 20.11 25.13 Q 20.60 24.67 21.29 24.67 Q 21.93 24.67 22.44 25.13 Q 22.94 25.59 22.94 26.32 Q 22.94 27.08 22.44 27.54 Q 21.93 28.00 21.29 28.00 Z";
 
 export function LogoMark({ className = "h-4 w-4" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 32 32" className={className} aria-hidden="true">
+    <svg viewBox="0 0 32 32" fill="none" className={className} aria-hidden="true">
+      <rect x="10" y="3.5" width="3" height="10" rx="1" fill="currentColor" />
+      <rect x="10" y="18.5" width="3" height="10" rx="1" fill="currentColor" />
       <path
-        d={F_PATH}
-        fill="currentColor"
+        d="M2.5 16 L16.5 16 M16.5 16 L21.5 11 M16.5 16 L21.5 21 M21.5 11 L27.5 7.5 M21.5 11 L27.5 13.5 M21.5 21 L27.5 18.5 M21.5 21 L27.5 24.5 M27.5 13.5 L27.5 18.5"
         stroke="currentColor"
-        strokeWidth={0.9}
-        strokeLinejoin="round"
+        strokeWidth="1.3"
+        strokeLinecap="round"
       />
-      <path
-        d={DOT_PATH}
-        fill="var(--color-mark-dot)"
-        transform="translate(21.27 26.33) scale(1.15) translate(-21.27 -26.33)"
-      />
+      <g fill="currentColor">
+        <circle cx="16.5" cy="16" r="1.75" />
+        <circle cx="21.5" cy="11" r="1.75" />
+        <circle cx="21.5" cy="21" r="1.75" />
+        <circle cx="27.5" cy="7.5" r="1.75" />
+        <circle cx="27.5" cy="13.5" r="1.75" />
+        <circle cx="27.5" cy="18.5" r="1.75" />
+      </g>
+      <circle cx="27.5" cy="24.5" r="2.2" fill="var(--color-mark-dot, #A8471B)" />
     </svg>
   );
 }
@@ -31,7 +32,7 @@ export function LogoMark({ className = "h-4 w-4" }: { className?: string }) {
 export function LogoTile({ className = "h-8 w-8" }: { className?: string }) {
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center rounded-[22%] bg-ink text-paper ${className}`}
+      className={`inline-flex shrink-0 items-center justify-center rounded-[22%] bg-ink p-1.5 text-paper ${className}`}
     >
       <LogoMark className="h-full w-full" />
     </span>

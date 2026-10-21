@@ -25,7 +25,7 @@ export function ThesisTeaser() {
     <section aria-labelledby="thesis-heading" className="bg-paper-deep/40 py-20 md:py-28">
       <Container className="grid grid-cols-1 gap-10 md:grid-cols-12">
         <SectionReveal className="md:col-span-4">
-          <div className="text-sm font-medium text-ink-mute">Thesis</div>
+          <div className="text-sm font-medium text-ink-mute">Notes</div>
           <h2 id="thesis-heading" className="mt-3 font-serif text-4xl leading-tight md:text-5xl">
             The Energy Ledger
           </h2>
@@ -34,10 +34,10 @@ export function ThesisTeaser() {
             of building with intention.
           </p>
           <Link
-            to="/thesis"
+            to="/notes"
             className="group mt-6 inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-5 text-sm text-paper transition-colors hover:bg-ink-soft"
           >
-            Read the essay
+            Read the notes
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </SectionReveal>
