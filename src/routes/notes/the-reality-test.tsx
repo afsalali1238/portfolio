@@ -67,9 +67,9 @@ function RealityTestPage() {
           <article className="mt-12 space-y-6 text-base leading-relaxed text-ink-soft md:text-lg">
             <p>
               Building a new product or a slick new feature is addictive. It feels like playing god.
-              At 2:00 AM, inside your dark room with your editor glowing, you have total control. You
-              tweak the padding, tune the animations to sixty frames per second, write clean schemas,
-              and watch your ideas materialize from nothing.
+              At 2:00 AM, inside your dark room with your editor glowing, you have total control.
+              You tweak the padding, tune the animations to sixty frames per second, write clean
+              schemas, and watch your ideas materialize from nothing.
             </p>
 
             <p>
@@ -89,8 +89,9 @@ function RealityTestPage() {
 
             <div className="my-8 border-l-2 border-ink py-2 pl-6">
               <p className="font-serif text-2xl italic leading-snug text-ink">
-                Building was never the hard part. Finding someone who gives a damn is the hardest part
-                of technology, because building only involves you. Customers involve someone else.
+                Building was never the hard part. Finding someone who gives a damn is the hardest
+                part of technology, because building only involves you. Customers involve someone
+                else.
               </p>
             </div>
 
@@ -113,13 +114,11 @@ function RealityTestPage() {
               absolutely <strong>zero bias</strong> toward you or your dream.
             </p>
 
-            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">
-              The Unbiased Room
-            </h2>
+            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">The Unbiased Room</h2>
 
             <p>
-              Strangers do not know that you skipped sleep for three weeks. They do not care that you
-              wrestled with database migrations until your eyes burned. They do not care how
+              Strangers do not know that you skipped sleep for three weeks. They do not care that
+              you wrestled with database migrations until your eyes burned. They do not care how
               architecturally pure your codebase is or how clever your copy sounds.
             </p>
 
@@ -141,20 +140,16 @@ function RealityTestPage() {
               your own vanity.
             </p>
 
-            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">
-              From Ego to Relief
-            </h2>
+            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">From Ego to Relief</h2>
 
             <p>
               This is where most founders quit. They don&rsquo;t quit because their code broke; they
-              quit because their pride couldn&rsquo;t survive the embarrassment of being ignored. They
-              blame the algorithm, the marketing channels, or &ldquo;users who don&rsquo;t understand
-              the vision.&rdquo;
+              quit because their pride couldn&rsquo;t survive the embarrassment of being ignored.
+              They blame the algorithm, the marketing channels, or &ldquo;users who don&rsquo;t
+              understand the vision.&rdquo;
             </p>
 
-            <p>
-              But if you survive that sting, something quietly liberating happens:
-            </p>
+            <p>But if you survive that sting, something quietly liberating happens:</p>
 
             <ul className="list-disc space-y-3 pl-6">
               <li>
@@ -168,9 +163,10 @@ function RealityTestPage() {
                 breath of relief because your software removed their friction.
               </li>
               <li>
-                <strong>You start with their pain, not your itch.</strong> You stop asking &ldquo;What
-                cool thing can I build today?&rdquo; and start asking &ldquo;Who around me is
-                struggling with something tedious, and can I take that burden off their plate?&rdquo;
+                <strong>You start with their pain, not your itch.</strong> You stop asking
+                &ldquo;What cool thing can I build today?&rdquo; and start asking &ldquo;Who around
+                me is struggling with something tedious, and can I take that burden off their
+                plate?&rdquo;
               </li>
             </ul>
 
