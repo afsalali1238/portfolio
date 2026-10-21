@@ -28,7 +28,6 @@ export const projects: Project[] = [
     detail:
       "A commonplace book for the ideas that run the world. Doomscholar maps powerful ideas into a cross-linked latticework — onboard around what you care about, skim a layer at a time, follow the edges between concepts, and keep them with spaced-repetition reviews. Audio narration for every node. Built for people who collect mental models the way others collect bookmarks, and being readied for Google Play and the App Store.",
     live: "https://www.doomscholar.com/",
-    github: "https://github.com/afsalali1238/doomscholar",
     problem:
       "Most mental model collections are static lists or disjointed blog posts. People read a concept, nod along, and forget it within 48 hours. There was no interactive system that let you explore the graph of cognitive frameworks while retaining them through disciplined spaced repetition.",
     solution:
@@ -70,9 +69,7 @@ export const projects: Project[] = [
       "Next.js",
       "React Three Fiber",
       "Three.js",
-      "GLSL Shaders",
       "Tailwind CSS",
-      "IndexedDB",
     ],
     highlights: [
       "Interactive 3D male & female anatomical models with vertex-accurate pain pinning",
@@ -120,10 +117,10 @@ export const projects: Project[] = [
       "Pharmacists working in Gulf hospitals and retail pharmacies face severe language barriers with Arabic-speaking patients. General language apps teach formal tourist Arabic rather than clinical dosage, symptoms, and contraindication phrasing.",
     solution:
       "Curated a specialized conversational syllabus focused exclusively on the pharmacy counter. Paired Arabic audio, phonetic transliteration, and English clinical meaning with gamified progression to make daily 5-minute practice habitual.",
-    stack: ["React", "TypeScript", "Tailwind CSS", "Tajawal Font", "Web Audio API"],
+    stack: ["React", "TypeScript", "Tailwind CSS", "Tajawal Font", "Web Speech API"],
     highlights: [
       "Clinical counter dialogues covering dosage, allergies, and chronic conditions",
-      "Native Arabic voice samples with phonetic English guides",
+      "Web Speech synthesis with phonetic English pronunciation guides",
       "Bilingual typography system balancing Tajawal Arabic and Inter English",
       "Open-source and zero-fee for healthcare workers across the region",
     ],
@@ -187,7 +184,7 @@ export const projects: Project[] = [
       "Solo founders often lack specialized sparring partners when validating new concepts. Standard LLM prompts give generic cheerleader advice instead of rigorous stress-testing, dissent, and sequenced execution planning.",
     solution:
       "Engineered an autonomous agentic orchestration pipeline. The CEO agent interviews the founder through an adversarial framework, conducts autonomous competitor research, generates strategic PRDs, and delegates implementation tasks to specialized subagents with review gates.",
-    stack: ["Node.js", "TypeScript", "Claude Code SDK", "MCP", "CLI"],
+    stack: ["Claude Code Skill", "Multi-Agent System", "Prompt Engineering", "Markdown"],
     highlights: [
       "Adversarial interview protocol challenging unexamined founder assumptions",
       "Autonomous web-search market synthesis generating strategic moat reports",
@@ -244,15 +241,16 @@ export const projects: Project[] = [
     year: "2025",
     for: "Wife",
     tags: ["Productivity", "Career"],
-    blurb: "A job hunting operating system — applications, stages, follow-ups, outcomes, moods.",
+    blurb:
+      "AI-IDE job search operating system — 100-point rubric, ATS-safe tailored CV generator, and tracker dashboard.",
     detail:
-      "Built one evening because a spreadsheet wasn't kind enough. Applications as cards, stages as columns, a small ritual for logging what actually happened in each conversation — including the mood, because job hunting is emotional labour.",
+      "An AI-IDE job hunting system built inside your development environment. Evaluates job postings against a rigorous 100-point fit rubric, drafts tailored ATS-compliant CVs, and tracks application pipelines with Excel sync and local persistence.",
     github: "https://github.com/afsalali1238/jobhunter-os",
     problem:
       "Cold spreadsheets reduce job searching to clinical rows, ignoring the emotional toll and chaotic follow-up cycles of active career transitions.",
     solution:
-      "Designed a compassionate Kanban board that captures not just company and status, but post-interview reflections, sentiment, and automated follow-up reminders.",
-    stack: ["React", "TypeScript", "Tailwind CSS", "LocalStorage"],
+      "Designed a comprehensive workflow with a 100-point role fit scorer, automated markdown CV generation, and a responsive application tracker.",
+    stack: ["AI-IDE Template", "Vanilla JS", "Prompt Engineering", "Excel Sync", "LocalStorage"],
     highlights: [
       "Reflective ritual tracking recording emotional energy alongside stage progress",
       "Dynamic follow-up calendar preventing opportunities from going cold",
@@ -294,7 +292,7 @@ export const projects: Project[] = [
     problem: "Most web games demand aggressive reflexes, daily streaks, or microtransactions.",
     solution:
       "Crafted a meditative browser micro-world with zero failure states where players gently influence climate and observe emergent folklore.",
-    stack: ["React", "SVG Animation", "Generative Text", "Web Audio"],
+    stack: ["PixiJS", "simplex-noise", "Vite", "Generative Text"],
     highlights: [
       "Procedural mythology generator chronicling civilization stories",
       "Zero fail-state atmospheric weather physics simulation",
@@ -358,7 +356,7 @@ export const projects: Project[] = [
       "Malayalam diaspora members living across the Gulf miss the ambient warmth and tactile memories of traditional Kerala tea shops and vintage radio broadcasts.",
     solution:
       "Synthesized an ambient web radio station with rain textures, tea-glass audio samples, and curated vintage Malayalam tracks in a retro analog tuner interface.",
-    stack: ["React", "Web Audio API", "Howler.js", "Tailwind CSS"],
+    stack: ["Next.js", "React", "Web Audio API", "Tailwind CSS"],
     highlights: [
       "Interactive analog radio dial tuning into classic Malayalam broadcasts",
       "Dynamic weather ambient generator blending rain, thunder, and tea shop sounds",

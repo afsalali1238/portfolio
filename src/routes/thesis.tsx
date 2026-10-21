@@ -115,10 +115,14 @@ function ThesisPage() {
             <p>
               A frontier model returning a breezy{" "}
               <strong className="text-ink font-medium">&ldquo;hello&rdquo;</strong> consumes the
-              watt-hours that could have kept an LED reading lamp burning in your room for minutes.
+              watt-hours that could have kept an LED reading lamp burning in your room for minutes.*
               Silicon compute is physical work. Soon, people will transact directly in tokens:
               compute will be the reserve currency of the intelligent economy, and energy will be
               the underlying peg.
+            </p>
+
+            <p className="text-xs italic text-ink-mute border-l-2 border-ink-mute/30 pl-3 py-1 mt-2">
+              *Google published 0.24 Wh as the median Gemini text prompt (Aug 2025) — roughly three minutes of a standard 5 W LED reading lamp.
             </p>
 
             <p>
