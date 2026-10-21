@@ -172,7 +172,11 @@ function ProjectRow({ p, index }: { p: Project; index: number }) {
                       applicationCategory: "DeveloperApplication",
                       operatingSystem: "Web",
                       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-                      author: { "@type": "Person", name: "Afsal Ali", url: "https://forthe.tech" },
+                      author: {
+                        "@type": "Person",
+                        name: "Afsal Ali",
+                        url: "https://www.forthe.tech",
+                      },
                       datePublished: p.year,
                       keywords: p.tags.join(", "),
                     }),

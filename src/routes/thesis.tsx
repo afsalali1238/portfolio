@@ -20,7 +20,7 @@ export const Route = createFileRoute("/thesis")({
           "A frontier model saying hello back burns the watt-hours a reading lamp uses for minutes. Firing off millions of aimless prompts while preaching ESG is pure hypocrisy.",
       },
       { property: "og:type", content: "article" },
-      { property: "og:url", content: "https://forthe.tech/thesis" },
+      { property: "og:url", content: "https://www.forthe.tech/thesis" },
     ],
   }),
   component: ThesisPage,
@@ -36,12 +36,12 @@ function ThesisPage() {
     author: {
       "@type": "Person",
       name: "Afsal Ali",
-      url: "https://forthe.tech",
+      url: "https://www.forthe.tech",
     },
     publisher: {
       "@type": "Organization",
       name: "forthe.tech",
-      url: "https://forthe.tech",
+      url: "https://www.forthe.tech",
     },
     datePublished: "2026-10-21",
     inLanguage: "en-US",

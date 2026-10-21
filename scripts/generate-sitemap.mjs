@@ -1,7 +1,7 @@
 // Automated sitemap generator for forthe.tech
 import { readFileSync, writeFileSync } from "fs";
 
-const SITE_URL = "https://forthe.tech";
+const SITE_URL = "https://www.forthe.tech";
 
 function getProjectIds() {
   try {

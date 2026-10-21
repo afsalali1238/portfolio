@@ -17,7 +17,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
  * Slack) will not resolve relative og:image paths, so every URL below is absolute.
  * Change this one line if the site moves to a custom domain.
  */
-const SITE_URL = "https://forthe.tech";
+const SITE_URL = "https://www.forthe.tech";
 
 function NotFoundComponent() {
   return (
@@ -165,7 +165,11 @@ function RootShell({ children }: { children: ReactNode }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(PERSON_SCHEMA) }}
         />
-        <script defer data-domain="forthe.tech" src="https://plausible.io/js/script.js" />
+        <script
+          defer
+          data-domain="forthe.tech,www.forthe.tech"
+          src="https://plausible.io/js/script.js"
+        />
       </head>
       <body>
         {children}
