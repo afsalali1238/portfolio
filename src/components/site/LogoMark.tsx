@@ -1,29 +1,86 @@
 /**
- * Logo: Round 4 A — Through the Crack (Recommended).
- * One line meets a wall, slips through its one gap, then branches 1 → 2 → 4
- * and joins back up; the newest node is clay.
+ * Logo: Half thought, half built. One line breaks through.
+ * Left half: smooth semi-circle (thinking, philosophy) with a line cutting through.
+ * Right half: 26 pixel blocks (building, tech) with the 4-pixel row turning clay (#A8471B / #E67E54).
  */
 
 export function LogoMark({ className = "h-4 w-4" }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" fill="none" className={className} aria-hidden="true">
-      <rect x="10" y="3.5" width="3" height="10" rx="1" fill="currentColor" />
-      <rect x="10" y="18.5" width="3" height="10" rx="1" fill="currentColor" />
-      <path
-        d="M2.5 16 L16.5 16 M16.5 16 L21.5 11 M16.5 16 L21.5 21 M21.5 11 L27.5 7.5 M21.5 11 L27.5 13.5 M21.5 21 L27.5 18.5 M21.5 21 L27.5 24.5 M27.5 13.5 L27.5 18.5"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinecap="round"
+      {/* Smooth left half with horizontal line cut (curiosity cutting in) */}
+      <path d="M 16 4.8 A 11.2 11.2 0 0 0 5.08 13.5 L 16 13.5 Z" fill="currentColor" />
+      <path d="M 16 15.75 L 4.80 15.75 A 11.2 11.2 0 0 0 16 27.2 Z" fill="currentColor" />
+
+      {/* Right half: pixel grid (tech, building) */}
+      {/* Row 0: 2 pixels */}
+      <rect x="16.25" y="5.25" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+      <rect x="19.00" y="5.25" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+
+      {/* Row 1: 3 pixels */}
+      <rect x="16.25" y="8.00" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+      <rect x="19.00" y="8.00" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+      <rect x="21.75" y="8.00" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+
+      {/* Row 2: 4 pixels */}
+      <rect x="16.25" y="10.75" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+      <rect x="19.00" y="10.75" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+      <rect x="21.75" y="10.75" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+      <rect x="24.50" y="10.75" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+
+      {/* Row 3: 4 pixels in clay (the line becomes built) */}
+      <rect
+        x="16.25"
+        y="13.50"
+        width="2.25"
+        height="2.25"
+        rx="0.3"
+        fill="var(--color-mark-dot, #E67E54)"
       />
-      <g fill="currentColor">
-        <circle cx="16.5" cy="16" r="1.75" />
-        <circle cx="21.5" cy="11" r="1.75" />
-        <circle cx="21.5" cy="21" r="1.75" />
-        <circle cx="27.5" cy="7.5" r="1.75" />
-        <circle cx="27.5" cy="13.5" r="1.75" />
-        <circle cx="27.5" cy="18.5" r="1.75" />
-      </g>
-      <circle cx="27.5" cy="24.5" r="2.2" fill="var(--color-mark-dot, #A8471B)" />
+      <rect
+        x="19.00"
+        y="13.50"
+        width="2.25"
+        height="2.25"
+        rx="0.3"
+        fill="var(--color-mark-dot, #E67E54)"
+      />
+      <rect
+        x="21.75"
+        y="13.50"
+        width="2.25"
+        height="2.25"
+        rx="0.3"
+        fill="var(--color-mark-dot, #E67E54)"
+      />
+      <rect
+        x="24.50"
+        y="13.50"
+        width="2.25"
+        height="2.25"
+        rx="0.3"
+        fill="var(--color-mark-dot, #E67E54)"
+      />
+
+      {/* Row 4: 4 pixels */}
+      <rect x="16.25" y="16.25" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+      <rect x="19.00" y="16.25" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+      <rect x="21.75" y="16.25" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+      <rect x="24.50" y="16.25" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+
+      {/* Row 5: 4 pixels */}
+      <rect x="16.25" y="19.00" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+      <rect x="19.00" y="19.00" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+      <rect x="21.75" y="19.00" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+      <rect x="24.50" y="19.00" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+
+      {/* Row 6: 3 pixels */}
+      <rect x="16.25" y="21.75" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+      <rect x="19.00" y="21.75" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+      <rect x="21.75" y="21.75" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+
+      {/* Row 7: 2 pixels */}
+      <rect x="16.25" y="24.50" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
+      <rect x="19.00" y="24.50" width="2.25" height="2.25" rx="0.3" fill="currentColor" />
     </svg>
   );
 }

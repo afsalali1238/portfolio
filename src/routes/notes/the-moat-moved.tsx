@@ -74,8 +74,26 @@ function TheMoatMovedPage() {
 
             <p>
               Then the wall came down. AI made building cheap, and for a moment the moat moved one
-              step: to whoever got there first. Being first still took effort. Effort was the moat.
+              step: to whoever got there first. An operator with AI is like a chimpanzee with an
+              AK-47: terrifying firepower, zero doctrine, spraying in every direction while everyone
+              else runs for cover. Being first took effort, and for a season, effort was the moat.
             </p>
+
+            <figure className="my-8 overflow-hidden rounded-lg border rule-hair bg-paper-deep/30 p-2 md:p-3">
+              <div className="relative aspect-video w-full overflow-hidden rounded bg-black">
+                <iframe
+                  src="https://www.youtube-nocookie.com/embed/GhxqIITtTtU?start=12&rel=0"
+                  title="Operator with AI: Chimpanzee with an AK-47 meme"
+                  className="absolute inset-0 h-full w-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xs text-ink-mute">
+                The operator with AI: terrifying firepower, zero doctrine.
+              </figcaption>
+            </figure>
 
             <div className="my-8 border-l-2 border-ink py-2 pl-6">
               <p className="font-serif text-2xl italic text-ink">That moment is over.</p>

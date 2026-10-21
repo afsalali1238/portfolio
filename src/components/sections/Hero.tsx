@@ -24,10 +24,6 @@ export function Hero() {
                 </RevealWord>
               </span>
             </h1>
-            <p className="mt-5 text-sm text-ink-mute">
-              Afsal Ali. Operations by day in Dubai; by night, small software for the people around
-              me.
-            </p>
           </div>
 
           <div className="flex flex-col justify-end space-y-5 md:col-span-4">
