@@ -42,6 +42,7 @@
   --color-ink-mute: var(--ink-mute);
   --color-rule: var(--rule);
   --color-accent-ink: var(--accent-ink);
+  --color-mark-dot: var(--mark-dot);
 }
 
 :root {
@@ -53,6 +54,8 @@
   --ink-mute: oklch(0.52 0.012 60);
   --rule: oklch(0.82 0.008 88);
   --accent-ink: oklch(0.52 0.14 42);
+  /* The logo dot sits on an ink tile, so it takes the opposite theme's clay. */
+  --mark-dot: oklch(0.7 0.14 42);
 
   --background: var(--paper);
   --foreground: var(--ink);
@@ -83,6 +86,7 @@
   --ink-mute: oklch(0.6 0.01 70);
   --rule: oklch(0.25 0.01 60);
   --accent-ink: oklch(0.7 0.14 42);
+  --mark-dot: oklch(0.52 0.14 42);
 
   --background: var(--paper);
   --foreground: var(--ink);
@@ -138,6 +142,19 @@
     transparent 1px
   ); /* taste-skill-ignore */
   background-size: 3px 3px;
+}
+
+/* Hero headline: slides up from its own clip box on first paint (no JS needed). */
+@keyframes reveal-up {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.reveal-word {
+  animation: reveal-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Marquee runs on a CSS animation, not a JS transform, so hover can actually pause it. */

@@ -1,6 +1,7 @@
 // Automated sitemap generator for forthe.tech
 import { readFileSync, writeFileSync } from "fs";
 
+// Keep in sync with SITE_URL in src/lib/site.ts (the www host is the one that serves).
 const SITE_URL = "https://www.forthe.tech";
 
 function getProjectIds() {
@@ -19,12 +20,14 @@ function generateSitemap() {
 
   const staticRoutes = [
     { path: "/", priority: 1.0, changefreq: "weekly" },
-    { path: "/thesis", priority: 0.9, changefreq: "monthly" },
+    { path: "/works", priority: 0.9, changefreq: "weekly" },
+    { path: "/thesis", priority: 0.8, changefreq: "monthly" },
+    { path: "/about", priority: 0.6, changefreq: "monthly" },
   ];
 
   const projectRoutes = projectIds.map((id) => ({
     path: `/works/${id}`,
-    priority: 0.8,
+    priority: 0.7,
     changefreq: "monthly",
   }));
 

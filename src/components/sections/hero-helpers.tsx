@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "motion/react";
-import { type ProjectFilter, useProjectFilter } from "../../data/filter-state";
+import { Link } from "@tanstack/react-router";
+import type { ProjectFilter } from "../../data/filters";
 import { rise } from "../../data/motion-constants";
 
 export function RevealWord({
@@ -12,21 +13,22 @@ export function RevealWord({
   delay?: number;
   italic?: boolean;
 }) {
+  // A CSS animation, not a Motion one: it starts on first paint from the server HTML
+  // instead of waiting for hydration, so the headline is never held back by JS.
   return (
     <span className="inline-block overflow-hidden align-top">
-      <motion.span
-        initial={{ y: "110%" }}
-        animate={{ y: "0%" }}
-        transition={{ duration: 1, delay, ease: [0.22, 1, 0.36, 1] }}
-        className={`inline-block ${italic ? "italic" : ""}`}
+      <span
+        className={`reveal-word inline-block ${italic ? "italic" : ""}`}
+        style={{ animationDelay: `${delay}s` }}
       >
         {children}
-      </motion.span>
+      </span>
     </span>
   );
 }
 
-export function StatButton({
+/** A stat tile that opens the catalogue pre-filtered, e.g. /works?filter=live. */
+export function StatLink({
   label,
   value,
   filterKey,
@@ -35,39 +37,25 @@ export function StatButton({
   value: string;
   filterKey: ProjectFilter;
 }) {
-  const [current, setFilter] = useProjectFilter();
-  const isActive = current === filterKey;
-
-  const handleClick = () => {
-    setFilter(isActive ? "all" : filterKey);
-    const el = document.getElementById("works");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   return (
-    <motion.button
-      type="button"
-      variants={rise}
-      onClick={handleClick}
-      whileHover={{ y: -2 }}
-      whileTap={{ scale: 0.97 }}
-      className={`group flex flex-col text-left transition-colors rounded-md p-2 -m-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink ${
-        isActive ? "bg-paper-deep ring-1 ring-ink/20" : "hover:bg-paper-deep/60"
-      }`}
-      aria-label={`Filter projects by ${label} (${value})`}
-    >
-      <div className="font-serif text-3xl leading-none text-ink flex items-center gap-2">
-        {value}
-        {isActive && <span className="h-1.5 w-1.5 rounded-full bg-ink" />}
-      </div>
-      <div className="mt-2 text-xs text-ink-mute group-hover:text-ink transition-colors flex items-center justify-between">
-        <span>{label}</span>
-        <span className="text-[10px] text-ink-mute opacity-0 group-hover:opacity-100 transition-opacity">
-          filter ↓
+    <motion.div variants={rise} whileHover={{ y: -2 }}>
+      <Link
+        to="/works"
+        search={filterKey === "all" ? {} : { filter: filterKey }}
+        className="group -m-2 flex flex-col rounded-md p-2 text-left transition-colors hover:bg-paper-deep/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+        aria-label={`${value} builds — ${label}. See them.`}
+      >
+        <span className="font-serif text-3xl leading-none text-ink">{value}</span>
+        <span className="mt-2 flex items-center justify-between text-xs text-ink-mute transition-colors group-hover:text-ink">
+          <span>{label}</span>
+          <span
+            aria-hidden="true"
+            className="text-[10px] opacity-0 transition-opacity group-hover:opacity-100"
+          >
+            see →
+          </span>
         </span>
-      </div>
-    </motion.button>
+      </Link>
+    </motion.div>
   );
 }
