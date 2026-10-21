@@ -56,10 +56,10 @@ export function Colophon() {
             <motion.a
               whileHover={{ y: -3 }}
               whileTap={{ y: 0 }}
-              href="mailto:afsalali1238@gmail.com"
+              href="mailto:here@forthe.tech"
               className="inline-flex items-center gap-2 border rule-hair px-5 py-3 text-sm hover:bg-paper-deep transition-colors"
             >
-              Email <ArrowUpRight className="h-4 w-4" />
+              here@forthe.tech <ArrowUpRight className="h-4 w-4" />
             </motion.a>
           </div>
           <div className="mt-16 flex flex-wrap items-end justify-between gap-4 border-t rule-hair pt-6 text-xs text-ink-mute">

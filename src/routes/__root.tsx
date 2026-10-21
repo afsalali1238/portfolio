@@ -147,7 +147,7 @@ const PERSON_SCHEMA = {
   jobTitle: "Indie builder",
   description:
     "Curious builder and indie shipper. AI tools, learning maps, cozy games, and quiet software.",
-  email: "mailto:afsalali1238@gmail.com",
+  email: "mailto:here@forthe.tech",
   sameAs: [
     "https://github.com/afsalali1238",
     "https://www.linkedin.com/in/afsalali1238/",
