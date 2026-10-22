@@ -66,25 +66,25 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     // (Never cluttering the left typography)
     const constellationNodes = [
       // Primary Clay Breakthrough Spine
-      { nx: 0.76, ny: 0.28, isClay: true, radius: 2.8, phase: 0.0 },
-      { nx: 0.83, ny: 0.23, isClay: true, radius: 3.2, phase: 0.3 },
-      { nx: 0.90, ny: 0.19, isClay: true, radius: 3.5, phase: 0.6 },
-      { nx: 0.96, ny: 0.17, isClay: true, radius: 2.8, phase: 0.9 },
+      { nx: 0.77, ny: 0.30, isClay: true, radius: 2.8, phase: 0.0 },
+      { nx: 0.84, ny: 0.25, isClay: true, radius: 3.2, phase: 0.3 },
+      { nx: 0.91, ny: 0.20, isClay: true, radius: 3.5, phase: 0.6 },
+      { nx: 0.97, ny: 0.17, isClay: true, radius: 2.8, phase: 0.9 },
 
       // Upper Canopy (Right corner)
-      { nx: 0.78, ny: 0.16, isClay: false, radius: 1.8, phase: 0.2 },
-      { nx: 0.86, ny: 0.11, isClay: false, radius: 2.0, phase: 0.5 },
-      { nx: 0.93, ny: 0.08, isClay: false, radius: 2.2, phase: 0.8 },
+      { nx: 0.79, ny: 0.18, isClay: false, radius: 1.8, phase: 0.2 },
+      { nx: 0.87, ny: 0.12, isClay: false, radius: 2.0, phase: 0.5 },
+      { nx: 0.94, ny: 0.09, isClay: false, radius: 2.2, phase: 0.8 },
 
       // Middle Resonance Arch
-      { nx: 0.79, ny: 0.38, isClay: false, radius: 2.0, phase: 0.4 },
-      { nx: 0.87, ny: 0.34, isClay: false, radius: 2.2, phase: 0.7 },
-      { nx: 0.94, ny: 0.31, isClay: false, radius: 2.0, phase: 1.0 },
+      { nx: 0.80, ny: 0.40, isClay: false, radius: 2.0, phase: 0.4 },
+      { nx: 0.88, ny: 0.36, isClay: false, radius: 2.2, phase: 0.7 },
+      { nx: 0.95, ny: 0.32, isClay: false, radius: 2.0, phase: 1.0 },
 
       // Lower Transition Filaments (Connecting down toward stats cards)
-      { nx: 0.74, ny: 0.48, isClay: false, radius: 1.8, phase: 0.5 },
-      { nx: 0.82, ny: 0.46, isClay: false, radius: 2.0, phase: 0.8 },
-      { nx: 0.91, ny: 0.45, isClay: false, radius: 1.8, phase: 1.1 },
+      { nx: 0.75, ny: 0.50, isClay: false, radius: 1.8, phase: 0.5 },
+      { nx: 0.83, ny: 0.48, isClay: false, radius: 2.0, phase: 0.8 },
+      { nx: 0.92, ny: 0.46, isClay: false, radius: 1.8, phase: 1.1 },
 
       // Bottom Arch (Behind & below stats row)
       { nx: 0.35, ny: 0.86, isClay: false, radius: 1.6, phase: 0.3 },
@@ -172,8 +172,8 @@ export function HeroPrism({ className = "" }: { className?: string }) {
         currentMouse.x += (targetMouse.x * dpr - currentMouse.x) * 0.05;
         currentMouse.y += (targetMouse.y * dpr - currentMouse.y) * 0.05;
       } else {
-        const idleX = width * 0.1;
-        const idleY = height * 0.08 + Math.sin(time * 0.6) * (height * 0.03);
+        const idleX = width * 0.65;
+        const idleY = height * 0.28 + Math.sin(time * 0.6) * (height * 0.03);
         currentMouse.x += (idleX - currentMouse.x) * 0.025;
         currentMouse.y += (idleY - currentMouse.y) * 0.025;
       }
@@ -181,7 +181,6 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       ctx.clearRect(0, 0, width, height);
 
       // Palette
-      const beamColor = dark ? "rgba(248, 246, 240, 0.85)" : "rgba(22, 16, 12, 0.60)";
       const beamGlow = dark ? "rgba(248, 246, 240, 0.3)" : "rgba(22, 16, 12, 0.08)";
       const glassBorder = dark ? "rgba(248, 246, 240, 0.35)" : "rgba(22, 16, 12, 0.22)";
       const filamentColor = dark ? "rgba(248, 246, 240, 0.12)" : "rgba(22, 16, 12, 0.09)";
@@ -193,8 +192,8 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       // The prism is positioned on the right stage, leaving the entire left column
       // for the authoritative headline and lead text without ANY collisions!
       const isMobile = width < 768 * dpr;
-      const prismCenterX = isMobile ? width * 0.72 : width * 0.70;
-      const prismCenterY = isMobile ? height * 0.24 : height * 0.30;
+      const prismCenterX = isMobile ? width * 0.74 : width * 0.70;
+      const prismCenterY = isMobile ? height * 0.26 : height * 0.32;
       const prismSize = Math.min(width, height) * (isMobile ? 0.16 : 0.18);
 
       // Prism Vertices (Equilateral triangle)
@@ -223,18 +222,27 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       ctx.fill();
 
       // 2. Incident Beam of Pure Curiosity
-      // Enters from high above in the top margin (sourceY = 6% to 10%), completely above all typography!
-      const sourceX = 0;
-      const sourceY = height * 0.08 + (currentMouse.y - height * 0.1) * 0.2;
+      // Enters from the open space between the text column and the prism:
+      // ZERO collision with the left headline and paragraph!
+      const raySpan = isMobile ? prismSize * 1.5 : prismSize * 2.2;
+      const sourceX = prismCenterX - raySpan;
+      const sourceY = prismCenterY - prismSize * 0.40 + (currentMouse.y - height * 0.3) * 0.15;
       const hitPoint = {
         x: prismCenterX - prismSize * 0.26,
-        y: prismCenterY - prismSize * 0.12 + (currentMouse.y - height * 0.1) * 0.1,
+        y: prismCenterY - prismSize * 0.12 + (currentMouse.y - height * 0.3) * 0.08,
       };
 
       ctx.save();
       ctx.shadowColor = beamGlow;
       ctx.shadowBlur = 10 * dpr;
-      ctx.strokeStyle = beamColor;
+
+      // Soft gradient fade-in along the incident beam
+      const beamGrad = ctx.createLinearGradient(sourceX, sourceY, hitPoint.x, hitPoint.y);
+      beamGrad.addColorStop(0, "transparent");
+      beamGrad.addColorStop(0.25, dark ? "rgba(248, 246, 240, 0.3)" : "rgba(22, 16, 12, 0.2)");
+      beamGrad.addColorStop(1, dark ? "rgba(248, 246, 240, 0.85)" : "rgba(22, 16, 12, 0.65)");
+
+      ctx.strokeStyle = beamGrad;
       ctx.lineWidth = 1.4 * dpr;
       ctx.beginPath();
       ctx.moveTo(sourceX, sourceY);
@@ -301,7 +309,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
         const mouseBend = (currentMouse.y / height - 0.25) * 0.1;
         const a1 = b1.angle + mouseBend;
         const a2 = b2.angle + mouseBend;
-        const ribbonLen = width * 0.45;
+        const ribbonLen = width * 0.42;
 
         const p1X = fanOriginX + Math.cos(a1) * ribbonLen;
         const p1Y = fanOriginY + Math.sin(a1) * ribbonLen;
@@ -328,7 +336,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       spectralBands.forEach((band) => {
         const mouseBend = (currentMouse.y / height - 0.25) * 0.1;
         const finalAngle = band.angle + mouseBend;
-        const rayLen = width * 0.48;
+        const rayLen = width * 0.45;
         const endX = fanOriginX + Math.cos(finalAngle) * rayLen;
         const endY = fanOriginY + Math.sin(finalAngle) * rayLen;
 

@@ -8,7 +8,7 @@ import { HeroPrism } from "./HeroPrism";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-12 pb-12 md:pt-20 md:pb-16">
+    <section className="relative overflow-hidden pt-14 pb-12 md:pt-24 md:pb-16">
       {/* Background Interactive Prism Canvas (Pink Floyd Dark Side + Constellation Motif) */}
       <HeroPrism className="absolute inset-0 z-0 h-full w-full opacity-90 transition-opacity" />
 
@@ -22,11 +22,6 @@ export function Hero() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 items-center">
           {/* Left Column: Authoritative Editorial Presentation */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 rounded-full border rule-hair bg-paper/80 px-3.5 py-1 text-xs font-medium text-ink-mute backdrop-blur-xs">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent-ink" />
-              <span>Afsal Ali · Dubai, UAE · Open ledger</span>
-            </div>
-
             <h1 className="font-serif tracking-tight">
               <span className="block text-[12vw] leading-[0.88] md:text-[5.5rem] lg:text-[6.8rem] text-ink">
                 <RevealWord delay={0.05}>For the tech.</RevealWord>
