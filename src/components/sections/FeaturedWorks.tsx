@@ -4,11 +4,15 @@ import { Container } from "../layout/Container";
 import { SectionReveal } from "../animations/SectionReveal";
 import { getProjectById, projectCount, numberWord, type Project } from "../../data/projects";
 
-/**
+/** 
  * Minimal featured showcase on the homepage (3 flagship pieces).
- * The full 16-piece visual catalogue lives on /works.
+ * Governed strictly by the brand guidelines: 8 px corners, 1 px rule, 24 px padding, no shadow.
  */
-const FEATURED_IDS = ["kine", "provia", "doomscholar"];
+const FEATURED_IDS = [
+  "kine",
+  "provia",
+  "doomscholar",
+];
 
 const featured = FEATURED_IDS.map(getProjectById).filter((p): p is Project => Boolean(p));
 
@@ -25,7 +29,7 @@ export function FeaturedWorks() {
           </div>
           <Link
             to="/works"
-            className="group inline-flex min-h-11 items-center gap-2 self-start text-sm font-medium text-ink md:self-auto hover:text-accent-ink transition-colors"
+            className="group inline-flex min-h-11 items-center gap-2 self-start text-sm font-medium text-ink md:self-auto hover:text-ink-soft transition-colors"
           >
             All {numberWord(projectCount).toLowerCase()} builds
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -38,19 +42,19 @@ export function FeaturedWorks() {
               <Link
                 to="/works/$id"
                 params={{ id: p.id }}
-                className="group flex h-full flex-col justify-between overflow-hidden rounded-xl border rule-hair bg-paper p-5 transition-all duration-300 hover:border-ink/40 hover:bg-paper-deep/30 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-mute"
+                className="group flex h-full flex-col justify-between overflow-hidden rounded-lg border rule-hair bg-paper p-6 transition-colors duration-150 hover:border-ink/40 hover:bg-paper-deep/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               >
                 <div>
                   {p.media && (
-                    <div className="relative -mx-5 -mt-5 mb-5 aspect-[16/10] overflow-hidden rounded-t-xl border-b rule-hair bg-paper-deep">
+                    <div className="relative -mx-6 -mt-6 mb-5 aspect-[16/10] overflow-hidden rounded-t-lg border-b rule-hair bg-paper-deep">
                       <img
                         src={p.media.poster}
                         alt={`${p.name} preview`}
                         loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                       />
-                      <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-ink/80 px-2.5 py-0.5 text-[10px] font-medium text-paper backdrop-blur-xs">
-                        <span className="h-1.5 w-1.5 rounded-full bg-accent-ink" />
+                      <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-ink/90 px-3 py-1 text-xs font-medium text-paper backdrop-blur-xs">
+                        <span className="h-1.5 w-1.5 rounded-full bg-paper" />
                         <span className="capitalize">{p.media.kind} build</span>
                       </div>
                     </div>
@@ -79,17 +83,17 @@ export function FeaturedWorks() {
           ))}
         </ul>
 
-        {/* Minimal prominent CTA */}
+        {/* Primary CTA Button: 44 px tall, 6 px corners, primary ink, no shadow */}
         <div className="mt-14 flex flex-col items-center justify-center text-center">
           <Link
             to="/works"
-            className="group inline-flex min-h-12 items-center gap-3 rounded-md bg-ink px-8 text-sm md:text-base font-medium text-paper transition-all hover:bg-ink-soft hover:shadow-md"
+            className="group inline-flex min-h-11 items-center gap-2.5 rounded-md bg-ink px-6 text-sm font-medium text-paper transition-colors hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             <span>Explore all {numberWord(projectCount).toLowerCase()} builds</span>
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1.5" />
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
           <p className="mt-2.5 text-xs text-ink-mute">
-            Explore 3D tools, clinical Arabic apps, and quiet software with visual explainers
+            Explore 3D tools, clinical Arabic apps, and quiet software with visual explainers.
           </p>
         </div>
       </Container>

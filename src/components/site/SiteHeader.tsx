@@ -67,7 +67,7 @@ export function SiteHeader() {
             className="group flex items-center gap-3 rounded-sm py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-mute"
             aria-label="forthe.tech — home"
           >
-            <LogoTile className="h-8 w-8 transition-transform duration-300 group-hover:-rotate-6" />
+            <LogoTile className="h-8 w-8 transition-opacity duration-200 group-hover:opacity-85" />
             <Wordmark className="text-2xl" />
           </Link>
 

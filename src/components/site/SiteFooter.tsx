@@ -1,50 +1,64 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, Github } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Container } from "../layout/Container";
 import { LogoTile, Wordmark } from "./LogoMark";
+import { AUTHOR } from "../../lib/site";
 
-const CONTACT_LINKS = [
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/afsalali1238/" },
-  { label: "Medium", href: "https://medium.com/@afsalali1238" },
-  { label: "Email", href: "mailto:here@forthe.tech" },
-];
-
-/** Contact lives here, on every page — not on a page of its own. */
 export function SiteFooter() {
   return (
-    <footer id="contact" className="scroll-mt-20 border-t rule-hair">
-      <Container className="grid grid-cols-1 gap-10 py-16 md:grid-cols-12 md:py-24">
-        <div className="md:col-span-3">
-          <div className="text-sm font-medium text-ink-mute">Colophon</div>
-        </div>
-        <div className="md:col-span-9">
-          <h2 className="font-serif text-5xl md:text-6xl">Say hello.</h2>
-          <p className="mt-4 max-w-xl text-base text-ink-soft">
-            Best found on GitHub, LinkedIn, or by email. I answer slowly, but I answer.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a
-              href="https://github.com/afsalali1238"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-5 py-3 text-sm text-paper transition-colors hover:bg-ink-soft"
-            >
-              GitHub · @afsalali1238
-              <Github className="h-4 w-4" />
-            </a>
-            {CONTACT_LINKS.map((l) => (
+    <footer id="contact" className="border-t rule-hair bg-paper-deep/40 py-16 text-sm text-ink-mute">
+      <Container className="space-y-12">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
+          <div className="space-y-4 md:col-span-6">
+            <h2 className="font-serif text-3xl text-ink md:text-4xl">Let&rsquo;s talk tech.</h2>
+            <p className="max-w-md text-ink-soft">
+              Have an idea, want to build something quiet, or just talk shop? Reach out.
+            </p>
+            <div className="pt-2">
               <a
-                key={l.label}
-                href={l.href}
-                {...(l.href.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {})}
-                className="inline-flex min-h-11 items-center gap-2 rounded-md border rule-hair px-5 py-3 text-sm transition-colors hover:bg-paper-deep"
+                href="mailto:here@forthe.tech"
+                className="inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-5 text-sm font-medium text-paper transition-colors hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               >
-                {l.label} <ArrowUpRight className="h-4 w-4" />
+                here@forthe.tech
+                <ArrowUpRight className="h-4 w-4" />
               </a>
-            ))}
+            </div>
           </div>
 
-          <div className="mt-16 flex flex-wrap items-center justify-between gap-6 border-t rule-hair pt-6 text-xs text-ink-mute">
+          <div className="space-y-3 text-xs md:col-span-6 md:text-right">
+            <div className="text-ink font-medium">Dubai, United Arab Emirates</div>
+            <p className="text-ink-mute">Gulf Standard Time (UTC+4)</p>
+            <div className="pt-4 flex flex-wrap gap-4 md:justify-end text-sm">
+              <a
+                href="https://github.com/afsalali1238"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
+              >
+                GitHub ↗
+              </a>
+              <a
+                href="https://linkedin.com/in/afsalali"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
+              >
+                LinkedIn ↗
+              </a>
+              <a
+                href="https://x.com/afsalali"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
+              >
+                X ↗
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t rule-hair pt-8">
+          <div className="flex flex-col gap-4 text-xs md:flex-row md:items-center md:justify-between">
             <Link
               to="/"
               className="flex min-h-11 items-center gap-2 text-ink"
@@ -63,16 +77,8 @@ export function SiteFooter() {
               <Link to="/about" className="inline-flex min-h-11 items-center hover:text-ink">
                 About
               </Link>
-              <a
-                href="/brand/forthe.tech-brand-guidelines.pdf"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-11 items-center hover:text-ink"
-              >
-                Brand
-              </a>
             </nav>
-            <div>© {new Date().getFullYear()} Afsal Ali · forthe.tech</div>
+            <div>© {new Date().getFullYear()} {AUTHOR} · forthe.tech</div>
           </div>
         </div>
       </Container>
