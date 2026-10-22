@@ -4,13 +4,13 @@ import { projectCount, numberWord } from "../../data/projects";
 
 export function About() {
   return (
-    <section id="about" className="pb-20 pt-14 md:pb-28 md:pt-20">
+    <section id="about" className="pb-16 pt-8 md:pb-24 md:pt-12 border-t rule-hair">
       <Container className="grid grid-cols-1 gap-10 md:grid-cols-12">
         <SectionReveal className="md:col-span-3">
           <div className="text-sm font-medium text-ink-mute">Origin</div>
-          <h1 className="mt-3 font-serif text-4xl italic leading-tight text-ink md:text-5xl">
+          <h2 className="mt-3 font-serif text-4xl italic leading-tight text-ink md:text-5xl">
             What is forthe.tech?
-          </h1>
+          </h2>
           <p className="mt-4 text-xs text-ink-mute leading-relaxed">
             The collapsing wall between imagining software and making it exist, documented in
             public.

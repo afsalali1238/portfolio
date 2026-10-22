@@ -8,13 +8,13 @@ import { HeroPrism } from "./HeroPrism";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden py-14 md:py-24">
+    <section className="relative overflow-hidden pt-12 pb-10 md:pt-20 md:pb-14">
       {/* Background Interactive Prism Canvas (Pink Floyd Dark Side + The Wall motif) */}
       <HeroPrism className="absolute inset-0 z-0 h-full w-full opacity-90 transition-opacity" />
 
-      {/* Radial soft fade overlay to seamlessly blend edges into the paper ground */}
+      {/* Gentle soft edge overlay - allows constellation to flow naturally behind and below the stats card */}
       <div
-        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-paper/30 via-transparent to-paper"
+        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-paper/20 via-transparent to-paper/60"
         aria-hidden="true"
       />
 
@@ -59,12 +59,13 @@ export function Hero() {
           </div>
         </div>
 
+        {/* Shipped & verified metrics card */}
         <motion.div
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-40px" }}
           variants={{ show: { transition: { staggerChildren: 0.08 } } }}
-          className="mt-14 grid grid-cols-2 gap-6 rounded-lg bg-paper-deep/60 p-6 backdrop-blur-xs text-sm md:grid-cols-4 md:p-8"
+          className="mt-12 grid grid-cols-2 gap-6 rounded-lg bg-paper-deep/60 p-6 backdrop-blur-xs text-sm md:grid-cols-4 md:p-8 border rule-hair"
         >
           <StatLink label="Total shipped" value={String(projectCount)} filterKey="all" />
           <StatLink label="Live on the internet" value={String(liveCount)} filterKey="live" />
