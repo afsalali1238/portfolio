@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { Container } from "../layout/Container";
 import { SectionReveal } from "../animations/SectionReveal";
+import { DISPATCHES } from "../../data/dispatches";
 
 const NOTES = [
   {
@@ -19,37 +20,54 @@ const NOTES = [
   { k: "Moat", v: "Not your pipeline complexity. Only what changes in someone's daily life." },
 ];
 
-/** The essay lives once, at /thesis. Home carries the argument in four lines. */
+/** Home carries the latest dispatch standfirst and the Energy Ledger core thesis. */
 export function ThesisTeaser() {
+  const latest = DISPATCHES[0];
+
   return (
-    <section aria-labelledby="thesis-heading" className="bg-paper-deep/40 py-20 md:py-28">
-      <Container className="grid grid-cols-1 gap-10 md:grid-cols-12">
-        <SectionReveal className="md:col-span-4">
-          <div className="text-sm font-medium text-ink-mute">Notes</div>
-          <h2 id="thesis-heading" className="mt-3 font-serif text-4xl leading-tight md:text-5xl">
-            The Energy Ledger
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-ink-mute">
-            On AI tokens as currency, the thermodynamic debt of a prompt, and the moral requirement
-            of building with intention.
-          </p>
-          <Link
-            to="/notes"
-            className="group mt-6 inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-5 text-sm text-paper transition-colors hover:bg-ink-soft"
-          >
-            Read the notes
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
+    <section
+      aria-labelledby="notes-heading"
+      className="bg-paper-deep/40 py-20 md:py-28 border-t rule-hair"
+    >
+      <Container className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+        <SectionReveal className="lg:col-span-5 space-y-6">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-mute">
+            <span>Notes</span>
+            <span>·</span>
+            <span>Latest dispatch</span>
+          </div>
+
+          <div>
+            <div className="text-xs text-ink-mute">
+              Dispatch No. {latest.number} · {latest.readTime}
+            </div>
+            <h2 id="notes-heading" className="mt-2 font-serif text-3xl md:text-4xl text-ink">
+              <Link to={latest.path} className="hover:text-ink-soft transition-colors">
+                {latest.title}
+              </Link>
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-ink-soft">{latest.subtitle}</p>
+          </div>
+
+          <div className="pt-2">
+            <Link
+              to="/notes"
+              className="group inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-5 text-sm text-paper transition-colors hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            >
+              All notes
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
         </SectionReveal>
 
-        <SectionReveal className="space-y-8 md:col-span-8">
-          <p className="font-serif text-3xl leading-snug text-ink md:text-4xl">
+        <SectionReveal className="space-y-6 lg:col-span-7">
+          <p className="font-serif text-2xl leading-snug text-ink md:text-3xl">
             AI tokens are the new currency. And every token is an{" "}
             <span className="italic">IOU on physical energy</span>.
           </p>
           <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {NOTES.map((n) => (
-              <li key={n.k} className="rounded-lg bg-paper/80 p-5">
+              <li key={n.k} className="rounded-lg bg-paper p-5 border rule-hair">
                 <div className="text-xs font-medium text-ink-mute">{n.k}</div>
                 <div className="mt-1.5 font-serif text-lg leading-snug text-ink">{n.v}</div>
               </li>

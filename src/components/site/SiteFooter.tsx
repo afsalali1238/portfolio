@@ -6,7 +6,10 @@ import { AUTHOR } from "../../lib/site";
 
 export function SiteFooter() {
   return (
-    <footer id="contact" className="border-t rule-hair bg-paper-deep/40 py-16 text-sm text-ink-mute">
+    <footer
+      id="contact"
+      className="border-t rule-hair bg-paper-deep/40 py-16 text-sm text-ink-mute"
+    >
       <Container className="space-y-12">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
           <div className="space-y-4 md:col-span-6">
@@ -35,23 +38,31 @@ export function SiteFooter() {
                 rel="noreferrer"
                 className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
               >
-                GitHub ↗
+                GitHub ↗<span className="sr-only"> (opens in a new tab)</span>
               </a>
               <a
-                href="https://linkedin.com/in/afsalali"
+                href="https://www.linkedin.com/in/afsalali1238/"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
               >
-                LinkedIn ↗
+                LinkedIn ↗<span className="sr-only"> (opens in a new tab)</span>
               </a>
               <a
-                href="https://x.com/afsalali"
+                href="https://medium.com/@afsalali1238"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
               >
-                X ↗
+                Medium ↗<span className="sr-only"> (opens in a new tab)</span>
+              </a>
+              <a
+                href="https://substack.com/@afsalali"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
+              >
+                Substack ↗<span className="sr-only"> (opens in a new tab)</span>
               </a>
             </div>
           </div>
@@ -78,7 +89,9 @@ export function SiteFooter() {
                 About
               </Link>
             </nav>
-            <div>© {new Date().getFullYear()} {AUTHOR} · forthe.tech</div>
+            <div>
+              © {new Date().getFullYear()} {AUTHOR} · forthe.tech
+            </div>
           </div>
         </div>
       </Container>

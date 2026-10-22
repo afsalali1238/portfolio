@@ -1,4 +1,5 @@
 export type ProjectStatus = "live" | "in daily use" | "paused" | "archived";
+export type Platform = "web" | "pwa" | "windows" | "cli";
 
 export type Project = {
   id: string;
@@ -11,6 +12,7 @@ export type Project = {
   github?: string;
   for: string;
   featured?: boolean;
+  platform?: Platform;
   problem?: string;
   solution?: string;
   stack?: string[];
@@ -20,10 +22,11 @@ export type Project = {
   status?: ProjectStatus;
   media?: {
     kind: "mobile" | "desktop";
-    video: string;
+    video?: string;
     webm?: string;
     poster: string;
-    steps: string[];
+    stills?: string[];
+    steps?: string[];
     sound?: boolean;
   };
 };
@@ -31,23 +34,16 @@ export type Project = {
 export const projects: Project[] = [
   {
     id: "doomscholar",
+    platform: "pwa",
     media: {
       kind: "mobile",
-      video: "/works/doomscholar/explainer.mp4",
       poster: "/works/doomscholar/poster.jpg",
-      steps: [
-        "Pick interests in onboarding.",
-        "Skim ideas one layer at a time.",
-        "Follow edges to linked concepts.",
-        "Listen to studio-grade audio narration.",
-        "Retain via spaced-repetition review queue.",
-      ],
     },
     status: "in daily use",
     outcome:
-      "Personal knowledge latticework actively syncing cognitive frameworks and mental models.",
+      "Used daily as my primary commonplace system for reviewing mental models and frameworks.",
     learned:
-      "Spaced repetition only works if layer skimming is friction-free with audio narration.",
+      "Passive review queues get abandoned; audio summaries make commuter repetition sustainable.",
     name: "Doomscholar",
     year: "2026",
     for: "Learning",
@@ -59,9 +55,9 @@ export const projects: Project[] = [
       "A commonplace book for the ideas that run the world. Doomscholar maps powerful ideas into a cross-linked latticework — onboard around what you care about, skim a layer at a time, follow the edges between concepts, and keep them with spaced-repetition reviews. Audio narration for every node. Built for people who collect mental models the way others collect bookmarks, and being readied for Google Play and the App Store.",
     live: "https://www.doomscholar.com/",
     problem:
-      "Most mental model collections are static lists or disjointed blog posts. People read a concept, nod along, and forget it within 48 hours. There was no interactive system that let you explore the graph of cognitive frameworks while retaining them through disciplined spaced repetition.",
+      "I kept collecting mental models across books and essays, only to forget them weeks later. Static notes don't prompt recall, and generic flashcard tools lack the conceptual relationships between ideas.",
     solution:
-      "Designed a non-linear knowledge graph where every concept is a node linked to related models. Integrated layer-based learning (skim, understand, master), synchronized audio narration for commuter listening, and an adaptive spaced-repetition review queue based on the SM-2 algorithm.",
+      "Built a non-linear knowledge graph where concepts connect to related models. Added short audio summaries for listening on the commute, layered depth (skim, read, deep dive), and an adaptive spaced-repetition queue based on the SM-2 algorithm.",
     stack: [
       "Next.js",
       "TypeScript",
@@ -73,29 +69,36 @@ export const projects: Project[] = [
     ],
     highlights: [
       "Cross-linked concept latticework with bidirectional relationship traversal",
-      "Studio-grade audio narration recorded for every mental model node",
-      "Automated spaced-repetition algorithm adapting to individual retention curves",
-      "Offline-first mobile PWA ready for iOS and Android app stores",
+      "Audio narration recorded for every mental model node",
+      "Spaced-repetition review queue adapting to individual retention intervals",
+      "Offline-first mobile PWA ready for mobile app stores",
     ],
   },
   {
     id: "kine",
+    platform: "web",
     media: {
       kind: "desktop",
-      video: "/works/kine/explainer.mp4",
       poster: "/works/kine/poster.jpg",
+      stills: [
+        "/works/kine/01.jpg",
+        "/works/kine/02.jpg",
+        "/works/kine/03.jpg",
+        "/works/kine/04.jpg",
+      ],
       steps: [
-        "Point to where it hurts on a real 3D body.",
-        "Pin one precise spot — here, the left knee.",
-        "Answer a few questions, red flags first.",
-        "Get a plan: Calm, Load, Capacity.",
-        "All of it in Arabic too, right-to-left.",
+        "Point to where it hurts on a 3D body.",
+        "Pin one spot — here, the left knee.",
+        "Answer red flag questions first.",
+        "Get a phased rehab plan.",
+        "Bilingual: English and right-to-left Arabic.",
       ],
     },
     status: "live",
-    outcome: "Validated by clinical physiotherapist friends for range-of-motion assessments.",
+    outcome:
+      "Used by physiotherapist friends to test whether patients can point out symptoms on a 3D model instead of 2D charts.",
     learned:
-      "Real 3D anatomical raycasting clarifies patient pain localization far better than 2D diagrams.",
+      "Letting someone tap a 3D body directly communicates pain location faster than drop-down menus.",
     name: "kinē",
     year: "2026",
     for: "Patients",
@@ -108,12 +111,12 @@ export const projects: Project[] = [
     live: "https://kin-lac.vercel.app",
     github: "https://github.com/afsalali1238/kin",
     problem:
-      "Patients struggle to describe musculoskeletal pain on 2D paper forms or flat drop-down menus. Clinical triage often fails because patients cannot pinpoint anatomical landmarks accurately, and exercise sheets are universally abandoned.",
+      "Patients struggle to describe musculoskeletal pain on 2D paper forms or flat drop-down menus. My physiotherapist friends kept seeing patients unable to communicate their pain clearly, and exercise sheets were usually abandoned within days.",
     solution:
-      "Engineered a real-time 3D anatomical model with raycasted ray-hit pain pinning. Built a rule-based clinical assessment engine that screens red flags, stratifies symptoms into clinical patterns, and outputs an adaptive 3-phase rehabilitation program with audio cues and RTL Arabic support.",
+      "Built a 3D anatomical viewer where patients rotate the model and pin their exact pain spot. Added red-flag triage questions, a three-phase recovery plan (Calm, Load, Capacity), and full Arabic RTL support.",
     stack: ["Next.js", "React Three Fiber", "Three.js", "Tailwind CSS"],
     highlights: [
-      "Interactive 3D male & female anatomical models with vertex-accurate pain pinning",
+      "Interactive 3D male & female anatomical models with point-and-click pain pinning",
       "Clinical triage engine with red-flag safety screening",
       "Calm → Load → Capacity 3-phase progressive exercise regime capped at 15m/day",
       "Complete English and Arabic bilingual support with native RTL layout",
@@ -121,10 +124,16 @@ export const projects: Project[] = [
   },
   {
     id: "provia",
+    platform: "pwa",
     media: {
       kind: "mobile",
-      video: "/works/provia/explainer.mp4",
       poster: "/works/provia/poster.jpg",
+      stills: [
+        "/works/provia/01.jpg",
+        "/works/provia/02.jpg",
+        "/works/provia/03.jpg",
+        "/works/provia/04.jpg",
+      ],
       steps: [
         "Open the 45-day exam countdown grid.",
         "Jump straight into Day 1 pharmacology.",
@@ -134,7 +143,8 @@ export const projects: Project[] = [
       ],
     },
     status: "in daily use",
-    outcome: "Used daily for 45-day sprint prep leading into the DHA pharmacist licensing exam.",
+    outcome:
+      "My wife used it every day during her 45-day sprint before sitting the DHA pharmacist exam.",
     learned: "Offline PWA caching is critical for exam study during daily metro and bus commutes.",
     name: "Provia",
     year: "2025",
@@ -146,7 +156,7 @@ export const projects: Project[] = [
       "Provia turns the daunting Gulf pharmacy licensing exam into a 45-day game. Progressive difficulty, structured daily sprints, spaced repetition, and enough encouragement to keep going when the pharmacology chapters get heavy. Built as a PWA so it works offline — because studying happens on the bus.",
     live: "https://proviaap.vercel.app",
     problem:
-      "My wife was studying for the grueling Dubai Health Authority (DHA) pharmacist licensing exam. Commercial question banks are dry, intimidating PDF dumps with zero psychological pacing or offline capabilities for daily commutes.",
+      "My wife was studying for the gruelling Dubai Health Authority (DHA) pharmacist licensing exam. Commercial question banks are dry, intimidating PDF dumps with zero psychological pacing or offline capabilities for daily commutes.",
     solution:
       "Created a progressive 45-day sprint curriculum broken into bite-sized daily drills. Integrated pharmacology mnemonics, clinical calculations, instant explanation breakdowns, and offline PWA caching so practice continues uninterrupted anywhere.",
     stack: ["React", "TypeScript", "Tailwind CSS", "PWA Service Worker", "Vite", "LocalForage"],
@@ -154,21 +164,15 @@ export const projects: Project[] = [
       "Structured 45-day sprint calendar covering DHA, MOH, and DOH curriculums",
       "Immediate rationale breakdowns for clinical pharmacology scenarios",
       "Offline-first PWA caching allowing full test simulation without internet",
-      "Personalized mastery tracking identifying weak drug classes automatically",
+      "Personalised mastery tracking identifying weak drug classes automatically",
     ],
   },
   {
     id: "pharmarab",
+    platform: "pwa",
     media: {
       kind: "mobile",
-      video: "/works/pharmarab/explainer.mp4",
       poster: "/works/pharmarab/poster.jpg",
-      steps: [
-        "Browse clinical Arabic syllabus for pharmacists.",
-        "Learn pediatric counter contraindications.",
-        "Tap to hear native clinical pronunciation.",
-        "Practice real hospital counter dialogues.",
-      ],
     },
     status: "live",
     outcome: "Open-source bilingual conversational hub used at pharmacy counters across the Gulf.",
@@ -187,7 +191,7 @@ export const projects: Project[] = [
     problem:
       "Pharmacists working in Gulf hospitals and retail pharmacies face severe language barriers with Arabic-speaking patients. General language apps teach formal tourist Arabic rather than clinical dosage, symptoms, and contraindication phrasing.",
     solution:
-      "Curated a specialized conversational syllabus focused exclusively on the pharmacy counter. Paired Arabic audio, phonetic transliteration, and English clinical meaning with gamified progression to make daily 5-minute practice habitual.",
+      "Curated a specialised conversational syllabus focused exclusively on the pharmacy counter. Paired Arabic audio, phonetic transliteration, and English clinical meaning with gamified progression to make daily 5-minute practice habitual.",
     stack: ["React", "TypeScript", "Tailwind CSS", "Tajawal Font", "Web Speech API"],
     highlights: [
       "Clinical counter dialogues covering dosage, allergies, and chronic conditions",
@@ -198,16 +202,10 @@ export const projects: Project[] = [
   },
   {
     id: "physioarab",
+    platform: "pwa",
     media: {
       kind: "mobile",
-      video: "/works/physioarab/explainer.mp4",
       poster: "/works/physioarab/poster.jpg",
-      steps: [
-        "Select clinical movement commands (flex, extend).",
-        "Direct patients in clear, precise Arabic.",
-        "Listen to bedside pronunciation audio.",
-        "Complete patient discharge dialogue drills.",
-      ],
     },
     status: "live",
     outcome: "Adopted for bedside Arabic movement instruction protocols.",
@@ -235,20 +233,14 @@ export const projects: Project[] = [
   },
   {
     id: "nxtdoorchef",
+    platform: "pwa",
     media: {
       kind: "mobile",
-      video: "/works/nxtdoorchef/explainer.mp4",
       poster: "/works/nxtdoorchef/poster.jpg",
-      steps: [
-        "Discover home chefs cooking in your neighborhood.",
-        "Browse today's limited home-kitchen specials.",
-        "Tap to say hello directly on WhatsApp.",
-        "Zero platform take-rate, 100% chef profit.",
-      ],
     },
     status: "live",
     outcome:
-      "Direct neighbor-to-kitchen discovery connecting home cooks across Dubai with zero platform commissions.",
+      "Direct neighbour-to-kitchen discovery connecting home cooks across Dubai with zero platform commissions.",
     learned:
       "Removing middleman fees creates trust; WhatsApp is the natural closing channel for local food.",
     name: "NxtDoorChef",
@@ -260,32 +252,25 @@ export const projects: Project[] = [
       "The best meal in town is next door. NxtDoorChef connects neighbours with home cooks making exactly what they feed their own families. Browse the map, tap 'Say hello' to connect on WhatsApp, walk over with a tiffin, and taste the cultures cooking right next door. From Karama to Dubai Marina.",
     live: "https://nxtdoorchef.vercel.app",
     problem:
-      "Dubai is filled with incredible home cooks from dozens of cultures, but food delivery apps charge exorbitant 30% commissions and exclude domestic kitchens. Neighbors had no way to discover authentic home-cooked meals being made down their hall.",
+      "Dubai is filled with incredible home cooks from dozens of cultures, but food delivery apps charge exorbitant 30% commissions and exclude domestic kitchens. Neighbours had no way to discover authentic home-cooked meals being made down their hall.",
     solution:
       "Created a hyper-local community discovery board. Cooks list their daily specials with photos, locations, and tiffin preferences. Buyers browse nearby kitchens and connect directly via WhatsApp with zero intermediary fees.",
     stack: ["Next.js", "TypeScript", "Tailwind CSS", "Mapbox GL", "WhatsApp API"],
     highlights: [
       "Hyperlocal map discovery of authentic regional home kitchens",
-      "Zero commission direct WhatsApp connection between neighbors",
+      "Zero commission direct WhatsApp connection between neighbours",
       "Cultural culinary map covering Karama, Deira, Marina, and Barsha",
     ],
   },
   {
     id: "incubator",
+    platform: "cli",
     media: {
       kind: "desktop",
-      video: "/works/incubator/explainer.mp4",
       poster: "/works/incubator/poster.jpg",
-      steps: [
-        "CLI command line interface for Claude Code.",
-        "Runs automated deep research interview.",
-        "Hires and orchestrates team of specialist AI agents.",
-        "Delivers full codebase scaffolding.",
-      ],
     },
     status: "live",
-    outcome:
-      "Automated autonomous multi-agent validation loops for stress-testing new product theses.",
+    outcome: "Autonomous multi-agent research loops for stress-testing new product theses.",
     learned:
       "Agents need adversarial dissent protocols, or they default to sycophantic cheerleader advice.",
     name: "Incubator",
@@ -310,16 +295,10 @@ export const projects: Project[] = [
   },
   {
     id: "novibe",
+    platform: "web",
     media: {
       kind: "desktop",
-      video: "/works/novibe/explainer.mp4",
       poster: "/works/novibe/poster.jpg",
-      steps: [
-        "Interactive 30-node landscape of tech trends.",
-        "Click a node to inspect market friction.",
-        "Follow threads connecting clustered insights.",
-        "Filter signal from AI industry hype.",
-      ],
     },
     status: "live",
     outcome:
@@ -348,16 +327,10 @@ export const projects: Project[] = [
   },
   {
     id: "craftersunited",
+    platform: "web",
     media: {
       kind: "mobile",
-      video: "/works/craftersunited/explainer.mp4",
       poster: "/works/craftersunited/poster.jpg",
-      steps: [
-        "Browse handmade crafts from local artisans.",
-        "Connect with makers directly via WhatsApp.",
-        "Order bespoke gifts without marketplace middlemen.",
-        "Simple listing flow for independent makers.",
-      ],
     },
     status: "live",
     outcome:
@@ -385,20 +358,14 @@ export const projects: Project[] = [
   },
   {
     id: "jobhunter-os",
+    platform: "web",
     media: {
       kind: "desktop",
-      video: "/works/jobhunter-os/explainer.mp4",
       poster: "/works/jobhunter-os/poster.jpg",
-      steps: [
-        "AI agent scrapes and matches job openings.",
-        "Scores postings against a 100-point rubric.",
-        "Tailors ATS-optimized resume variants.",
-        "Kanban pipeline tracking every application.",
-      ],
     },
     status: "in daily use",
     outcome:
-      "Automated 100-point fit scoring and tailored ATS-safe markdown CV generation for active applications.",
+      "100-point fit scoring and tailored ATS-safe markdown CV generation for active applications.",
     learned:
       "An AI-IDE workspace beats clinical spreadsheets by preserving emotional context and reflections.",
     name: "JobHunter OS",
@@ -422,19 +389,13 @@ export const projects: Project[] = [
   },
   {
     id: "medical-coding",
+    platform: "web",
     media: {
       kind: "desktop",
-      video: "/works/medical-coding/explainer.mp4",
       poster: "/works/medical-coding/poster.jpg",
-      steps: [
-        "Structured 10-week clinical coding syllabus.",
-        "Practice ICD-10 and CPT coding drills.",
-        "Review instant rationales for code selection.",
-        "Track exam readiness with checkpoint tests.",
-      ],
     },
     status: "live",
-    outcome: "Calm 10-week study path covering AAPC CPC syllabus with DHA eClaimLink compliance.",
+    outcome: "10-week study path covering AAPC CPC syllabus with DHA eClaimLink compliance.",
     learned:
       "Region-specific insurance guidelines are what make generic certification material actually usable.",
     name: "Medical Coding Mastery",
@@ -458,20 +419,13 @@ export const projects: Project[] = [
   },
   {
     id: "terrarium",
+    platform: "web",
     media: {
       kind: "desktop",
-      video: "/works/terrarium/explainer.mp4",
       poster: "/works/terrarium/poster.jpg",
-      steps: [
-        "Nudge climate and weather in a miniature biosphere.",
-        "Answer tiny prayers from digital organisms.",
-        "Discover evolving myths and emergent world states.",
-        "Watch the ecosystem thrive over days.",
-      ],
     },
     status: "live",
-    outcome:
-      "Cozy generative browser sandbox played without failure states or notification fatigue.",
+    outcome: "Generative browser sandbox played without failure states or notification fatigue.",
     learned:
       "Procedural climate and lore generation can turn an idle browser tab into a meditative ritual.",
     name: "Terrarium",
@@ -495,19 +449,13 @@ export const projects: Project[] = [
   },
   {
     id: "gtm-os",
+    platform: "cli",
     media: {
       kind: "desktop",
-      video: "/works/gtm-os/explainer.mp4",
       poster: "/works/gtm-os/poster.jpg",
-      steps: [
-        "Run gtm init to scaffold product launch.",
-        "Generates 16 strategic go-to-market pillars.",
-        "Tracks progress from zero to first 100 users.",
-        "Automates marketing checklists and launch copy.",
-      ],
     },
     status: "live",
-    outcome: "Open-source 16-pillar go-to-market framework adopted by technical founders.",
+    outcome: "Open-source 16-pillar go-to-market framework for technical founders.",
     learned:
       "Engineers don't hate sales; they hate ambiguity. Structured checklists bridge the gap.",
     name: "GTM-OS",
@@ -531,15 +479,10 @@ export const projects: Project[] = [
   },
   {
     id: "parallel-perspective",
+    platform: "web",
     media: {
       kind: "mobile",
-      video: "/works/parallel-perspective/explainer.mp4",
       poster: "/works/parallel-perspective/poster.jpg",
-      steps: [
-        "Editorial scroll on architecture and culture.",
-        "Explore curated garments and spatial ideas.",
-        "Read quiet observations from Dubai.",
-      ],
     },
     status: "live",
     outcome: "Published digital monograph exploring apparel semiotics and personal philosophy.",
@@ -566,17 +509,11 @@ export const projects: Project[] = [
   },
   {
     id: "nadan-chayakada",
+    platform: "web",
     media: {
       kind: "desktop",
       sound: true,
-      video: "/works/nadan-chayakada/explainer.mp4",
       poster: "/works/nadan-chayakada/poster.jpg",
-      steps: [
-        "Turn the nostalgic radio tuner dial.",
-        "Stream soothing rain and Kerala tea-shop ambience.",
-        "Listen to curated retro audio streams.",
-        "Designed for deep coding flow.",
-      ],
     },
     status: "live",
     outcome:
@@ -604,16 +541,10 @@ export const projects: Project[] = [
   },
   {
     id: "bodhi-pomodoro",
+    platform: "windows",
     media: {
       kind: "desktop",
-      video: "/works/bodhi-pomodoro/explainer.mp4",
       poster: "/works/bodhi-pomodoro/poster.jpg",
-      steps: [
-        "Set focus timer, task, and allowed apps.",
-        "Bodhi meditates quietly beneath the Bodhi tree.",
-        "Distracting apps trigger laser alarms after grace.",
-        "Grow the tree and review end-of-day focus logs.",
-      ],
     },
     status: "live",
     outcome:

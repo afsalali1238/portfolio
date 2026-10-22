@@ -6,9 +6,15 @@ import { projectCount, numberWord } from "../../data/projects";
 import { seo } from "../../lib/site";
 
 export const Route = createFileRoute("/works/")({
-  validateSearch: (search: Record<string, unknown>): { filter?: ProjectFilter } => {
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { filter?: ProjectFilter; view?: "grid" | "table" } => {
     const filter = parseFilter(search.filter);
-    return filter === "all" ? {} : { filter };
+    const view = search.view === "table" ? "table" : search.view === "grid" ? "grid" : undefined;
+    return {
+      ...(filter === "all" ? {} : { filter }),
+      ...(view ? { view } : {}),
+    };
   },
   head: () =>
     seo({
@@ -21,10 +27,10 @@ export const Route = createFileRoute("/works/")({
 });
 
 function WorksPage() {
-  const { filter } = Route.useSearch();
+  const { filter, view } = Route.useSearch();
   return (
     <PageShell>
-      <Works filter={filter ?? "all"} />
+      <Works filter={filter ?? "all"} view={view ?? "grid"} />
     </PageShell>
   );
 }

@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { PageShell } from "../../components/site/PageShell";
 import { Container } from "../../components/layout/Container";
 import { SectionReveal } from "../../components/animations/SectionReveal";
-import { seo } from "../../lib/site";
+import { seo, SITE_URL, SITE_NAME, AUTHOR } from "../../lib/site";
 
 const ARTICLE_SCHEMA = {
   "@context": "https://schema.org",
@@ -12,25 +12,25 @@ const ARTICLE_SCHEMA = {
   description: "Ideas were cheap. Then building was. Now even being first is.",
   author: {
     "@type": "Person",
-    name: "Afsal Ali",
-    url: "https://www.forthe.tech",
+    name: AUTHOR,
+    url: SITE_URL,
   },
   publisher: {
     "@type": "Organization",
-    name: "forthe.tech",
-    url: "https://www.forthe.tech",
+    name: SITE_NAME,
+    url: SITE_URL,
   },
-  datePublished: "2026-10-21",
-  inLanguage: "en-US",
+  datePublished: "2026-06-20",
+  inLanguage: "en-GB",
 };
 
 export const Route = createFileRoute("/notes/the-moat-moved")({
   head: () => ({
     ...seo({
-      title: "The Moat Moved: Dispatch No. 02 · forthe.tech",
+      title: "The Moat Moved: No. 02 · forthe.tech",
       description: "Ideas were cheap. Then building was. Now even being first is.",
       path: "/notes/the-moat-moved",
-      image: "/og/home.png",
+      image: "/og/the-moat-moved.png",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],
@@ -51,7 +51,7 @@ function TheMoatMovedPage() {
               <ArrowLeft className="h-3.5 w-3.5" /> Back to Notes
             </Link>
             <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-              Dispatch No. 02 · October 2026
+              No. 02 · 20 June 2026
             </div>
             <h1 className="mt-3 font-serif text-5xl leading-[1.05] tracking-tight text-ink md:text-6xl">
               The moat moved.
@@ -79,7 +79,7 @@ function TheMoatMovedPage() {
               else runs for cover. Being first took effort, and for a season, effort was the moat.
             </p>
 
-            <figure className="my-8 overflow-hidden rounded-lg border rule-hair bg-paper-deep/30 p-2 md:p-3">
+            <figure className="my-8 overflow-hidden rounded-md border rule-hair bg-paper-deep/30 p-2 md:p-3">
               <div className="relative aspect-video w-full overflow-hidden rounded bg-black">
                 <iframe
                   src="https://www.youtube-nocookie.com/embed/GhxqIITtTtU?start=12&rel=0"
@@ -136,6 +136,23 @@ function TheMoatMovedPage() {
             </p>
 
             <p className="pt-4 font-serif text-2xl italic text-ink">Yours is just a copy.</p>
+
+            <div className="mt-16 flex items-center justify-between border-t rule-hair pt-8">
+              <Link
+                to="/notes/the-energy-ledger"
+                className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
+              >
+                <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                <span>Prev: No. 01 · The Energy Ledger</span>
+              </Link>
+              <Link
+                to="/notes/the-empathy-moat"
+                className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
+              >
+                <span>Next: No. 03 · The empathy moat</span>
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
           </article>
         </Container>
       </div>

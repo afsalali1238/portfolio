@@ -1,8 +1,7 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
-  createRootRouteWithContext,
+  createRootRoute,
   useRouter,
   HeadContent,
   Scripts,
@@ -54,37 +53,39 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   }, [error]);
 
   return (
-    <div className="flex min-h-svh items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <button
-            onClick={() => {
-              router.invalidate();
-              reset();
-            }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Try again
-          </button>
-          <a
-            href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-          >
-            Go home
-          </a>
+    <PageShell>
+      <div className="flex min-h-[60svh] items-center justify-center px-4">
+        <div className="max-w-md text-center">
+          <h1 className="font-serif text-5xl text-ink">Something broke.</h1>
+          <p className="mt-3 font-serif text-2xl text-ink-soft">A glitch in the ledger.</p>
+          <p className="mt-2 text-sm text-ink-mute">
+            The page encountered an unexpected runtime error. Try reloading, or return to safety.
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                router.invalidate();
+                reset();
+              }}
+              className="inline-flex min-h-11 items-center rounded-md bg-ink px-5 text-sm font-medium text-paper transition-colors hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            >
+              Try again
+            </button>
+            <Link
+              to="/"
+              className="inline-flex min-h-11 items-center rounded-md border rule-hair bg-paper px-5 text-sm font-medium text-ink transition-colors hover:bg-paper-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            >
+              Back to home
+            </Link>
+          </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+export const Route = createRootRoute({
   // Site-wide defaults only. Each route adds its own title, description, canonical,
   // og:url and share image through seo() in src/lib/site.ts — never a canonical here,
   // because TanStack doesn't dedupe links and every page would inherit it.
@@ -96,7 +97,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: DEFAULT_DESCRIPTION },
       { name: "author", content: AUTHOR },
       { property: "og:site_name", content: SITE_NAME },
-      { property: "og:locale", content: "en_US" },
+      { property: "og:locale", content: "en_GB" },
       { name: "theme-color", content: "#F8F6F0", media: "(prefers-color-scheme: light)" },
       { name: "theme-color", content: "#0F0A06", media: "(prefers-color-scheme: dark)" },
     ],
@@ -161,12 +162,5 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-    </QueryClientProvider>
-  );
+  return <Outlet />;
 }

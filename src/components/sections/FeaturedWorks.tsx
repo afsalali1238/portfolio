@@ -1,20 +1,43 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Container } from "../layout/Container";
 import { SectionReveal } from "../animations/SectionReveal";
 import { getProjectById, projectCount, numberWord, type Project } from "../../data/projects";
 
-/** 
+/**
  * Minimal featured showcase on the homepage (3 flagship pieces).
  * Governed strictly by the brand guidelines: 8 px corners, 1 px rule, 24 px padding, no shadow.
  */
-const FEATURED_IDS = [
-  "kine",
-  "provia",
-  "doomscholar",
-];
+const FEATURED_IDS = ["kine", "provia", "doomscholar"];
 
 const featured = FEATURED_IDS.map(getProjectById).filter((p): p is Project => Boolean(p));
+
+function FeaturedPoster({ src, isMobile }: { src: string; isMobile: boolean }) {
+  const [landscape, setLandscape] = useState(false);
+  const check = (img: HTMLImageElement | null) => {
+    if (img && img.complete && img.naturalWidth) {
+      setLandscape(img.naturalWidth > img.naturalHeight);
+    }
+  };
+  const framed = isMobile && !landscape;
+  return (
+    <div className="flex h-full w-full items-center justify-center p-3 bg-paper-deep">
+      <img
+        ref={check}
+        src={src}
+        alt=""
+        loading="lazy"
+        onLoad={(e) => check(e.currentTarget)}
+        className={`block h-auto max-h-full w-auto max-w-full bg-paper transition-opacity duration-150 ${
+          framed
+            ? "rounded-[1.25rem] border-[4px] border-ink"
+            : "rounded-md border rule-hair object-contain"
+        }`}
+      />
+    </div>
+  );
+}
 
 export function FeaturedWorks() {
   return (
@@ -37,50 +60,46 @@ export function FeaturedWorks() {
         </SectionReveal>
 
         <ul className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
-          {featured.map((p) => (
-            <li key={p.id}>
-              <Link
-                to="/works/$id"
-                params={{ id: p.id }}
-                className="group flex h-full flex-col justify-between overflow-hidden rounded-lg border rule-hair bg-paper p-6 transition-colors duration-150 hover:border-ink/40 hover:bg-paper-deep/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
-              >
-                <div>
-                  {p.media && (
-                    <div className="relative -mx-6 -mt-6 mb-5 aspect-[16/10] overflow-hidden rounded-t-lg border-b rule-hair bg-paper-deep">
-                      <img
-                        src={p.media.poster}
-                        alt={`${p.name} preview`}
-                        loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                      />
-                      <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-ink/90 px-3 py-1 text-xs font-medium text-paper backdrop-blur-xs">
-                        <span className="h-1.5 w-1.5 rounded-full bg-paper" />
-                        <span className="capitalize">{p.media.kind} build</span>
+          {featured.map((p) => {
+            const isMobile = p.media?.kind === "mobile" || p.platform === "pwa";
+            return (
+              <li key={p.id}>
+                <Link
+                  to="/works/$id"
+                  params={{ id: p.id }}
+                  className="group flex h-full flex-col justify-between overflow-hidden rounded-lg border rule-hair bg-paper p-6 transition-colors duration-150 hover:border-ink/40 hover:bg-paper-deep/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                >
+                  <div>
+                    {p.media && (
+                      <div className="relative -mx-6 -mt-6 mb-5 aspect-[16/10] overflow-hidden rounded-t-lg border-b rule-hair bg-paper-deep">
+                        <FeaturedPoster src={p.media.poster} isMobile={isMobile} />
+                        <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-ink/90 px-3 py-1 text-xs font-medium text-paper backdrop-blur-xs">
+                          <span className="h-1.5 w-1.5 rounded-full bg-paper" />
+                          <span className="capitalize">
+                            {isMobile ? "Phone build" : "Web build"}
+                          </span>
+                        </div>
                       </div>
+                    )}
+
+                    <div className="flex items-center justify-between text-xs text-ink-mute">
+                      <span>Built for {p.for.toLowerCase() === "wife" ? "my wife" : p.for}</span>
+                      <span>{p.year}</span>
                     </div>
-                  )}
-
-                  <div className="flex items-center justify-between text-xs text-ink-mute">
-                    <span>Built for {p.for}</span>
-                    <span>{p.year}</span>
+                    <h3 className="mt-3 font-serif text-3xl leading-none text-ink">{p.name}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-ink-soft line-clamp-3">
+                      {p.blurb}
+                    </p>
                   </div>
-                  <h3 className="mt-3 font-serif text-3xl leading-none text-ink">{p.name}</h3>
-                  <p className="mt-2 text-xs leading-relaxed text-ink-soft line-clamp-3">
-                    {p.blurb}
-                  </p>
-                </div>
 
-                <div className="mt-5 flex items-center justify-between border-t rule-hair pt-3 text-xs font-medium text-ink">
-                  <span>Read case study</span>
-                  {p.live ? (
-                    <ArrowUpRight className="h-3.5 w-3.5 text-ink-mute transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                  ) : (
+                  <div className="mt-5 flex items-center justify-between border-t rule-hair pt-3 text-xs font-medium text-ink">
+                    <span>Read case study</span>
                     <ArrowRight className="h-3.5 w-3.5 text-ink-mute transition-transform group-hover:translate-x-1" />
-                  )}
-                </div>
-              </Link>
-            </li>
-          ))}
+                  </div>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
 
         {/* Primary CTA Button: 44 px tall, 6 px corners, primary ink, no shadow */}
@@ -93,7 +112,7 @@ export function FeaturedWorks() {
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
           <p className="mt-2.5 text-xs text-ink-mute">
-            Explore 3D tools, clinical Arabic apps, and quiet software with visual explainers.
+            Explore 3D tools, clinical Arabic apps, and quiet software with open architecture notes.
           </p>
         </div>
       </Container>

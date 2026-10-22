@@ -18,6 +18,13 @@ function appCategory(p: Project) {
   return "WebApplication";
 }
 
+function operatingSystem(p: Project) {
+  if (p.platform === "windows") return "Windows";
+  if (p.platform === "cli") return "Cross-platform CLI";
+  if (p.platform === "pwa") return "iOS, Android, Web (PWA)";
+  return "Web";
+}
+
 function projectSchema(p: Project) {
   return {
     "@context": "https://schema.org",
@@ -27,7 +34,7 @@ function projectSchema(p: Project) {
     url: p.live ?? `${SITE_URL}/works/${p.id}`,
     ...(p.github ? { codeRepository: p.github } : {}),
     applicationCategory: appCategory(p),
-    operatingSystem: "Web",
+    operatingSystem: operatingSystem(p),
     author: { "@type": "Person", name: AUTHOR, url: SITE_URL },
     dateCreated: p.year,
     keywords: p.tags.join(", "),
@@ -66,6 +73,9 @@ export const Route = createFileRoute("/works/$id")({
 function ProjectCaseStudy() {
   const { project, prev, next } = Route.useLoaderData();
 
+  const problemText = project.problem ?? project.detail;
+  const solutionText = project.solution ?? (project.problem ? project.detail : undefined);
+
   return (
     <PageShell>
       <Container className="max-w-4xl pt-8">
@@ -89,7 +99,12 @@ function ProjectCaseStudy() {
               </span>
               <span>·</span>
               <span className="rounded-full bg-paper-deep px-3 py-1 font-medium text-ink-soft">
-                Built for {project.for}
+                Built for{" "}
+                {project.for.toLowerCase() === "wife"
+                  ? "my wife"
+                  : project.for.toLowerCase() === "me"
+                    ? "me"
+                    : project.for}
               </span>
               {project.status && (
                 <>
@@ -103,7 +118,7 @@ function ProjectCaseStudy() {
                 <>
                   <span>·</span>
                   <span className="rounded-full bg-ink px-3 py-1 font-medium text-paper">
-                    Spotlight Build
+                    Spotlight build
                   </span>
                 </>
               )}
@@ -124,9 +139,11 @@ function ProjectCaseStudy() {
                   href={project.live}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-0.5"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink-soft"
                 >
-                  Visit Live Site <ArrowUpRight className="h-4 w-4" />
+                  {project.platform === "windows" ? "Windows app · download" : "Visit live site"}
+                  <ArrowUpRight className="h-4 w-4" />
+                  <span className="sr-only"> (opens in a new tab)</span>
                 </a>
               )}
               {project.github && (
@@ -136,7 +153,8 @@ function ProjectCaseStudy() {
                   rel="noreferrer"
                   className="inline-flex min-h-11 items-center gap-2 rounded-md border rule-hair bg-paper px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-paper-deep"
                 >
-                  Source Code <Github className="h-4 w-4" />
+                  Source code <Github className="h-4 w-4" />
+                  <span className="sr-only"> (opens in a new tab)</span>
                 </a>
               )}
             </div>
@@ -147,23 +165,7 @@ function ProjectCaseStudy() {
                 <ExplainerVideo
                   media={project.media}
                   title={project.name}
-                  stills={
-                    project.id === "kine"
-                      ? [
-                          "/works/kine/01.jpg",
-                          "/works/kine/02.jpg",
-                          "/works/kine/03.jpg",
-                          "/works/kine/04.jpg",
-                        ]
-                      : project.id === "provia"
-                        ? [
-                            "/works/provia/01.jpg",
-                            "/works/provia/02.jpg",
-                            "/works/provia/03.jpg",
-                            "/works/provia/04.jpg",
-                          ]
-                        : [project.media.poster]
-                  }
+                  stills={project.media.stills}
                 />
               </div>
             )}
@@ -172,34 +174,34 @@ function ProjectCaseStudy() {
           {/* Deep-dive sections */}
           <div className="mt-12 space-y-12">
             {/* The Human Friction */}
-            <SectionReveal className="space-y-4">
-              <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-                01 · The Human Friction
-              </div>
-              <h2 className="font-serif text-3xl text-ink">Why this exists.</h2>
-              <p className="text-base md:text-lg leading-relaxed text-ink-soft">
-                {project.problem || project.detail}
-              </p>
-            </SectionReveal>
+            {problemText && (
+              <SectionReveal className="space-y-4">
+                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
+                  01 · Why this exists
+                </div>
+                <h2 className="font-serif text-3xl text-ink">Why this exists.</h2>
+                <p className="text-base md:text-lg leading-relaxed text-ink-soft">{problemText}</p>
+              </SectionReveal>
+            )}
 
             {/* The Build & Architecture */}
-            <SectionReveal className="space-y-4">
-              <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-                02 · The Solution
-              </div>
-              <h2 className="font-serif text-3xl text-ink">How it was built.</h2>
-              <p className="text-base md:text-lg leading-relaxed text-ink-soft">
-                {project.solution || project.detail}
-              </p>
-            </SectionReveal>
+            {solutionText && (
+              <SectionReveal className="space-y-4">
+                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
+                  02 · How it was built
+                </div>
+                <h2 className="font-serif text-3xl text-ink">How it was built.</h2>
+                <p className="text-base md:text-lg leading-relaxed text-ink-soft">{solutionText}</p>
+              </SectionReveal>
+            )}
 
             {/* Outcome */}
             {project.outcome && (
               <SectionReveal className="space-y-4">
                 <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-                  03 · What Changed (Outcome)
+                  03 · The outcome
                 </div>
-                <h2 className="font-serif text-3xl text-ink">The Real Result.</h2>
+                <h2 className="font-serif text-3xl text-ink">The real result.</h2>
                 <p className="text-base leading-relaxed text-ink md:text-lg">{project.outcome}</p>
               </SectionReveal>
             )}
@@ -208,7 +210,7 @@ function ProjectCaseStudy() {
             {project.learned && (
               <SectionReveal className="space-y-4 border-l-2 border-ink py-2 pl-6">
                 <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-                  04 · What I Learned
+                  04 · What I learned
                 </div>
                 <p className="font-serif text-2xl italic leading-snug text-ink">
                   &ldquo;{project.learned}&rdquo;
@@ -220,9 +222,9 @@ function ProjectCaseStudy() {
             {project.highlights && project.highlights.length > 0 && (
               <SectionReveal className="space-y-4">
                 <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-                  05 · Engineering Highlights
+                  05 · Highlights
                 </div>
-                <h2 className="font-serif text-3xl text-ink">Concrete Capabilities</h2>
+                <h2 className="font-serif text-3xl text-ink">Concrete capabilities.</h2>
                 <ul className="space-y-3 pt-2">
                   {project.highlights.map((h: string, i: number) => (
                     <li key={i} className="flex items-start gap-3 text-base text-ink-soft">
@@ -234,11 +236,12 @@ function ProjectCaseStudy() {
               </SectionReveal>
             )}
 
-            {/* Tech Stack */}
+            {/* Tech Stack - Section 06 (fixes numbering bug!) */}
             <SectionReveal className="space-y-4 rounded-lg bg-paper-deep/50 p-6 md:p-8">
               <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-                04 · Technical Stack & Standards
+                06 · Technical stack
               </div>
+              <h2 className="font-serif text-2xl text-ink">Tools and dependencies.</h2>
               <div className="flex flex-wrap gap-2 pt-2">
                 {((project.stack || project.tags) as string[]).map((tech: string) => (
                   <span

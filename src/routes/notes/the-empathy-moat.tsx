@@ -21,18 +21,18 @@ const ARTICLE_SCHEMA = {
     name: SITE_NAME,
     url: SITE_URL,
   },
-  datePublished: "2026-10-21",
-  inLanguage: "en-US",
+  datePublished: "2026-07-28",
+  inLanguage: "en-GB",
 };
 
 export const Route = createFileRoute("/notes/the-empathy-moat")({
   head: () => ({
     ...seo({
-      title: "The Empathy Moat: Dispatch No. 03 · forthe.tech",
+      title: "The Empathy Moat: No. 03 · forthe.tech",
       description:
         "Why building for your wife or friends beats building for anonymous metrics, and why personal friction produces software that survives.",
       path: "/notes/the-empathy-moat",
-      image: "/og/home.png",
+      image: "/og/the-empathy-moat.png",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],
@@ -53,7 +53,7 @@ function EmpathyMoatPage() {
               <ArrowLeft className="h-3.5 w-3.5" /> Back to Notes
             </Link>
             <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-              Dispatch No. 03 · October 2026
+              No. 03 · 28 July 2026
             </div>
             <h1 className="mt-3 font-serif text-5xl leading-[1.05] tracking-tight text-ink md:text-6xl">
               The empathy moat.
@@ -73,7 +73,7 @@ function EmpathyMoatPage() {
             <p>I don&rsquo;t know Sarah. But I know my wife.</p>
 
             <p>
-              My wife is a clinical pharmacist in Dubai. I watched her come home after grueling
+              My wife is a clinical pharmacist in Dubai. I watched her come home after gruelling
               twelve-hour hospital shifts, sit at the kitchen table, and stare into 800-page dry PDF
               question banks for her DHA licensing exams. The existing prep tools were hostile:
               clunky desktop portals that required constant Wi-Fi, loaded slowly on mobile, and
@@ -118,7 +118,7 @@ function EmpathyMoatPage() {
                 PharmaRab
               </Link>
               . General language apps teach you how to ask where the museum is. They don&rsquo;t
-              teach a retail pharmacist how to explain pediatric dosage contraindications to an
+              teach a retail pharmacist how to explain paediatric dosage contraindications to an
               anxious Arabic-speaking mother at the counter.
             </p>
 
@@ -138,7 +138,7 @@ function EmpathyMoatPage() {
             </p>
 
             <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">
-              Software Without Tourists
+              Software without tourists.
             </h2>
 
             <p>
@@ -155,10 +155,17 @@ function EmpathyMoatPage() {
 
             <div className="mt-16 flex items-center justify-between border-t rule-hair pt-8">
               <Link
+                to="/notes/the-moat-moved"
+                className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
+              >
+                <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                <span>Prev: No. 02 · The moat moved</span>
+              </Link>
+              <Link
                 to="/notes/the-15-minute-rule"
                 className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
               >
-                <span>Next: Dispatch No. 04 · The 15-minute rule</span>
+                <span>Next: No. 04 · The 15-minute rule</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>

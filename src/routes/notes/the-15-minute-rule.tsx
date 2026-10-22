@@ -21,18 +21,18 @@ const ARTICLE_SCHEMA = {
     name: SITE_NAME,
     url: SITE_URL,
   },
-  datePublished: "2026-10-21",
-  inLanguage: "en-US",
+  datePublished: "2026-08-30",
+  inLanguage: "en-GB",
 };
 
 export const Route = createFileRoute("/notes/the-15-minute-rule")({
   head: () => ({
     ...seo({
-      title: "The 15-Minute Rule: Dispatch No. 04 · forthe.tech",
+      title: "The 15-Minute Rule: No. 04 · forthe.tech",
       description:
         "Why infinite scroll loops and aggressive gamification destroy retention, and why software that respects time survives.",
       path: "/notes/the-15-minute-rule",
-      image: "/og/home.png",
+      image: "/og/the-15-minute-rule.png",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],
@@ -53,7 +53,7 @@ function FifteenMinuteRulePage() {
               <ArrowLeft className="h-3.5 w-3.5" /> Back to Notes
             </Link>
             <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-              Dispatch No. 04 · October 2026
+              No. 04 · 30 August 2026
             </div>
             <h1 className="mt-3 font-serif text-5xl leading-[1.05] tracking-tight text-ink md:text-6xl">
               The 15-minute rule.
@@ -64,7 +64,7 @@ function FifteenMinuteRulePage() {
           </SectionReveal>
 
           <article className="mt-12 space-y-6 text-base leading-relaxed text-ink-soft md:text-lg">
-            <p>Every product designer has been trained to optimize for time-in-app.</p>
+            <p>Every product designer has been trained to optimise for time-in-app.</p>
 
             <p>
               More sessions. Longer sessions. Red badge notifications at 9:00 PM reminding you that
@@ -128,10 +128,17 @@ function FifteenMinuteRulePage() {
 
             <div className="mt-16 flex items-center justify-between border-t rule-hair pt-8">
               <Link
+                to="/notes/the-empathy-moat"
+                className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
+              >
+                <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                <span>Prev: No. 03 · The empathy moat</span>
+              </Link>
+              <Link
                 to="/notes/the-whatsapp-operating-system"
                 className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
               >
-                <span>Next: Dispatch No. 05 · The WhatsApp operating system</span>
+                <span>Next: No. 05 · The WhatsApp operating system</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>

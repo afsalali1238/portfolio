@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell } from "../components/site/PageShell";
-import { About } from "../components/sections/About";
-import { Posture } from "../components/sections/Posture";
+import { Origin } from "../components/sections/Origin";
 import { seo } from "../lib/site";
 
 export const Route = createFileRoute("/about")({
@@ -19,8 +18,7 @@ export const Route = createFileRoute("/about")({
 function AboutPage() {
   return (
     <PageShell>
-      <About />
-      <Posture />
+      <Origin isPage />
     </PageShell>
   );
 }

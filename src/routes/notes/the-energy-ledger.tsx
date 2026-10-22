@@ -21,8 +21,8 @@ const ARTICLE_SCHEMA = {
     name: SITE_NAME,
     url: SITE_URL,
   },
-  datePublished: "2026-10-21",
-  inLanguage: "en-US",
+  datePublished: "2026-05-14",
+  inLanguage: "en-GB",
 };
 
 export const Route = createFileRoute("/notes/the-energy-ledger")({
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/notes/the-energy-ledger")({
       description:
         "On AI tokens as currency, the thermodynamic debt of a prompt, and the moral requirement of building with intention.",
       path: "/notes/the-energy-ledger",
-      image: "/og/thesis.png",
+      image: "/og/the-energy-ledger.png",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],
@@ -53,7 +53,7 @@ function EnergyLedgerPage() {
               <ArrowLeft className="h-3.5 w-3.5" /> Back to Notes
             </Link>
             <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-              Manifesto · Dispatch No. 01
+              No. 01 · 14 May 2026
             </div>
 
             <h1 className="mt-4 font-serif text-5xl leading-[1.02] text-ink md:text-7xl">
@@ -96,8 +96,17 @@ function EnergyLedgerPage() {
             </p>
 
             <p className="mt-2 border-l-2 border-ink-mute/30 py-1 pl-3 text-xs italic text-ink-mute">
-              *Google published 0.24 Wh as the median Gemini text prompt (Aug 2025) — roughly three
-              minutes of a standard 5 W LED reading lamp.
+              *Google measured 0.24 Wh as the median Gemini text prompt in their{" "}
+              <a
+                href="https://arxiv.org/abs/2508.15734"
+                target="_blank"
+                rel="noreferrer"
+                className="underline hover:text-ink transition-colors"
+              >
+                August 2025 inference energy study
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>{" "}
+              — roughly three minutes of a standard 5 W LED reading lamp.
             </p>
 
             <p>
@@ -178,7 +187,7 @@ function EnergyLedgerPage() {
                 >
                   NxtDoorChef
                 </Link>{" "}
-                to connect neighbors directly to authentic home kitchens with zero platform tax.
+                to connect neighbours directly to authentic home kitchens with zero platform tax.
               </li>
             </ul>
 
@@ -197,7 +206,7 @@ function EnergyLedgerPage() {
                 to="/notes/the-moat-moved"
                 className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
               >
-                <span>Next: Dispatch No. 02 · The moat moved</span>
+                <span>Next: No. 02 · The moat moved</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>

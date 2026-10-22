@@ -22,17 +22,17 @@ const ARTICLE_SCHEMA = {
     url: SITE_URL,
   },
   datePublished: "2026-10-21",
-  inLanguage: "en-US",
+  inLanguage: "en-GB",
 };
 
 export const Route = createFileRoute("/notes/the-reality-test")({
   head: () => ({
     ...seo({
-      title: "The Reality Test: Dispatch No. 06 · forthe.tech",
+      title: "The Reality Test: No. 06 · forthe.tech",
       description:
         "Building is safe because it only involves you. Finding customers is brutal because they have zero bias toward your baby.",
       path: "/notes/the-reality-test",
-      image: "/og/home.png",
+      image: "/og/the-reality-test.png",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],
@@ -53,7 +53,7 @@ function RealityTestPage() {
               <ArrowLeft className="h-3.5 w-3.5" /> Back to Notes
             </Link>
             <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-              Dispatch No. 06 · October 2026
+              No. 06 · 21 October 2026
             </div>
             <h1 className="mt-3 font-serif text-5xl leading-[1.05] tracking-tight text-ink md:text-6xl">
               The reality test.
@@ -69,7 +69,7 @@ function RealityTestPage() {
               Building a new product or a slick new feature is addictive. It feels like playing god.
               At 2:00 AM, inside your dark room with your editor glowing, you have total control.
               You tweak the padding, tune the animations to sixty frames per second, write clean
-              schemas, and watch your ideas materialize from nothing.
+              schemas, and watch your ideas materialise from nothing.
             </p>
 
             <p>
@@ -114,7 +114,7 @@ function RealityTestPage() {
               absolutely <strong>zero bias</strong> toward you or your dream.
             </p>
 
-            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">The Unbiased Room</h2>
+            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">The unbiased room.</h2>
 
             <p>
               Strangers do not know that you skipped sleep for three weeks. They do not care that
@@ -134,13 +134,13 @@ function RealityTestPage() {
             </p>
 
             <p>
-              That realization hits like a physical blow. You suddenly see that the product gave{" "}
+              That realisation hits like a physical blow. You suddenly see that the product gave{" "}
               <em>you</em> purpose, but it solves nothing for <em>them</em>. It fed your ego and
               inflated your self-worth, but in the harsh light of reality, it was just a monument to
               your own vanity.
             </p>
 
-            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">From Ego to Relief</h2>
+            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">From ego to relief.</h2>
 
             <p>
               This is where most founders quit. They don&rsquo;t quit because their code broke; they
@@ -155,7 +155,7 @@ function RealityTestPage() {
               <li>
                 <strong>You stop falling in love with your own artifacts.</strong> Software is not a
                 baby to be worshipped; it is a wrench. If it doesn&rsquo;t turn the bolt, nobody
-                cares what color you painted the handle.
+                cares what colour you painted the handle.
               </li>
               <li>
                 <strong>You strip away founder vanity.</strong> Self-worth can no longer come from a
@@ -172,7 +172,7 @@ function RealityTestPage() {
 
             <p>
               The reality test is painful. But it is the only test that matters. It strips away the
-              theater of being a creator and leaves you with the only question worth answering:
+              theatre of being a creator and leaves you with the only question worth answering:
             </p>
 
             <p className="font-serif text-xl italic text-ink">
@@ -185,7 +185,7 @@ function RealityTestPage() {
                 className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
               >
                 <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span>Prev: Dispatch No. 05 · The WhatsApp operating system</span>
+                <span>Prev: No. 05 · The WhatsApp operating system</span>
               </Link>
             </div>
           </article>

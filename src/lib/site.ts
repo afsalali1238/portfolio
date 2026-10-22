@@ -4,12 +4,13 @@
  * JSON-LD URL is built from this constant — social scrapers will not resolve relative
  * paths, and a canonical on a host that doesn't resolve is worse than none.
  */
+import { projectCount, numberWord } from "../data/projects";
+
 export const SITE_URL = "https://www.forthe.tech";
 export const SITE_NAME = "forthe.tech";
 export const AUTHOR = "Afsal Ali";
 
-export const DEFAULT_DESCRIPTION =
-  "Documenting what happens when the wall between having an idea and building it disappears. Sixteen builds by Afsal Ali, made in Dubai for the people around him.";
+export const DEFAULT_DESCRIPTION = `Documenting what happens when the wall between having an idea and building it disappears. ${numberWord(projectCount)} builds by Afsal Ali, made in Dubai for the people around him.`;
 
 type SeoInput = {
   title: string;

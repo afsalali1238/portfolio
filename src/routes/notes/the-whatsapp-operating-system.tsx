@@ -21,18 +21,18 @@ const ARTICLE_SCHEMA = {
     name: SITE_NAME,
     url: SITE_URL,
   },
-  datePublished: "2026-10-21",
-  inLanguage: "en-US",
+  datePublished: "2026-09-24",
+  inLanguage: "en-GB",
 };
 
 export const Route = createFileRoute("/notes/the-whatsapp-operating-system")({
   head: () => ({
     ...seo({
-      title: "The WhatsApp OS: Dispatch No. 05 · forthe.tech",
+      title: "The WhatsApp OS: No. 05 · forthe.tech",
       description:
         "What building NxtDoorChef in Dubai taught me about community trust and why direct communication beats 30% delivery fees.",
       path: "/notes/the-whatsapp-operating-system",
-      image: "/og/home.png",
+      image: "/og/the-whatsapp-operating-system.png",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],
@@ -53,7 +53,7 @@ function WhatsAppOSPage() {
               <ArrowLeft className="h-3.5 w-3.5" /> Back to Notes
             </Link>
             <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-              Dispatch No. 05 · October 2026
+              No. 05 · 24 September 2026
             </div>
             <h1 className="mt-3 font-serif text-5xl leading-[1.05] tracking-tight text-ink md:text-6xl">
               The WhatsApp operating system.
@@ -77,7 +77,7 @@ function WhatsAppOSPage() {
 
             <p>
               In Dubai — from Karama to Al Barsha — some of the most authentic cooking in the city
-              comes from home kitchens. A grandmother making regional Kerala biryani, a neighbor
+              comes from home kitchens. A grandmother making regional Kerala biryani, a neighbour
               crafting Hyderabadi haleem, an Egyptian family baking fresh baladi bread.
             </p>
 
@@ -91,7 +91,7 @@ function WhatsAppOSPage() {
                 NxtDoorChef
               </Link>
               , the temptation was to build a full delivery marketplace. But when you talk to the
-              cooks and the neighbors, you realize they don&rsquo;t want an aggregator standing
+              cooks and the neighbours, you realise they don&rsquo;t want an aggregator standing
               between them with surge pricing and credit card processing holds.
             </p>
 
@@ -103,7 +103,7 @@ function WhatsAppOSPage() {
             </div>
 
             <p>
-              Neighbors want to see who is cooking within walking distance, tap a button to say
+              Neighbours want to see who is cooking within walking distance, tap a button to say
               hello on WhatsApp, agree on the tiffin, and walk upstairs. The software&rsquo;s only
               job is discovery and connection — then get completely out of the way. Zero commission.
               Zero middleman fee.
@@ -130,17 +130,17 @@ function WhatsAppOSPage() {
 
             <div className="mt-16 flex items-center justify-between border-t rule-hair pt-8">
               <Link
-                to="/notes"
+                to="/notes/the-15-minute-rule"
                 className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
               >
                 <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span>All dispatches</span>
+                <span>Prev: No. 04 · The 15-minute rule</span>
               </Link>
               <Link
                 to="/notes/the-reality-test"
                 className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
               >
-                <span>Next: Dispatch No. 06 · The reality test</span>
+                <span>Next: No. 06 · The reality test</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
