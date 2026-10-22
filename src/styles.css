@@ -157,6 +157,23 @@
   animation: reveal-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Hero cells are "built" once on first paint, one after another (logo guide, 07: the row is
+   built one cell at a time). CSS, not JS, so it never waits for hydration. Only defined when
+   the visitor hasn't asked for less motion, so reduced motion gets the finished grid. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes cell-build {
+    from {
+      background-color: var(--color-paper-deep);
+      border-color: transparent;
+      color: transparent;
+    }
+  }
+  .cell-build {
+    animation: cell-build 0.2s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: calc(0.45s + var(--i, 0) * 0.04s);
+  }
+}
+
 /* Marquee runs on a CSS animation, not a JS transform, so hover can actually pause it. */
 @keyframes marquee-scroll {
   from {

@@ -1,82 +1,80 @@
-import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Container } from "../layout/Container";
-import { projectCount, liveCount, forPeopleCount, sourceCount } from "../../data/projects";
-import { RevealWord, StatLink } from "./hero-helpers";
-import { HeroPrism } from "./HeroPrism";
+import { projectCount, numberWord } from "../../data/projects";
+import { RevealWord } from "./hero-helpers";
+import { BuildDetails, BuildIndex, BuildStage } from "./hero-bench";
+import { useBench } from "./hero-bench-state";
 
+/**
+ * The hero is the index: the thesis on the left, every build underneath it as a cell,
+ * and on the right the build you're pointing at, shown for real (screenshot, facts, links).
+ *
+ * Layout: one grid. On phones the order is thesis → stage → cells → details, so a tap on
+ * a cell changes the screenshot just above it and the facts just below. From lg up the
+ * right-hand wrapper becomes a column that spans both rows (thesis + cells on the left).
+ */
 export function Hero() {
+  const bench = useBench();
+
   return (
-    <section className="relative overflow-hidden pt-14 pb-12 md:pt-24 md:pb-16">
-      {/* Background Interactive Prism Canvas (Pink Floyd Dark Side + Constellation Motif) */}
-      <HeroPrism className="absolute inset-0 z-0 h-full w-full opacity-90 transition-opacity" />
-
-      {/* Gentle soft edge overlay - preserves readability while letting the constellation breathe */}
-      <div
-        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-paper/10 via-transparent to-paper/50"
-        aria-hidden="true"
-      />
-
-      <Container className="relative z-10">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 items-center">
-          {/* Left Column: Authoritative Editorial Presentation */}
-          <div className="lg:col-span-7 space-y-6">
-            <h1 className="font-serif tracking-tight">
-              <span className="block text-[12vw] leading-[0.88] md:text-[5.5rem] lg:text-[6.8rem] text-ink">
+    <section aria-labelledby="hero-heading" className="pb-14 pt-10 md:pb-20 md:pt-14">
+      <Container>
+        <div className="grid grid-cols-1 gap-x-12 gap-y-8 lg:grid-cols-12 lg:grid-rows-[auto_1fr]">
+          <div className="order-1 lg:col-span-7 lg:row-start-1">
+            <h1 id="hero-heading" className="font-serif tracking-tight">
+              <span className="block text-[12vw] leading-[0.88] text-ink md:text-[5.5rem] lg:text-[6rem] xl:text-[6.8rem]">
                 <RevealWord delay={0.05}>For the tech.</RevealWord>
               </span>
-              <span className="block mt-2 text-[7.5vw] leading-[1.02] italic text-ink-mute md:text-[3.2rem] lg:text-[4rem]">
+              <span className="mt-2 block text-[7.5vw] italic leading-[1.02] text-ink-mute md:text-[3.2rem] lg:text-[3.3rem] xl:text-[3.8rem]">
                 <RevealWord delay={0.18} italic>
                   Not because anyone asked.
                 </RevealWord>
               </span>
             </h1>
 
-            <p className="max-w-xl text-base md:text-lg leading-relaxed text-ink-soft">
+            <p className="mt-6 max-w-xl text-base leading-relaxed text-ink-soft md:text-lg">
               Documenting what happens when the wall between having an idea and building it
-              disappears. Sixteen quiet tools, public code, and honest field notes.
+              disappears. {numberWord(projectCount)} quiet tools, public code, and honest field
+              notes.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 pt-2 text-sm">
+            <div className="mt-7 flex flex-col gap-3 text-sm sm:flex-row sm:flex-wrap sm:items-center">
               <Link
                 to="/works"
-                className="inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-6 text-paper transition-colors hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-ink px-6 text-paper transition-colors duration-150 hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
               >
-                See the builds <ArrowRight className="h-4 w-4" />
+                See the builds
+                <ArrowRight
+                  className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
               </Link>
               <Link
                 to="/notes"
-                className="inline-flex min-h-11 items-center gap-2 rounded-md border rule-hair bg-paper px-6 text-ink transition-colors hover:bg-paper-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-md border rule-hair bg-paper px-6 text-ink transition-colors duration-150 hover:bg-paper-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               >
-                Read the notes <ArrowRight className="h-4 w-4" />
+                Read the notes
+                <ArrowRight
+                  className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
               </Link>
             </div>
           </div>
 
-          {/* Right Column: Open visual space for the Prism, Spectrum & Constellation */}
-          <div className="hidden lg:block lg:col-span-5 h-[360px] pointer-events-none" aria-hidden="true">
-            {/* Acts as spacer reserving the visual stage for the canvas artwork */}
+          <BuildIndex
+            bench={bench}
+            className="order-3 lg:order-none lg:col-span-7 lg:row-start-2 lg:self-end"
+          />
+
+          {/* On phones this wrapper dissolves (display: contents) so its two children can sit
+              either side of the cells; from lg up it's the right-hand column. */}
+          <div className="contents lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1 lg:flex lg:flex-col lg:gap-6">
+            <BuildStage bench={bench} className="order-2 lg:order-none" />
+            <BuildDetails bench={bench} className="order-4 lg:order-none" />
           </div>
         </div>
-
-        {/* Shipped & verified metrics card: Grounded below the hero */}
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-40px" }}
-          variants={{ show: { transition: { staggerChildren: 0.08 } } }}
-          className="mt-14 grid grid-cols-2 gap-6 rounded-lg bg-paper/90 p-6 backdrop-blur-xs text-sm md:grid-cols-4 md:p-8 border rule-hair"
-        >
-          <StatLink label="Total shipped" value={String(projectCount)} filterKey="all" />
-          <StatLink label="Live on the internet" value={String(liveCount)} filterKey="live" />
-          <StatLink label="Open source" value={String(sourceCount)} filterKey="oss" />
-          <StatLink
-            label="For wife, friends, me"
-            value={String(forPeopleCount)}
-            filterKey="for-people"
-          />
-        </motion.div>
       </Container>
     </section>
   );

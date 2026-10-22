@@ -1,8 +1,4 @@
 import React from "react";
-import { motion } from "motion/react";
-import { Link } from "@tanstack/react-router";
-import type { ProjectFilter } from "../../data/filters";
-import { rise } from "../../data/motion-constants";
 
 export function RevealWord({
   children,
@@ -24,38 +20,5 @@ export function RevealWord({
         {children}
       </span>
     </span>
-  );
-}
-
-/** A stat tile that opens the catalogue pre-filtered, e.g. /works?filter=live. */
-export function StatLink({
-  label,
-  value,
-  filterKey,
-}: {
-  label: string;
-  value: string;
-  filterKey: ProjectFilter;
-}) {
-  return (
-    <motion.div variants={rise} whileHover={{ y: -2 }}>
-      <Link
-        to="/works"
-        search={filterKey === "all" ? {} : { filter: filterKey }}
-        className="group -m-2 flex flex-col rounded-md p-2 text-left transition-colors hover:bg-paper-deep/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
-        aria-label={`${value} builds — ${label}. See them.`}
-      >
-        <span className="font-serif text-3xl leading-none text-ink">{value}</span>
-        <span className="mt-2 flex items-center justify-between text-xs text-ink-mute transition-colors group-hover:text-ink">
-          <span>{label}</span>
-          <span
-            aria-hidden="true"
-            className="text-[10px] opacity-0 transition-opacity group-hover:opacity-100"
-          >
-            see →
-          </span>
-        </span>
-      </Link>
-    </motion.div>
   );
 }
