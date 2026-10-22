@@ -172,6 +172,22 @@
     animation: cell-build 0.2s cubic-bezier(0.22, 1, 0.36, 1) backwards;
     animation-delay: calc(0.45s + var(--i, 0) * 0.04s);
   }
+
+  /* Logo guide 07: the clay pixel row is built outward on first paint. */
+  @keyframes pixel-build {
+    from {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  .logo-clay-pixel {
+    transform-origin: 16px 14px;
+    animation: pixel-build 0.25s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
 }
 
 /* Marquee runs on a CSS animation, not a JS transform, so hover can actually pause it. */

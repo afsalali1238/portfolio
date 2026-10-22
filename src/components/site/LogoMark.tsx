@@ -23,9 +23,30 @@ export function LogoMark({ className = "h-4 w-4" }: { className?: string }) {
       </g>
       {/* Clay pixel row continuing through the cut gap */}
       <g fill="var(--color-mark-dot, #E67E54)">
-        <rect x="16.3" y="12.6" width="3.1" height="3.1" rx="0.5" />
-        <rect x="20" y="12.6" width="3.1" height="3.1" rx="0.5" />
-        <rect x="23.7" y="12.6" width="3.1" height="3.1" rx="0.5" />
+        <rect
+          x="16.3"
+          y="12.6"
+          width="3.1"
+          height="3.1"
+          rx="0.5"
+          className="logo-clay-pixel [animation-delay:0.2s]"
+        />
+        <rect
+          x="20"
+          y="12.6"
+          width="3.1"
+          height="3.1"
+          rx="0.5"
+          className="logo-clay-pixel [animation-delay:0.28s]"
+        />
+        <rect
+          x="23.7"
+          y="12.6"
+          width="3.1"
+          height="3.1"
+          rx="0.5"
+          className="logo-clay-pixel [animation-delay:0.36s]"
+        />
       </g>
     </svg>
   );
