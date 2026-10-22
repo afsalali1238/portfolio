@@ -62,110 +62,78 @@ export function HeroPrism({ className = "" }: { className?: string }) {
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
 
-    // Harmonic constellation nodes (extending across the entire hero, including behind and below the shipped card)
+    // Constellation nodes positioned in the right stage and lower transition
+    // (Never cluttering the left typography)
     const constellationNodes = [
-      // Primary Breakthrough Spine (Warm Clay)
-      { nx: 0.50, ny: 0.28, isClay: true, radius: 2.5, phase: 0.0 },
-      { nx: 0.58, ny: 0.24, isClay: true, radius: 2.8, phase: 0.3 },
-      { nx: 0.68, ny: 0.20, isClay: true, radius: 3.2, phase: 0.6 },
-      { nx: 0.79, ny: 0.16, isClay: true, radius: 3.5, phase: 0.9 },
-      { nx: 0.90, ny: 0.14, isClay: true, radius: 3.0, phase: 1.2 },
+      // Primary Clay Breakthrough Spine
+      { nx: 0.76, ny: 0.28, isClay: true, radius: 2.8, phase: 0.0 },
+      { nx: 0.83, ny: 0.23, isClay: true, radius: 3.2, phase: 0.3 },
+      { nx: 0.90, ny: 0.19, isClay: true, radius: 3.5, phase: 0.6 },
+      { nx: 0.96, ny: 0.17, isClay: true, radius: 2.8, phase: 0.9 },
 
-      // Upper Celestial Canopy (Expanding into top-right negative space)
-      { nx: 0.54, ny: 0.16, isClay: false, radius: 1.8, phase: 0.2 },
-      { nx: 0.63, ny: 0.11, isClay: false, radius: 2.0, phase: 0.5 },
-      { nx: 0.74, ny: 0.08, isClay: false, radius: 2.2, phase: 0.8 },
-      { nx: 0.85, ny: 0.07, isClay: false, radius: 2.0, phase: 1.1 },
-      { nx: 0.94, ny: 0.09, isClay: false, radius: 1.6, phase: 1.4 },
+      // Upper Canopy (Right corner)
+      { nx: 0.78, ny: 0.16, isClay: false, radius: 1.8, phase: 0.2 },
+      { nx: 0.86, ny: 0.11, isClay: false, radius: 2.0, phase: 0.5 },
+      { nx: 0.93, ny: 0.08, isClay: false, radius: 2.2, phase: 0.8 },
 
       // Middle Resonance Arch
-      { nx: 0.55, ny: 0.36, isClay: false, radius: 1.9, phase: 0.4 },
-      { nx: 0.65, ny: 0.32, isClay: false, radius: 2.2, phase: 0.7 },
-      { nx: 0.75, ny: 0.29, isClay: false, radius: 2.4, phase: 1.0 },
-      { nx: 0.86, ny: 0.27, isClay: false, radius: 2.0, phase: 1.3 },
-      { nx: 0.95, ny: 0.25, isClay: false, radius: 1.8, phase: 1.6 },
+      { nx: 0.79, ny: 0.38, isClay: false, radius: 2.0, phase: 0.4 },
+      { nx: 0.87, ny: 0.34, isClay: false, radius: 2.2, phase: 0.7 },
+      { nx: 0.94, ny: 0.31, isClay: false, radius: 2.0, phase: 1.0 },
 
-      // Mid-Lower Arch (Guiding down towards stats cards)
-      { nx: 0.52, ny: 0.48, isClay: false, radius: 1.6, phase: 0.3 },
-      { nx: 0.62, ny: 0.45, isClay: false, radius: 1.8, phase: 0.6 },
-      { nx: 0.73, ny: 0.42, isClay: false, radius: 2.0, phase: 0.9 },
-      { nx: 0.84, ny: 0.40, isClay: false, radius: 1.7, phase: 1.2 },
+      // Lower Transition Filaments (Connecting down toward stats cards)
+      { nx: 0.74, ny: 0.48, isClay: false, radius: 1.8, phase: 0.5 },
+      { nx: 0.82, ny: 0.46, isClay: false, radius: 2.0, phase: 0.8 },
+      { nx: 0.91, ny: 0.45, isClay: false, radius: 1.8, phase: 1.1 },
 
-      // Cross-linking geometry anchors
-      { nx: 0.60, ny: 0.18, isClay: false, radius: 1.5, phase: 0.4 },
-      { nx: 0.71, ny: 0.24, isClay: false, radius: 1.7, phase: 0.8 },
-      { nx: 0.82, ny: 0.21, isClay: false, radius: 1.8, phase: 1.1 },
-
-      // LOWER EXPANSION: Flowing behind & below the shipped card
-      { nx: 0.22, ny: 0.78, isClay: false, radius: 1.6, phase: 0.2 },
-      { nx: 0.38, ny: 0.84, isClay: true, radius: 2.2, phase: 0.5 },
-      { nx: 0.50, ny: 0.82, isClay: false, radius: 1.8, phase: 0.8 },
-      { nx: 0.64, ny: 0.88, isClay: true, radius: 2.4, phase: 1.1 },
-      { nx: 0.78, ny: 0.83, isClay: false, radius: 1.9, phase: 1.4 },
-      { nx: 0.88, ny: 0.89, isClay: false, radius: 1.7, phase: 1.7 },
-      { nx: 0.48, ny: 0.94, isClay: true, radius: 2.0, phase: 0.6 },
-      { nx: 0.72, ny: 0.95, isClay: false, radius: 1.8, phase: 1.0 },
+      // Bottom Arch (Behind & below stats row)
+      { nx: 0.35, ny: 0.86, isClay: false, radius: 1.6, phase: 0.3 },
+      { nx: 0.52, ny: 0.84, isClay: true, radius: 2.2, phase: 0.6 },
+      { nx: 0.70, ny: 0.86, isClay: false, radius: 1.9, phase: 0.9 },
+      { nx: 0.88, ny: 0.88, isClay: true, radius: 2.2, phase: 1.2 },
+      { nx: 0.60, ny: 0.95, isClay: false, radius: 1.7, phase: 1.5 },
     ];
 
-    // Constellation Edges (Fine filaments connecting the dots)
+    // Constellation Edges
     const constellationEdges = [
-      // Primary Clay Spine
+      // Clay Spine
       { from: 0, to: 1, isClay: true },
       { from: 1, to: 2, isClay: true },
       { from: 2, to: 3, isClay: true },
-      { from: 3, to: 4, isClay: true },
 
       // Upper Canopy
-      { from: 0, to: 5 },
+      { from: 0, to: 4 },
+      { from: 4, to: 5 },
       { from: 5, to: 6 },
-      { from: 6, to: 7 },
-      { from: 7, to: 8 },
-      { from: 8, to: 9 },
-
-      // Middle Arch
-      { from: 0, to: 10 },
-      { from: 10, to: 11 },
-      { from: 11, to: 12 },
-      { from: 12, to: 13 },
-      { from: 13, to: 14 },
-
-      // Lower Arch
-      { from: 10, to: 15 },
-      { from: 15, to: 16 },
-      { from: 16, to: 17 },
-      { from: 17, to: 18 },
-
-      // Polyhedral cross-ties
       { from: 1, to: 5 },
       { from: 2, to: 6 },
-      { from: 2, to: 19 },
-      { from: 19, to: 7 },
-      { from: 3, to: 8 },
-      { from: 1, to: 10 },
-      { from: 2, to: 11 },
-      { from: 11, to: 20 },
-      { from: 20, to: 12 },
-      { from: 3, to: 21 },
-      { from: 21, to: 13 },
-      { from: 12, to: 17 },
-      { from: 13, to: 18 },
-      { from: 4, to: 14 },
 
-      // Connect down into the lower shipped-card constellation
-      { from: 16, to: 24 },
-      { from: 17, to: 25 },
-      { from: 22, to: 23 },
-      { from: 23, to: 24 },
-      { from: 24, to: 25 },
-      { from: 25, to: 26 },
-      { from: 26, to: 27 },
-      { from: 24, to: 28, isClay: true },
-      { from: 25, to: 29 },
-      { from: 28, to: 29 },
+      // Middle Arch
+      { from: 0, to: 7 },
+      { from: 7, to: 8 },
+      { from: 8, to: 9 },
+      { from: 1, to: 8 },
+      { from: 2, to: 9 },
+
+      // Lower Transition
+      { from: 7, to: 10 },
+      { from: 10, to: 11 },
+      { from: 11, to: 12 },
+      { from: 8, to: 11 },
+      { from: 9, to: 12 },
+
+      // Flowing down to bottom cards
+      { from: 10, to: 15 },
+      { from: 11, to: 16 },
+      { from: 13, to: 14 },
+      { from: 14, to: 15 },
+      { from: 15, to: 16 },
+      { from: 14, to: 17 },
+      { from: 15, to: 17 },
     ];
 
-    // Delicate floating ambient dust motes
-    const ambientMotes = Array.from({ length: 30 }, () => ({
+    // Floating ambient dust motes
+    const ambientMotes = Array.from({ length: 24 }, () => ({
       x: Math.random(),
       y: Math.random(),
       vx: (Math.random() - 0.5) * 0.0002,
@@ -174,16 +142,15 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       alpha: 0.15 + Math.random() * 0.35,
     }));
 
-    // Micro-photons gliding across constellation edges
+    // Micro-photons gliding across edges
     const travelingPhotons = [
-      { edgeIdx: 0, progress: 0.1, speed: 0.006 },
-      { edgeIdx: 2, progress: 0.6, speed: 0.005 },
-      { edgeIdx: 3, progress: 0.3, speed: 0.007 },
-      { edgeIdx: 6, progress: 0.8, speed: 0.004 },
-      { edgeIdx: 11, progress: 0.4, speed: 0.005 },
-      { edgeIdx: 17, progress: 0.2, speed: 0.006 },
-      { edgeIdx: 23, progress: 0.5, speed: 0.005 },
-      { edgeIdx: 25, progress: 0.3, speed: 0.006 },
+      { edgeIdx: 0, progress: 0.1, speed: 0.007 },
+      { edgeIdx: 1, progress: 0.5, speed: 0.006 },
+      { edgeIdx: 2, progress: 0.3, speed: 0.008 },
+      { edgeIdx: 4, progress: 0.8, speed: 0.005 },
+      { edgeIdx: 7, progress: 0.4, speed: 0.006 },
+      { edgeIdx: 13, progress: 0.2, speed: 0.005 },
+      { edgeIdx: 16, progress: 0.6, speed: 0.007 },
     ];
 
     // Main animation loop
@@ -205,31 +172,30 @@ export function HeroPrism({ className = "" }: { className?: string }) {
         currentMouse.x += (targetMouse.x * dpr - currentMouse.x) * 0.05;
         currentMouse.y += (targetMouse.y * dpr - currentMouse.y) * 0.05;
       } else {
-        // Idle gentle breathing wave
-        const idleX = width * 0.12;
-        const idleY = height * 0.18 + Math.sin(time * 0.6) * (height * 0.04);
+        const idleX = width * 0.1;
+        const idleY = height * 0.08 + Math.sin(time * 0.6) * (height * 0.03);
         currentMouse.x += (idleX - currentMouse.x) * 0.025;
         currentMouse.y += (idleY - currentMouse.y) * 0.025;
       }
 
       ctx.clearRect(0, 0, width, height);
 
-      // Color Palette Definition
-      const beamColor = dark ? "rgba(248, 246, 240, 0.85)" : "rgba(22, 16, 12, 0.65)";
-      const beamGlow = dark ? "rgba(248, 246, 240, 0.3)" : "rgba(22, 16, 12, 0.10)";
-      const glassBorder = dark ? "rgba(248, 246, 240, 0.35)" : "rgba(22, 16, 12, 0.25)";
-      const filamentColor = dark ? "rgba(248, 246, 240, 0.14)" : "rgba(22, 16, 12, 0.10)";
+      // Palette
+      const beamColor = dark ? "rgba(248, 246, 240, 0.85)" : "rgba(22, 16, 12, 0.60)";
+      const beamGlow = dark ? "rgba(248, 246, 240, 0.3)" : "rgba(22, 16, 12, 0.08)";
+      const glassBorder = dark ? "rgba(248, 246, 240, 0.35)" : "rgba(22, 16, 12, 0.22)";
+      const filamentColor = dark ? "rgba(248, 246, 240, 0.12)" : "rgba(22, 16, 12, 0.09)";
       const clayColor = dark ? "#E67E54" : "#A8471B";
-      const clayGlow = dark ? "rgba(230, 126, 84, 0.4)" : "rgba(168, 71, 27, 0.25)";
+      const clayGlow = dark ? "rgba(230, 126, 84, 0.4)" : "rgba(168, 71, 27, 0.22)";
       const starNodeFill = dark ? "rgba(248, 246, 240, 0.75)" : "rgba(22, 16, 12, 0.65)";
 
       // Compositional positioning:
-      // The prism is positioned safely above the headline so the beam enters from the top-left
-      // and glides cleanly across the upper negative space without intersecting any typography!
+      // The prism is positioned on the right stage, leaving the entire left column
+      // for the authoritative headline and lead text without ANY collisions!
       const isMobile = width < 768 * dpr;
-      const prismCenterX = isMobile ? width * 0.35 : width * 0.42;
-      const prismCenterY = isMobile ? height * 0.28 : height * 0.26;
-      const prismSize = Math.min(width, height) * (isMobile ? 0.20 : 0.17);
+      const prismCenterX = isMobile ? width * 0.72 : width * 0.70;
+      const prismCenterY = isMobile ? height * 0.24 : height * 0.30;
+      const prismSize = Math.min(width, height) * (isMobile ? 0.16 : 0.18);
 
       // Prism Vertices (Equilateral triangle)
       const topVertex = { x: prismCenterX, y: prismCenterY - prismSize * 0.88 };
@@ -239,29 +205,30 @@ export function HeroPrism({ className = "" }: { className?: string }) {
         y: prismCenterY + prismSize * 0.58,
       };
 
-      // 1. Soft Ambient Prism Glow (Radial bloom in the background)
+      // 1. Soft Ambient Radial Bloom
       const bloomGrad = ctx.createRadialGradient(
         prismCenterX,
         prismCenterY,
         0,
         prismCenterX,
         prismCenterY,
-        prismSize * 2.2,
+        prismSize * 2.4,
       );
-      bloomGrad.addColorStop(0, dark ? "rgba(230, 126, 84, 0.08)" : "rgba(168, 71, 27, 0.05)");
-      bloomGrad.addColorStop(0.5, dark ? "rgba(248, 246, 240, 0.03)" : "rgba(22, 16, 12, 0.02)");
+      bloomGrad.addColorStop(0, dark ? "rgba(230, 126, 84, 0.09)" : "rgba(168, 71, 27, 0.05)");
+      bloomGrad.addColorStop(0.5, dark ? "rgba(248, 246, 240, 0.02)" : "rgba(22, 16, 12, 0.015)");
       bloomGrad.addColorStop(1, "transparent");
       ctx.fillStyle = bloomGrad;
       ctx.beginPath();
-      ctx.arc(prismCenterX, prismCenterY, prismSize * 2.2, 0, Math.PI * 2);
+      ctx.arc(prismCenterX, prismCenterY, prismSize * 2.4, 0, Math.PI * 2);
       ctx.fill();
 
-      // 2. Incident Beam of Pure Curiosity (Sweeps gracefully from upper-left in open space)
+      // 2. Incident Beam of Pure Curiosity
+      // Enters from high above in the top margin (sourceY = 6% to 10%), completely above all typography!
       const sourceX = 0;
-      const sourceY = height * 0.14 + (currentMouse.y - height * 0.18) * 0.25;
+      const sourceY = height * 0.08 + (currentMouse.y - height * 0.1) * 0.2;
       const hitPoint = {
         x: prismCenterX - prismSize * 0.26,
-        y: prismCenterY - prismSize * 0.15 + (currentMouse.y - height * 0.18) * 0.12,
+        y: prismCenterY - prismSize * 0.12 + (currentMouse.y - height * 0.1) * 0.1,
       };
 
       ctx.save();
@@ -274,13 +241,13 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       ctx.lineTo(hitPoint.x, hitPoint.y);
       ctx.stroke();
 
-      // Core bright photon streak along the incident ray
+      // Core photon gliding along the incident ray
       const beamProgress = (time * 0.6) % 1;
       const beamPhotonX = sourceX + (hitPoint.x - sourceX) * beamProgress;
       const beamPhotonY = sourceY + (hitPoint.y - sourceY) * beamProgress;
       ctx.fillStyle = dark ? "#FFF" : clayColor;
       ctx.beginPath();
-      ctx.arc(beamPhotonX, beamPhotonY, 2.0 * dpr, 0, Math.PI * 2);
+      ctx.arc(beamPhotonX, beamPhotonY, 1.8 * dpr, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
 
@@ -302,9 +269,9 @@ export function HeroPrism({ className = "" }: { className?: string }) {
         internalExitLower.x,
         internalExitLower.y,
       );
-      refractionGrad.addColorStop(0, dark ? "rgba(255,255,255,0.7)" : "rgba(22,16,12,0.5)");
-      refractionGrad.addColorStop(0.5, dark ? "rgba(230,126,84,0.6)" : "rgba(168,71,27,0.5)");
-      refractionGrad.addColorStop(1, dark ? "rgba(255,255,255,0.8)" : "rgba(22,16,12,0.7)");
+      refractionGrad.addColorStop(0, dark ? "rgba(255,255,255,0.7)" : "rgba(22,16,12,0.45)");
+      refractionGrad.addColorStop(0.5, dark ? "rgba(230,126,84,0.6)" : "rgba(168,71,27,0.4)");
+      refractionGrad.addColorStop(1, dark ? "rgba(255,255,255,0.8)" : "rgba(22,16,12,0.6)");
       ctx.strokeStyle = refractionGrad;
       ctx.beginPath();
       ctx.moveTo(hitPoint.x, hitPoint.y);
@@ -314,7 +281,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       ctx.stroke();
       ctx.restore();
 
-      // 4. Multi-Spectral Dispersion (Pink Floyd chromatic fan into upper-right space)
+      // 4. Multi-Spectral Dispersion Fan (Pink Floyd Dark Side Chromatic Ribbon)
       const spectralBands = [
         { color: dark ? "rgba(168, 85, 247, 0.55)" : "rgba(147, 51, 234, 0.45)", angle: -0.22 }, // Violet
         { color: dark ? "rgba(59, 130, 246, 0.60)" : "rgba(37, 99, 235, 0.45)", angle: -0.16 },  // Cyan
@@ -327,21 +294,52 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       const fanOriginX = prismCenterX + prismSize * 0.28;
       const fanOriginY = prismCenterY + prismSize * 0.04;
 
+      // Draw soft gradient fills between consecutive bands (authentic continuous ribbon)
+      for (let i = 0; i < spectralBands.length - 1; i++) {
+        const b1 = spectralBands[i];
+        const b2 = spectralBands[i + 1];
+        const mouseBend = (currentMouse.y / height - 0.25) * 0.1;
+        const a1 = b1.angle + mouseBend;
+        const a2 = b2.angle + mouseBend;
+        const ribbonLen = width * 0.45;
+
+        const p1X = fanOriginX + Math.cos(a1) * ribbonLen;
+        const p1Y = fanOriginY + Math.sin(a1) * ribbonLen;
+        const p2X = fanOriginX + Math.cos(a2) * ribbonLen;
+        const p2Y = fanOriginY + Math.sin(a2) * ribbonLen;
+
+        const ribbonGrad = ctx.createLinearGradient(fanOriginX, fanOriginY, p1X, p1Y);
+        ribbonGrad.addColorStop(0, dark ? "rgba(255,255,255,0.06)" : "rgba(22,16,12,0.03)");
+        ribbonGrad.addColorStop(0.5, b1.color);
+        ribbonGrad.addColorStop(1, "transparent");
+
+        ctx.save();
+        ctx.fillStyle = ribbonGrad;
+        ctx.beginPath();
+        ctx.moveTo(fanOriginX, fanOriginY);
+        ctx.lineTo(p1X, p1Y);
+        ctx.lineTo(p2X, p2Y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Draw crisp spectral rays
       spectralBands.forEach((band) => {
-        const mouseBend = (currentMouse.y / height - 0.25) * 0.12;
+        const mouseBend = (currentMouse.y / height - 0.25) * 0.1;
         const finalAngle = band.angle + mouseBend;
-        const rayLen = width * 0.75;
+        const rayLen = width * 0.48;
         const endX = fanOriginX + Math.cos(finalAngle) * rayLen;
         const endY = fanOriginY + Math.sin(finalAngle) * rayLen;
 
         const rayGrad = ctx.createLinearGradient(fanOriginX, fanOriginY, endX, endY);
         rayGrad.addColorStop(0, band.color);
-        rayGrad.addColorStop(0.35, band.color);
-        rayGrad.addColorStop(0.85, "transparent");
+        rayGrad.addColorStop(0.4, band.color);
+        rayGrad.addColorStop(0.9, "transparent");
 
         ctx.save();
         ctx.strokeStyle = rayGrad;
-        ctx.lineWidth = 1.4 * dpr;
+        ctx.lineWidth = 1.3 * dpr;
         ctx.beginPath();
         ctx.moveTo(fanOriginX, fanOriginY);
         ctx.lineTo(endX, endY);
@@ -349,7 +347,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
         ctx.restore();
       });
 
-      // 5. Constellation Filaments (Connecting the Dots across the full hero)
+      // 5. Constellation Filaments
       ctx.save();
       constellationEdges.forEach((edge) => {
         const p1 = constellationNodes[edge.from];
@@ -376,7 +374,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       });
       ctx.restore();
 
-      // 6. Traveling Photons along Constellation Filaments
+      // 6. Traveling Photons
       travelingPhotons.forEach((photon) => {
         photon.progress += photon.speed;
         if (photon.progress > 1) photon.progress = 0;
@@ -400,7 +398,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
         ctx.restore();
       });
 
-      // 7. Constellation Nodes (Delicate Star Points)
+      // 7. Constellation Nodes
       constellationNodes.forEach((node) => {
         const nx = node.nx * width;
         const ny = node.ny * height;
@@ -414,7 +412,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
           ctx.shadowBlur = 8 * dpr;
         } else {
           ctx.fillStyle = starNodeFill;
-          ctx.shadowColor = dark ? "rgba(248, 246, 240, 0.2)" : "rgba(22, 16, 12, 0.1)";
+          ctx.shadowColor = dark ? "rgba(248, 246, 240, 0.2)" : "rgba(22, 16, 12, 0.08)";
           ctx.shadowBlur = 4 * dpr;
         }
 
@@ -422,9 +420,8 @@ export function HeroPrism({ className = "" }: { className?: string }) {
         ctx.arc(nx, ny, r, 0, Math.PI * 2);
         ctx.fill();
 
-        // Delicate inner halo for the brightest breakthrough nodes
         if (node.isClay && node.radius > 2.5) {
-          ctx.strokeStyle = dark ? "rgba(230, 126, 84, 0.4)" : "rgba(168, 71, 27, 0.25)";
+          ctx.strokeStyle = dark ? "rgba(230, 126, 84, 0.4)" : "rgba(168, 71, 27, 0.22)";
           ctx.lineWidth = 0.8 * dpr;
           ctx.beginPath();
           ctx.arc(nx, ny, r * 2.2, 0, Math.PI * 2);
@@ -446,7 +443,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
         const my = mote.y * height;
         ctx.fillStyle = dark
           ? `rgba(248, 246, 240, ${mote.alpha * 0.3})`
-          : `rgba(22, 16, 12, ${mote.alpha * 0.18})`;
+          : `rgba(22, 16, 12, ${mote.alpha * 0.16})`;
         ctx.beginPath();
         ctx.arc(mx, my, mote.size * dpr, 0, Math.PI * 2);
         ctx.fill();
@@ -454,7 +451,6 @@ export function HeroPrism({ className = "" }: { className?: string }) {
 
       // 9. Prism Glass Shell & Architectural Caustic Facets
       ctx.save();
-      // Translucent Glass Face
       ctx.fillStyle = dark ? "rgba(248, 246, 240, 0.03)" : "rgba(22, 16, 12, 0.02)";
       ctx.beginPath();
       ctx.moveTo(topVertex.x, topVertex.y);
@@ -463,12 +459,11 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       ctx.closePath();
       ctx.fill();
 
-      // Sharp Crisp Facet Edges
       ctx.strokeStyle = glassBorder;
       ctx.lineWidth = 1.4 * dpr;
       ctx.stroke();
 
-      // Inner Caustic Line (Refraction plane inside prism)
+      // Inner Caustic Line
       ctx.strokeStyle = dark ? "rgba(248, 246, 240, 0.15)" : "rgba(22, 16, 12, 0.08)";
       ctx.lineWidth = 0.8 * dpr;
       ctx.beginPath();
