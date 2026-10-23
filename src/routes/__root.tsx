@@ -156,6 +156,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <body>
         {children}
         <Scripts />
+        <script defer src="https://cdn.vercel-insights.com/v1/script.js" />
       </body>
     </html>
   );
