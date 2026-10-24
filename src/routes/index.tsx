@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell } from "../components/site/PageShell";
 import { Hero } from "../components/sections/Hero";
-import { InDailyUse } from "../components/sections/InDailyUse";
+import { FeaturedWorks } from "../components/sections/FeaturedWorks";
 import { ThesisTeaser } from "../components/sections/ThesisTeaser";
 import { Origin } from "../components/sections/Origin";
 import { seo, DEFAULT_DESCRIPTION } from "../lib/site";
@@ -18,17 +18,17 @@ export const Route = createFileRoute("/")({
 });
 
 /**
- * Suggested order (review section 4):
- * 1. Hero (the build index)
- * 2. In daily use (Provia, Doomscholar, JobHunter OS)
- * 3. Latest note (Dispatch standfirst + Energy Ledger thesis)
+ * Home presents the whole arc:
+ * 1. Hero (prism + constellation interactive canvas, thesis, stat tiles)
+ * 2. Featured builds (selected showcase — kinē, Provia, Doomscholar)
+ * 3. Thesis teaser (dispatch standfirst + Energy Ledger thesis)
  * 4. Origin (concise About story + static posture drawing)
  */
 function Index() {
   return (
     <PageShell>
       <Hero />
-      <InDailyUse />
+      <FeaturedWorks />
       <ThesisTeaser />
       <Origin />
     </PageShell>

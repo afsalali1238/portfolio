@@ -95,10 +95,6 @@ function ProjectCaseStudy() {
             {/* Meta badges */}
             <div className="flex flex-wrap items-center gap-3 text-xs text-ink-mute">
               <span className="rounded-full bg-paper-deep px-3 py-1 font-medium text-ink-soft">
-                {project.year}
-              </span>
-              <span>·</span>
-              <span className="rounded-full bg-paper-deep px-3 py-1 font-medium text-ink-soft">
                 Built for{" "}
                 {project.for.toLowerCase() === "wife"
                   ? "my wife"

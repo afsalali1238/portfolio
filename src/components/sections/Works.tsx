@@ -182,9 +182,8 @@ export function Works({
 
                       {/* Card Content: 24 px padding */}
                       <div className="p-6">
-                        <div className="flex items-center justify-between text-xs text-ink-mute">
+                        <div className="text-xs text-ink-mute">
                           <span className="font-medium">{builtForLabel(p.for)}</span>
-                          <span>{p.year}</span>
                         </div>
 
                         <div className="mt-3 flex items-baseline gap-2">
@@ -276,8 +275,7 @@ export function Works({
                   params={{ id: p.id }}
                   className="group grid grid-cols-12 items-baseline gap-x-4 gap-y-2 py-6 transition-colors hover:bg-paper-deep/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink md:px-3"
                 >
-                  <span className="col-span-2 text-xs text-ink-mute md:col-span-1">{p.year}</span>
-                  <span className="col-span-10 flex flex-wrap items-baseline gap-3 md:col-span-4">
+                  <span className="col-span-12 flex flex-wrap items-baseline gap-3 md:col-span-5">
                     <span className="font-serif text-2xl leading-tight transition-transform duration-150 group-hover:translate-x-1 md:text-3xl">
                       {p.name}
                     </span>

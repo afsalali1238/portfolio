@@ -9,7 +9,7 @@ import { getProjectById, projectCount, numberWord, type Project } from "../../da
  * Minimal featured showcase on the homepage (3 flagship pieces).
  * Governed strictly by the brand guidelines: 8 px corners, 1 px rule, 24 px padding, no shadow.
  */
-const FEATURED_IDS = ["kine", "provia", "doomscholar"];
+const FEATURED_IDS = ["provia", "doomscholar", "kine"];
 
 const featured = FEATURED_IDS.map(getProjectById).filter((p): p is Project => Boolean(p));
 
@@ -67,11 +67,11 @@ export function FeaturedWorks() {
                 <Link
                   to="/works/$id"
                   params={{ id: p.id }}
-                  className="group flex h-full flex-col justify-between overflow-hidden rounded-lg border rule-hair bg-paper p-6 transition-colors duration-150 hover:border-ink/40 hover:bg-paper-deep/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                  className="group flex h-full flex-col justify-between overflow-hidden rounded-lg border rule-hair bg-paper p-6 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:border-ink/60 hover:bg-paper-deep/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
                 >
                   <div>
                     {p.media && (
-                      <div className="relative -mx-6 -mt-6 mb-5 aspect-[16/10] overflow-hidden rounded-t-lg border-b rule-hair bg-paper-deep">
+                      <div className="relative -mx-6 -mt-6 mb-5 aspect-[16/10] overflow-hidden rounded-t-lg border-b rule-hair bg-paper-deep transition-transform duration-200 group-hover:scale-[1.03]">
                         <FeaturedPoster src={p.media.poster} isMobile={isMobile} />
                         <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-ink/90 px-3 py-1 text-xs font-medium text-paper backdrop-blur-xs">
                           <span className="h-1.5 w-1.5 rounded-full bg-paper" />
@@ -82,9 +82,8 @@ export function FeaturedWorks() {
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between text-xs text-ink-mute">
+                    <div className="text-xs text-ink-mute">
                       <span>Built for {p.for.toLowerCase() === "wife" ? "my wife" : p.for}</span>
-                      <span>{p.year}</span>
                     </div>
                     <h3 className="mt-3 font-serif text-3xl leading-none text-ink">{p.name}</h3>
                     <p className="mt-2 text-sm leading-relaxed text-ink-soft line-clamp-3">

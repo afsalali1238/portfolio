@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as ThesisRouteImport } from './routes/thesis'
 import { Route as NotesIndexRouteImport } from './routes/notes/index'
 import { Route as NotesThe15MinuteRuleRouteImport } from './routes/notes/the-15-minute-rule'
@@ -25,11 +24,6 @@ import { Route as WorksIdRouteImport } from './routes/works/$id'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ThesisRoute = ThesisRouteImport.update({
@@ -86,7 +80,6 @@ const WorksIdRoute = WorksIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/thesis': typeof ThesisRoute
   '/notes/the-15-minute-rule': typeof NotesThe15MinuteRuleRoute
   '/notes/the-empathy-moat': typeof NotesTheEmpathyMoatRoute
@@ -100,7 +93,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/thesis': typeof ThesisRoute
   '/notes/the-15-minute-rule': typeof NotesThe15MinuteRuleRoute
   '/notes/the-empathy-moat': typeof NotesTheEmpathyMoatRoute
@@ -115,7 +107,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/thesis': typeof ThesisRoute
   '/notes/the-15-minute-rule': typeof NotesThe15MinuteRuleRoute
   '/notes/the-empathy-moat': typeof NotesTheEmpathyMoatRoute
@@ -131,7 +122,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/about'
     | '/thesis'
     | '/notes/the-15-minute-rule'
     | '/notes/the-empathy-moat'
@@ -145,7 +135,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/about'
     | '/thesis'
     | '/notes/the-15-minute-rule'
     | '/notes/the-empathy-moat'
@@ -159,7 +148,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/about'
     | '/thesis'
     | '/notes/the-15-minute-rule'
     | '/notes/the-empathy-moat'
@@ -174,7 +162,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
   ThesisRoute: typeof ThesisRoute
   NotesThe15MinuteRuleRoute: typeof NotesThe15MinuteRuleRoute
   NotesTheEmpathyMoatRoute: typeof NotesTheEmpathyMoatRoute
@@ -194,13 +181,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/thesis': {
@@ -278,7 +258,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
   ThesisRoute: ThesisRoute,
   NotesThe15MinuteRuleRoute: NotesThe15MinuteRuleRoute,
   NotesTheEmpathyMoatRoute: NotesTheEmpathyMoatRoute,

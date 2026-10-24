@@ -82,7 +82,7 @@ export function InDailyUse() {
                       </Link>
                     )}
 
-                    <div className="flex items-center justify-between text-xs text-ink-mute">
+                    <div className="text-xs text-ink-mute">
                       <span>
                         Built for{" "}
                         {p.for.toLowerCase() === "wife"
@@ -91,7 +91,6 @@ export function InDailyUse() {
                             ? "me"
                             : p.for}
                       </span>
-                      <span>{p.year}</span>
                     </div>
                     <h3 className="mt-3 font-serif text-3xl leading-none text-ink">
                       <Link
