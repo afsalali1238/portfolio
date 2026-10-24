@@ -299,13 +299,6 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       { color: isDark ? "rgba(245, 158, 11, 0.70)" : "rgba(217, 119, 6, 0.55)",   angle:  0.06, width: 1.8 }, // amber
       { color: isDark ? "rgba(239, 68, 68, 0.65)" : "rgba(220, 38, 38, 0.50)",   angle:  0.12, width: 1.6 }, // red
     ];
-        { color: isDark ? "rgba(168,85,247,0.55)"  : "rgba(147,51,234,0.45)",  angle: -0.22 }, // violet
-        { color: isDark ? "rgba(59,130,246,0.60)"   : "rgba(37,99,235,0.45)",   angle: -0.16 }, // cyan
-        { color: isDark ? "rgba(16,185,129,0.60)"   : "rgba(5,150,105,0.45)",   angle: -0.10 }, // jade
-        { color: isDark ? "rgba(230,126,84,0.85)"   : "rgba(168,71,27,0.70)",   angle: -0.04 }, // clay flagship
-        { color: isDark ? "rgba(245,158,11,0.65)"   : "rgba(217,119,6,0.50)",   angle:  0.02 }, // amber
-        { color: isDark ? "rgba(239,68,68,0.55)"    : "rgba(220,38,38,0.40)",   angle:  0.08 }, // warm red
-      ];
 
       const fanOX = prismCX + prismSize * 0.28;
       const fanOY = prismCY + prismSize * 0.04;
