@@ -85,7 +85,11 @@ export function SiteFooter() {
               <Link to="/notes" className="inline-flex min-h-11 items-center hover:text-ink">
                 Notes
               </Link>
-              <Link to="/about" className="inline-flex min-h-11 items-center hover:text-ink">
+              <Link
+                to="/"
+                hash="origin"
+                className="inline-flex min-h-11 items-center hover:text-ink"
+              >
                 About
               </Link>
             </nav>
