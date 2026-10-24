@@ -15,4 +15,11 @@ export default defineConfig({
   nitro: {
     preset: "vercel",
   },
+  vite: {
+    server: {
+      // Dev-only: previews are proxied through a sandbox host, so Vite's default
+      // localhost-only host allowlist rejects them with a 403.
+      allowedHosts: true,
+    },
+  },
 });
