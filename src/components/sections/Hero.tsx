@@ -1,7 +1,13 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Container } from "../layout/Container";
-import { projectCount, liveCount, forPeopleCount, sourceCount, numberWord } from "../../data/projects";
+import {
+  projectCount,
+  liveCount,
+  forPeopleCount,
+  sourceCount,
+  numberWord,
+} from "../../data/projects";
 import { RevealWord } from "./hero-helpers";
 import { HeroPrism } from "./HeroPrism";
 import type { ProjectFilter } from "../../data/filters";
@@ -43,7 +49,10 @@ function StatLink({
  */
 export function Hero() {
   return (
-    <section aria-labelledby="hero-heading" className="relative overflow-hidden pt-14 pb-12 md:pt-24 md:pb-16">
+    <section
+      aria-labelledby="hero-heading"
+      className="relative overflow-hidden pt-14 pb-12 md:pt-24 md:pb-16"
+    >
       {/* Background interactive prism canvas */}
       <HeroPrism className="absolute inset-0 z-0 h-full w-full opacity-90 transition-opacity" />
 
@@ -99,7 +108,10 @@ export function Hero() {
           </div>
 
           {/* Right column: open visual space for the prism, spectrum & constellation */}
-          <div className="hidden lg:block lg:col-span-5 h-[360px] pointer-events-none" aria-hidden="true" />
+          <div
+            className="hidden lg:block lg:col-span-5 h-[360px] pointer-events-none"
+            aria-hidden="true"
+          />
         </div>
 
         {/* Shipped & verified metrics — stat tiles that filter the catalogue */}
@@ -107,7 +119,11 @@ export function Hero() {
           <StatLink label="Total shipped" value={String(projectCount)} filterKey="all" />
           <StatLink label="Live on the internet" value={String(liveCount)} filterKey="live" />
           <StatLink label="Open source" value={String(sourceCount)} filterKey="oss" />
-          <StatLink label="For wife, friends, me" value={String(forPeopleCount)} filterKey="for-people" />
+          <StatLink
+            label="For wife, friends, me"
+            value={String(forPeopleCount)}
+            filterKey="for-people"
+          />
         </div>
       </Container>
     </section>
