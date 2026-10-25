@@ -285,8 +285,11 @@ export function Works({
                       </span>
                     )}
                   </span>
-                  <span className="col-span-12 text-sm text-ink-soft md:col-span-5">{p.blurb}</span>
-                  <span className="col-span-12 flex items-center justify-between gap-3 text-xs text-ink-mute md:col-span-2 md:justify-end">
+                  <span className="col-span-12 text-sm text-ink-soft md:col-span-4">{p.blurb}</span>
+                  <span className="col-span-12 flex flex-wrap items-center justify-between gap-2.5 text-xs text-ink-mute md:col-span-3 md:justify-end">
+                    <span className="rounded-full bg-paper-deep px-2.5 py-0.5 font-medium text-ink-soft">
+                      {platformBadge(p)}
+                    </span>
                     <span>{builtForLabel(p.for)}</span>
                     <ArrowRight className="h-4 w-4 text-ink transition-transform duration-150 group-hover:translate-x-1" />
                   </span>

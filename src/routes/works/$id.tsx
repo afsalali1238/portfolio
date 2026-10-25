@@ -25,6 +25,14 @@ function operatingSystem(p: Project) {
   return "Web";
 }
 
+function platformBadge(p: Project) {
+  if (p.platform === "windows") return "Windows app";
+  if (p.platform === "cli") return "CLI tool";
+  if (p.platform === "pwa") return "Phone app (PWA)";
+  if (p.media?.kind === "mobile") return "Phone app";
+  return "Web app";
+}
+
 function projectSchema(p: Project) {
   return {
     "@context": "https://schema.org",
@@ -94,6 +102,10 @@ function ProjectCaseStudy() {
           <SectionReveal>
             {/* Meta badges */}
             <div className="flex flex-wrap items-center gap-3 text-xs text-ink-mute">
+              <span className="rounded-full bg-paper-deep px-3 py-1 font-medium text-ink-soft">
+                {platformBadge(project)}
+              </span>
+              <span>·</span>
               <span className="rounded-full bg-paper-deep px-3 py-1 font-medium text-ink-soft">
                 Built for{" "}
                 {project.for.toLowerCase() === "wife"

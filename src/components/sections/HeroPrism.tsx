@@ -783,6 +783,22 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     };
 
     const onMouseMove = (e: MouseEvent) => handlePointer(e.clientX, e.clientY);
+    const onTouchStart = (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (t) {
+        handlePointer(t.clientX, t.clientY);
+        const x = (t.clientX - rectLeft) * dpr;
+        const y = (t.clientY - rectTop) * dpr;
+        if (x >= 0 && x <= width && y >= 0 && y <= height) {
+          ripples.push({
+            x,
+            y,
+            bornAt: performance.now(),
+            maxRadius: Math.min(width, height) * 0.45,
+          });
+        }
+      }
+    };
     const onTouchMove = (e: TouchEvent) => {
       const t = e.touches[0];
       if (t) handlePointer(t.clientX, t.clientY);
@@ -801,6 +817,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     };
 
     window.addEventListener("mousemove", onMouseMove, { passive: true });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchmove", onTouchMove, { passive: true });
     window.addEventListener("click", onClick, { passive: true });
     window.addEventListener("mouseout", onPointerGone, { passive: true });
@@ -820,6 +837,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       visObs.disconnect();
       themeObserver.disconnect();
       window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("click", onClick);
       window.removeEventListener("mouseout", onPointerGone);
