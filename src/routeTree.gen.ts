@@ -13,8 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ThesisRouteImport } from './routes/thesis'
 import { Route as NotesIndexRouteImport } from './routes/notes/index'
 import { Route as NotesThe15MinuteRuleRouteImport } from './routes/notes/the-15-minute-rule'
+import { Route as NotesTheCuriousCaseOfBuildingRouteImport } from './routes/notes/the-curious-case-of-building'
 import { Route as NotesTheEmpathyMoatRouteImport } from './routes/notes/the-empathy-moat'
 import { Route as NotesTheEnergyLedgerRouteImport } from './routes/notes/the-energy-ledger'
+import { Route as NotesTheFirstHitIsFreeRouteImport } from './routes/notes/the-first-hit-is-free'
 import { Route as NotesTheMoatMovedRouteImport } from './routes/notes/the-moat-moved'
 import { Route as NotesTheRealityTestRouteImport } from './routes/notes/the-reality-test'
 import { Route as NotesTheWhatsappOperatingSystemRouteImport } from './routes/notes/the-whatsapp-operating-system'
@@ -41,6 +43,12 @@ const NotesThe15MinuteRuleRoute = NotesThe15MinuteRuleRouteImport.update({
   path: '/notes/the-15-minute-rule',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NotesTheCuriousCaseOfBuildingRoute =
+  NotesTheCuriousCaseOfBuildingRouteImport.update({
+    id: '/notes/the-curious-case-of-building',
+    path: '/notes/the-curious-case-of-building',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const NotesTheEmpathyMoatRoute = NotesTheEmpathyMoatRouteImport.update({
   id: '/notes/the-empathy-moat',
   path: '/notes/the-empathy-moat',
@@ -49,6 +57,11 @@ const NotesTheEmpathyMoatRoute = NotesTheEmpathyMoatRouteImport.update({
 const NotesTheEnergyLedgerRoute = NotesTheEnergyLedgerRouteImport.update({
   id: '/notes/the-energy-ledger',
   path: '/notes/the-energy-ledger',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotesTheFirstHitIsFreeRoute = NotesTheFirstHitIsFreeRouteImport.update({
+  id: '/notes/the-first-hit-is-free',
+  path: '/notes/the-first-hit-is-free',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotesTheMoatMovedRoute = NotesTheMoatMovedRouteImport.update({
@@ -82,8 +95,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/thesis': typeof ThesisRoute
   '/notes/the-15-minute-rule': typeof NotesThe15MinuteRuleRoute
+  '/notes/the-curious-case-of-building': typeof NotesTheCuriousCaseOfBuildingRoute
   '/notes/the-empathy-moat': typeof NotesTheEmpathyMoatRoute
   '/notes/the-energy-ledger': typeof NotesTheEnergyLedgerRoute
+  '/notes/the-first-hit-is-free': typeof NotesTheFirstHitIsFreeRoute
   '/notes/the-moat-moved': typeof NotesTheMoatMovedRoute
   '/notes/the-reality-test': typeof NotesTheRealityTestRoute
   '/notes/the-whatsapp-operating-system': typeof NotesTheWhatsappOperatingSystemRoute
@@ -95,8 +110,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/thesis': typeof ThesisRoute
   '/notes/the-15-minute-rule': typeof NotesThe15MinuteRuleRoute
+  '/notes/the-curious-case-of-building': typeof NotesTheCuriousCaseOfBuildingRoute
   '/notes/the-empathy-moat': typeof NotesTheEmpathyMoatRoute
   '/notes/the-energy-ledger': typeof NotesTheEnergyLedgerRoute
+  '/notes/the-first-hit-is-free': typeof NotesTheFirstHitIsFreeRoute
   '/notes/the-moat-moved': typeof NotesTheMoatMovedRoute
   '/notes/the-reality-test': typeof NotesTheRealityTestRoute
   '/notes/the-whatsapp-operating-system': typeof NotesTheWhatsappOperatingSystemRoute
@@ -109,8 +126,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/thesis': typeof ThesisRoute
   '/notes/the-15-minute-rule': typeof NotesThe15MinuteRuleRoute
+  '/notes/the-curious-case-of-building': typeof NotesTheCuriousCaseOfBuildingRoute
   '/notes/the-empathy-moat': typeof NotesTheEmpathyMoatRoute
   '/notes/the-energy-ledger': typeof NotesTheEnergyLedgerRoute
+  '/notes/the-first-hit-is-free': typeof NotesTheFirstHitIsFreeRoute
   '/notes/the-moat-moved': typeof NotesTheMoatMovedRoute
   '/notes/the-reality-test': typeof NotesTheRealityTestRoute
   '/notes/the-whatsapp-operating-system': typeof NotesTheWhatsappOperatingSystemRoute
@@ -124,8 +143,10 @@ export interface FileRouteTypes {
     | '/'
     | '/thesis'
     | '/notes/the-15-minute-rule'
+    | '/notes/the-curious-case-of-building'
     | '/notes/the-empathy-moat'
     | '/notes/the-energy-ledger'
+    | '/notes/the-first-hit-is-free'
     | '/notes/the-moat-moved'
     | '/notes/the-reality-test'
     | '/notes/the-whatsapp-operating-system'
@@ -137,8 +158,10 @@ export interface FileRouteTypes {
     | '/'
     | '/thesis'
     | '/notes/the-15-minute-rule'
+    | '/notes/the-curious-case-of-building'
     | '/notes/the-empathy-moat'
     | '/notes/the-energy-ledger'
+    | '/notes/the-first-hit-is-free'
     | '/notes/the-moat-moved'
     | '/notes/the-reality-test'
     | '/notes/the-whatsapp-operating-system'
@@ -150,8 +173,10 @@ export interface FileRouteTypes {
     | '/'
     | '/thesis'
     | '/notes/the-15-minute-rule'
+    | '/notes/the-curious-case-of-building'
     | '/notes/the-empathy-moat'
     | '/notes/the-energy-ledger'
+    | '/notes/the-first-hit-is-free'
     | '/notes/the-moat-moved'
     | '/notes/the-reality-test'
     | '/notes/the-whatsapp-operating-system'
@@ -164,8 +189,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ThesisRoute: typeof ThesisRoute
   NotesThe15MinuteRuleRoute: typeof NotesThe15MinuteRuleRoute
+  NotesTheCuriousCaseOfBuildingRoute: typeof NotesTheCuriousCaseOfBuildingRoute
   NotesTheEmpathyMoatRoute: typeof NotesTheEmpathyMoatRoute
   NotesTheEnergyLedgerRoute: typeof NotesTheEnergyLedgerRoute
+  NotesTheFirstHitIsFreeRoute: typeof NotesTheFirstHitIsFreeRoute
   NotesTheMoatMovedRoute: typeof NotesTheMoatMovedRoute
   NotesTheRealityTestRoute: typeof NotesTheRealityTestRoute
   NotesTheWhatsappOperatingSystemRoute: typeof NotesTheWhatsappOperatingSystemRoute
@@ -204,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NotesThe15MinuteRuleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/notes/the-curious-case-of-building': {
+      id: '/notes/the-curious-case-of-building'
+      path: '/notes/the-curious-case-of-building'
+      fullPath: '/notes/the-curious-case-of-building'
+      preLoaderRoute: typeof NotesTheCuriousCaseOfBuildingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/notes/the-empathy-moat': {
       id: '/notes/the-empathy-moat'
       path: '/notes/the-empathy-moat'
@@ -216,6 +250,13 @@ declare module '@tanstack/react-router' {
       path: '/notes/the-energy-ledger'
       fullPath: '/notes/the-energy-ledger'
       preLoaderRoute: typeof NotesTheEnergyLedgerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notes/the-first-hit-is-free': {
+      id: '/notes/the-first-hit-is-free'
+      path: '/notes/the-first-hit-is-free'
+      fullPath: '/notes/the-first-hit-is-free'
+      preLoaderRoute: typeof NotesTheFirstHitIsFreeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/notes/the-moat-moved': {
@@ -260,8 +301,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ThesisRoute: ThesisRoute,
   NotesThe15MinuteRuleRoute: NotesThe15MinuteRuleRoute,
+  NotesTheCuriousCaseOfBuildingRoute: NotesTheCuriousCaseOfBuildingRoute,
   NotesTheEmpathyMoatRoute: NotesTheEmpathyMoatRoute,
   NotesTheEnergyLedgerRoute: NotesTheEnergyLedgerRoute,
+  NotesTheFirstHitIsFreeRoute: NotesTheFirstHitIsFreeRoute,
   NotesTheMoatMovedRoute: NotesTheMoatMovedRoute,
   NotesTheRealityTestRoute: NotesTheRealityTestRoute,
   NotesTheWhatsappOperatingSystemRoute: NotesTheWhatsappOperatingSystemRoute,

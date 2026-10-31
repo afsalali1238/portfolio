@@ -22,6 +22,8 @@ function generateSitemap() {
     { path: "/", priority: 1.0, changefreq: "weekly" },
     { path: "/works", priority: 0.9, changefreq: "weekly" },
     { path: "/notes", priority: 0.85, changefreq: "weekly" },
+    { path: "/notes/the-curious-case-of-building", priority: 0.85, changefreq: "monthly" },
+    { path: "/notes/the-first-hit-is-free", priority: 0.8, changefreq: "monthly" },
     { path: "/notes/the-moat-moved", priority: 0.8, changefreq: "monthly" },
     { path: "/notes/the-energy-ledger", priority: 0.8, changefreq: "monthly" },
     { path: "/notes/the-empathy-moat", priority: 0.8, changefreq: "monthly" },

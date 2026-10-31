@@ -33,20 +33,28 @@ export function SiteFooter() {
             <p className="text-ink-mute">Gulf Standard Time (UTC+4)</p>
             <div className="pt-4 flex flex-wrap gap-4 md:justify-end text-sm">
               <a
-                href="https://github.com/afsalali1238"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
-              >
-                GitHub ↗<span className="sr-only"> (opens in a new tab)</span>
-              </a>
-              <a
                 href="https://www.linkedin.com/in/afsalali1238/"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
               >
                 LinkedIn ↗<span className="sr-only"> (opens in a new tab)</span>
+              </a>
+              <a
+                href="https://x.com/afsalali1238"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
+              >
+                X (Twitter) ↗<span className="sr-only"> (opens in a new tab)</span>
+              </a>
+              <a
+                href="https://substack.com/@afsalali"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
+              >
+                Substack ↗<span className="sr-only"> (opens in a new tab)</span>
               </a>
               <a
                 href="https://medium.com/@afsalali1238"
@@ -57,12 +65,12 @@ export function SiteFooter() {
                 Medium ↗<span className="sr-only"> (opens in a new tab)</span>
               </a>
               <a
-                href="https://substack.com/@afsalali"
+                href="https://github.com/afsalali1238"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
               >
-                Substack ↗<span className="sr-only"> (opens in a new tab)</span>
+                GitHub ↗<span className="sr-only"> (opens in a new tab)</span>
               </a>
             </div>
           </div>

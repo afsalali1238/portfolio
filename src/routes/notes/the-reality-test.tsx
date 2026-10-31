@@ -1,9 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { PageShell } from "../../components/site/PageShell";
 import { Container } from "../../components/layout/Container";
 import { SectionReveal } from "../../components/animations/SectionReveal";
 import { seo, SITE_URL, SITE_NAME, AUTHOR } from "../../lib/site";
+import {
+  ArticlePlatformBar,
+  RelatedBuildsSection,
+  ArticleDiscussionFooter,
+} from "../../components/site/ArticleConnect";
+import { getDispatchByPath, getNextAndPrevDispatches } from "../../data/dispatches";
+
+const PATH = "/notes/the-reality-test";
+const dispatch = getDispatchByPath(PATH)!;
+const { prev, next } = getNextAndPrevDispatches(PATH);
 
 const ARTICLE_SCHEMA = {
   "@context": "https://schema.org",
@@ -31,7 +41,7 @@ export const Route = createFileRoute("/notes/the-reality-test")({
       title: "The Reality Test: No. 06 · forthe.tech",
       description:
         "Building is safe because it only involves you. Finding customers is brutal because they have zero bias toward your baby.",
-      path: "/notes/the-reality-test",
+      path: PATH,
       image: "/og/the-reality-test.png",
       type: "article",
     }),
@@ -62,9 +72,15 @@ function RealityTestPage() {
               Building is easy because it only involves you. Finding customers is brutal because
               strangers have zero bias toward your baby.
             </p>
+
+            <ArticlePlatformBar
+              external={dispatch.external}
+              readTime={dispatch.readTime}
+              words={dispatch.words}
+            />
           </SectionReveal>
 
-          <article className="mt-12 space-y-6 text-base leading-relaxed text-ink-soft md:text-lg">
+          <article className="mt-10 space-y-6 text-base leading-relaxed text-ink-soft md:text-lg">
             <p>
               Building a new product or a slick new feature is addictive. It feels like playing god.
               At 2:00 AM, inside your dark room with your editor glowing, you have total control.
@@ -98,97 +114,95 @@ function RealityTestPage() {
             <p>
               You cannot compile another human being&rsquo;s attention. You cannot{" "}
               <code className="rounded bg-paper-deep px-1.5 py-0.5 font-mono text-sm">
-                git commit
+                git push
               </code>{" "}
-              their willingness to open their wallet. You cannot prompt an AI agent to manufacture
-              genuine human trust.
+              trust.
             </p>
 
             <p>
-              And then comes the day you finally push it public. You tweet the link. You post it on
-              forums. You show it to the world.
+              When you step out of your editor and show your creation to a stranger, you enter the
+              arena of unvarnished truth. The market doesn&rsquo;t care that you didn&rsquo;t sleep on
+              Thursday. It doesn&rsquo;t care that your backend is a masterclass in clean architecture.
+              If the tool doesn&rsquo;t eliminate their specific, agonizing friction within sixty
+              seconds, they close the tab and never return.
             </p>
+
+            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">
+              The Founder&rsquo;s Hiding Place
+            </h2>
 
             <p>
-              And you step directly into the coldest room on earth: the room of people who have
-              absolutely <strong>zero bias</strong> toward you or your dream.
+              Faced with this brutal indifference, most builders retreat. But they don&rsquo;t admit
+              they are retreating. Instead, they disguise their fear as diligence:
             </p>
 
-            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">The unbiased room.</h2>
-
-            <p>
-              Strangers do not know that you skipped sleep for three weeks. They do not care that
-              you wrestled with database migrations until your eyes burned. They do not care how
-              architecturally pure your codebase is or how clever your copy sounds.
-            </p>
-
-            <p>
-              They are on the metro, or standing in line for coffee, or stressed about their own
-              mortgage, their own children, their own exhaustion. They glance at your landing page
-              for 1.8 seconds with one thumb and keep scrolling.
-            </p>
-
-            <p>
-              And in that split second, the illusion collapses: the product you conceived and
-              pampered like your own child is, to the outside world, just another useless link.
-            </p>
-
-            <p>
-              That realisation hits like a physical blow. You suddenly see that the product gave{" "}
-              <em>you</em> purpose, but it solves nothing for <em>them</em>. It fed your ego and
-              inflated your self-worth, but in the harsh light of reality, it was just a monument to
-              your own vanity.
-            </p>
-
-            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">From ego to relief.</h2>
-
-            <p>
-              This is where most founders quit. They don&rsquo;t quit because their code broke; they
-              quit because their pride couldn&rsquo;t survive the embarrassment of being ignored.
-              They blame the algorithm, the marketing channels, or &ldquo;users who don&rsquo;t
-              understand the vision.&rdquo;
-            </p>
-
-            <p>But if you survive that sting, something quietly liberating happens:</p>
-
-            <ul className="list-disc space-y-3 pl-6">
+            <ul className="space-y-3 pl-4 border-l rule-hair text-ink-soft">
               <li>
-                <strong>You stop falling in love with your own artifacts.</strong> Software is not a
-                baby to be worshipped; it is a wrench. If it doesn&rsquo;t turn the bolt, nobody
-                cares what colour you painted the handle.
+                <em>&ldquo;The conversion rate is low because we don&rsquo;t have dark mode yet.&rdquo;</em>
               </li>
               <li>
-                <strong>You strip away founder vanity.</strong> Self-worth can no longer come from a
-                title or an unlaunched dream. It comes from whether someone in the real world took a
-                breath of relief because your software removed their friction.
+                <em>&ldquo;People aren&rsquo;t signing up because the onboarding flow needs three more steps.&rdquo;</em>
               </li>
               <li>
-                <strong>You start with their pain, not your itch.</strong> You stop asking
-                &ldquo;What cool thing can I build today?&rdquo; and start asking &ldquo;Who around
-                me is struggling with something tedious, and can I take that burden off their
-                plate?&rdquo;
+                <em>&ldquo;Let me rewrite the database layer in Rust before we do customer outreach.&rdquo;</em>
               </li>
             </ul>
 
             <p>
-              The reality test is painful. But it is the only test that matters. It strips away the
-              theatre of being a creator and leaves you with the only question worth answering:
+              This is the classic founder hiding place. Rewriting code feels like work, but it is
+              actually cowardice. It is an emotional insurance policy against hearing the one
+              sentence that will crush your ego:{" "}
+              <strong className="text-ink">&ldquo;This doesn&rsquo;t matter to me.&rdquo;</strong>
             </p>
 
-            <p className="font-serif text-xl italic text-ink">
-              Did you build this for yourself, or did you build it for them?
+            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">
+              The 14-Day Reality Rule
+            </h2>
+
+            <p>
+              To survive as an operator, you must cure yourself of this romantic disease. At{" "}
+              <strong className="text-ink">forthe.tech</strong>, every build is subjected to a strict
+              operating contract:
             </p>
 
-            <div className="mt-16 flex items-center justify-between border-t rule-hair pt-8">
-              <Link
-                to="/notes/the-whatsapp-operating-system"
-                className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
-              >
-                <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span>Prev: No. 05 · The WhatsApp operating system</span>
-              </Link>
+            <div className="space-y-4 pt-2">
+              <div className="rounded-lg bg-paper-deep/50 p-6">
+                <h3 className="font-serif text-xl text-ink">1. Name the Person</h3>
+                <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                  Never build for an anonymous demographic. Before writing a line of code, name the
+                  exact human who has the problem. If it&rsquo;s your wife, a pharmacist in Deira, or
+                  a logistics dispatcher in Jebel Ali, you know who has to say yes.
+                </p>
+              </div>
+
+              <div className="rounded-lg bg-paper-deep/50 p-6">
+                <h3 className="font-serif text-xl text-ink">2. The Two-Week Verdict</h3>
+                <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                  Deploy a working version within 14 days and put it directly into their hands. If
+                  they aren&rsquo;t using it organically by day 15, do not add ten more features. Ask
+                  why the pain wasn&rsquo;t sharp enough.
+                </p>
+              </div>
+
+              <div className="rounded-lg bg-paper-deep/50 p-6">
+                <h3 className="font-serif text-xl text-ink">3. Kill Without Ceremony</h3>
+                <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                  If the software failed the reality test, shut down the server, archive the repo,
+                  and write down what broke. Never keep zombie apps alive to protect your founder ego.
+                </p>
+              </div>
             </div>
+
+            <p className="pt-4">
+              Your software is not your child. It is a tool. If the wrench doesn&rsquo;t turn the
+              bolt, you don&rsquo;t polish the handle for six months — you put it down and find a
+              different tool.
+            </p>
           </article>
+
+          <RelatedBuildsSection projectIds={dispatch.relatedWorks} />
+
+          <ArticleDiscussionFooter dispatch={dispatch} prev={prev} next={next} />
         </Container>
       </div>
     </PageShell>

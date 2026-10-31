@@ -5,6 +5,7 @@ import { SectionReveal } from "../../components/animations/SectionReveal";
 import { PageShell } from "../../components/site/PageShell";
 import { ExplainerVideo } from "../../components/site/ExplainerVideo";
 import { getProjectById, getNextAndPrevProjects, type Project } from "../../data/projects";
+import { getRelatedNotesForProject } from "../../data/dispatches";
 import { seo, SITE_URL, AUTHOR } from "../../lib/site";
 
 /** schema.org category from the project's tags — a recipe board isn't a DeveloperApplication. */
@@ -261,6 +262,42 @@ function ProjectCaseStudy() {
                 ))}
               </div>
             </SectionReveal>
+
+            {/* Related Essays & Dispatches */}
+            {getRelatedNotesForProject(project.id).length > 0 && (
+              <SectionReveal className="space-y-4 rounded-lg border rule-hair bg-paper p-6 md:p-8">
+                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
+                  07 · Related Essays & Dispatches
+                </div>
+                <h2 className="font-serif text-2xl text-ink">Read the deeper thesis.</h2>
+                <p className="text-sm text-ink-soft">
+                  The operational context, design philosophy, and lessons behind this build:
+                </p>
+                <div className="space-y-3 pt-2">
+                  {getRelatedNotesForProject(project.id).map((note) => (
+                    <Link
+                      key={note.number}
+                      to={note.path}
+                      className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-md border rule-hair bg-paper-deep/40 p-4 transition-colors hover:border-ink hover:bg-paper-deep"
+                    >
+                      <div className="space-y-1">
+                        <div className="text-xs text-ink-mute font-mono">
+                          No. {note.number} · {note.date}
+                        </div>
+                        <div className="font-serif text-xl text-ink group-hover:text-ink">
+                          {note.title}
+                        </div>
+                        <div className="text-xs text-ink-soft line-clamp-1">{note.subtitle}</div>
+                      </div>
+                      <div className="inline-flex items-center gap-1.5 text-xs font-medium text-ink shrink-0">
+                        <span>Read essay</span>
+                        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </SectionReveal>
+            )}
           </div>
 
           {/* Next / Previous Project Footer */}

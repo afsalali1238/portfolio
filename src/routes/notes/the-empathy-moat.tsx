@@ -1,16 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { PageShell } from "../../components/site/PageShell";
 import { Container } from "../../components/layout/Container";
 import { SectionReveal } from "../../components/animations/SectionReveal";
 import { seo, SITE_URL, SITE_NAME, AUTHOR } from "../../lib/site";
+import {
+  ArticlePlatformBar,
+  RelatedBuildsSection,
+  ArticleDiscussionFooter,
+} from "../../components/site/ArticleConnect";
+import { getDispatchByPath, getNextAndPrevDispatches } from "../../data/dispatches";
+
+const PATH = "/notes/the-empathy-moat";
+const dispatch = getDispatchByPath(PATH)!;
+const { prev, next } = getNextAndPrevDispatches(PATH);
 
 const ARTICLE_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "TechArticle",
-  headline: "The Empathy Moat: Building for Someone You Love",
+  headline: "The Empathy Moat: Why Building for Someone You Love Beats Product Frameworks",
   description:
-    "Why building for your wife or friends beats building for anonymous metrics, and why personal friction produces software that survives.",
+    "Why building for someone you love beats every synthetic product persona and corporate metrics deck ever written.",
   author: {
     "@type": "Person",
     name: AUTHOR,
@@ -30,8 +40,8 @@ export const Route = createFileRoute("/notes/the-empathy-moat")({
     ...seo({
       title: "The Empathy Moat: No. 03 · forthe.tech",
       description:
-        "Why building for your wife or friends beats building for anonymous metrics, and why personal friction produces software that survives.",
-      path: "/notes/the-empathy-moat",
+        "Why building for someone you love beats every synthetic product persona and corporate metrics deck ever written.",
+      path: PATH,
       image: "/og/the-empathy-moat.png",
       type: "article",
     }),
@@ -61,9 +71,15 @@ function EmpathyMoatPage() {
             <p className="mt-4 font-serif text-xl italic text-ink-mute">
               Why building for someone you love beats every product framework ever written.
             </p>
+
+            <ArticlePlatformBar
+              external={dispatch.external}
+              readTime={dispatch.readTime}
+              words={dispatch.words}
+            />
           </SectionReveal>
 
-          <article className="mt-12 space-y-6 text-base leading-relaxed text-ink-soft md:text-lg">
+          <article className="mt-10 space-y-6 text-base leading-relaxed text-ink-soft md:text-lg">
             <p>
               Silicon Valley loves to talk about &ldquo;target user personas.&rdquo; They invent
               synthetic characters named &ldquo;Sarah, 32, Marketing Manager&rdquo; and map her
@@ -102,14 +118,18 @@ function EmpathyMoatPage() {
               >
                 Provia
               </Link>
-              . It wasn&rsquo;t built to flip to an acquirer or raise a seed round. It was built as
-              a 45-day game with offline caching because studying happens on the metro between Deira
-              and Healthcare City. It was built with genuine encouragement because studying for
-              licensing exams is lonely, terrifying work.
+              . We threw out the multi-hundred-page PDFs and built an interactive 45-day sprint
+              tailored for 20-minute fragments between shifts.
             </p>
 
             <p>
-              The same thing happened with{" "}
+              Then she hit a second wall: clinical Arabic. Not high-brow classical Arabic, but the
+              exact dialect phrases customers say at the counter in Deira — the word someone uses
+              when they mean &ldquo;burning&rdquo; instead of &ldquo;ache&rdquo;.
+            </p>
+
+            <p>
+              Textbooks don&rsquo;t teach counter conversations. So I built{" "}
               <Link
                 to="/works/$id"
                 params={{ id: "pharmarab" }}
@@ -117,59 +137,61 @@ function EmpathyMoatPage() {
               >
                 PharmaRab
               </Link>
-              . General language apps teach you how to ask where the museum is. They don&rsquo;t
-              teach a retail pharmacist how to explain paediatric dosage contraindications to an
-              anxious Arabic-speaking mother at the counter.
+              : audio-powered, micro-gamified clinical phrase training designed for 5-minute break
+              intervals on a smartphone.
             </p>
 
             <p>
-              The same thing happened with my physiotherapist friends. They didn&rsquo;t need
-              another telehealth dashboard; they needed a way for patients to pin pain on an
-              anatomical 3D body because patients freeze when asked to name cervical vertebrae. That
-              became{" "}
+              And when her physiotherapist colleagues asked why pharmacists got all the good tools,
+              we extended the engine to create{" "}
               <Link
                 to="/works/$id"
-                params={{ id: "kine" }}
+                params={{ id: "physioarab" }}
                 className="text-ink underline hover:text-ink-soft"
               >
-                kinē
+                PhysioArab
               </Link>
               .
             </p>
 
             <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">
-              Software without tourists.
+              The Audience of One Advantage
             </h2>
 
             <p>
-              In an era where anyone can prompt an AI to generate a full SaaS codebase in twenty
-              minutes, surface-level software has collapsed to near-zero value.
+              When you build for a single real person with a real name and phone number:
             </p>
 
-            <p>
-              The only software that endures is software rooted in deep, un-faked empathy. Tools
-              built for specific human beings whose day-to-day struggle you actually understand.
-            </p>
+            <ul className="space-y-3 pl-4 border-l rule-hair text-ink-soft">
+              <li>
+                <strong className="text-ink">Scope collapses:</strong> You don&rsquo;t argue over 40
+                hypothetical feature requests. You ask: &ldquo;Does this help you right now?&rdquo;
+                If not, it dies before you write code.
+              </li>
+              <li>
+                <strong className="text-ink">Feedback is visceral:</strong> Strangers churn silently.
+                Someone who loves you tells you the onboarding is confusing right across the dining
+                table in a voice you cannot ignore.
+              </li>
+              <li>
+                <strong className="text-ink">Finishing gets easier:</strong> The last 10% of software
+                is pure grind. Summoning discipline for an imaginary user is hard. Summoning
+                discipline because someone is waiting on you tomorrow morning is effortless.
+              </li>
+            </ul>
 
-            <p>Not users. People.</p>
-
-            <div className="mt-16 flex items-center justify-between border-t rule-hair pt-8">
-              <Link
-                to="/notes/the-moat-moved"
-                className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
-              >
-                <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span>Prev: No. 02 · The moat moved</span>
-              </Link>
-              <Link
-                to="/notes/the-15-minute-rule"
-                className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
-              >
-                <span>Next: No. 04 · The 15-minute rule</span>
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
+            <div className="my-8 rounded-lg bg-paper-deep/70 p-6 md:p-8">
+              <p className="font-serif text-2xl text-ink">
+                Start with an audience of one. If you can make Tuesday genuinely better for one
+                person you love, you have built something real. The other thousand people will follow
+                the relief.
+              </p>
             </div>
           </article>
+
+          <RelatedBuildsSection projectIds={dispatch.relatedWorks} />
+
+          <ArticleDiscussionFooter dispatch={dispatch} prev={prev} next={next} />
         </Container>
       </div>
     </PageShell>

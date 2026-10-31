@@ -1,16 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { PageShell } from "../../components/site/PageShell";
 import { Container } from "../../components/layout/Container";
 import { SectionReveal } from "../../components/animations/SectionReveal";
 import { seo, SITE_URL, SITE_NAME, AUTHOR } from "../../lib/site";
+import {
+  ArticlePlatformBar,
+  RelatedBuildsSection,
+  ArticleDiscussionFooter,
+} from "../../components/site/ArticleConnect";
+import { getDispatchByPath, getNextAndPrevDispatches } from "../../data/dispatches";
+
+const PATH = "/notes/the-15-minute-rule";
+const dispatch = getDispatchByPath(PATH)!;
+const { prev, next } = getNextAndPrevDispatches(PATH);
 
 const ARTICLE_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "TechArticle",
   headline: "The 15-Minute Rule: The Case for Bounded Software",
   description:
-    "Why infinite scroll loops and aggressive gamification destroy retention, and why software that respects time survives.",
+    "Why infinite scroll loops and aggressive gamification destroy retention, and why software that respects human time survives.",
   author: {
     "@type": "Person",
     name: AUTHOR,
@@ -30,8 +40,8 @@ export const Route = createFileRoute("/notes/the-15-minute-rule")({
     ...seo({
       title: "The 15-Minute Rule: No. 04 · forthe.tech",
       description:
-        "Why infinite scroll loops and aggressive gamification destroy retention, and why software that respects time survives.",
-      path: "/notes/the-15-minute-rule",
+        "Why infinite scroll loops and aggressive gamification destroy retention, and why software that respects human time survives.",
+      path: PATH,
       image: "/og/the-15-minute-rule.png",
       type: "article",
     }),
@@ -59,11 +69,18 @@ function FifteenMinuteRulePage() {
               The 15-minute rule.
             </h1>
             <p className="mt-4 font-serif text-xl italic text-ink-mute">
-              Why most habit, study, and health apps get abandoned, and the case for bounded loops.
+              Why most habit, study, and health apps get abandoned, and the case for bounded daily
+              loops.
             </p>
+
+            <ArticlePlatformBar
+              external={dispatch.external}
+              readTime={dispatch.readTime}
+              words={dispatch.words}
+            />
           </SectionReveal>
 
-          <article className="mt-12 space-y-6 text-base leading-relaxed text-ink-soft md:text-lg">
+          <article className="mt-10 space-y-6 text-base leading-relaxed text-ink-soft md:text-lg">
             <p>Every product designer has been trained to optimise for time-in-app.</p>
 
             <p>
@@ -98,51 +115,62 @@ function FifteenMinuteRulePage() {
               </Link>
               , we set an uncompromising constraint: the progressive plan (Calm → Load → Capacity)
               had to be hard-capped at fifteen minutes a day. No marathon workouts. No clinical
-              guilt. Just enough stimulus to signal recovery, then close the tab.
+              jargon. Just targeted, progressive loading you can execute before your morning coffee.
             </p>
 
             <p>
-              We applied the exact same constraint to{" "}
+              We applied the exact same principle to licensing exam prep with{" "}
               <Link
                 to="/works/$id"
                 params={{ id: "provia" }}
                 className="text-ink underline hover:text-ink-soft"
               >
                 Provia
-              </Link>{" "}
-              for pharmacy exams and{" "}
-              <Link
-                to="/works/$id"
-                params={{ id: "bodhi-pomodoro" }}
-                className="text-ink underline hover:text-ink-soft"
-              >
-                Bodhi Pomodoro
-              </Link>{" "}
-              for desktop focus. Bounded sprints. A small ritual. Then done.
+              </Link>
+              . Pharmacists preparing for DHA and MOH examinations in Dubai work demanding retail or
+              hospital shifts. They don&rsquo;t have three-hour study blocks.
             </p>
 
             <p>
-              When an app promises that using it won&rsquo;t consume your entire evening, you
-              actually open it tomorrow.
+              So Provia broke the curriculum into 15-minute high-yield sprints. Duel mode pits you
+              against another pharmacist on ten rapid clinical scenarios during lunch. You get in,
+              test your clinical recall, and get out.
             </p>
 
-            <div className="mt-16 flex items-center justify-between border-t rule-hair pt-8">
-              <Link
-                to="/notes/the-empathy-moat"
-                className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
-              >
-                <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span>Prev: No. 03 · The empathy moat</span>
-              </Link>
-              <Link
-                to="/notes/the-whatsapp-operating-system"
-                className="group inline-flex items-center gap-2 text-sm text-ink-mute transition-colors hover:text-ink"
-              >
-                <span>Next: No. 05 · The WhatsApp operating system</span>
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
+            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">
+              The Anti-Gamification Philosophy
+            </h2>
+
+            <p>
+              The moment you introduce streaks, XP points, and virtual leaderboards, you distort the
+              user&rsquo;s motivation.
+            </p>
+
+            <p>
+              People stop learning clinical pharmacy or rehabilitating their patellar tendon because
+              they care about the outcome; they do it to avoid breaking an arbitrary flame icon. And
+              the day life interrupts and the streak breaks, they don&rsquo;t just miss one day —
+              they delete the application in disgust.
+            </p>
+
+            <div className="my-8 rounded-lg bg-paper-deep/70 p-6 md:p-8">
+              <p className="font-serif text-2xl text-ink">
+                Software should be like a good hammer: you pick it up, drive the nail into the wall,
+                and put the hammer back in the drawer. The hammer doesn&rsquo;t send you a push
+                notification at midnight asking why you haven&rsquo;t hammered anything today.
+              </p>
             </div>
+
+            <p>
+              Bounded software respects human cognitive sovereignty. When you design for completion
+              rather than addiction, you build products that users genuinely trust and keep for
+              years.
+            </p>
           </article>
+
+          <RelatedBuildsSection projectIds={dispatch.relatedWorks} />
+
+          <ArticleDiscussionFooter dispatch={dispatch} prev={prev} next={next} />
         </Container>
       </div>
     </PageShell>
