@@ -57,8 +57,11 @@ for (const vp of VIEWPORTS) {
     await page.evaluate(() => document.documentElement.classList.add("dark"));
   }
   await page.waitForTimeout(1800);
-  await page.mouse.move(vp.w * 0.5, vp.h * 0.5);
-  await page.waitForTimeout(400);
+  // Park the cursor outside the section and let the idle timer expire: from phase 5 on, an
+  // idle still is only idle if nothing is reaching for the pointer. A cursor left at the
+  // hero's centre drags a pair of Tesla bolts into the frame and changes every comparison.
+  await page.mouse.move(vp.w * 0.5, vp.h + 60);
+  await page.waitForTimeout(2900);
 
   const captured = await page.evaluate(() => {
     const w = window;

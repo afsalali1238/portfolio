@@ -43,12 +43,20 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     const drawCtx = ctx as unknown as Ctx;
 
     // Offscreen surfaces (the drafting plate) are the shell's job: the engine stays DOM-free.
+    let plateCanvas: HTMLCanvasElement | undefined;
     const ray = createHeroRay({
       createSurface: (width, height) => {
-        const surface = document.createElement("canvas");
+        // Reuse the element across rebuilds: assigning width/height reallocates the backing
+        // store, and dropping the old canvas to the GC mid-drag keeps the free list churning.
+        // One reused canvas turns a resize from "allocate + paint + collect" into "paint".
+        const surface = plateCanvas ?? document.createElement("canvas");
+        plateCanvas = surface;
         surface.width = Math.max(1, width);
         surface.height = Math.max(1, height);
         const surfaceCtx = surface.getContext("2d");
+        // The blit target is cleared by the resize; cheap insurance if the factory is ever
+        // handed a tighter box than the one it holds.
+        surfaceCtx?.clearRect(0, 0, surface.width, surface.height);
         // `image` is the canvas itself: drawImage blits an element, never a context.
         return surfaceCtx
           ? { ctx: surfaceCtx as unknown as Ctx, width, height, image: surface }
@@ -71,6 +79,10 @@ export function HeroPrism({ className = "" }: { className?: string }) {
 
     const debug =
       typeof window !== "undefined" && new URLSearchParams(window.location.search).has("heroDebug");
+    if (debug) {
+      // QA only: the harness reads live geometry instead of waiting for the next resize.
+      (window as unknown as { __heroRay?: unknown }).__heroRay = ray;
+    }
     // The QA harness sets __hideDebug on the section to photograph the clean frame.
     ray.setDebug(debug);
     const debugVisible = () => debug && !hero.dataset.hideDebug;
@@ -202,6 +214,14 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       }
     };
 
+    /**
+     * Pointer position in hero-local CSS px.
+     *
+     * The old handler called measureHero() on every move, which re-read every rect in the
+     * component — a per-frame layout read during a gesture. The canvas is stretched over the
+     * hero and therefore shares its coordinate space, so one cached rect is enough; it is
+     * refreshed on scroll and resize, both of which already run.
+     */
     const onPointerMove = (e: PointerEvent) => {
       const x = e.clientX - rectLeft;
       const y = e.clientY - rectTop;
@@ -253,6 +273,22 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     });
     themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 
+    // Tile coupling: read the hovered tile from data attributes rather than attaching twelve
+    // listeners — the engine only needs to know which band to light.
+    const onHeroPointerOver = (e: PointerEvent) => {
+      const target = e.target as Element | null;
+      const tile = target?.closest?.("[data-hero-tile]");
+      const tiles = Array.from(hero.querySelectorAll<HTMLElement>("[data-hero-tile]"));
+      ray.setTileHover(tile ? tiles.indexOf(tile as HTMLElement) : -1);
+      ray.setHeadlineHover(Boolean(target?.closest?.("#hero-heading")));
+    };
+
+    hero.addEventListener("pointerover", onHeroPointerOver, { passive: true });
+    hero.addEventListener("pointerleave", () => {
+      ray.setTileHover(-1);
+      ray.setHeadlineHover(false);
+    });
+
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("pointerdown", onPointerDown, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -272,6 +308,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       resizeObs.disconnect();
       visObs.disconnect();
       themeObs.disconnect();
+      hero.removeEventListener("pointerover", onHeroPointerOver);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("scroll", onScroll);

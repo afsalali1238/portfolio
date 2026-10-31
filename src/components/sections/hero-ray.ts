@@ -57,6 +57,11 @@ const STRIKE_ANCHORS = 9;
 const STRIKE_REACH_MAX = 96;
 /** Jitter is quantised to 24 fps, so the lightning crackles at a deliberate cadence. */
 const JITTER_FPS = 24;
+/** A surge's whole life, and the pointer's follow time constant (§7). */
+const SURGE_LIFE_MS = 950;
+const POINTER_TAU_MS = 90;
+/** Hovering a tile dims every other band to this fraction (§7). */
+const TILE_DIM = 0.45;
 /** No branches closer than this to the core: density there is already deliberate. */
 const BRANCH_MIN_DIST = 70;
 /** Branches stay out of the type column. */
@@ -408,6 +413,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   let version = 0;
 
   let isDark = false;
+  let veil: Surface | null = null;
+  let veilKeyValue = "";
   let time = 0;
   let surgeEnergy = 0;
   let debug = false;
@@ -417,6 +424,16 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   let pointerY = 0;
   let leanX = 0;
   let leanY = 0;
+
+  /**
+   * Interaction state. All of it is additive and decays to rest, so the still, the reel and
+   * the reduced-motion frame all come out identical to phase 4's composition.
+   */
+  let pointerEase = 0; // 0..1, 90 ms follow — how much the pointer is influencing the field
+  let hoverTile = -1; // index of the stat tile under the pointer, -1 for none
+  let headlineHover = false;
+  const surges: { x: number; y: number; at: number; seed: number }[] = [];
+  let surgeLife = 0; // ms since the most recent surge started
 
   /** The drafting plate is rasterised once per geometry/theme and blitted thereafter. */
   let plate: Surface | null = null;
@@ -644,13 +661,16 @@ export function createHeroRay(options: HeroRayOptions = {}) {
           Math.sin(TAU * 2.3 * band.cycles * s + omega * 1.35) * scale * 0.26) *
         env;
 
-      // Magnetic lean toward the pointer: ≤10px, strongest mid-span, never at the root.
+      // Magnetic lean toward the pointer: ≤10 px, strongest mid-span, never at the root. The
+      // radius is deliberately generous (250 px): at 170 px only the root end of a ribbon came
+      // within reach, where the envelope is ~0, so the whole effect measured 1.7 px — legal
+      // under the spec and invisible on screen.
       if (pointerActive) {
         const bx = exit.x + dx * s;
         const by = exit.y + dy * s;
         const d = Math.hypot(leanX - bx, leanY - by);
-        if (d < 170) {
-          const pull = Math.pow(1 - d / 170, 2) * 10;
+        if (d < 250) {
+          const pull = Math.pow(1 - d / 250, 1.6) * 10;
           const side = Math.sign((leanX - bx) * nx + (leanY - by) * ny) || 1;
           off += pull * side * env;
         }
@@ -907,6 +927,52 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     void heroH;
   };
 
+  /**
+   * The plate has no mask of its own — it is a raster — so the dissolve under the copy is
+   * painted *into* the plate at build time: same quiet rects, same radial falloff. That closes
+   * phase 4's known gap (column rules and crop marks crossing the headline at 4% ink) without
+   * paying for it in the frame loop.
+   */
+  const dissolvePlate = (ctx: Ctx) => {
+    if (!layout || !geo) return;
+    // The copy column never moves without a layout change, so the veil is only stale when the
+    // version or the theme changes — not on every viewport step of a drag. Building five
+    // full-height radial gradients per resize is what turns a cheap resize into a 70 ms frame.
+    const veilKey = `${version}:${isDark ? "dark" : "light"}`;
+    if (!veil || veilKey !== veilKeyValue) {
+      const surface = createSurface
+        ? createSurface(Math.ceil(geo.heroW), Math.ceil(geo.heroH))
+        : null;
+      if (surface) {
+        const vctx = surface.ctx;
+        const paper = isDark ? INK : PAPER;
+        vctx.clearRect(0, 0, geo.heroW, geo.heroH);
+        for (const rect of layout.ledger.quietRects) {
+          const cx = (rect.left + rect.right) / 2;
+          const cy = (rect.top + rect.bottom) / 2;
+          const halfW = (rect.right - rect.left) / 2;
+          const halfH = (rect.bottom - rect.top) / 2;
+          const radius = Math.hypot(halfW, halfH) * 1.12;
+          const stencil = vctx.createRadialGradient(cx, cy, radius * 0.5, cx, cy, radius);
+          stencil.addColorStop(0, rgba(paper, 1));
+          stencil.addColorStop(0.7, rgba(paper, 0.9));
+          stencil.addColorStop(1, rgba(paper, 0));
+          vctx.fillStyle = stencil;
+          vctx.fillRect(
+            rect.left - radius,
+            rect.top - radius,
+            radius * 2 + (rect.right - rect.left),
+            radius * 2 + (rect.bottom - rect.top),
+          );
+        }
+        veil = surface;
+        veilKeyValue = veilKey;
+      }
+    }
+    const blit = veil?.image ?? veil?.ctx;
+    if (veil && blit) ctx.drawImage?.(blit, 0, 0);
+  };
+
   /** Blit the cached plate, rebuilding it only when geometry or theme changes. */
   const drawPlate = (ctx: Ctx) => {
     if (!geo) return;
@@ -919,6 +985,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
           const previous = plate;
           plate = surface;
           paintPlate(surface.ctx);
+          dissolvePlate(surface.ctx);
           plateKey = key;
           void previous;
         }
@@ -932,6 +999,19 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
     // No surface factory: paint directly (stills and the node harness only).
     paintPlate(ctx);
+  };
+
+  /**
+   * Per-band alpha multiplier for tile coupling: hovering a tile lights its own band and dims
+   * the rest to 0.45 (§7). At rest every band returns 1, so the still never changes.
+   */
+  const bandVoice = (index: number) => {
+    if (hoverTile < 0) return 1;
+    const ground = geo?.grounds[hoverTile];
+    if (!ground) return 1;
+    // The chosen band doesn't merely hold still while the rest fade: it gains weight, which
+    // is what makes the coupling legible at the far end of a 1400 px fan.
+    return ground.band === index ? 1.45 : TILE_DIM;
   };
 
   /** Layer 2 — spectral body: seven tapered ribbons, one gradient each. */
@@ -951,7 +1031,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const maxHalf =
         (layer === "bend" ? band.ribbon * 0.55 : band.ribbon) * (1 + surgeEnergy * 0.22);
 
-      ctx.globalAlpha = layer === "bend" ? 0.62 : 1;
+      ctx.globalAlpha = (layer === "bend" ? 0.62 : 1) * bandVoice(i);
       ctx.fillStyle = ribbonGrads[i] ?? rgba(isDark ? band.dark : band.light, band.ribbonAlpha);
       ctx.beginPath();
       for (let j = 0; j <= STRAND_STEPS; j++) {
@@ -980,7 +1060,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     for (let i = 0; i < BANDS.length; i++) {
       const band = BANDS[i];
       const colour = isDark ? band.dark : band.light;
-      const alpha = (isDark ? band.darkAlpha : band.lightAlpha) * (1 + surgeEnergy * 0.25);
+      const alpha =
+        (isDark ? band.darkAlpha : band.lightAlpha) * (1 + surgeEnergy * 0.25) * bandVoice(i);
       const stroke = rgba(colour, 1);
 
       trace(ctx, strandBufs[i]);
@@ -1031,7 +1112,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const lane = geo.spans[i];
       const nrm = geo.normals[i];
       const colour = isDark ? band.dark : band.light;
-      const weight = band.plasma * (isDark ? 0.95 : 0.86) * (1 + surgeEnergy * 0.3);
+      const weight = band.plasma * (isDark ? 0.95 : 0.86) * (1 + surgeEnergy * 0.3) * bandVoice(i);
       const base = (isDark ? band.darkAlpha : band.lightAlpha) * weight;
       // Offset anchors must never throw the strike into a neighbouring lane.
       const strikeAmp = clamp(lane * 0.035, 5, 15);
@@ -1187,12 +1268,13 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     ctx.moveTo(buf[0], buf[1]);
     for (let i = 1; i <= steps; i++) ctx.lineTo(buf[i * 2], buf[i * 2 + 1]);
 
-    ctx.globalAlpha = 0.2;
+    const beamBoost = headlineHover ? 1.3 : 1;
+    ctx.globalAlpha = Math.min(1, 0.2 * beamBoost);
     ctx.lineWidth = 6.5;
     ctx.stroke();
 
-    ctx.globalAlpha = 0.85;
-    ctx.lineWidth = 1.2;
+    ctx.globalAlpha = Math.min(1, 0.85 * beamBoost);
+    ctx.lineWidth = 1.2 * (headlineHover ? 1.2 : 1);
     ctx.stroke();
     ctx.globalAlpha = 1;
   };
@@ -1309,10 +1391,14 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
-    for (const ground of geo.grounds) {
+    for (const [index, ground] of geo.grounds.entries()) {
+      const hovered = hoverTile === index;
       const band = BANDS[ground.band];
       const colour = isDark ? band.dark : band.light;
-      const alpha = (isDark ? band.darkAlpha : band.lightAlpha) * (isDark ? 0.5 : 0.42);
+      const alpha =
+        (isDark ? band.darkAlpha : band.lightAlpha) *
+        (isDark ? 0.5 : 0.42) *
+        (hoverTile < 0 ? 1 : hovered ? 3 : 0.26);
       const { from, to } = ground;
       const dx = to.x - from.x;
       const dy = to.y - from.y;
@@ -1336,6 +1422,20 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       ctx.globalAlpha = alpha;
       ctx.lineWidth = 0.8;
       ctx.stroke();
+
+      // The hovered tile gets a landing bloom above its panel edge, where the tile's own
+      // 90%-opaque surface can't swallow it: without this the "light on that tile" half of
+      // the coupling is invisible under the card.
+      if (hovered && hoverTile >= 0) {
+        const bloom = ctx.createRadialGradient(to.x, to.y, 0, to.x, to.y, 38);
+        bloom.addColorStop(0, rgba(colour, 0.34));
+        bloom.addColorStop(0.45, rgba(colour, 0.16));
+        bloom.addColorStop(1, rgba(colour, 0));
+        ctx.fillStyle = bloom;
+        ctx.beginPath();
+        ctx.arc(to.x, to.y, 38, 0, TAU);
+        ctx.fill();
+      }
 
       // Terminal node where the light lands on the tile: a bright point and a faint ring, so
       // the eye can follow the fan all the way into the catalogue.
@@ -1624,6 +1724,225 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     return { x: lerp(exit.x, target.x, t), y: lerp(exit.y, target.y, t) };
   };
 
+  /**
+   * Tesla arcs pulled to the pointer.
+   *
+   * Two real chords from the core, plus their dendrites: the field is not decorating the
+   * cursor, it is being attracted by it, so the arcs start at the glass and *reach* — the
+   * pointer only gets to say which way. Everything is on the 24 fps jitter bucket, so the
+   * arcs snap like discharge rather than sliding like a rubber band.
+   */
+  const drawPointerArcs = (ctx: Ctx) => {
+    if (!geo || pointerEase <= 0.01) return;
+    const { exit } = geo;
+    const warm = isDark ? BANDS[0].dark : BANDS[0].light;
+
+    // Bolts run from the facet exit out toward the cursor, but stop short of it: the field is
+    // attracted, never grabbed. The gap to the cursor is what makes it read as reach.
+    const toX = leanX - exit.x;
+    const toY = leanY - exit.y;
+    const span = Math.hypot(toX, toY);
+    if (span < 40) return;
+    const baseAngle = Math.atan2(toY, toX);
+    // Saturating length: a cursor parked across the page doesn't stretch the bolts into
+    // hairlines, and a cursor close in doesn't collapse them into the core.
+    const reach = Math.min(span * 0.86, 300);
+    // One gesture at a time: when a stat tile owns the interaction, the bolts step back so
+    // the eye reads the band coupling rather than a discharge falling onto the tiles.
+    const alpha = pointerEase * (hoverTile >= 0 ? 0.26 : 1);
+
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    for (let bolt = 0; bolt < 3; bolt++) {
+      const spread = (bolt - 1) * 0.2;
+      const angle = baseAngle + spread;
+      const length = reach * (bolt === 1 ? 1 : 0.72 + hash(bolt * 53, 1) * 0.18);
+      // Aim a little wide and a little high of the cursor: a bolt that lands exactly on it
+      // reads as a vector drawn to a point, not as a field reaching for a rise.
+      const tipX = exit.x + Math.cos(angle) * length;
+      const tipY = exit.y + Math.sin(angle) * length - length * 0.06;
+      const nx = -Math.sin(angle);
+      const ny = Math.cos(angle);
+      const segments = 8;
+
+      // A random walk with one hard kink, not a sawtooth: alternating the sign each vertex
+      // builds a regular Christmas-tree squiggle, which is the tell of a drawn lightning
+      // bolt. Real discharge drifts, then breaks once and carries on from the new heading.
+      const kink = 3 + Math.floor(hash(bolt * 61 + 9, jitterFrame) * 3);
+      const kinkDir = hash(bolt * 97 + 1, jitterFrame) > 0.5 ? 1 : -1;
+      const offsets: number[] = [0];
+      let walk = 0;
+      for (let k = 1; k < segments; k++) {
+        const env = Math.pow(Math.sin(Math.PI * (k / segments)), 0.45);
+        walk += (hash(bolt * 71 + k * 13, jitterFrame) - 0.5) * 13;
+        walk = clamp(walk, -15, 15);
+        const kick = k === kink ? kinkDir * (16 + hash(bolt * 13 + 7, jitterFrame) * 12) : 0;
+        offsets.push((walk + kick) * env);
+      }
+      offsets.push(0);
+
+      ctx.beginPath();
+      ctx.moveTo(exit.x, exit.y);
+      for (let k = 1; k <= segments; k++) {
+        const t = k / segments;
+        ctx.lineTo(
+          exit.x + (tipX - exit.x) * t + nx * offsets[k],
+          exit.y + (tipY - exit.y) * t + ny * offsets[k],
+        );
+      }
+      const lastX = exit.x + (tipX - exit.x) + nx * offsets[segments];
+      const lastY = exit.y + (tipY - exit.y) + ny * offsets[segments];
+
+      // Haze, channel, hot core — the fan's three passes, but tighter so the arc stays a
+      // filament on top of the ribbons rather than a fourth ribbon.
+      ctx.strokeStyle = rgba(warm, 1);
+      ctx.globalAlpha = clamp(alpha * 0.1, 0, 1);
+      ctx.lineWidth = 4;
+      ctx.stroke();
+      ctx.globalAlpha = clamp(alpha * 0.62, 0, 1);
+      ctx.lineWidth = 1.1;
+      ctx.stroke();
+      ctx.strokeStyle = isDark ? "rgba(255,252,246,0.95)" : rgba(mix(warm, INK, 0.35), 1);
+      ctx.globalAlpha = clamp(alpha * 0.85, 0, 1);
+      ctx.lineWidth = 0.55;
+      ctx.stroke();
+
+      // Fray: the tip breaks into three short filaments instead of ending on a blunt cut.
+      for (let f = 0; f < 3; f++) {
+        const frayAngle = angle + (f - 1) * (0.22 + hash(f * 11, jitterFrame) * 0.16);
+        const frayLen = length * (0.1 + hash(f * 29 + bolt, jitterFrame) * 0.12);
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(
+          lastX + Math.cos(frayAngle) * frayLen - Math.sin(frayAngle) * 7,
+          lastY + Math.sin(frayAngle) * frayLen + Math.cos(frayAngle) * 7,
+        );
+        ctx.strokeStyle = rgba(warm, 1);
+        ctx.globalAlpha = clamp(alpha * (0.5 - f * 0.12), 0, 1);
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+      }
+
+      // Dendrites: one per bolt, thrown off the middle of the run, shorter than the parent.
+      const rootT = 0.46 + hash(bolt * 19 + 3, jitterFrame) * 0.2;
+      const rootX = exit.x + (tipX - exit.x) * rootT + nx * offsets[Math.round(rootT * segments)];
+      const rootY = exit.y + (tipY - exit.y) * rootT + ny * offsets[Math.round(rootT * segments)];
+      const fork = 0.5 + hash(bolt * 31 + 5, jitterFrame) * 0.55;
+      const forkLen = length * 0.26;
+      const forkAngle = angle + (bolt % 2 === 0 ? fork : -fork);
+      ctx.beginPath();
+      ctx.moveTo(rootX, rootY);
+      for (let k = 1; k <= 4; k++) {
+        const t = k / 4;
+        const sign = k % 2 === 0 ? 1 : -1;
+        const wander = sign * (hash(bolt * 17 + k * 7, jitterFrame) * 10) * t;
+        ctx.lineTo(
+          rootX + Math.cos(forkAngle) * forkLen * t - Math.sin(forkAngle) * wander,
+          rootY + Math.sin(forkAngle) * forkLen * t + Math.cos(forkAngle) * wander,
+        );
+      }
+      ctx.strokeStyle = rgba(warm, 1);
+      ctx.globalAlpha = clamp(alpha * 0.34, 0, 1);
+      ctx.lineWidth = 0.65;
+      ctx.stroke();
+    }
+
+    // The cursor gets a faint halo only: it is the sink of the field, not a light source.
+    const glow = ctx.createRadialGradient(leanX, leanY, 0, leanX, leanY, 54);
+    glow.addColorStop(0, rgba(warm, 0.09 * alpha));
+    glow.addColorStop(1, rgba(warm, 0));
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(leanX, leanY, 54, 0, TAU);
+    ctx.fill();
+
+    ctx.globalAlpha = 1;
+  };
+
+  /**
+   * The click surge: amplitude lifts, the core whites out for 80 ms, and one shockwave ring
+   * runs 8 → 238 px. §7's envelope is exp(−t/280), capped at 950 ms; each ring carries its
+   * own seed so two quick clicks don't pulse in lockstep.
+   */
+  const drawSurges = (ctx: Ctx) => {
+    if (surges.length === 0) return;
+    const warm = isDark ? BANDS[2].dark : BANDS[2].light;
+
+    for (let i = surges.length - 1; i >= 0; i--) {
+      const surge = surges[i];
+      const age = surgeLife - surge.at;
+      if (age < 0) continue;
+      if (age > SURGE_LIFE_MS) {
+        surges.splice(i, 1);
+        continue;
+      }
+      const t = age / SURGE_LIFE_MS;
+      const energy = Math.exp(-age / 340);
+      const radius = 10 + Math.pow(t, 0.6) * 250;
+
+      // Not a circle: a perfect ring is the one shape the eye reads as UI (a ripple from a
+      // tap). The front is displaced by two seeded harmonics and dimmed where the field is
+      // brightest, because a wavefront doesn't exist where the discharge already is.
+      const front = (r: number, amp: number, lobes: number, phase: number) => {
+        ctx.beginPath();
+        for (let a = 0; a <= 96; a++) {
+          const theta = (a / 96) * TAU;
+          const rr = r * (1 + Math.sin(theta * lobes + phase) * amp);
+          const x = surge.x + Math.cos(theta) * rr;
+          const y = surge.y + Math.sin(theta) * rr;
+          if (a === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+      };
+
+      const band = (r: number, width: number, a: number, core: number, seed: number) => {
+        const inner = Math.max(0, r - width);
+        const outer = r + width;
+        const grad = ctx.createRadialGradient(surge.x, surge.y, inner, surge.x, surge.y, outer);
+        grad.addColorStop(0, rgba(warm, 0));
+        grad.addColorStop(0.62, rgba(warm, a * 0.35));
+        grad.addColorStop(0.88, rgba(warm, a));
+        grad.addColorStop(1, rgba(warm, 0));
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(surge.x, surge.y, outer, 0, TAU);
+        ctx.fill();
+        // A thin front on the outer edge pins the geometry; without it the band reads as fog.
+        ctx.strokeStyle = rgba(warm, core);
+        ctx.lineWidth = 1.15;
+        front(r + width * 0.72, 0.05 + 0.02 * (seed % 3), 3 + (seed % 2), seed * 1.7);
+        ctx.stroke();
+      };
+
+      band(radius, 9 + 13 * (1 - t), (1 - t) * 0.75 * energy, (1 - t) * 0.9 * energy, surge.seed);
+      // Second, tighter ring for the first half: the wavefront, then its echo.
+      if (t < 0.55)
+        band(
+          radius * 0.68,
+          6,
+          (1 - t * 1.8) * 0.4 * energy,
+          (1 - t * 1.8) * 0.34 * energy,
+          surge.seed + 3,
+        );
+
+      // White-out at the point of contact, 80 ms.
+      if (age < 80) {
+        const flash = 1 - age / 80;
+        const flashR = 16 + (1 - flash) * 26;
+        const bloom = ctx.createRadialGradient(surge.x, surge.y, 0, surge.x, surge.y, flashR);
+        bloom.addColorStop(0, `rgba(255,255,255,${(0.55 * flash).toFixed(3)})`);
+        bloom.addColorStop(0.5, rgba(warm, 0.3 * flash));
+        bloom.addColorStop(1, rgba(warm, 0));
+        ctx.fillStyle = bloom;
+        ctx.beginPath();
+        ctx.arc(surge.x, surge.y, flashR, 0, TAU);
+        ctx.fill();
+      }
+    }
+  };
+
   /** ?heroDebug=1 — the register check: columns, facet points, target order, entry mode. */
   const drawDebug = (ctx: Ctx) => {
     if (!geo || !layout) return;
@@ -1719,6 +2038,10 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     drawCore(ctx);
     drawGrounds(ctx);
 
+    // Interaction: arcs reach from the core toward the pointer, surges flash on top.
+    drawPointerArcs(ctx);
+    drawSurges(ctx);
+
     // Layer 6 — atmosphere
     drawAtmosphere(ctx, dtMs);
 
@@ -1772,10 +2095,19 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       }
       pointerActive = active;
     },
+    /** Which stat tile the pointer is over (-1 for none). Drives tile coupling (§7). */
+    setTileHover(index: number) {
+      hoverTile = index < 0 ? -1 : Math.max(0, Math.min(BANDS.length - 1, index));
+    },
+    /** Hovering the headline brightens the incident ray ×1.3 (§7). */
+    setHeadlineHover(on: boolean) {
+      headlineHover = on;
+    },
     addSurge(x: number, y: number, at: number) {
-      void x;
-      void y;
-      void at;
+      // `at` is the shell's clock; store it relative to the engine's own surge clock so the
+      // ring decays on frame time rather than on wall time.
+      surges.push({ x, y, at: surgeLife, seed: surges.length });
+      if (surges.length > 4) surges.shift();
       surgeEnergy = 1;
     },
     /** advance one frame and paint. */
@@ -1783,9 +2115,16 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       void now;
       time += dtMs / 1000;
       advanceJitter();
+      surgeLife += dtMs;
       surgeEnergy = Math.max(0, surgeEnergy - dtMs / 900);
-      leanX += (pointerX - leanX) * Math.min(1, dtMs / 90);
-      leanY += (pointerY - leanY) * Math.min(1, dtMs / 90);
+
+      // τ = 90 ms follow for the lean, and the same ease for how much the pointer is allowed
+      // to influence the arcs — so they arrive and leave together instead of popping.
+      const ease = Math.min(1, dtMs / POINTER_TAU_MS);
+      leanX += (pointerX - leanX) * ease;
+      leanY += (pointerY - leanY) * ease;
+      pointerEase += ((pointerActive ? 1 : 0) - pointerEase) * ease;
+
       drawScene(ctx, dtMs);
     },
     /** one composed still, for reduced-motion visitors and for design review. */
@@ -1793,6 +2132,10 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       time = 4.6;
       surgeEnergy = 0;
       pointerActive = false;
+      pointerEase = 0;
+      hoverTile = -1;
+      headlineHover = false;
+      surges.length = 0;
       advanceJitter();
       drawScene(ctx, 0);
     },
@@ -1826,6 +2169,13 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         steps: STRAND_STEPS,
         jitterBucket,
         branches: BANDS.length * BRANCH_AT.length,
+        interaction: {
+          pointerEase,
+          hoverTile,
+          headlineHover,
+          surges: surges.length,
+          surgeEnergy,
+        },
       };
     },
     /** QA: one band's live point buffer (x, y pairs). */
@@ -1859,6 +2209,10 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       time = 4.6;
       surgeEnergy = 0;
       pointerActive = false;
+      pointerEase = 0;
+      hoverTile = -1;
+      headlineHover = false;
+      surges.length = 0;
       advanceJitter();
       for (let i = 0; i < BANDS.length; i++) fillStrand(strandBufs[i], BANDS[i], i);
     },
