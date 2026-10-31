@@ -19,7 +19,7 @@ export const Route = createFileRoute("/")({
 
 /**
  * Home presents the whole arc:
- * 1. Hero (prism + constellation interactive canvas, thesis, stat tiles)
+ * 1. Hero (the idea ray: prism dispersion canvas, thesis, stat tiles)
  * 2. Featured builds (selected showcase — kinē, Provia, Doomscholar)
  * 3. Thesis teaser (dispatch standfirst + Energy Ledger thesis)
  * 4. Origin (concise About story + static posture drawing)
