@@ -51,8 +51,8 @@ function StatLink({
 }
 
 /**
- * The hero: authoritative thesis on the left, interactive dispersion prism + constellation
- * on the right, and four interactive verification stat tiles linking into the catalogue.
+ * The hero: authoritative thesis on the left, the idea ray dispersing across the right,
+ * and four interactive verification stat tiles linking into the catalogue.
  */
 export function Hero() {
   return (
@@ -60,16 +60,17 @@ export function Hero() {
       aria-labelledby="hero-heading"
       className="relative overflow-hidden pt-12 pb-12 sm:pt-16 md:pt-24 md:pb-16"
     >
-      {/* Background interactive prism canvas */}
-      <HeroPrism className="absolute inset-0 z-0 h-full w-full opacity-90 transition-opacity" />
+      {/* Background: one ray, one prism, one restrained dispersion fan (full-bleed) */}
+      <HeroPrism className="absolute inset-0 z-0 h-full w-full" />
 
-      {/* Dual readability masks: ensures razor-sharp contrast for typography across light/dark & screen widths */}
+      {/* Readability veils: a soft paper lift under the copy column, and a floor under the
+          stat tiles. Kept light so the dispersion stays present across the whole hero. */}
       <div
-        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-paper/95 via-paper/70 to-transparent lg:from-paper/75 lg:via-paper/20 lg:to-transparent"
+        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-paper/85 via-paper/30 to-transparent"
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-paper/10 via-transparent to-paper/60"
+        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-paper/45"
         aria-hidden="true"
       />
 
@@ -118,7 +119,7 @@ export function Hero() {
             </div>
           </div>
 
-          {/* Right column: reserved visual aperture for the prism, spectrum & constellation */}
+          {/* Right column: breathing room so the copy never runs into the dispersion fan */}
           <div
             className="hidden lg:block lg:col-span-5 h-[360px] pointer-events-none"
             aria-hidden="true"
