@@ -16,6 +16,16 @@
     <priority>0.85</priority>
   </url>
   <url>
+    <loc>https://www.forthe.tech/notes/the-curious-case-of-building</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.forthe.tech/notes/the-first-hit-is-free</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.forthe.tech/notes/the-moat-moved</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
