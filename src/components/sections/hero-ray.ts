@@ -374,6 +374,8 @@ export type Ctx = {
   fillStyle: string | Gradient;
   strokeStyle: string | Gradient;
   setLineDash?(segments: number[]): void;
+  /** stencil passes only: a blurred clip stands in for a soft mask */
+  filter?: string;
   translate?(x: number, y: number): void;
   scale?(x: number, y: number): void;
   rotate?(angle: number): void;
@@ -719,6 +721,95 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   };
 
   /* -------------------------------------------------------------------- layers */
+
+  /**
+   * Layer 0 — the dissolve.
+   *
+   * This replaces the two veil divs. A veil hides the field behind a gradient, which is why it
+   * produced a seam: the page and the drawing sat on two planes. A dissolve instead thins the
+   * light where the words are and lets paper show through, so lines pass *behind* type, fade,
+   * and resume — one plane, no edge, no legibility cost.
+   *
+   * Three passes, applied to the body and plasma layers only (plate, glass, core and filaments
+   * stay at full strength):
+   *
+   *   1. the type's ink extent at a clean 0.16 — this is a halo, not a box;
+   *   2. a blurred clip over each quiet rect at 0.45, so nothing bright runs under a word;
+   *   3. a radial paper lift centred on the copy block, peaking at 0.35.
+   *
+   * The result is measured, not eyeballed: `tools/hero-contrast.mjs` reads the rendered pixels
+   * and reports the contrast of the real words against what is actually behind them.
+   */
+  const drawDissolve = (ctx: Ctx) => {
+    if (!geo || !layout) return;
+    const { heroW, heroH } = geo;
+    const paper = isDark ? INK : PAPER;
+    const rects = layout.ledger.quietRects;
+    if (rects.length === 0) return;
+
+    // 3. The lift first, so the ink halo below it stays legible.
+    const copyCenter = copyCenterOf();
+    const radius = 0.55 * Math.max(heroW, heroH);
+    const lift = ctx.createRadialGradient(
+      copyCenter.x,
+      copyCenter.y,
+      0,
+      copyCenter.x,
+      copyCenter.y,
+      radius,
+    );
+    lift.addColorStop(0, rgba(paper, 0.35));
+    lift.addColorStop(0.45, rgba(paper, 0.16));
+    lift.addColorStop(1, rgba(paper, 0));
+    ctx.fillStyle = lift;
+    ctx.fillRect(0, 0, heroW, heroH);
+
+    // 2. Per-rect radial stencils. A blurred rectangle still reads as a rectangle once the
+    //    field behind it has any structure; a radial has no edge at all, so this pass can be
+    //    generous without ever drawing a box around the copy.
+    for (const rect of rects) {
+      const cx = (rect.left + rect.right) / 2;
+      const cy = (rect.top + rect.bottom) / 2;
+      const halfW = (rect.right - rect.left) / 2;
+      const halfH = (rect.bottom - rect.top) / 2;
+      const radius = Math.hypot(halfW, halfH) * 1.18;
+      const stencil = ctx.createRadialGradient(cx, cy, radius * 0.42, cx, cy, radius);
+      stencil.addColorStop(0, rgba(paper, 0.5));
+      stencil.addColorStop(0.62, rgba(paper, 0.26));
+      stencil.addColorStop(1, rgba(paper, 0));
+      ctx.fillStyle = stencil;
+      ctx.fillRect(
+        rect.left - radius,
+        rect.top - radius,
+        radius * 2 + (rect.right - rect.left),
+        radius * 2 + (rect.bottom - rect.top),
+      );
+    }
+
+    // 1. The halo: the type's own ink extent, at a weight that reads as paper, not as a patch.
+    ctx.fillStyle = rgba(paper, 0.1);
+    for (const rect of rects) {
+      ctx.fillRect(
+        rect.left + 6,
+        rect.top + 6,
+        rect.right - rect.left - 12,
+        rect.bottom - rect.top - 12,
+      );
+    }
+  };
+
+  /** Centre of the copy block, derived from the quiet rects — no extra measurement pass. */
+  const copyCenterOf = () => {
+    if (!layout || layout.ledger.quietRects.length === 0) {
+      return { x: (geo?.heroW ?? 0) / 2, y: (geo?.heroH ?? 0) / 2 };
+    }
+    const rects = layout.ledger.quietRects;
+    const left = Math.min(...rects.map((r) => r.left));
+    const right = Math.max(...rects.map((r) => r.right));
+    const top = Math.min(...rects.map((r) => r.top));
+    const bottom = Math.max(...rects.map((r) => r.bottom));
+    return { x: (left + right) / 2, y: (top + bottom) / 2 };
+  };
 
   /**
    * Layer 1 — the drafting plate.
@@ -1613,6 +1704,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     drawRibbons(ctx);
     drawSpines(ctx);
     drawPlasma(ctx);
+
+    // The dissolve sits between the field and the things that must stay bright: the light
+    // behind the words is thinned here, then the beam, glass, core and filaments are painted
+    // over it at full strength.
+    drawDissolve(ctx);
 
     // The incident ray, then the glass that receives it
     drawBeam(ctx);

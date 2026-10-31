@@ -65,17 +65,10 @@ export function Hero() {
       {/* Background: one ray, one prism, one restrained dispersion fan (full-bleed) */}
       <HeroPrism className="absolute inset-0 z-0 h-full w-full" />
 
-      {/* Readability veils: a soft paper lift under the copy column, and a floor under the
-          stat tiles. Kept light so the dispersion stays present across the whole hero. */}
-      <div
-        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-paper/85 via-paper/30 to-transparent"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-paper/45"
-        aria-hidden="true"
-      />
-
+      {/* No veils. The field stays bright under the words and the engine thins it there — the
+          dissolve in hero-ray.ts replaces what used to be two gradient divs. A veil hides the
+          drawing behind a gradient, which is exactly what produced the seam between the page
+          and the graphic; a dissolve keeps them on one plane. */}
       <Container className="relative z-10" data-hero-container>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 items-center">
           {/* Left column: headline + thesis + CTAs */}
