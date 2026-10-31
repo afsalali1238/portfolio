@@ -9,9 +9,10 @@ One continuous, physically coherent light chain that occupies the **entire** her
 > a coherent ray leaves the last sentence of the headline → enters a glass prism → refracts through internal caustics → erupts at an incandescent core → disperses into a full-height spectral fan braided with Tesla plasma → the light visibly grounds on the four stat tiles.
 
 Non-negotiables:
+
 1. **No seam.** No hard vertical veil. The background dissolves behind type and resumes beyond it.
 2. **Layout-derived geometry.** Positions come from measured DOM rects, never from `%` of the section.
-3. **Continuity invariant.** Every strand's first vertex is *exactly* the exit point; envelope is 0 at both ends.
+3. **Continuity invariant.** Every strand's first vertex is _exactly_ the exit point; envelope is 0 at both ends.
 4. **Electric, not noisy.** Plasma density is deliberate: dense at the core, calm at the frame edges.
 5. **60 fps or it doesn't ship.** No `shadowBlur` in any loop.
 
@@ -60,12 +61,13 @@ pointermove ────┘                       │
 
 ```ts
 export type LayoutSnapshot = {
-  heroW: number; heroH: number;
-  copyRight: number;                       // h1/p right edge, hero-relative
+  heroW: number;
+  heroH: number;
+  copyRight: number; // h1/p right edge, hero-relative
   thesisLine: { left: number; right: number; baselineY: number };
   tiles: { x: number; top: number; bottom: number; cx: number }[]; // 4
   container: { left: number; right: number };
-  columns: number[];                       // 12 column x-positions
+  columns: number[]; // 12 column x-positions
 };
 
 export function measureHero(hero: HTMLElement): LayoutSnapshot;
@@ -126,28 +128,28 @@ Mobile (`heroW < 768`): portrait variant — prism at `(0.78w, 0.13h)`, size `cl
 
 Seven bands, print-graded so hues read as pigment on `#F7F4EE` (light) and as light on `#1B1815` (dark). Clay is always the flagship.
 
-| # | Band | Light | α | Dark | α | Width |
-|---|---|---|---|---|---|---|
-| 0 | Red | `#B03A2B` | .46 | `#E86A55` | .62 | 1.05 |
-| 1 | Amber | `#BF6A18` | .54 | `#F0A544` | .70 | 1.25 |
-| 2 | **Clay (flagship)** | `#A8471B` | **.92** | `#E67E54` | **1.0** | **2.20** |
-| 3 | Emerald | `#2F7D5E` | .44 | `#31C89A` | .58 | 1.10 |
-| 4 | Cyan | `#2A6F86` | .40 | `#39C0DA` | .56 | 1.05 |
-| 5 | Cobalt | `#33518E` | .36 | `#5A8AF0` | .52 | 1.00 |
-| 6 | Violet | `#5B4A8C` | .32 | `#9B7BF0` | .48 | 0.95 |
+| #   | Band                | Light     | α       | Dark      | α       | Width    |
+| --- | ------------------- | --------- | ------- | --------- | ------- | -------- |
+| 0   | Red                 | `#B03A2B` | .46     | `#E86A55` | .62     | 1.05     |
+| 1   | Amber               | `#BF6A18` | .54     | `#F0A544` | .70     | 1.25     |
+| 2   | **Clay (flagship)** | `#A8471B` | **.92** | `#E67E54` | **1.0** | **2.20** |
+| 3   | Emerald             | `#2F7D5E` | .44     | `#31C89A` | .58     | 1.10     |
+| 4   | Cyan                | `#2A6F86` | .40     | `#39C0DA` | .56     | 1.05     |
+| 5   | Cobalt              | `#33518E` | .36     | `#5A8AF0` | .52     | 1.00     |
+| 6   | Violet              | `#5B4A8C` | .32     | `#9B7BF0` | .48     | 0.95     |
 
 Ink/clay tokens stay authoritative for text; these are only for the field. Glow alphas = band α × 0.22 for the corona pass.
 
 ## 5. Layer order (back → front)
 
-| # | Layer | Notes |
-|---|---|---|
-| 1 | **Drafting plate** | 12 column rules at 4% ink, corner crop marks on `container`, baseline ticks, caustic ellipse under the glass, 2.5% grain, corner vignette. **Pre-render to an offscreen canvas** on resize/theme only. |
-| 2 | **Spectral body** | 7 volumetric ribbons: tapered polygon ±(0.5 → 14px) along each strand, linear gradient along `P_exit→T_k`, α .035–.09. Cached gradients (rebuild only on geometry/theme change). |
-| 3 | **Tesla plasma** | Per band: 3-pass stroke (6px @ α·.12 → 2px @ α·.55 → 0.9px @ α·.95 white-hot core), 3 dendritic branches at s = .36/.64/.82, angle ±(0.55–0.90 rad), length 24–46% of span, jitter quantised to 24 fps via a time bucket. Suppress branches when `dist < 70px`. |
-| 4 | **Prism & core** | Glass: white-only gradient fill (α .52→.10) — *any warm stop in the shell makes it look like beige paper*; 1.3px ink edge at 40%; bright inner edge on the incident facet; 3 internal chords to `u = .42/.52/.62`; caustic radial pooling at `P_exit`; core bloom white→clay→transparent at `r = size·0.28`; 1.9px white point; 4 orbiting micro-sparks. |
-| 5 | **Grounding filaments** | From the fan ray nearest each tile to that tile's top-centre: hairline + terminal node. Reasons the fan into the catalogue. |
-| 6 | **Atmosphere** | 14–24 motes (α .04–.10), photon packets on the incident beam, flourish ring on click. |
+| #   | Layer                   | Notes                                                                                                                                                                                                                                                                                                                                                    |
+| --- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Drafting plate**      | 12 column rules at 4% ink, corner crop marks on `container`, baseline ticks, caustic ellipse under the glass, 2.5% grain, corner vignette. **Pre-render to an offscreen canvas** on resize/theme only.                                                                                                                                                   |
+| 2   | **Spectral body**       | 7 volumetric ribbons: tapered polygon ±(0.5 → 14px) along each strand, linear gradient along `P_exit→T_k`, α .035–.09. Cached gradients (rebuild only on geometry/theme change).                                                                                                                                                                         |
+| 3   | **Tesla plasma**        | Per band: 3-pass stroke (6px @ α·.12 → 2px @ α·.55 → 0.9px @ α·.95 white-hot core), 3 dendritic branches at s = .36/.64/.82, angle ±(0.55–0.90 rad), length 24–46% of span, jitter quantised to 24 fps via a time bucket. Suppress branches when `dist < 70px`.                                                                                          |
+| 4   | **Prism & core**        | Glass: white-only gradient fill (α .52→.10) — _any warm stop in the shell makes it look like beige paper_; 1.3px ink edge at 40%; bright inner edge on the incident facet; 3 internal chords to `u = .42/.52/.62`; caustic radial pooling at `P_exit`; core bloom white→clay→transparent at `r = size·0.28`; 1.9px white point; 4 orbiting micro-sparks. |
+| 5   | **Grounding filaments** | From the fan ray nearest each tile to that tile's top-centre: hairline + terminal node. Reasons the fan into the catalogue.                                                                                                                                                                                                                              |
+| 6   | **Atmosphere**          | 14–24 motes (α .04–.10), photon packets on the incident beam, flourish ring on click.                                                                                                                                                                                                                                                                    |
 
 Type always renders above (`z-10`); the canvas is `z-0` and `pointer-events-none`.
 
@@ -167,15 +169,15 @@ Plus one soft radial paper lift (`paper` @ 0.35, `r = 0.55·max(w,h)`) centred o
 
 ## 7. Interaction
 
-| Trigger | Response | Timing |
-|---|---|---|
-| Idle | ribbons undulate, photons climb the beam, core breathes | 1.5 Hz core, 0.15–0.25 Hz strands |
-| Pointer move over hero | core attracts real Tesla arcs (2 chords + branches); strands lean ≤10px within 170px | τ = 90 ms follow |
-| Pointer idle 2.6 s | lean + arcs release | ease-out |
-| Click / tap | surge: `E=1` → amplitude ×1.35, glow ×1.6, white-out core 80 ms, shockwave ring 8→238px, decay `exp(−t/280)`, ≤950 ms | |
-| Hover a stat tile | that tile's grounding filament + its band surge; other bands dim to 0.45 | 150 ms |
-| Hover the headline | incident ray brightens ×1.3 | 150 ms |
-| `prefers-reduced-motion` | one composed still via `paintStill`, no rAF ever | |
+| Trigger                  | Response                                                                                                              | Timing                            |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| Idle                     | ribbons undulate, photons climb the beam, core breathes                                                               | 1.5 Hz core, 0.15–0.25 Hz strands |
+| Pointer move over hero   | core attracts real Tesla arcs (2 chords + branches); strands lean ≤10px within 170px                                  | τ = 90 ms follow                  |
+| Pointer idle 2.6 s       | lean + arcs release                                                                                                   | ease-out                          |
+| Click / tap              | surge: `E=1` → amplitude ×1.35, glow ×1.6, white-out core 80 ms, shockwave ring 8→238px, decay `exp(−t/280)`, ≤950 ms |                                   |
+| Hover a stat tile        | that tile's grounding filament + its band surge; other bands dim to 0.45                                              | 150 ms                            |
+| Hover the headline       | incident ray brightens ×1.3                                                                                           | 150 ms                            |
+| `prefers-reduced-motion` | one composed still via `paintStill`, no rAF ever                                                                      |                                   |
 
 ## 8. Performance rules
 
@@ -199,9 +201,11 @@ node --experimental-strip-types render.mts   # imports src/.../hero-ray.ts direc
 import { createCanvas, GlobalFonts } from "@napi-rs/canvas";
 import { createHeroRay } from "/path/to/src/components/sections/hero-ray.ts";
 
-const W = 1440, H = 780;
+const W = 1440,
+  H = 780;
 const ray = createHeroRay();
-ray.setTheme(false); ray.resize(W, H);
+ray.setTheme(false);
+ray.resize(W, H);
 const layer = createCanvas(W, H);
 ray.paintStill(layer.getContext("2d") as any);
 
@@ -212,26 +216,31 @@ Register `@fontsource/instrument-serif/files/*-latin-400-normal.woff` with `Glob
 
 ## 10. Build order
 
-| Phase | Deliverable | Checkpoint |
-|---|---|---|
-| 1 | `hero-layout.ts` + engine `setLayout()`; prism & ray in register at 3 widths | stills at 1440/1024/390 |
-| 2 | Spectral ribbons + Tesla plasma at full density | still + 3 frames from a synthetic motion reel |
-| 3 | Glass, core, filaments, plate, atmosphere | light + dark stills |
-| 4 | Dissolve mask; delete veil divs from `Hero.tsx` | type-contrast check |
-| 5 | Interaction: arcs, lean, surge, tile coupling | manual pass |
-| 6 | Perf + a11y audit, `paintStill` frame | throttled profile |
+| Phase | Deliverable                                                                  | Checkpoint                                    |
+| ----- | ---------------------------------------------------------------------------- | --------------------------------------------- |
+| 1     | `hero-layout.ts` + engine `setLayout()`; prism & ray in register at 3 widths | stills at 1440/1024/390                       |
+| 2     | Spectral ribbons + Tesla plasma at full density                              | still + 3 frames from a synthetic motion reel |
+| 3     | Glass, core, filaments, plate, atmosphere                                    | light + dark stills                           |
+| 4     | Dissolve mask; delete veil divs from `Hero.tsx`                              | type-contrast check                           |
+| 5     | Interaction: arcs, lean, surge, tile coupling                                | manual pass                                   |
+| 6     | Perf + a11y audit, `paintStill` frame                                        | throttled profile                             |
 
 Ship in that order — each phase ends with a rendering you can actually judge.
 
 ## 11. Acceptance criteria
 
-- [ ] Light 1440×780, dark 1440×780, mobile 390×820 all look composed **with type**, no seam at any width.
-- [ ] `grep -c shadowBlur src/components/sections/*.ts*` → `0`
-- [ ] ≤ 4 ms/frame; no long task > 50 ms on resize.
-- [ ] Reduced motion → exactly one `paintStill`, zero rAF.
-- [ ] Every strand's `P(0)` equals `P_exit` within 0.01px (unit check against `geometry()`).
-- [ ] Hovering each stat tile brightens exactly one band.
-- [ ] `npx tsc --noEmit` clean; `npx eslint src/components/sections src/routes/index.tsx` clean; `npm run build` green.
+- [x] Light 1440×780, dark 1440×780, mobile 390×820 all look composed **with type**, no seam at any width. — worst background step 3.25/255 against a 4/255 budget
+- [x] `grep -c shadowBlur src/components/sections/*.ts*` → `0`
+- [x] ≤ 4 ms/frame; no long task > 50 ms on resize. — 0.50 ms median idle, 0.60 ms interacting; 0 long tasks at drag rate
+- [x] Reduced motion → exactly one `paintStill`, zero rAF. — 0 rAF through load + resize + pointer move
+- [x] Every strand's `P(0)` equals `P_exit` within 0.01px (unit check against `geometry()`).
+- [x] Hovering each stat tile brightens exactly one band.
+- [x] `npx tsc --noEmit` clean; `npx eslint src/components/sections src/routes/index.tsx` clean; `npm run build` green.
+
+Verification lives in `tools/`: `hero-qa.mjs` (stills + layouts), `hero-interaction.mjs` (nine
+interaction beats), `hero-audit.mjs` (the a11y/perf checklist above, exit 1 on failure),
+`hero-contrast.mjs`, `hero-perf.mjs`, `hero-idle-hash.mjs`, and `npx tsx scripts/hero-qa/check.mts`.
+Per-phase evidence and rationale: `design/hero-phase{1..6}/README.md`.
 
 ## 12. Gotchas learned the hard way
 
@@ -239,7 +248,7 @@ Ship in that order — each phase ends with a rendering you can actually judge.
 2. Warm gradient stops in the glass shell ⇒ the prism looks like a beige paper cut-out. Shell stays white; warmth only in caustics.
 3. Retargeting bands to constellation nodes ⇒ crossing rays, broken spectrum order. Keep `T_k` ordered.
 4. `A` above ~14px over 700px ⇒ hairlines; below ~5px ⇒ wires. 6–12 is the window.
-5. `shadowBlur` inside per-item loops ⇒ 20 ms frames and the auto-DPR fallback makes it *worse*. Sprites.
+5. `shadowBlur` inside per-item loops ⇒ 20 ms frames and the auto-DPR fallback makes it _worse_. Sprites.
 6. Prism below ~0.22·min(w,h) ⇒ reads as a diagram, not glass.
 7. Fan on `heroW < 768` ⇒ stubs behind text; portrait it instead of deleting it.
 8. Canvas `width` assignment per resize event ⇒ layout thrash. Coalesce in rAF.
