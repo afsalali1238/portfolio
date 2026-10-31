@@ -413,8 +413,6 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   let version = 0;
 
   let isDark = false;
-  let veil: Surface | null = null;
-  let veilKeyValue = "";
   let time = 0;
   let surgeEnergy = 0;
   let debug = false;
@@ -935,42 +933,25 @@ export function createHeroRay(options: HeroRayOptions = {}) {
    */
   const dissolvePlate = (ctx: Ctx) => {
     if (!layout || !geo) return;
-    // The copy column never moves without a layout change, so the veil is only stale when the
-    // version or the theme changes — not on every viewport step of a drag. Building five
-    // full-height radial gradients per resize is what turns a cheap resize into a 70 ms frame.
-    const veilKey = `${version}:${isDark ? "dark" : "light"}`;
-    if (!veil || veilKey !== veilKeyValue) {
-      const surface = createSurface
-        ? createSurface(Math.ceil(geo.heroW), Math.ceil(geo.heroH))
-        : null;
-      if (surface) {
-        const vctx = surface.ctx;
-        const paper = isDark ? INK : PAPER;
-        vctx.clearRect(0, 0, geo.heroW, geo.heroH);
-        for (const rect of layout.ledger.quietRects) {
-          const cx = (rect.left + rect.right) / 2;
-          const cy = (rect.top + rect.bottom) / 2;
-          const halfW = (rect.right - rect.left) / 2;
-          const halfH = (rect.bottom - rect.top) / 2;
-          const radius = Math.hypot(halfW, halfH) * 1.12;
-          const stencil = vctx.createRadialGradient(cx, cy, radius * 0.5, cx, cy, radius);
-          stencil.addColorStop(0, rgba(paper, 1));
-          stencil.addColorStop(0.7, rgba(paper, 0.9));
-          stencil.addColorStop(1, rgba(paper, 0));
-          vctx.fillStyle = stencil;
-          vctx.fillRect(
-            rect.left - radius,
-            rect.top - radius,
-            radius * 2 + (rect.right - rect.left),
-            radius * 2 + (rect.bottom - rect.top),
-          );
-        }
-        veil = surface;
-        veilKeyValue = veilKey;
-      }
+    const paper = isDark ? INK : PAPER;
+    for (const rect of layout.ledger.quietRects) {
+      const cx = (rect.left + rect.right) / 2;
+      const cy = (rect.top + rect.bottom) / 2;
+      const halfW = (rect.right - rect.left) / 2;
+      const halfH = (rect.bottom - rect.top) / 2;
+      const radius = Math.hypot(halfW, halfH) * 1.12;
+      const stencil = ctx.createRadialGradient(cx, cy, radius * 0.5, cx, cy, radius);
+      stencil.addColorStop(0, rgba(paper, 1));
+      stencil.addColorStop(0.7, rgba(paper, 0.9));
+      stencil.addColorStop(1, rgba(paper, 0));
+      ctx.fillStyle = stencil;
+      ctx.fillRect(
+        rect.left - radius,
+        rect.top - radius,
+        radius * 2 + (rect.right - rect.left),
+        radius * 2 + (rect.bottom - rect.top),
+      );
     }
-    const blit = veil?.image ?? veil?.ctx;
-    if (veil && blit) ctx.drawImage?.(blit, 0, 0);
   };
 
   /** Blit the cached plate, rebuilding it only when geometry or theme changes. */
