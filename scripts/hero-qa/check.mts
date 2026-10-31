@@ -4,7 +4,7 @@
  *   node tools/hero-qa.mjs                     # capture real layouts (+ browser stills)
  *   cd scripts/hero-qa && npm i && npm run check
  *
- * Writes design/hero-phase1/phase1-engine-*.png: the engine's own contribution, with no type.
+ * Writes design/hero-phase<N>/phase<N>-engine-*.png (N from HERO_PHASE, default 2): the engine's own contribution, with no type.
  * The composited stills (type over the field) come from tools/hero-qa.mjs.
  *
  * Pins the two things that have broken this effect before:
@@ -22,7 +22,8 @@ import type { LayoutSnapshot } from "../../src/components/sections/hero-layout.t
 
 const here = dirname(fileURLToPath(import.meta.url));
 const dataDir = join(here, "data");
-const shotsDir = join(here, "../../design/hero-phase1");
+const PHASE = process.env.HERO_PHASE ?? "2";
+const shotsDir = join(here, `../../design/hero-phase${PHASE}`);
 mkdirSync(shotsDir, { recursive: true });
 const files = readdirSync(dataDir)
   .filter((f) => f.endsWith(".json"))
@@ -127,7 +128,7 @@ for (const file of files) {
     for (let i = 3; i < pixels.length; i += 4) if (pixels[i] > 4) opaque += 1;
     assert.ok(opaque > 500, `only ${opaque} non-empty pixels — the field did not draw`);
     writeFileSync(
-      join(shotsDir, `phase1-engine-${capture.name}.png`),
+      join(shotsDir, `phase${PHASE}-engine-${capture.name}.png`),
       canvas.toBuffer("image/png"),
     );
   });

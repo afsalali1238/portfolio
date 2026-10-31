@@ -75,26 +75,49 @@ function lineRect(el: Element | null, originLeft: number, originTop: number): Re
 }
 
 /**
- * The baseline of a line of text, measured rather than estimated.
+ * A measuring context for font metrics. Created once, never attached to the document.
  *
- * A zero-size inline-block aligned to the baseline reports its own top edge, which is
- * exactly the baseline y. It is removed in the same frame, so nothing shifts.
+ * The previous implementation appended a zero-height probe span and read its rect, which is
+ * exact but forces a synchronous layout — on a resize that cost 40–70 ms per gesture. The
+ * baseline can be derived from the line box and the font's own ascent/descent instead, with
+ * no DOM mutation at all.
  */
-function baselineOf(el: Element | null, originTop: number, fallback: number): number {
-  if (!el || !el.isConnected) return fallback;
-  const probe = document.createElement("span");
-  probe.setAttribute("aria-hidden", "true");
-  probe.style.cssText =
-    "display:inline-block;width:0;height:0;vertical-align:baseline;pointer-events:none;";
-  let baseline = fallback;
+let metricsCtx: CanvasRenderingContext2D | null = null;
+const getMetricsCtx = () => {
+  if (metricsCtx) return metricsCtx;
   try {
-    el.appendChild(probe);
-    const top = probe.getBoundingClientRect().top;
-    if (Number.isFinite(top) && top > 0) baseline = top - originTop;
-  } finally {
-    probe.remove();
+    metricsCtx = document.createElement("canvas").getContext("2d");
+  } catch {
+    metricsCtx = null;
   }
-  return baseline;
+  return metricsCtx;
+};
+
+/**
+ * Baseline y of a text line, derived from its line box:
+ *
+ *   baseline = lineTop + (lineHeight − (ascent + descent)) / 2 + ascent
+ *
+ * The half-leading term is what keeps this exact for short line-heights (the headline runs at
+ * 0.88, so the leading is negative and the glyphs overflow the box — hence the clamp).
+ */
+function baselineOf(el: Element | null, line: Rect, fallback: number): number {
+  if (!el) return fallback;
+  const ctx = getMetricsCtx();
+  if (!ctx) return fallback;
+  try {
+    const cs = window.getComputedStyle(el);
+    ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    const metrics = ctx.measureText("Ay");
+    const ascent = metrics.fontBoundingBoxAscent;
+    const descent = metrics.fontBoundingBoxDescent;
+    if (!Number.isFinite(ascent) || !Number.isFinite(descent)) return fallback;
+    const lineHeight = line.bottom - line.top;
+    const leading = lineHeight - (ascent + descent);
+    return line.top + leading / 2 + ascent;
+  } catch {
+    return fallback;
+  }
 }
 
 /** A defensive snapshot for the first frame, before the hooks are measurable. */
@@ -157,11 +180,14 @@ export function measureHero(hero: HTMLElement): LayoutSnapshot {
   const thesisRect =
     lineRect(thesisEl, ox, oy) ?? headlineLines[headlineLines.length - 1] ?? fallback.textRects[0];
 
-  const thesisBottom = thesisRect.bottom;
   const thesisLine = {
     left: thesisRect.left,
     right: thesisRect.right,
-    baselineY: baselineOf(thesisEl, oy, thesisBottom - (thesisRect.bottom - thesisRect.top) * 0.24),
+    baselineY: baselineOf(
+      thesisEl,
+      thesisRect,
+      thesisRect.bottom - (thesisRect.bottom - thesisRect.top) * 0.24,
+    ),
   };
 
   const ledeEl = copyEl?.querySelector<HTMLElement>("p") ?? null;

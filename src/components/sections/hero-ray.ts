@@ -6,9 +6,9 @@
  *   coherent ray leaves the last sentence → glass prism → internal caustics
  *   → incandescent core → spectral fan → grounds on the stat tiles
  *
- * Phase 1 (this revision): layout-driven geometry, the seven spectral ribbons, the glass
- * and the core. Tesla plasma, grounding filaments, the drafting plate and the dissolve mask
- * land in later phases.
+ * Phase 1: layout-driven geometry, the seven spectral ribbons, the glass and the core.
+ * Phase 2 (this revision): Tesla plasma braided over the spectral body. Grounding filaments,
+ * the drafting plate, the dissolve mask and interaction land in later phases.
  *
  * Three invariants this file exists to protect:
  *
@@ -33,6 +33,30 @@ const STRAND_STEPS = 40;
 /** Lane overshoot as a fraction of span: tips must leave the frame, not stop inside it. */
 const OVERSHOOT = 1.06;
 
+/* --------------------------------------------------------------- plasma constants */
+
+/** Dendritic branch sites along s, and their reach as a fraction of the strand's span. */
+const BRANCH_AT = [0.36, 0.64, 0.82] as const;
+/**
+ * Reach as a fraction of the lane's span. §5 says 24–46%; at a ~700px span that is a 300px
+ * scratch across three neighbouring lanes, which reads as damage, not discharge. 12–20% is
+ * long enough to fork and short enough to stay in its band.
+ */
+const BRANCH_LEN = [0.2, 0.14, 0.11] as const;
+const BRANCH_STEPS = 12;
+/** A branch is stroked in three runs so it tapers to nothing instead of ending in a cut. */
+const BRANCH_RUNS = [0.42, 0.32, 0.26] as const;
+/** The channel is a polyline through this many anchors: sparse enough to stay angular. */
+const STRIKE_ANCHORS = 9;
+/** No fork reaches further than this from its root, in px. */
+const STRIKE_REACH_MAX = 96;
+/** Jitter is quantised to 24 fps, so the lightning crackles at a deliberate cadence. */
+const JITTER_FPS = 24;
+/** No branches closer than this to the core: density there is already deliberate. */
+const BRANCH_MIN_DIST = 70;
+/** Branches stay out of the type column. */
+const BRANCH_MAX_X = 0.86;
+
 const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const smooth = (t: number) => {
@@ -41,6 +65,12 @@ const smooth = (t: number) => {
 };
 
 export type Rgb = readonly [number, number, number];
+
+const mix = (a: Rgb, b: Rgb, t: number): Rgb => [
+  lerp(a[0], b[0], t),
+  lerp(a[1], b[1], t),
+  lerp(a[2], b[2], t),
+];
 
 const rgba = (c: Rgb, a: number) =>
   `rgba(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])},${a.toFixed(4)})`;
@@ -67,6 +97,8 @@ export type BandSpec = {
   ribbon: number;
   /** ribbon body alpha at full span */
   ribbonAlpha: number;
+  /** how much of the band's alpha the plasma pass is allowed to use */
+  plasma: number;
   flagship?: boolean;
 };
 
@@ -87,6 +119,7 @@ export const BANDS: readonly BandSpec[] = [
     hz: 0.19,
     ribbon: 16,
     ribbonAlpha: 0.072,
+    plasma: 0.85,
   },
   {
     name: "amber",
@@ -100,6 +133,7 @@ export const BANDS: readonly BandSpec[] = [
     hz: 0.17,
     ribbon: 19,
     ribbonAlpha: 0.086,
+    plasma: 0.9,
   },
   {
     name: "clay",
@@ -113,6 +147,7 @@ export const BANDS: readonly BandSpec[] = [
     hz: 0.15,
     ribbon: 26,
     ribbonAlpha: 0.12,
+    plasma: 1.0,
     flagship: true,
   },
   {
@@ -127,6 +162,7 @@ export const BANDS: readonly BandSpec[] = [
     hz: 0.21,
     ribbon: 20,
     ribbonAlpha: 0.08,
+    plasma: 0.9,
   },
   {
     name: "cyan",
@@ -140,6 +176,7 @@ export const BANDS: readonly BandSpec[] = [
     hz: 0.23,
     ribbon: 17,
     ribbonAlpha: 0.07,
+    plasma: 0.85,
   },
   {
     name: "cobalt",
@@ -153,6 +190,7 @@ export const BANDS: readonly BandSpec[] = [
     hz: 0.25,
     ribbon: 15,
     ribbonAlpha: 0.06,
+    plasma: 0.8,
   },
   {
     name: "violet",
@@ -166,6 +204,7 @@ export const BANDS: readonly BandSpec[] = [
     hz: 0.18,
     ribbon: 13,
     ribbonAlpha: 0.05,
+    plasma: 0.75,
   },
 ];
 
@@ -202,6 +241,10 @@ export type HeroGeometry = {
   /** how far the beam had to be rerouted to reach the facet */
   entryMode: "sentence" | "top-edge";
   targets: Vec[];
+  /** unit normal per band, ⟂ to its lane: cached so the plasma pass never recomputes it */
+  normals: Vec[];
+  /** lane span per band, in px: branch reach is a fraction of this */
+  spans: number[];
 };
 
 const onFacet = (a: Vec, b: Vec, t: number): Vec => ({
@@ -210,6 +253,18 @@ const onFacet = (a: Vec, b: Vec, t: number): Vec => ({
 });
 
 const dist = (a: Vec, b: Vec) => Math.hypot(a.x - b.x, a.y - b.y);
+
+/**
+ * Deterministic hash → [0, 1). Used for plasma jitter so a frame can be reproduced exactly:
+ * the motion reel and the browser see the same crackle for the same bucket.
+ */
+const hash = (seed: number, frame: number) => {
+  let x = Math.imul(seed ^ 0x9e3779b9, 0x85ebca6b) ^ Math.imul(frame + 0x165667b1, 0xc2b2ae35);
+  x ^= x >>> 15;
+  x = Math.imul(x, 0x2545f491);
+  x ^= x >>> 13;
+  return (x >>> 0) / 4294967296;
+};
 
 /* ------------------------------------------------------------------------- context */
 
@@ -277,6 +332,20 @@ export function createHeroRay() {
   const strandBufs = BANDS.map(() => new Float32Array((STRAND_STEPS + 1) * 2));
   /** the incident beam's own scratch buffer: no allocation inside the loop */
   const beamBuf = new Float32Array((36 + 1) * 2);
+  /** one dendritic branch's vertices, reused for all 21 branches every frame */
+  const branchBuf = new Float32Array((BRANCH_STEPS + 1) * 2);
+  /** jitter changes on a 24 fps bucket, not every frame: deliberate, not noisy */
+  let jitterBucket = -1;
+  let jitterFrame = 0;
+
+  /** Snap the plasma jitter to the next 24 fps bucket. Below a bucket the field is frozen. */
+  const advanceJitter = () => {
+    const bucket = Math.floor(time * JITTER_FPS);
+    if (bucket !== jitterBucket) {
+      jitterBucket = bucket;
+      jitterFrame = bucket;
+    }
+  };
 
   /* ---------------------------------------------------------------- stage build */
 
@@ -320,6 +389,16 @@ export function createHeroRay() {
       y: lerp(yTop, yBottom, i / (BANDS.length - 1)),
     }));
 
+    const normals: Vec[] = [];
+    const spans: number[] = [];
+    for (const target of targets) {
+      const dx = (target.x - exit.x) * OVERSHOOT;
+      const dy = (target.y - exit.y) * OVERSHOOT;
+      const len = Math.hypot(dx, dy) || 1;
+      normals.push({ x: -dy / len, y: dx / len });
+      spans.push(len);
+    }
+
     geo = {
       heroW,
       heroH,
@@ -333,6 +412,8 @@ export function createHeroRay() {
       source,
       entryMode,
       targets,
+      normals,
+      spans,
     };
     version += 1;
   };
@@ -367,8 +448,9 @@ export function createHeroRay() {
       const s = i / STRAND_STEPS;
       const env = Math.pow(Math.sin(Math.PI * s), 0.9);
 
-      // Ripples grow with distance: the core is dense, the frame edges are calm.
-      const scale = amp * Math.pow(s, 0.35);
+      // Ripples grow with distance (the core is dense, the frame edges are calm), and only
+      // the upper bands carry real travel — lower bands keep just enough to read as motion.
+      const scale = amp * (0.55 + 0.45 * band.plasma) * Math.pow(s, 0.35);
 
       let off =
         (Math.sin(TAU * band.cycles * s - omega + phase) * scale +
@@ -518,6 +600,155 @@ export function createHeroRay() {
         ctx.stroke();
       }
     }
+    ctx.globalAlpha = 1;
+  };
+
+  /**
+   * Layer 3 — Tesla plasma, braided over each band.
+   *
+   * A discharge is angular: current takes the shortest path between strike points, so the
+   * channel is a polyline through a handful of anchors with a large lateral offset and only
+   * a pixel of micro-jitter — not a smooth sine displaced sideways (that reads as a fuzzy
+   * twin of the ribbon, which is what v1 of this pass looked like).
+   *
+   * Per band: three stroke passes (ionised haze → coloured channel → white-hot core), three
+   * discharge knots, and three dendritic forks, one level deep. Jitter is quantised to a
+   * 24 fps bucket so the crackle snaps instead of shimmering, and every value comes from a
+   * hash: no allocation and no Math.random inside a frame.
+   */
+  const drawPlasma = (ctx: Ctx) => {
+    if (!geo) return;
+    const { exit } = geo;
+    const frame = jitterFrame;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    for (let i = 0; i < BANDS.length; i++) {
+      const band = BANDS[i];
+      const buf = strandBufs[i];
+      const lane = geo.spans[i];
+      const nrm = geo.normals[i];
+      const colour = isDark ? band.dark : band.light;
+      const weight = band.plasma * (isDark ? 0.95 : 0.86) * (1 + surgeEnergy * 0.3);
+      const base = (isDark ? band.darkAlpha : band.lightAlpha) * weight;
+      // Offset anchors must never throw the strike into a neighbouring lane.
+      const strikeAmp = clamp(lane * 0.035, 5, 15);
+
+      // --- anchors: sparse, so the segments between them are straight and angular
+      ctx.beginPath();
+      let prevX = buf[0];
+      let prevY = buf[1];
+      ctx.moveTo(prevX, prevY);
+      for (let k = 1; k <= STRIKE_ANCHORS; k++) {
+        const s = k / STRIKE_ANCHORS;
+        const at = Math.round(s * STRAND_STEPS);
+        const env = Math.pow(Math.sin(Math.PI * s), 0.9);
+        // The same three-quarter pull the ribbon uses, so the strike tracks its band.
+        const offset =
+          (hash(i * 97 + k * 31 + 7, frame) - 0.5) * 2 * strikeAmp * Math.pow(s, 0.45) * env;
+        const x = buf[at * 2] + nrm.x * offset;
+        const y = buf[at * 2 + 1] + nrm.y * offset;
+        // Micro-jitter on the corner itself: the crackle, not the shape.
+        const jx = (hash(i * 41 + k * 17 + 3, frame) - 0.5) * 1.6;
+        ctx.lineTo(x + nrm.x * jx, y + nrm.y * jx);
+        prevX = x;
+        prevY = y;
+      }
+      void prevX;
+      void prevY;
+
+      // ionised haze: wide, faint, coloured
+      ctx.strokeStyle = rgba(colour, 1);
+      ctx.globalAlpha = clamp(base * (isDark ? 0.16 : 0.24), 0, 1);
+      ctx.lineWidth = isDark ? 7 : 6;
+      ctx.stroke();
+
+      // the channel proper
+      ctx.globalAlpha = clamp(base * 0.72, 0, 1);
+      ctx.lineWidth = isDark ? 1.9 : 1.7;
+      ctx.stroke();
+
+      // Hot core. On ink it is white-hot; on paper a white core would vanish into the cream,
+      // so light theme drops to a saturated filament instead — the same read, inverted.
+      ctx.strokeStyle = isDark ? "rgba(255,252,246,0.95)" : rgba(mix(colour, INK, 0.42), 1);
+      ctx.globalAlpha = clamp(base * (isDark ? 0.55 : 0.5), 0, 1);
+      ctx.lineWidth = 0.85;
+      ctx.stroke();
+
+      // --- discharge knots: where the current pools, the channel brightens
+      ctx.fillStyle = isDark ? "rgba(255,252,246,0.9)" : rgba(mix(colour, INK, 0.45), 1);
+      for (let k = 1; k < STRIKE_ANCHORS; k += 3) {
+        const s = k / STRIKE_ANCHORS;
+        if (s * lane < BRANCH_MIN_DIST) continue;
+        const at = Math.round(s * STRAND_STEPS);
+        const env = Math.pow(Math.sin(Math.PI * s), 0.9);
+        const offset =
+          (hash(i * 97 + k * 31 + 7, frame) - 0.5) * 2 * strikeAmp * Math.pow(s, 0.45) * env;
+        const x = buf[at * 2] + nrm.x * offset;
+        const y = buf[at * 2 + 1] + nrm.y * offset;
+        if (x > geo.heroW * BRANCH_MAX_X) continue;
+        ctx.globalAlpha = clamp(base * 0.8, 0, 1);
+        ctx.beginPath();
+        ctx.arc(x, y, 1.15, 0, TAU);
+        ctx.fill();
+      }
+
+      // --- dendrites: one fork per site, one level deep, tapering to nothing at the tip.
+      // Coloured at the root, white only at the hot end: a grey branch reads as a scratch.
+      for (let b = 0; b < BRANCH_AT.length; b++) {
+        // Per-band offset so all seven strands don't fork at the same three stations.
+        const offset = (hash(i * 19 + b * 7 + 3, 0) - 0.5) * 0.06;
+        const sPos = BRANCH_AT[b] + offset;
+        const at = Math.round(sPos * STRAND_STEPS);
+        const rootX = buf[at * 2];
+        const rootY = buf[at * 2 + 1];
+        // Density is already deliberate near the core, and nothing crackles over the type.
+        if (dist({ x: rootX, y: rootY }, exit) < BRANCH_MIN_DIST) continue;
+        if (rootX > geo.heroW * BRANCH_MAX_X) continue;
+
+        const seed = hash(i * 131 + b * 37 + 17, frame);
+        // A fork stays inside its own band: reach is capped by the lane's half-width budget.
+        const reach = Math.min(lane * BRANCH_LEN[b] * (0.82 + seed * 0.36), STRIKE_REACH_MAX);
+        const sway = (hash(i * 61 + b * 23 + 5, frame) - 0.5) * 0.9;
+        const side = ((i + b) % 2 === 0 ? 1 : -1) * (0.6 + seed * 0.3);
+        const angle = Math.atan2(nrm.y, nrm.x) + side;
+        const dx = Math.cos(angle) * reach;
+        const dy = Math.sin(angle) * reach;
+        const wobAmp = reach * 0.22;
+
+        // Trace once into the scratch buffer; stroke it in tapering runs.
+        for (let k = 0; k <= BRANCH_STEPS; k++) {
+          const t = k / BRANCH_STEPS;
+          // A streamer bends: the wander grows toward the tip, never at the root.
+          const wander = (hash(i * 17 + b * 71 + k * 11, frame) - 0.5) * wobAmp * t * t;
+          const bend = sway * reach * t * t * 0.35;
+          branchBuf[k * 2] = rootX + dx * t - dy * (wander / reach) - dy * (bend / reach);
+          branchBuf[k * 2 + 1] = rootY + dy * t + dx * (wander / reach) + dx * (bend / reach);
+        }
+
+        let runStart = 0;
+        for (let run = 0; run < BRANCH_RUNS.length; run++) {
+          const runEnd = runStart + Math.round(BRANCH_RUNS[run] * BRANCH_STEPS);
+          const fade = 1 - run / BRANCH_RUNS.length;
+          ctx.beginPath();
+          ctx.moveTo(branchBuf[runStart * 2], branchBuf[runStart * 2 + 1]);
+          for (let k = runStart + 1; k <= Math.min(runEnd, BRANCH_STEPS); k++) {
+            ctx.lineTo(branchBuf[k * 2], branchBuf[k * 2 + 1]);
+          }
+          const isTip = run === BRANCH_RUNS.length - 1;
+          ctx.strokeStyle = isTip
+            ? isDark
+              ? "rgba(255,252,246,0.95)"
+              : rgba(mix(colour, INK, 0.4), 1)
+            : rgba(colour, 1);
+          ctx.globalAlpha = clamp(base * (isTip ? 0.5 : 0.66) * fade, 0, 1);
+          ctx.lineWidth = isTip ? 0.55 : 1.35 * (1 - run * 0.22);
+          ctx.stroke();
+          runStart = runEnd;
+        }
+      }
+    }
+
     ctx.globalAlpha = 1;
   };
 
@@ -795,6 +1026,7 @@ export function createHeroRay() {
 
     drawRibbons(ctx);
     drawSpines(ctx);
+    drawPlasma(ctx);
     drawBeam(ctx);
     drawGlass(ctx);
     drawEntrySpark(ctx);
@@ -859,6 +1091,7 @@ export function createHeroRay() {
     paint(ctx: Ctx, dtMs: number, now: number) {
       void now;
       time += dtMs / 1000;
+      advanceJitter();
       surgeEnergy = Math.max(0, surgeEnergy - dtMs / 900);
       leanX += (pointerX - leanX) * Math.min(1, dtMs / 90);
       leanY += (pointerY - leanY) * Math.min(1, dtMs / 90);
@@ -869,7 +1102,13 @@ export function createHeroRay() {
       time = 4.6;
       surgeEnergy = 0;
       pointerActive = false;
+      advanceJitter();
       drawScene(ctx, 0);
+    },
+    /** QA/motion reel: jump to an exact scene time so frames are reproducible. */
+    setTime(seconds: number) {
+      time = seconds;
+      advanceJitter();
     },
     /** Debug/QA: the full geometry, including the strand roots the invariant test pins. */
     geometry() {
@@ -894,6 +1133,8 @@ export function createHeroRay() {
           tip: { x: buf[STRAND_STEPS * 2], y: buf[STRAND_STEPS * 2 + 1] },
         })),
         steps: STRAND_STEPS,
+        jitterBucket,
+        branches: BANDS.length * BRANCH_AT.length,
       };
     },
     /** QA: one band's live point buffer (x, y pairs). */
@@ -927,6 +1168,7 @@ export function createHeroRay() {
       time = 4.6;
       surgeEnergy = 0;
       pointerActive = false;
+      advanceJitter();
       for (let i = 0; i < BANDS.length; i++) fillStrand(strandBufs[i], BANDS[i], i);
     },
   };

@@ -3,6 +3,14 @@ import { createHeroRay, type Ctx } from "./hero-ray";
 import { measureHero, type LayoutSnapshot } from "./hero-layout";
 
 const MAX_DELTA_MS = 64;
+/**
+ * Reallocating a 2× backing store costs tens of milliseconds while the user is still dragging
+ * the window, so the canvas commits its size once resizing has gone quiet. Layout is measured
+ * immediately (cheap); the backing store follows.
+ */
+const RESIZE_COMMIT_DELAY_MS = 140;
+/** Above this many device pixels the canvas drops resolution rather than the frame rate. */
+const MAX_BACKING_PIXELS = 2_200_000;
 
 /** Debug hook shape exposed at ?heroDebug=1 so the headless harness can read real rects. */
 type HeroDebugWindow = {
@@ -56,37 +64,81 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     const debugVisible = () => debug && !hero.dataset.hideDebug;
 
     let lastPaintCost = 0;
+    let sized = false;
+    let commitTimer: ReturnType<typeof setTimeout> | undefined;
+
+    /** Effective DPR: capped at 2, then reduced so the backing store stays affordable. */
+    const effectiveDpr = (w: number, h: number) => {
+      const base = Math.min(window.devicePixelRatio || 1, 2);
+      const pixels = w * h * base * base;
+      if (pixels <= MAX_BACKING_PIXELS) return base;
+      return Math.max(1, base * Math.sqrt(MAX_BACKING_PIXELS / pixels));
+    };
 
     /** Measure the page, then size the canvas. Coalesced into rAF by the observer below. */
+    /** Expensive: reallocate the backing store and re-register the context transform. */
+    const commitCanvas = () => {
+      const commitStarted = performance.now();
+      const dpr = effectiveDpr(cssW, cssH);
+      const targetW = Math.round(cssW * dpr);
+      const targetH = Math.round(cssH * dpr);
+      // Only pay for a reallocation when the surface really changed: a drag that returns to
+      // (nearly) the same size is absorbed by the CSS stretch.
+      const changed =
+        Math.abs(targetW - canvas.width) / Math.max(1, canvas.width) > 0.02 ||
+        Math.abs(targetH - canvas.height) / Math.max(1, canvas.height) > 0.02;
+      if (changed) {
+        canvas.width = targetW;
+        canvas.height = targetH;
+      }
+      canvas.style.width = `${cssW}px`;
+      canvas.style.height = `${cssH}px`;
+      // Work in CSS pixels: the context transform absorbs device pixel ratio.
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      sized = true;
+      // Outside the loop (paused, hidden, reduced motion) the still has to be re-composed.
+      if (!running) ray.paintStill(drawCtx);
+      if (debug) console.log(`[hero] commit ${(performance.now() - commitStarted).toFixed(2)}`);
+    };
+
+    /** Cheap enough to run on every observer callback: measure the page, hand it to the engine. */
     const resize = () => {
+      const resizeStarted = performance.now();
       const rect = hero.getBoundingClientRect();
       rectLeft = rect.left;
       rectTop = rect.top;
       cssW = Math.max(1, rect.width);
       cssH = Math.max(1, rect.height);
 
-      // Work in CSS pixels: the context transform absorbs device pixel ratio.
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const targetW = Math.round(cssW * dpr);
-      const targetH = Math.round(cssH * dpr);
-      if (canvas.width !== targetW || canvas.height !== targetH) {
-        canvas.width = targetW;
-        canvas.height = targetH;
-      }
-      canvas.style.width = `${cssW}px`;
-      canvas.style.height = `${cssH}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
       ray.setTheme(document.documentElement.classList.contains("dark"));
+      const tMeasure = performance.now();
       const snapshot = measureHero(hero);
+      if (debug) console.log(`[hero] measure ${(performance.now() - tMeasure).toFixed(2)}`);
       ray.setLayout(snapshot);
       if (debug) {
         // ?heroDebug=1 — hand the measured snapshot + live geometry to the QA harness.
-        (window as unknown as HeroDebugWindow).__hero = snapshot
-          ? { layout: snapshot, geometry: ray.geometry() }
-          : undefined;
+        (window as unknown as HeroDebugWindow).__hero = {
+          layout: snapshot,
+          geometry: ray.geometry(),
+        };
       }
-      if (!running) ray.paintStill(drawCtx);
+
+      if (!running || !sized) {
+        commitCanvas();
+        if (!running) ray.paintStill(drawCtx);
+      } else {
+        // Canvas keeps its current size and is CSS-stretched until the drag settles. The
+        // commit then waits for idle time, so it never lands mid-gesture or mid-frame.
+        if (commitTimer !== undefined) clearTimeout(commitTimer);
+        commitTimer = setTimeout(() => {
+          commitTimer = undefined;
+          const idle = (window as unknown as { requestIdleCallback?: (cb: () => void) => number })
+            .requestIdleCallback;
+          if (idle) idle(() => commitCanvas());
+          else commitCanvas();
+        }, RESIZE_COMMIT_DELAY_MS);
+      }
+      if (debug) console.log(`[hero] resize ${(performance.now() - resizeStarted).toFixed(2)}`);
     };
 
     // Coalesce resize into one frame. Under reduced motion there is no loop to borrow a
@@ -116,8 +168,9 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       ray.setDebug(debugVisible());
       ray.paint(drawCtx, dt, ts);
       lastPaintCost = performance.now() - started;
-      if (debug && Math.random() < 0.05) {
-        console.log(`[hero] paint ${lastPaintCost.toFixed(2)}ms`);
+      // ?heroDebug=1 logs one frame in twenty; data-perf (QA only) logs every frame.
+      if (debug && (hero.dataset.perf === "1" || Math.random() < 0.05)) {
+        console.log(`[hero] paint ${lastPaintCost.toFixed(2)}`);
       }
     };
 
@@ -203,6 +256,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     return () => {
       running = false;
       cancelAnimationFrame(rafId);
+      if (commitTimer !== undefined) clearTimeout(commitTimer);
       resizeObs.disconnect();
       visObs.disconnect();
       themeObs.disconnect();

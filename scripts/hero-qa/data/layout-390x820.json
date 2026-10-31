@@ -12,7 +12,7 @@
   "thesisLine": {
    "left": 24,
    "right": 290.015625,
-   "baselineY": 121.171875
+   "baselineY": 122.0859375
   },
   "tiles": [
    {
@@ -90,7 +90,7 @@
   ]
  },
  "canvasDataUrl": null,
- "paintCostMs": 0.39999999999999997,
+ "paintCostMs": 0.38,
  "html": {
   "serif": "",
   "serifItalic": "",

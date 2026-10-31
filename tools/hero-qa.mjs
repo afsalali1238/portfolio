@@ -4,7 +4,8 @@
  *
  *   npm run dev                     # in one shell (port 5173)
  *   npm i -D playwright-core        # once, if it is not already available
- *   node tools/hero-qa.mjs          # writes design/hero-phase1/*.png + scripts/hero-qa/data/*.json
+ *   node tools/hero-qa.mjs          # writes design/hero-phase<N>/*.png + scripts/hero-qa/data/*.json
+ *                                   # N comes from HERO_PHASE (default 2)
  *   cd scripts/hero-qa && npm run stills
  *
  * The engine is DOM-free, so it can paint anywhere — but phase 1's contract is that the
@@ -19,7 +20,8 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, "..");
-const outShots = join(repo, "design/hero-phase1");
+const PHASE = process.env.HERO_PHASE ?? "2";
+const outShots = join(repo, `design/hero-phase${PHASE}`);
 const outData = join(repo, "scripts/hero-qa/data");
 mkdirSync(outShots, { recursive: true });
 mkdirSync(outData, { recursive: true });
@@ -44,7 +46,7 @@ for (const vp of VIEWPORTS) {
   const page = await context.newPage();
   const paintCosts = [];
   page.on("console", (msg) => {
-    const m = /\[hero\] paint ([\d.]+)ms/.exec(msg.text());
+    const m = /\[hero\] paint ([\d.]+)/.exec(msg.text());
     if (m) paintCosts.push(Number(m[1]));
   });
   page.on("pageerror", (err) => console.error(`[${vp.name}] page error:`, err.message));
@@ -105,7 +107,7 @@ for (const vp of VIEWPORTS) {
   await page.screenshot({
     path: join(
       outShots,
-      `phase1-page-${vp.name.replace(/-dark$/, "")}${vp.dark ? "-dark" : ""}.png`,
+      `phase${PHASE}-page-${vp.name.replace(/-dark$/, "")}${vp.dark ? "-dark" : ""}.png`,
     ),
     clip: {
       x: captured.section.left,
