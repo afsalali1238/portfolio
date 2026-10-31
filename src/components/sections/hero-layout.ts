@@ -1,0 +1,209 @@
+/**
+ * hero-layout — the only module in the hero that touches the DOM.
+ *
+ * The drawing engine is geometry-driven: every position it paints comes from a measured
+ * rect, never from a percentage of the section. This module reads those rects once per
+ * resize and hands the engine a plain snapshot, so the engine stays DOM-free and can be
+ * rendered headlessly.
+ *
+ * All coordinates are CSS pixels, relative to the hero's own top-left corner.
+ *
+ * Hooks (added in Hero.tsx, no visual change):
+ *   data-hero-copy        the copy column (headline + lede + CTAs)
+ *   data-hero-thesis      the last line of the headline (the italic sentence)
+ *   data-hero-tiles       the stats grid
+ *   data-hero-tile        each stat tile (repeatable)
+ *   data-hero-container   the Container wrapper, for the 12-column drafting grid
+ */
+
+export type Rect = { left: number; top: number; right: number; bottom: number };
+
+export type TileRect = {
+  /** hero-relative left edge */
+  x: number;
+  top: number;
+  bottom: number;
+  /** hero-relative horizontal centre */
+  cx: number;
+  width: number;
+};
+
+export type LayoutSnapshot = {
+  heroW: number;
+  heroH: number;
+  /** right edge of the copy block (h1 ∪ ledger), hero-relative */
+  copyRight: number;
+  /** the closing sentence's ink extent plus its true baseline */
+  thesisLine: { left: number; right: number; baselineY: number };
+  /** the four stat tiles, left → right */
+  tiles: TileRect[];
+  /** the Container's content box */
+  container: { left: number; right: number };
+  /** 12 vertical rules across the container: the interior boundaries plus the right edge */
+  columns: number[];
+  /** type boxes used by the dissolve mask (h1 lines, lede, CTA row) */
+  textRects: Rect[];
+};
+
+const MIN_RECT = 8;
+
+function toLocal(rect: DOMRect, originLeft: number, originTop: number): Rect {
+  return {
+    left: rect.left - originLeft,
+    top: rect.top - originTop,
+    right: rect.right - originLeft,
+    bottom: rect.bottom - originTop,
+  };
+}
+
+/**
+ * The tight line box of an element's text.
+ *
+ * A range around inline content can report more than one rect (the clip box that the
+ * headline's reveal animation uses is taller than the glyphs). The line itself is the
+ * shortest of those rects, which is also the one that sits on the baseline.
+ */
+function lineRect(el: Element | null, originLeft: number, originTop: number): Rect | null {
+  if (!el) return null;
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const rects = Array.from(range.getClientRects()).filter((r) => r.height > MIN_RECT);
+  range.detach?.();
+  if (rects.length === 0) return null;
+  const tightest = rects.reduce((a, b) => (b.height < a.height ? b : a));
+  return toLocal(tightest, originLeft, originTop);
+}
+
+/**
+ * The baseline of a line of text, measured rather than estimated.
+ *
+ * A zero-size inline-block aligned to the baseline reports its own top edge, which is
+ * exactly the baseline y. It is removed in the same frame, so nothing shifts.
+ */
+function baselineOf(el: Element | null, originTop: number, fallback: number): number {
+  if (!el || !el.isConnected) return fallback;
+  const probe = document.createElement("span");
+  probe.setAttribute("aria-hidden", "true");
+  probe.style.cssText =
+    "display:inline-block;width:0;height:0;vertical-align:baseline;pointer-events:none;";
+  let baseline = fallback;
+  try {
+    el.appendChild(probe);
+    const top = probe.getBoundingClientRect().top;
+    if (Number.isFinite(top) && top > 0) baseline = top - originTop;
+  } finally {
+    probe.remove();
+  }
+  return baseline;
+}
+
+/** A defensive snapshot for the first frame, before the hooks are measurable. */
+function fallbackSnapshot(w: number, h: number): LayoutSnapshot {
+  const margin = Math.min(96, w * 0.06);
+  const left = margin;
+  const right = w - margin;
+  return {
+    heroW: w,
+    heroH: h,
+    copyRight: right * 0.58,
+    thesisLine: { left, right: right * 0.56, baselineY: h * 0.3 },
+    tiles: [0, 1, 2, 3].map((i) => {
+      const cx = lerpNumbers(left, right, (i + 0.5) / 4);
+      return { x: cx - 60, top: h * 0.72, bottom: h * 0.9, cx, width: 120 };
+    }),
+    container: { left, right },
+    columns: Array.from({ length: 12 }, (_, i) => left + ((right - left) * (i + 1)) / 12),
+    textRects: [{ left, top: h * 0.16, right: right * 0.56, bottom: h * 0.52 }],
+  };
+}
+
+const lerpNumbers = (a: number, b: number, t: number) => a + (b - a) * t;
+
+/**
+ * Read the hero's real layout.
+ *
+ * `hero` is the <section> element. Returns a snapshot in hero-relative CSS pixels.
+ * Never throws: a missing hook degrades that one field rather than the whole scene.
+ */
+export function measureHero(hero: HTMLElement): LayoutSnapshot {
+  const heroRect = hero.getBoundingClientRect();
+  const heroW = Math.max(1, heroRect.width);
+  const heroH = Math.max(1, heroRect.height);
+  const ox = heroRect.left;
+  const oy = heroRect.top;
+
+  const fallback = fallbackSnapshot(heroW, heroH);
+
+  const containerEl = hero.querySelector<HTMLElement>("[data-hero-container]");
+  const containerRect = containerEl?.getBoundingClientRect();
+  const container = containerRect
+    ? { left: containerRect.left - ox, right: containerRect.right - ox }
+    : fallback.container;
+
+  const copyEl = hero.querySelector<HTMLElement>("[data-hero-copy]");
+  const copyRect = copyEl?.getBoundingClientRect();
+  const containerWidth = container.right - container.left;
+  const columns = Array.from(
+    { length: 12 },
+    (_, i) => container.left + (containerWidth * (i + 1)) / 12,
+  );
+
+  const headline = hero.querySelector<HTMLElement>("[data-hero-copy] h1") ?? null;
+  const headlineLines = Array.from(headline?.children ?? [])
+    .map((child) => lineRect(child, ox, oy))
+    .filter((r): r is Rect => r !== null);
+
+  const thesisEl = hero.querySelector<HTMLElement>("[data-hero-thesis]");
+  const thesisRect =
+    lineRect(thesisEl, ox, oy) ?? headlineLines[headlineLines.length - 1] ?? fallback.textRects[0];
+
+  const thesisBottom = thesisRect.bottom;
+  const thesisLine = {
+    left: thesisRect.left,
+    right: thesisRect.right,
+    baselineY: baselineOf(thesisEl, oy, thesisBottom - (thesisRect.bottom - thesisRect.top) * 0.24),
+  };
+
+  const ledeEl = copyEl?.querySelector<HTMLElement>("p") ?? null;
+  const ledeRect = ledeEl ? toLocal(ledeEl.getBoundingClientRect(), ox, oy) : null;
+
+  const ctaEl = ledeEl?.parentElement
+    ? (ledeEl.parentElement.querySelector<HTMLElement>(":scope > div") ?? null)
+    : null;
+  const ctaRect = ctaEl ? toLocal(ctaEl.getBoundingClientRect(), ox, oy) : null;
+
+  const copyRight = Math.max(
+    copyRect ? copyRect.right - ox : 0,
+    ...headlineLines.map((r) => r.right),
+    ledeRect?.right ?? 0,
+    ctaRect?.right ?? 0,
+    fallback.copyRight,
+  );
+
+  const tiles = Array.from(hero.querySelectorAll<HTMLElement>("[data-hero-tile]"))
+    .map((el) => el.getBoundingClientRect())
+    .sort((a, b) => a.left - b.left)
+    .map((r) => ({
+      x: r.left - ox,
+      top: r.top - oy,
+      bottom: r.bottom - oy,
+      cx: r.left - ox + r.width / 2,
+      width: r.width,
+    }));
+
+  const textRects: Rect[] = [...headlineLines];
+  if (ledeRect) textRects.push(ledeRect);
+  if (ctaRect) textRects.push(ctaRect);
+  if (textRects.length === 0) textRects.push(...fallback.textRects);
+
+  return {
+    heroW,
+    heroH,
+    copyRight,
+    thesisLine,
+    tiles: tiles.length === 4 ? tiles : fallback.tiles,
+    container,
+    columns,
+    textRects,
+  };
+}

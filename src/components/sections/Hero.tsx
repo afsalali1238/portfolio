@@ -31,6 +31,7 @@ function StatLink({
       search={filterKey === "all" ? {} : { filter: filterKey }}
       className="group flex flex-col justify-between rounded-md p-3.5 sm:p-4 text-left transition-colors duration-150 hover:bg-paper-deep/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
       aria-label={`${value} builds — ${label}. See them.`}
+      data-hero-tile
     >
       <div className="flex items-baseline justify-between">
         <span className="font-serif text-3xl sm:text-4xl leading-none text-ink transition-colors duration-150 group-hover:text-accent-ink">
@@ -58,6 +59,7 @@ export function Hero() {
   return (
     <section
       aria-labelledby="hero-heading"
+      data-hero
       className="relative overflow-hidden pt-12 pb-12 sm:pt-16 md:pt-24 md:pb-16"
     >
       {/* Background: one ray, one prism, one restrained dispersion fan (full-bleed) */}
@@ -74,15 +76,18 @@ export function Hero() {
         aria-hidden="true"
       />
 
-      <Container className="relative z-10">
+      <Container className="relative z-10" data-hero-container>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 items-center">
           {/* Left column: headline + thesis + CTAs */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-7 space-y-6" data-hero-copy>
             <h1 id="hero-heading" className="font-serif tracking-tight">
               <span className="block text-[12vw] leading-[0.88] text-ink sm:text-[4.5rem] md:text-[5.5rem] lg:text-[6rem] xl:text-[6.8rem]">
                 <RevealWord delay={0.05}>For the tech.</RevealWord>
               </span>
-              <span className="mt-2 block text-[7.5vw] italic leading-[1.02] text-ink-mute sm:text-[2.6rem] md:text-[3.2rem] lg:text-[3.3rem] xl:text-[3.8rem]">
+              <span
+                data-hero-thesis
+                className="mt-2 block text-[7.5vw] italic leading-[1.02] text-ink-mute sm:text-[2.6rem] md:text-[3.2rem] lg:text-[3.3rem] xl:text-[3.8rem]"
+              >
                 <RevealWord delay={0.18} italic>
                   Not because anyone asked.
                 </RevealWord>
@@ -127,7 +132,10 @@ export function Hero() {
         </div>
 
         {/* Shipped & verified metrics — stat tiles that pre-filter the catalogue */}
-        <div className="mt-12 sm:mt-14 grid grid-cols-2 gap-3 sm:gap-4 rounded-lg bg-paper/90 p-4 sm:p-6 backdrop-blur-xs text-sm md:grid-cols-4 border rule-hair">
+        <div
+          data-hero-tiles
+          className="mt-12 sm:mt-14 grid grid-cols-2 gap-3 sm:gap-4 rounded-lg bg-paper/90 p-4 sm:p-6 backdrop-blur-xs text-sm md:grid-cols-4 border rule-hair"
+        >
           <StatLink label="Total shipped" value={String(projectCount)} filterKey="all" />
           <StatLink label="Live on the internet" value={String(liveCount)} filterKey="live" />
           <StatLink label="Open source" value={String(sourceCount)} filterKey="oss" />

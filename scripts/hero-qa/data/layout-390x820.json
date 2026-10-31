@@ -1,0 +1,104 @@
+{
+ "name": "390x820",
+ "dark": false,
+ "viewport": {
+  "w": 390,
+  "h": 820
+ },
+ "layout": {
+  "heroW": 390,
+  "heroH": 697,
+  "copyRight": 366,
+  "thesisLine": {
+   "left": 24,
+   "right": 290.015625,
+   "baselineY": 121.171875
+  },
+  "tiles": [
+   {
+    "x": 41,
+    "top": 452,
+    "bottom": 536,
+    "cx": 115,
+    "width": 148
+   },
+   {
+    "x": 41,
+    "top": 548,
+    "bottom": 632,
+    "cx": 115,
+    "width": 148
+   },
+   {
+    "x": 201,
+    "top": 452,
+    "bottom": 536,
+    "cx": 275,
+    "width": 148
+   },
+   {
+    "x": 201,
+    "top": 548,
+    "bottom": 632,
+    "cx": 275,
+    "width": 148
+   }
+  ],
+  "container": {
+   "left": 0,
+   "right": 390
+  },
+  "columns": [
+   32.5,
+   65,
+   97.5,
+   130,
+   162.5,
+   195,
+   227.5,
+   260,
+   292.5,
+   325,
+   357.5,
+   390
+  ],
+  "textRects": [
+   {
+    "left": 24,
+    "top": 48,
+    "right": 213.8125,
+    "bottom": 89.171875
+   },
+   {
+    "left": 24,
+    "top": 97.171875,
+    "right": 290.015625,
+    "bottom": 127
+   },
+   {
+    "left": 24,
+    "top": 151,
+    "right": 366,
+    "bottom": 255
+   },
+   {
+    "left": 24,
+    "top": 279,
+    "right": 366,
+    "bottom": 387
+   }
+  ]
+ },
+ "canvasDataUrl": null,
+ "paintCostMs": 0.39999999999999997,
+ "html": {
+  "serif": "",
+  "serifItalic": "",
+  "sans": "",
+  "sansMedium": ""
+ },
+ "footer": {
+  "baselineY": 0,
+  "left": 0
+ }
+}

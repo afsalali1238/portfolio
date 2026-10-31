@@ -1,23 +1,34 @@
 import { useEffect, useRef } from "react";
 import { createHeroRay, type Ctx } from "./hero-ray";
+import { measureHero, type LayoutSnapshot } from "./hero-layout";
 
 const MAX_DELTA_MS = 64;
+
+/** Debug hook shape exposed at ?heroDebug=1 so the headless harness can read real rects. */
+type HeroDebugWindow = {
+  __hero?: {
+    layout: LayoutSnapshot;
+    geometry: ReturnType<ReturnType<typeof createHeroRay>["geometry"]>;
+  };
+};
 
 /**
  * HeroPrism — lifecycle shell for the hero's dispersion field.
  *
- * Owns only what the browser owns: sizing, DPR, the animation loop, visibility
- * pausing, theme changes and pointer events. All composition lives in ./hero-ray,
- * which is DOM-free and can be rendered headlessly.
+ * Owns only what the browser owns: sizing, DPR, the animation loop, visibility pausing,
+ * theme changes, pointer events, and reading the real layout off the page. All composition
+ * lives in ./hero-ray, which is DOM-free and can be rendered headlessly.
+ *
+ * The container element it measures is the hero <section> itself (`data-hero`), not a
+ * wrapper: geometry has to come from the section the copy actually sits in.
  */
 export function HeroPrism({ className = "" }: { className?: string }) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const container = containerRef.current;
-    if (!canvas || !container) return;
+    const hero = canvas?.closest<HTMLElement>("[data-hero]") ?? null;
+    if (!canvas || !hero) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     // The engine only needs the structural subset both DOM canvas and node-canvas share.
@@ -38,24 +49,58 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     let lastTs = 0;
     let lastPointerTs = 0;
 
+    const debug =
+      typeof window !== "undefined" && new URLSearchParams(window.location.search).has("heroDebug");
+    // The QA harness sets __hideDebug on the section to photograph the clean frame.
+    ray.setDebug(debug);
+    const debugVisible = () => debug && !hero.dataset.hideDebug;
+
+    let lastPaintCost = 0;
+
+    /** Measure the page, then size the canvas. Coalesced into rAF by the observer below. */
     const resize = () => {
-      const rect = container.getBoundingClientRect();
+      const rect = hero.getBoundingClientRect();
       rectLeft = rect.left;
       rectTop = rect.top;
-      cssW = rect.width;
-      cssH = rect.height;
+      cssW = Math.max(1, rect.width);
+      cssH = Math.max(1, rect.height);
 
       // Work in CSS pixels: the context transform absorbs device pixel ratio.
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.max(1, Math.round(cssW * dpr));
-      canvas.height = Math.max(1, Math.round(cssH * dpr));
+      const targetW = Math.round(cssW * dpr);
+      const targetH = Math.round(cssH * dpr);
+      if (canvas.width !== targetW || canvas.height !== targetH) {
+        canvas.width = targetW;
+        canvas.height = targetH;
+      }
       canvas.style.width = `${cssW}px`;
       canvas.style.height = `${cssH}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       ray.setTheme(document.documentElement.classList.contains("dark"));
-      ray.resize(cssW, cssH);
+      const snapshot = measureHero(hero);
+      ray.setLayout(snapshot);
+      if (debug) {
+        // ?heroDebug=1 — hand the measured snapshot + live geometry to the QA harness.
+        (window as unknown as HeroDebugWindow).__hero = snapshot
+          ? { layout: snapshot, geometry: ray.geometry() }
+          : undefined;
+      }
       if (!running) ray.paintStill(drawCtx);
+    };
+
+    // Coalesce resize into one frame. Under reduced motion there is no loop to borrow a
+    // frame from, so the same work rides a microtask and the hero still requests zero rAF.
+    let resizeQueued = false;
+    const queueResize = () => {
+      if (resizeQueued) return;
+      resizeQueued = true;
+      const run = () => {
+        resizeQueued = false;
+        resize();
+      };
+      if (prefersReduced) queueMicrotask(run);
+      else requestAnimationFrame(run);
     };
 
     const frame = (ts: number) => {
@@ -66,7 +111,14 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       lastTs = ts;
 
       if (performance.now() - lastPointerTs > 2600) ray.setPointer(0, 0, false);
+
+      const started = performance.now();
+      ray.setDebug(debugVisible());
       ray.paint(drawCtx, dt, ts);
+      lastPaintCost = performance.now() - started;
+      if (debug && Math.random() < 0.05) {
+        console.log(`[hero] paint ${lastPaintCost.toFixed(2)}ms`);
+      }
     };
 
     const syncLoop = () => {
@@ -103,7 +155,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     const onPointerLeave = () => ray.setPointer(0, 0, false);
 
     const onScroll = () => {
-      const rect = container.getBoundingClientRect();
+      const rect = hero.getBoundingClientRect();
       rectLeft = rect.left;
       rectTop = rect.top;
     };
@@ -114,8 +166,12 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       syncLoop();
     };
 
-    const resizeObs = new ResizeObserver(resize);
-    resizeObs.observe(container);
+    const resizeObs = new ResizeObserver(queueResize);
+    resizeObs.observe(hero);
+
+    // The headline's entrance animation settles a frame or two after mount; re-measure once
+    // fonts are in so the beam leaves the real full stop, not the fallback.
+    document.fonts?.ready.then(() => queueResize()).catch(() => undefined);
 
     const visObs = new IntersectionObserver(
       ([entry]) => {
@@ -124,7 +180,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       },
       { threshold: 0.02 },
     );
-    visObs.observe(container);
+    visObs.observe(hero);
 
     const themeObs = new MutationObserver(() => {
       ray.setTheme(document.documentElement.classList.contains("dark"));
@@ -161,8 +217,10 @@ export function HeroPrism({ className = "" }: { className?: string }) {
   }, []);
 
   return (
-    <div ref={containerRef} className={`pointer-events-none ${className}`} aria-hidden="true">
-      <canvas ref={canvasRef} className="block h-full w-full" />
-    </div>
+    <canvas
+      ref={canvasRef}
+      className={`pointer-events-none absolute inset-0 z-0 block h-full w-full ${className}`}
+      aria-hidden="true"
+    />
   );
 }

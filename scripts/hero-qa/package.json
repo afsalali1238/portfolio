@@ -1,0 +1,15 @@
+{
+  "name": "hero-qa",
+  "private": true,
+  "type": "module",
+  "description": "Headless stills + invariant checks for the hero dispersion field (design tooling, not shipped).",
+  "scripts": {
+    "check": "tsx check.mts"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^1.1.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
+  }
+}
