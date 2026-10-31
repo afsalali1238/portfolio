@@ -28,6 +28,20 @@ export type TileRect = {
   width: number;
 };
 
+/**
+ * The ledger: one derived object every layer reads from, so the drawing never crosses into
+ * the type. A fan ray that would land inside a text box is pushed below it — the dispersion
+ * keeps its angular order while the copy keeps its quiet.
+ */
+export type Ledger = {
+  /** hero-relative boxes where nothing but the plate may draw */
+  quietRects: Rect[];
+  /** baseline ticks for the drafting plate: (y, x0, x1) */
+  baselines: { y: number; x0: number; x1: number }[];
+  /** where the fan may be dense: the right edge is hot, the left edge is quiet */
+  balance: number;
+};
+
 export type LayoutSnapshot = {
   heroW: number;
   heroH: number;
@@ -43,9 +57,29 @@ export type LayoutSnapshot = {
   columns: number[];
   /** type boxes used by the dissolve mask (h1 lines, lede, CTA row) */
   textRects: Rect[];
+  /** the derived quiet zones + drafting references */
+  ledger: Ledger;
 };
 
 const MIN_RECT = 8;
+
+/** Merge overlapping/near-touching rects so a text column reads as one quiet zone. */
+function mergeRects(rects: Rect[]): Rect[] {
+  const sorted = [...rects].sort((a, b) => a.top - b.top || a.left - b.left);
+  const out: Rect[] = [];
+  for (const rect of sorted) {
+    const last = out[out.length - 1];
+    if (last && rect.top <= last.bottom && rect.left <= last.right && rect.right >= last.left) {
+      last.top = Math.min(last.top, rect.top);
+      last.left = Math.min(last.left, rect.left);
+      last.right = Math.max(last.right, rect.right);
+      last.bottom = Math.max(last.bottom, rect.bottom);
+    } else {
+      out.push({ ...rect });
+    }
+  }
+  return out;
+}
 
 function toLocal(rect: DOMRect, originLeft: number, originTop: number): Rect {
   return {
@@ -137,6 +171,11 @@ function fallbackSnapshot(w: number, h: number): LayoutSnapshot {
     container: { left, right },
     columns: Array.from({ length: 12 }, (_, i) => left + ((right - left) * (i + 1)) / 12),
     textRects: [{ left, top: h * 0.16, right: right * 0.56, bottom: h * 0.52 }],
+    ledger: {
+      quietRects: [{ left, top: h * 0.16, right: right * 0.56, bottom: h * 0.52 }],
+      baselines: [],
+      balance: 0.5,
+    },
   };
 }
 
@@ -222,6 +261,46 @@ export function measureHero(hero: HTMLElement): LayoutSnapshot {
   if (ctaRect) textRects.push(ctaRect);
   if (textRects.length === 0) textRects.push(...fallback.textRects);
 
+  // Quiet zones are the type boxes plus a margin, merged when they touch: the dissolve mask
+  // and the ray ledger both work off this, so they can never disagree.
+  const QUIET_MARGIN = 10;
+  const quietRects = mergeRects(
+    textRects.map((r) => ({
+      left: r.left - QUIET_MARGIN,
+      top: r.top - QUIET_MARGIN,
+      right: r.right + QUIET_MARGIN,
+      bottom: r.bottom + QUIET_MARGIN,
+    })),
+  );
+
+  // The fan is hottest on the side away from the copy: the drawing balances the page instead
+  // of crowding the words. Measured, not assumed.
+  const balance =
+    copyRect && containerWidth > 0
+      ? Math.min(1, Math.max(0, (copyRect.right - ox - container.left) / containerWidth))
+      : 0.5;
+
+  // Baseline ticks for the plate: the headline lines and the lede, with their ink extents.
+  const baselines: { y: number; x0: number; x1: number }[] = [];
+  const headlineEls = Array.from(headline?.children ?? []);
+  for (const [index, child] of headlineEls.entries()) {
+    const rect = headlineLines[index];
+    if (!rect) continue;
+    const el = child as HTMLElement;
+    baselines.push({
+      y: baselineOf(el.querySelector("[data-hero-thesis]") ? thesisEl : el, rect, rect.bottom - 4),
+      x0: rect.left,
+      x1: rect.right,
+    });
+  }
+  if (ledeRect) {
+    baselines.push({
+      y: ledeRect.top + (ledeRect.bottom - ledeRect.top) / 2,
+      x0: ledeRect.left,
+      x1: ledeRect.right,
+    });
+  }
+
   return {
     heroW,
     heroH,
@@ -231,5 +310,6 @@ export function measureHero(hero: HTMLElement): LayoutSnapshot {
     container,
     columns,
     textRects,
+    ledger: { quietRects, baselines, balance },
   };
 }

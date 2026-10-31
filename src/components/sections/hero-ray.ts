@@ -7,8 +7,13 @@
  *   → incandescent core → spectral fan → grounds on the stat tiles
  *
  * Phase 1: layout-driven geometry, the seven spectral ribbons, the glass and the core.
- * Phase 2 (this revision): Tesla plasma braided over the spectral body. Grounding filaments,
- * the drafting plate, the dissolve mask and interaction land in later phases.
+ * Phase 2: Tesla plasma braided over the spectral body.
+ * Phase 3 (this revision): full-bleed coverage, the drafting plate, grounding filaments,
+ * atmosphere, and a core that actually erupts. The dissolve mask and interaction are phase 4–5.
+ *
+ * Coverage is the point of this revision: the field occupies the whole hero — a return sweep
+ * above the copy, a fan that spans the full height and leaves both the top and the bottom
+ * edge, and filaments that land on every stat tile.
  *
  * Three invariants this file exists to protect:
  *
@@ -245,6 +250,15 @@ export type HeroGeometry = {
   normals: Vec[];
   /** lane span per band, in px: branch reach is a fraction of this */
   spans: number[];
+  /**
+   * The reflected half of the beam: prism-side hit, bowed through the gutter above the
+   * catalogue, ending off the left edge. This is what reaches the quiet side of the hero.
+   */
+  reflection: { waypoints: Vec[]; sample: (u: number) => Vec; gutterY: number };
+  /** the apex exit: the least of the three ways light leaves the glass */
+  specular: { waypoints: Vec[]; sample: (u: number) => Vec };
+  /** one grounding filament per tile: the fan ray nearest the tile's top-centre */
+  grounds: { from: Vec; to: Vec; band: number }[];
 };
 
 const onFacet = (a: Vec, b: Vec, t: number): Vec => ({
@@ -253,6 +267,57 @@ const onFacet = (a: Vec, b: Vec, t: number): Vec => ({
 });
 
 const dist = (a: Vec, b: Vec) => Math.hypot(a.x - b.x, a.y - b.y);
+
+/**
+ * Catmull-Rom sampler through a list of waypoints.
+ *
+ * The exit rays have to obey two constraints at once: stay out of the type boxes (which forces
+ * waypoints near the corridor edges) and still look like light rather than drafting. Sampling
+ * a spline through the waypoints gives both — the elbows disappear, the corridor holds.
+ *
+ * Pure and exported so the invariant check samples exactly the curve that gets drawn.
+ */
+export function buildPath(waypoints: Vec[], tension = 0.5): (u: number) => Vec {
+  const points = waypoints;
+  const segments = Math.max(1, points.length - 1);
+  const clampIndex = (i: number) => Math.min(points.length - 1, Math.max(0, i));
+  return (u: number) => {
+    const scaled = Math.min(0.999999, Math.max(0, u)) * segments;
+    const index = Math.min(segments - 1, Math.floor(scaled));
+    const t = scaled - index;
+    const p0 = points[clampIndex(index - 1)];
+    const p1 = points[index];
+    const p2 = points[clampIndex(index + 1)];
+    const p3 = points[clampIndex(index + 2)];
+    const t2 = t * t;
+    const t3 = t2 * t;
+    const m1x = (p2.x - p0.x) * tension;
+    const m1y = (p2.y - p0.y) * tension;
+    const m2x = (p3.x - p1.x) * tension;
+    const m2y = (p3.y - p1.y) * tension;
+    return {
+      x:
+        (2 * t3 - 3 * t2 + 1) * p1.x +
+        (t3 - 2 * t2 + t) * m1x +
+        (-2 * t3 + 3 * t2) * p2.x +
+        (t3 - t2) * m2x,
+      y:
+        (2 * t3 - 3 * t2 + 1) * p1.y +
+        (t3 - 2 * t2 + t) * m1y +
+        (-2 * t3 + 3 * t2) * p2.y +
+        (t3 - t2) * m2y,
+    };
+  };
+}
+
+/** Quadratic Bézier point. Used for the reflected ray and for tapping the tiles off it. */
+const quadratic = (a: Vec, control: Vec, b: Vec, t: number): Vec => {
+  const inv = 1 - t;
+  return {
+    x: inv * inv * a.x + 2 * inv * t * control.x + t * t * b.x,
+    y: inv * inv * a.y + 2 * inv * t * control.y + t * t * b.y,
+  };
+};
 
 /**
  * Deterministic hash → [0, 1). Used for plasma jitter so a frame can be reproduced exactly:
@@ -278,6 +343,15 @@ export type Ctx = {
   lineTo(x: number, y: number): void;
   quadraticCurveTo(cx: number, cy: number, x: number, y: number): void;
   arc(x: number, y: number, r: number, a0: number, a1: number): void;
+  ellipse?(
+    x: number,
+    y: number,
+    rx: number,
+    ry: number,
+    rotation: number,
+    a0: number,
+    a1: number,
+  ): void;
   rect(x: number, y: number, w: number, h: number): void;
   clip(): void;
   fill(): void;
@@ -301,6 +375,10 @@ export type Ctx = {
   strokeStyle: string | Gradient;
   setLineDash?(segments: number[]): void;
   translate?(x: number, y: number): void;
+  scale?(x: number, y: number): void;
+  rotate?(angle: number): void;
+  /** offscreen plates only */
+  drawImage?(image: unknown, dx: number, dy: number): void;
   /** debug overlay only */
   font?: string;
   textAlign?: string;
@@ -313,7 +391,16 @@ export type HeroRay = ReturnType<typeof createHeroRay>;
 
 /* -------------------------------------------------------------------------- engine */
 
-export function createHeroRay() {
+/**
+ * An offscreen surface, provided by the shell (browser) or the harness (node-canvas). The
+ * engine owns what is on it, never where it lives — that keeps it DOM-free.
+ */
+export type Surface = { ctx: Ctx; width: number; height: number; image?: unknown };
+export type SurfaceFactory = (width: number, height: number) => Surface | null;
+
+export type HeroRayOptions = { createSurface?: SurfaceFactory };
+
+export function createHeroRay(options: HeroRayOptions = {}) {
   let geo: HeroGeometry | null = null;
   let layout: LayoutSnapshot | null = null;
   let version = 0;
@@ -328,6 +415,12 @@ export function createHeroRay() {
   let pointerY = 0;
   let leanX = 0;
   let leanY = 0;
+
+  /** The drafting plate is rasterised once per geometry/theme and blitted thereafter. */
+  let plate: Surface | null = null;
+  let plateKey = "";
+  let grainDots: Float32Array | null = null;
+  const createSurface = options.createSurface ?? null;
 
   const strandBufs = BANDS.map(() => new Float32Array((STRAND_STEPS + 1) * 2));
   /** the incident beam's own scratch buffer: no allocation inside the loop */
@@ -381,9 +474,11 @@ export function createHeroRay() {
       entryMode = "top-edge";
     }
 
-    // Fan targets sit off the right edge and stay in angular order: no crossings.
-    const yTop = heroH * (mobile ? -0.05 : -0.02);
-    const yBottom = heroH * (mobile ? 0.55 : 1.02);
+    // Fan targets sit off the right edge and stay in angular order: no crossings. The spread
+    // is the whole hero, not a wedge beside the copy — the fan has to leave the top edge and
+    // the bottom edge so the light occupies the section rather than decorating one side.
+    const yTop = mobile ? -0.08 * heroH : -0.06 * heroH;
+    const yBottom = mobile ? 0.62 * heroH : 1.08 * heroH;
     const targets = BANDS.map((_, i) => ({
       x: heroW + 80,
       y: lerp(yTop, yBottom, i / (BANDS.length - 1)),
@@ -397,6 +492,93 @@ export function createHeroRay() {
       const len = Math.hypot(dx, dy) || 1;
       normals.push({ x: -dy / len, y: dx / len });
       spans.push(len);
+    }
+
+    // --- the reflected ray --------------------------------------------------------------
+    // A prism does not only refract: part of the beam reflects. That reflection is what
+    // carries the light into the quiet half of the hero — it runs the gutter between the copy
+    // and the catalogue, and every stat tile taps off it. Physically honest, and it is the
+    // reason the field occupies the whole section instead of one side of it.
+    const firstTextTop = Math.min(...layout.textRects.map((r) => r.top), heroH * 0.2);
+    const copyBottom = Math.max(...layout.textRects.map((r) => r.bottom), heroH * 0.5);
+    const tilesTop = layout.tiles.length
+      ? Math.min(...layout.tiles.map((t) => t.top))
+      : heroH * 0.86;
+    const gutterY = Math.min(
+      tilesTop - Math.max(16, heroH * 0.03),
+      Math.max(copyBottom + 22, (copyBottom + tilesTop) / 2),
+    );
+    // The specular exit: light leaving through the apex facet, drawn up and left across the
+    // top margin. Faint by nature — it is the least of the three exits — but it is what keeps
+    // the upper-left of the page from being dead paper.
+    //
+    // On portrait screens the copy is full-width, so there is only one corridor: the strip
+    // above the headline. The apex ray takes it, which is what keeps the top of a phone hero
+    // from being empty paper, and the reflection gives up on crossing the page.
+    const stripBottom = Math.max(14, firstTextTop - 12);
+    // Same corridor logic as the reflection: rise past the copy's right edge first, then run
+    // the top margin. A single curve would clip the headline's box on its way left.
+    const specularWaypoints: Vec[] = mobile
+      ? [topV, { x: heroW * 0.45, y: 8 }, { x: -20, y: stripBottom }]
+      : [
+          topV,
+          { x: container.right + 8, y: topV.y - 56 },
+          { x: container.right - 30, y: Math.max(14, firstTextTop * 0.24) },
+          { x: container.left - 60, y: Math.max(12, firstTextTop * 0.34) },
+        ];
+    const specular = { waypoints: specularWaypoints, sample: buildPath(specularWaypoints) };
+
+    // Two segments, not one: from the facet the ray must fall *past* the copy's right edge
+    // before it may turn left under it. A single curve cuts the lede's corner, which the
+    // invariant check catches — so the corridor is walked in order: down, then across.
+    const reflectionWaypoints: Vec[] = mobile
+      ? // Portrait: the corner is the only room left. A short reflected flare, off the frame.
+        [hit, { x: heroW * 0.95, y: 34 }, { x: heroW + 26, y: 16 }]
+      : [
+          hit,
+          { x: layout.copyRight + 44, y: (hit.y + gutterY) / 2 },
+          { x: layout.copyRight + 26, y: gutterY - 18 },
+          { x: container.left - 34, y: gutterY },
+        ];
+    const reflection = {
+      waypoints: reflectionWaypoints,
+      sample: buildPath(reflectionWaypoints),
+      gutterY,
+    };
+
+    // --- grounding filaments ----------------------------------------------------------
+    // Each tile taps the reflected ray directly above its own centre: a stub, not a leader
+    // line, so nothing crosses the layout to reach a tile.
+    const grounds: { from: Vec; to: Vec; band: number }[] = [];
+    for (const tile of layout.tiles) {
+      if (mobile) {
+        // Portrait: a stub rising out of the tile into the gap above the catalogue.
+        const reach = Math.min(44, Math.max(24, tile.top - copyBottom - 8));
+        const lean = tile.cx < heroW * 0.5 ? -0.5 : 0.5;
+        grounds.push({
+          from: { x: tile.cx + lean * 10, y: tile.top - 6 - reach },
+          to: { x: tile.cx, y: tile.top - 6 },
+          band: tile.cx < heroW * 0.5 ? 2 : 4,
+        });
+        continue;
+      }
+      // Nearest point on the reflected path, sampled segment by segment.
+      let best = { x: tile.cx, y: reflection.gutterY };
+      let bestDistance = Number.POSITIVE_INFINITY;
+      for (let k = 0; k <= 60; k++) {
+        const point = reflection.sample(k / 60);
+        const d = Math.abs(point.x - tile.cx);
+        if (d < bestDistance) {
+          bestDistance = d;
+          best = point;
+        }
+      }
+      const band = clamp(Math.round((best.y / heroH + 1) * 3), 0, BANDS.length - 1);
+      grounds.push({
+        from: best,
+        to: { x: tile.cx, y: tile.top - 6 },
+        band,
+      });
     }
 
     geo = {
@@ -414,6 +596,9 @@ export function createHeroRay() {
       targets,
       normals,
       spans,
+      reflection,
+      specular,
+      grounds,
     };
     version += 1;
   };
@@ -535,8 +720,131 @@ export function createHeroRay() {
 
   /* -------------------------------------------------------------------- layers */
 
+  /**
+   * Layer 1 — the drafting plate.
+   *
+   * Column rules, crop marks, baseline ticks, the caustic ellipse under the glass, grain and
+   * a corner vignette. It never changes between frames, so it is rasterised once per
+   * geometry/theme into an offscreen surface and blitted — the §8 rule, and the difference
+   * between a plate that costs nothing and one that costs twenty strokes a frame.
+   *
+   * Without a surface factory (a bare node harness) it draws straight to the target, which is
+   * only ever used for stills.
+   */
+  const paintPlate = (ctx: Ctx) => {
+    if (!geo || !layout) return;
+    const { heroW, heroH, prismSize, exit } = geo;
+    const ink = isDark ? 248 : 27;
+    const rule = (a: number) => (isDark ? `rgba(${ink},246,240,${a})` : `rgba(27,24,21,${a})`);
+
+    // 12 column rules at 4% ink, across the container.
+    ctx.strokeStyle = rule(0.04);
+    ctx.lineWidth = 1;
+    for (const x of layout.columns) {
+      ctx.beginPath();
+      ctx.moveTo(Math.round(x) + 0.5, 0);
+      ctx.lineTo(Math.round(x) + 0.5, heroH);
+      ctx.stroke();
+    }
+
+    // Corner crop marks on the container: registration marks, not decoration.
+    const { left, right } = layout.container;
+    const top = layout.textRects[0]?.top ?? heroH * 0.1;
+    const bottom = layout.tiles.length
+      ? Math.max(...layout.tiles.map((t) => t.bottom))
+      : heroH * 0.9;
+    const tick = 9;
+    ctx.strokeStyle = rule(0.16);
+    for (const [x, y, sx, sy] of [
+      [left, top, 1, 1],
+      [right, top, -1, 1],
+      [left, bottom, 1, -1],
+      [right, bottom, -1, -1],
+    ] as const) {
+      ctx.beginPath();
+      ctx.moveTo(x, y + sy * tick);
+      ctx.lineTo(x, y);
+      ctx.lineTo(x + sx * tick, y);
+      ctx.stroke();
+    }
+
+    // Baseline ticks: short marks off the left of each line's ink.
+    ctx.strokeStyle = rule(0.1);
+    for (const baseline of layout.ledger.baselines) {
+      ctx.beginPath();
+      ctx.moveTo(baseline.x0 - 26, Math.round(baseline.y) + 0.5);
+      ctx.lineTo(baseline.x0 - 8, Math.round(baseline.y) + 0.5);
+      ctx.stroke();
+    }
+
+    // Caustic ellipse under the glass: the light that did not leave the prism.
+    ctx.strokeStyle = rule(isDark ? 0.1 : 0.07);
+    ctx.beginPath();
+    if (ctx.ellipse) {
+      ctx.ellipse(
+        exit.x - prismSize * 0.1,
+        exit.y + prismSize * 0.72,
+        prismSize * 0.86,
+        prismSize * 0.16,
+        0,
+        0,
+        TAU,
+      );
+    } else {
+      ctx.arc(exit.x, exit.y + prismSize * 0.72, prismSize * 0.5, 0, TAU);
+    }
+    ctx.stroke();
+
+    // Grain: 2.5% static dots. Generated once, reused forever.
+    if (!grainDots) {
+      const count = Math.round((heroW * heroH) / 9000);
+      grainDots = new Float32Array(count * 3);
+      for (let i = 0; i < count; i++) {
+        grainDots[i * 3] = hash(i * 7 + 1, 11) * heroW;
+        grainDots[i * 3 + 1] = hash(i * 13 + 5, 23) * heroH;
+        grainDots[i * 3 + 2] = 0.014 + hash(i * 17 + 3, 37) * 0.018;
+      }
+    }
+    for (let i = 0; i < grainDots.length; i += 3) {
+      ctx.fillStyle = rule(grainDots[i + 2] * (isDark ? 1.6 : 1));
+      ctx.fillRect(grainDots[i], grainDots[i + 1], 1, 1);
+    }
+
+    // No vignette, no border: §0 forbids an edge around the field. What keeps the plate from
+    // reading as a box is that every mark in it is derived from the layout, not from the frame.
+    void heroW;
+    void heroH;
+  };
+
+  /** Blit the cached plate, rebuilding it only when geometry or theme changes. */
+  const drawPlate = (ctx: Ctx) => {
+    if (!geo) return;
+    const key = `${version}:${isDark ? "dark" : "light"}`;
+
+    if (createSurface) {
+      if (!plate || plateKey !== key) {
+        const surface = createSurface(Math.ceil(geo.heroW), Math.ceil(geo.heroH));
+        if (surface) {
+          const previous = plate;
+          plate = surface;
+          paintPlate(surface.ctx);
+          plateKey = key;
+          void previous;
+        }
+      }
+      const blit = plate?.image ?? plate?.ctx;
+      if (plate && blit && ctx.drawImage) {
+        ctx.drawImage(blit, 0, 0);
+        return;
+      }
+    }
+
+    // No surface factory: paint directly (stills and the node harness only).
+    paintPlate(ctx);
+  };
+
   /** Layer 2 — spectral body: seven tapered ribbons, one gradient each. */
-  const drawRibbons = (ctx: Ctx) => {
+  const drawRibbons = (ctx: Ctx, layer: "fan" | "bend" = "fan") => {
     if (!geo) return;
     const { targets, exit } = geo;
 
@@ -549,8 +857,10 @@ export function createHeroRay() {
       const len = Math.hypot(dx, dy) || 1;
       const nx = -dy / len;
       const ny = dx / len;
-      const maxHalf = band.ribbon * (1 + surgeEnergy * 0.22);
+      const maxHalf =
+        (layer === "bend" ? band.ribbon * 0.55 : band.ribbon) * (1 + surgeEnergy * 0.22);
 
+      ctx.globalAlpha = layer === "bend" ? 0.62 : 1;
       ctx.fillStyle = ribbonGrads[i] ?? rgba(isDark ? band.dark : band.light, band.ribbonAlpha);
       ctx.beginPath();
       for (let j = 0; j <= STRAND_STEPS; j++) {
@@ -569,6 +879,7 @@ export function createHeroRay() {
       ctx.closePath();
       ctx.fill();
     }
+    ctx.globalAlpha = 1;
   };
 
   /** Spine pass: thin, bright centre lines that give the ribbons an edge of light. */
@@ -795,6 +1106,163 @@ export function createHeroRay() {
     ctx.globalAlpha = 1;
   };
 
+  /**
+   * The reflected ray — the field's other half.
+   *
+   * Part of the beam never refracts; it reflects, and the reflection is what carries light to
+   * the quiet side of the hero. It leaves the facet, falls past the copy's right edge, then
+   * runs the gutter above the catalogue and off the left edge, so the field reads as full-bleed
+   * without ever crossing a word. Every stat tile taps off it.
+   */
+  const drawReflection = (ctx: Ctx) => {
+    if (!geo) return;
+    const { reflection } = geo;
+    const warm = isDark ? BANDS[2].dark : BANDS[2].light;
+    const baseAlpha = isDark ? 0.52 : 0.38;
+    const STEPS = 90;
+
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    // Same gradient language as the beam: hot at the glass, cooling as it travels.
+    const gradient = ctx.createLinearGradient(
+      reflection.waypoints[0].x,
+      reflection.waypoints[0].y,
+      reflection.waypoints[reflection.waypoints.length - 1].x,
+      reflection.waypoints[reflection.waypoints.length - 1].y,
+    );
+    gradient.addColorStop(0, rgba(warm, 1));
+    gradient.addColorStop(0.45, rgba(warm, 0.72));
+    gradient.addColorStop(1, rgba(warm, 0.2));
+
+    const tracePath = () => {
+      ctx.beginPath();
+      let first = true;
+      for (let k = 0; k <= STEPS; k++) {
+        const u = k / STEPS;
+        const point = reflection.sample(u);
+        // Photon-level wobble: zero at both ends so the joins stay welded.
+        const wobble = Math.sin(TAU * 2.1 * u - time * 1.2) * 1.7 * Math.sin(Math.PI * u);
+        if (first) {
+          ctx.moveTo(point.x, point.y + wobble);
+          first = false;
+        } else {
+          ctx.lineTo(point.x, point.y + wobble);
+        }
+      }
+    };
+
+    for (const pass of [
+      { width: 6, alpha: baseAlpha * 0.22 },
+      { width: 1.15, alpha: baseAlpha },
+      { width: 0.55, alpha: baseAlpha * 0.55 },
+    ]) {
+      tracePath();
+      ctx.strokeStyle = gradient;
+      ctx.globalAlpha = clamp(pass.alpha * (1 + surgeEnergy * 0.3), 0, 1);
+      ctx.lineWidth = pass.width;
+      ctx.stroke();
+    }
+
+    // The apex exit: same construction, a third of the weight, thinning as it crosses.
+    const spec = geo.specular;
+    const specGradient = ctx.createLinearGradient(
+      spec.waypoints[0].x,
+      spec.waypoints[0].y,
+      spec.waypoints[spec.waypoints.length - 1].x,
+      spec.waypoints[spec.waypoints.length - 1].y,
+    );
+    specGradient.addColorStop(0, rgba(warm, 1));
+    specGradient.addColorStop(1, rgba(warm, 0.15));
+
+    for (const pass of [
+      { width: 4, alpha: baseAlpha * 0.14 },
+      { width: 0.85, alpha: baseAlpha * 0.66 },
+    ]) {
+      ctx.beginPath();
+      let first = true;
+      for (let k = 0; k <= STEPS; k++) {
+        const u = k / STEPS;
+        const point = spec.sample(u);
+        const wobble = Math.sin(TAU * 1.7 * u + time * 0.9) * 1.5 * Math.sin(Math.PI * u);
+        if (first) {
+          ctx.moveTo(point.x, point.y + wobble);
+          first = false;
+        } else {
+          ctx.lineTo(point.x, point.y + wobble);
+        }
+      }
+      ctx.strokeStyle = specGradient;
+      ctx.globalAlpha = clamp(pass.alpha, 0, 1);
+      ctx.lineWidth = pass.width;
+      ctx.stroke();
+    }
+
+    // The tap points glow: where the reflection feeds a tile, the ray brightens.
+    for (const ground of geo.grounds) {
+      const spec2 = BANDS[ground.band];
+      const colour = isDark ? spec2.dark : spec2.light;
+      ctx.globalAlpha = isDark ? 0.5 : 0.36;
+      ctx.fillStyle = rgba(colour, 1);
+      ctx.beginPath();
+      ctx.arc(ground.from.x, ground.from.y, 1.2, 0, TAU);
+      ctx.fill();
+    }
+
+    ctx.globalAlpha = 1;
+  };
+
+  /** Layer 5 — grounding filaments: the fan is reasoned onto the catalogue, one per tile. */
+  const drawGrounds = (ctx: Ctx) => {
+    if (!geo) return;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    for (const ground of geo.grounds) {
+      const band = BANDS[ground.band];
+      const colour = isDark ? band.dark : band.light;
+      const alpha = (isDark ? band.darkAlpha : band.lightAlpha) * (isDark ? 0.5 : 0.42);
+      const { from, to } = ground;
+      const dx = to.x - from.x;
+      const dy = to.y - from.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len;
+      const ny = dx / len;
+
+      // A tap, not a leader line: it bows slightly and never quite runs straight.
+      ctx.beginPath();
+      for (let k = 0; k <= 18; k++) {
+        const t = k / 18;
+        const env = Math.sin(Math.PI * t);
+        const bow = Math.sin(t * Math.PI * 1.15) * 9 * env;
+        const jitter = (hash(ground.band * 31 + k * 7, jitterFrame) - 0.5) * 0.9 * env;
+        const x = from.x + dx * t + nx * (bow + jitter);
+        const y = from.y + dy * t + ny * (bow + jitter);
+        if (k === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = rgba(colour, 1);
+      ctx.globalAlpha = alpha;
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+
+      // Terminal node where the light lands on the tile: a bright point and a faint ring, so
+      // the eye can follow the fan all the way into the catalogue.
+      ctx.globalAlpha = Math.min(1, alpha * 1.9);
+      ctx.fillStyle = rgba(colour, 1);
+      ctx.beginPath();
+      ctx.arc(to.x, to.y, 1.7, 0, TAU);
+      ctx.fill();
+      ctx.globalAlpha = alpha * 0.75;
+      ctx.strokeStyle = rgba(colour, 1);
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.arc(to.x, to.y, 4.6, 0, TAU);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  };
+
   /** Layer 4 — the glass. White-only shell, ink edge, internal chords, caustic pooling. */
   const drawGlass = (ctx: Ctx) => {
     if (!geo) return;
@@ -912,28 +1380,62 @@ export function createHeroRay() {
     ctx.stroke();
   };
 
-  /** The core: where refraction becomes emission. Provisional in phase 1. */
+  /**
+   * The core: where refraction becomes emission.
+   *
+   * Two radials — a clay corona that reaches past the glass, and a white-hot bloom inside it.
+   * Its strength follows the ledger's balance: on a page whose copy owns the left, the core
+   * carries the light. On mobile the copy is full-width, so the core stays quiet.
+   */
   const drawCore = (ctx: Ctx) => {
     if (!geo) return;
     const { exit, prismSize } = geo;
+    const balance = layout?.ledger.balance ?? 0.5;
+    const voice = geo.mobile ? 0.55 : 0.72 + balance * 0.4;
     const pulse = 1 + Math.sin(time * TAU * 1.5) * 0.05 + surgeEnergy * 0.5;
-    const r = prismSize * 0.28 * pulse;
     const warm = isDark ? BANDS[2].dark : BANDS[2].light;
 
+    // Corona: band α × 0.22 for the glow pass (§4), wide enough to wrap the glass.
+    const coronaR = prismSize * (0.62 + surgeEnergy * 0.35);
+    const corona = ctx.createRadialGradient(exit.x, exit.y, 0, exit.x, exit.y, coronaR);
+    const bandAlpha = isDark ? BANDS[2].darkAlpha : BANDS[2].lightAlpha;
+    corona.addColorStop(0, rgba(warm, bandAlpha * 0.22 * voice));
+    corona.addColorStop(0.45, rgba(warm, bandAlpha * 0.08 * voice));
+    corona.addColorStop(1, rgba(warm, 0));
+    ctx.fillStyle = corona;
+    ctx.beginPath();
+    ctx.arc(exit.x, exit.y, coronaR, 0, TAU);
+    ctx.fill();
+
+    // Bloom: white → clay → transparent at r = size·0.28 (§5).
+    const r = prismSize * 0.28 * pulse;
     const bloom = ctx.createRadialGradient(exit.x, exit.y, 0, exit.x, exit.y, r);
-    bloom.addColorStop(0, "rgba(255,255,252,0.96)");
-    bloom.addColorStop(0.18, rgba(warm, isDark ? 0.72 : 0.6));
-    bloom.addColorStop(0.5, rgba(warm, isDark ? 0.18 : 0.13));
+    bloom.addColorStop(0, "rgba(255,255,252,0.97)");
+    bloom.addColorStop(0.17, rgba(warm, isDark ? 0.78 : 0.72));
+    bloom.addColorStop(0.48, rgba(warm, isDark ? 0.2 : 0.14));
     bloom.addColorStop(1, rgba(warm, 0));
     ctx.fillStyle = bloom;
     ctx.beginPath();
     ctx.arc(exit.x, exit.y, r, 0, TAU);
     ctx.fill();
 
+    // The point itself, and four micro-sparks in orbit around it.
     ctx.fillStyle = "rgba(255,255,255,0.97)";
     ctx.beginPath();
     ctx.arc(exit.x, exit.y, 1.9 * pulse, 0, TAU);
     ctx.fill();
+
+    for (let k = 0; k < 4; k++) {
+      const orbit = prismSize * (0.15 + k * 0.035);
+      const angle = time * TAU * (0.085 + k * 0.021) + k * 1.7;
+      const x = exit.x + Math.cos(angle) * orbit;
+      const y = exit.y + Math.sin(angle) * orbit * 0.72;
+      const alpha = 0.5 - k * 0.09;
+      ctx.fillStyle = isDark ? `rgba(255,252,246,${alpha})` : rgba(BANDS[2].light, alpha * 0.9);
+      ctx.beginPath();
+      ctx.arc(x, y, 1.1 - k * 0.12, 0, TAU);
+      ctx.fill();
+    }
   };
 
   /** Entry spark: the facet lights where the beam lands. */
@@ -950,6 +1452,85 @@ export function createHeroRay() {
     ctx.beginPath();
     ctx.arc(hit.x, hit.y, r, 0, TAU);
     ctx.fill();
+  };
+
+  /**
+   * Atmosphere — motes and photon packets.
+   *
+   * Density is deliberate: motes are twice as likely over the fan side as over the copy, and
+   * there are none inside a quiet rect. Photons ride the whole chain — beam, then fan —
+   * parametrised by arc length so their speed is constant across the two segments.
+   */
+  const drawAtmosphere = (ctx: Ctx, dtMs: number) => {
+    if (!geo) return;
+    const { source, hit, exit, targets, heroW, heroH } = geo;
+    const beamLen = dist(source, hit) || 1;
+    const fanLen = dist(exit, targets[2]) || 1;
+    const totalLen = beamLen + fanLen;
+    const step = dtMs / 1000;
+
+    // --- motes: a fixed field drifting slowly, brighter toward the fan
+    const moteCount = isDark ? 24 : 18;
+    for (let i = 0; i < moteCount; i++) {
+      const seedX = hash(i * 13 + 1, 0);
+      const seedY = hash(i * 29 + 5, 0);
+      const speed = 0.00004 + hash(i * 7 + 3, 0) * 0.00006;
+      // Cheap deterministic drift: fold time into the seed space rather than storing state.
+      const x = ((seedX + time * speed) % 1) * heroW;
+      const y = ((seedY + time * speed * 0.6) % 1) * heroH;
+      if (isQuiet(x, y) > 0.02) continue;
+      const r = 0.6 + hash(i * 11 + 7, 0) * 1.1;
+      const a = (0.05 + hash(i * 17 + 9, 0) * 0.07) * (x > heroW * 0.55 ? 1.15 : 0.8);
+      ctx.fillStyle = isDark
+        ? `rgba(248,246,240,${a.toFixed(3)})`
+        : `rgba(27,24,21,${a.toFixed(3)})`;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, TAU);
+      ctx.fill();
+    }
+
+    // --- photon packets: climb the beam, then ride the clay band out of the frame
+    const packets = isDark ? 3 : 2;
+    for (let p = 0; p < packets; p++) {
+      const head = ((time * 0.16 + p / packets) % 1) * totalLen;
+      const fade = Math.min(1, Math.min(head, totalLen - head) / 40);
+      if (fade <= 0) continue;
+      const point = pointOnChain(head, beamLen, totalLen);
+      if (!point) continue;
+      ctx.globalAlpha = 0.55 * fade * (1 + surgeEnergy * 0.6);
+      ctx.fillStyle = isDark ? "rgba(255,252,246,0.95)" : rgba(BANDS[2].light, 0.95);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, 1.5, 0, TAU);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    void step;
+  };
+
+  /** Distance from a point to the nearest quiet rect, 0 inside one. */
+  const isQuiet = (x: number, y: number) => {
+    if (!layout) return 1;
+    let best = 1;
+    for (const r of layout.ledger.quietRects) {
+      const dx = Math.max(r.left - x, 0, x - r.right);
+      const dy = Math.max(r.top - y, 0, y - r.bottom);
+      const d = Math.hypot(dx, dy);
+      best = Math.min(best, d / 48);
+    }
+    return 1 - Math.min(1, best);
+  };
+
+  /** Arc-length parametrisation over the whole light chain: beam, then the clay lane. */
+  const pointOnChain = (distance: number, beamLen: number, totalLen: number) => {
+    if (!geo) return null;
+    const { source, hit, exit, targets } = geo;
+    if (distance <= beamLen) {
+      const t = distance / (beamLen || 1);
+      return { x: lerp(source.x, hit.x, t), y: lerp(source.y, hit.y, t) };
+    }
+    const t = (distance - beamLen) / Math.max(1, totalLen - beamLen);
+    const target = targets[2];
+    return { x: lerp(exit.x, target.x, t), y: lerp(exit.y, target.y, t) };
   };
 
   /** ?heroDebug=1 — the register check: columns, facet points, target order, entry mode. */
@@ -1022,17 +1603,30 @@ export function createHeroRay() {
     ctx.clearRect(0, 0, geo.heroW, geo.heroH);
 
     ensureCaches(ctx);
-    for (let i = 0; i < BANDS.length; i++) fillStrand(strandBufs[i], BANDS[i], i);
 
+    // Layer 1 — plate (cached raster)
+    drawPlate(ctx);
+
+    // Layers 2–3 — spectral body + Tesla plasma
+    for (let i = 0; i < BANDS.length; i++) fillStrand(strandBufs[i], BANDS[i], i);
+    drawReflection(ctx);
     drawRibbons(ctx);
     drawSpines(ctx);
     drawPlasma(ctx);
+
+    // The incident ray, then the glass that receives it
     drawBeam(ctx);
     drawGlass(ctx);
     drawEntrySpark(ctx);
+
+    // Layer 4 — the core, then layer 5 — the filaments that ground the fan
     drawCore(ctx);
+    drawGrounds(ctx);
+
+    // Layer 6 — atmosphere
+    drawAtmosphere(ctx, dtMs);
+
     if (debug) drawDebug(ctx);
-    void dtMs;
   };
 
   /* ----------------------------------------------------------------- public API */
@@ -1061,6 +1655,7 @@ export function createHeroRay() {
           container: { left: margin, right: fallbackW - margin },
           columns: [],
           textRects: [],
+          ledger: { quietRects: [], baselines: [], balance: 0.5 },
         };
         buildGeometry();
       }

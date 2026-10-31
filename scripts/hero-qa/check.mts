@@ -17,7 +17,7 @@ import { createCanvas } from "@napi-rs/canvas";
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createHeroRay } from "../../src/components/sections/hero-ray.ts";
+import { createHeroRay, buildPath } from "../../src/components/sections/hero-ray.ts";
 import type { LayoutSnapshot } from "../../src/components/sections/hero-layout.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -131,6 +131,57 @@ for (const file of files) {
       join(shotsDir, `phase${PHASE}-engine-${capture.name}.png`),
       canvas.toBuffer("image/png"),
     );
+  });
+
+  check("no exit ray crosses a text box (coverage without collision)", () => {
+    const inside = (x: number, y: number) =>
+      layout.ledger.quietRects.some((r) => x > r.left && x < r.right && y > r.top && y < r.bottom);
+    // Sample the exact curves the engine draws, not an approximation of them.
+    const reflectionCurve = buildPath(geo.reflection.waypoints);
+    const specularCurve = buildPath(geo.specular.waypoints);
+    for (let k = 1; k <= 59; k++) {
+      const u = k / 60;
+      // Portrait reflections are a corner flare that leaves the frame immediately.
+      if (!geo.mobile) {
+        const point = reflectionCurve(u);
+        assert.ok(
+          !inside(point.x, point.y),
+          `reflected ray enters a text box at u=${u.toFixed(2)}`,
+        );
+      }
+      const apex = specularCurve(u);
+      assert.ok(!inside(apex.x, apex.y), `specular ray enters a text box at u=${u.toFixed(2)}`);
+    }
+  });
+
+  check("every stat tile is grounded (one filament each)", () => {
+    assert.equal(geo.grounds.length, layout.tiles.length, "a tile has no filament");
+    for (const ground of geo.grounds) {
+      // Tiles can share a column centre in the 2×2 portrait grid, so match the nearest top.
+      const tile = layout.tiles.reduce((best, candidate) =>
+        Math.abs(candidate.top - ground.to.y) < Math.abs(best.top - ground.to.y) ? candidate : best,
+      );
+      assert.ok(ground.to.y <= tile.top, "filament does not land above its tile");
+      if (geo.mobile) {
+        assert.ok(ground.from.y < ground.to.y, "portrait stub should rise out of its tile");
+      }
+      assert.ok(Number.isFinite(ground.from.x) && Number.isFinite(ground.from.y), "taps nowhere");
+    }
+  });
+
+  check("the field reaches all four edges (desktop; portrait keeps its top strip)", () => {
+    const ends = [...geo.specular.waypoints, ...geo.reflection.waypoints, ...geo.targets];
+    const nearLeft = ends.some((p) => p.x < geo.heroW * 0.3);
+    const nearRight = ends.some((p) => p.x > geo.heroW);
+    const nearTop = ends.some((p) => p.y < geo.heroH * 0.12);
+    const nearBottom = ends.some((p) => p.y > geo.heroH * 0.95);
+    if (geo.mobile) {
+      // Deliberate: on a phone the copy is full-width and the fan ends at 0.62h per §3,
+      // so the bottom edge belongs to the catalogue, not the light.
+      assert.ok(nearLeft && nearRight && nearTop, "portrait lost its top-strip coverage");
+      return;
+    }
+    assert.ok(nearLeft && nearRight && nearTop && nearBottom, "one or more edges are dead");
   });
 
   check("geometry responds to layout, not to the section's percentage", () => {

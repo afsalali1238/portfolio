@@ -87,10 +87,50 @@
     "right": 366,
     "bottom": 387
    }
-  ]
+  ],
+  "ledger": {
+   "quietRects": [
+    {
+     "left": 14,
+     "top": 38,
+     "right": 300.015625,
+     "bottom": 137
+    },
+    {
+     "left": 14,
+     "top": 141,
+     "right": 376,
+     "bottom": 265
+    },
+    {
+     "left": 14,
+     "top": 269,
+     "right": 376,
+     "bottom": 397
+    }
+   ],
+   "baselines": [
+    {
+     "y": 84.0859375,
+     "x0": 24,
+     "x1": 213.8125
+    },
+    {
+     "y": 122.0859375,
+     "x0": 24,
+     "x1": 290.015625
+    },
+    {
+     "y": 203,
+     "x0": 24,
+     "x1": 366
+    }
+   ],
+   "balance": 0.9384615384615385
+  }
  },
  "canvasDataUrl": null,
- "paintCostMs": 0.38,
+ "paintCostMs": 0.6333333333333333,
  "html": {
   "serif": "",
   "serifItalic": "",

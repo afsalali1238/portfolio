@@ -42,7 +42,19 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     // The engine only needs the structural subset both DOM canvas and node-canvas share.
     const drawCtx = ctx as unknown as Ctx;
 
-    const ray = createHeroRay();
+    // Offscreen surfaces (the drafting plate) are the shell's job: the engine stays DOM-free.
+    const ray = createHeroRay({
+      createSurface: (width, height) => {
+        const surface = document.createElement("canvas");
+        surface.width = Math.max(1, width);
+        surface.height = Math.max(1, height);
+        const surfaceCtx = surface.getContext("2d");
+        // `image` is the canvas itself: drawImage blits an element, never a context.
+        return surfaceCtx
+          ? { ctx: surfaceCtx as unknown as Ctx, width, height, image: surface }
+          : null;
+      },
+    });
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     let prefersReduced = motionQuery.matches;
 
