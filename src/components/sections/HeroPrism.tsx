@@ -11,6 +11,12 @@ const MAX_DELTA_MS = 64;
 const RESIZE_COMMIT_DELAY_MS = 140;
 /** Above this many device pixels the canvas drops resolution rather than the frame rate. */
 const MAX_BACKING_PIXELS = 2_200_000;
+/**
+ * How long a still pointer keeps influencing the field. The current is what makes the hero
+ * feel alive, so it should not switch itself off while the cursor is parked on the page —
+ * only release when the pointer has truly gone (it also releases on pointerleave/blur).
+ */
+const POINTER_IDLE_RELEASE_MS = 45_000;
 
 /** Debug hook shape exposed at ?heroDebug=1 so the headless harness can read real rects. */
 type HeroDebugWindow = {
@@ -76,6 +82,9 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     let rectTop = 0;
     let lastTs = 0;
     let lastPointerTs = 0;
+    let lastClientX = 0;
+    let lastClientY = 0;
+    let pointerInside = false;
 
     const debug =
       typeof window !== "undefined" && new URLSearchParams(window.location.search).has("heroDebug");
@@ -186,11 +195,13 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       const dt = lastTs === 0 ? 16 : Math.min(MAX_DELTA_MS, ts - lastTs);
       lastTs = ts;
 
-      if (performance.now() - lastPointerTs > 2600) ray.setPointer(0, 0, false);
+      // The current stays attached while the cursor rests inside the hero: only a pointer
+      // that has genuinely gone (left the section, or the window lost focus) is released.
+      if (performance.now() - lastPointerTs > POINTER_IDLE_RELEASE_MS) ray.setPointer(0, 0, false);
 
       const started = performance.now();
       ray.setDebug(debugVisible());
-      ray.paint(drawCtx, dt, ts);
+      ray.paint(drawCtx, dt);
       lastPaintCost = performance.now() - started;
       // ?heroDebug=1 logs one frame in twenty; data-perf (QA only) logs every frame.
       if (debug && (hero.dataset.perf === "1" || Math.random() < 0.05)) {
@@ -223,9 +234,12 @@ export function HeroPrism({ className = "" }: { className?: string }) {
      * refreshed on scroll and resize, both of which already run.
      */
     const onPointerMove = (e: PointerEvent) => {
+      lastClientX = e.clientX;
+      lastClientY = e.clientY;
       const x = e.clientX - rectLeft;
       const y = e.clientY - rectTop;
       const inside = x >= 0 && x <= cssW && y >= -40 && y <= cssH + 40;
+      pointerInside = inside;
       ray.setPointer(x, y, inside);
       if (inside) lastPointerTs = performance.now();
     };
@@ -234,15 +248,24 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       const x = e.clientX - rectLeft;
       const y = e.clientY - rectTop;
       if (x < 0 || x > cssW || y < 0 || y > cssH) return;
-      ray.addSurge(x, y, performance.now());
+      ray.addSurge(x, y);
     };
 
-    const onPointerLeave = () => ray.setPointer(0, 0, false);
+    const onPointerLeave = () => {
+      pointerInside = false;
+      ray.setPointer(0, 0, false);
+    };
 
     const onScroll = () => {
       const rect = hero.getBoundingClientRect();
       rectLeft = rect.left;
       rectTop = rect.top;
+      // The pointer is reported in hero-local coordinates, so a scroll moves the hero out
+      // from under a still cursor. Re-project the last client position instead of letting
+      // the current keep reaching for a stale point.
+      if (pointerInside) {
+        ray.setPointer(lastClientX - rectLeft, lastClientY - rectTop, true);
+      }
     };
 
     const onVisibility = () => syncLoop();
