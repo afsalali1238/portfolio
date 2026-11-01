@@ -188,7 +188,7 @@ const BEAM_WAVE = {
  * the critical angle, and the refracted ray inside the glass is at ~24° to the far facet normal
  * — past that facet's own critical angle. It is therefore **totally internally reflected** and
  * leaves through the base. Shallow descents (≈ 36–41° of incidence) refract straight out of the
- * right facet instead. Both are drawn as traced rays; `restOptics` says which one this layout
+ * right facet instead. Both remain recorded as traced rays; `restOptics` says which one this layout
  * produced, and QA asserts the reflection never emits from the facet it reflects off.
  *
  * Portrait rises at 14°, which lands well inside the window where the ray refracts out of the
@@ -418,6 +418,7 @@ export type HeroGeometry = {
   beamAngle: number;
   /** the traced optics at rest: the internal leg is refracted even when nobody is pointing */
   restOptics: ReturnType<typeof tracePrism>;
+  restingOrigin: "refracted-facet";
   /** the dispersion origin == exit; named because the copy talks about the core */
   core: Vec;
   strands: Strand[];
@@ -928,22 +929,12 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       source = { x: hit.x - (hit.y - (heroH - margin)) / tanA, y: heroH - margin };
     if (source.x < edge) source = { x: edge, y: hit.y - (hit.x - edge) * tanA };
 
-    /**
-     * The resting optics: the same `tracePrism` the pointer drives, run once on the resting
-     * axis. The internal leg is therefore a refracted ray at rest as well — the still, the
-     * reduced-motion frame and the first frame of interaction all show a real solution.
-     */
+    // Keep the physical record, including TIR. The resting composition uses the first
+    // far-facet contact, not the eventual physical exit; interaction still uses the trace.
     const restOptics = tracePrism(source, hit, topV, leftV, rightV);
     const exitU = 0.56;
-    // A degenerate trace (a ray that never leaves) still needs an origin on the exit facet.
-    const exit = restOptics.exitFacet ? restOptics.exit : onFacet(topV, rightV, exitU);
+    const exit = restOptics.legs[0]?.to ?? onFacet(topV, rightV, exitU);
 
-    /**
-     * The dispersion origin is the traced exit point: refraction — or, where the geometry
-     * demands it, total internal reflection followed by refraction — is what decides where the
-     * light leaves, not a fixed corner of the glass. Move the beam, the pointer or the prism and
-     * the fan's origin moves with the optics.
-     */
     const core = exit;
 
     /**
@@ -1121,6 +1112,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       entryU,
       beamAngle,
       restOptics,
+      restingOrigin: "refracted-facet",
       core,
       strands,
       targets,
@@ -2169,6 +2161,20 @@ export function createHeroRay(options: HeroRayOptions = {}) {
    * (ink edge + inner white), one neutral ray, a caustic pool and glints at each vertex.
    * Spectral colour is drawn separately, outside the exit facet.
    */
+  // Shared paint plan: QA inspects the same segments the renderer consumes.
+  const internalDrawing = () => (optics && opticalWeight > 0.001 ? optics.legs : []);
+  const entryHinge = () => {
+    if (!geo) return null;
+    const hit = liveHit ?? geo.hit;
+    const dx = hit.x - geo.source.x;
+    const dy = hit.y - geo.source.y;
+    const length = Math.hypot(dx, dy) || 1;
+    return {
+      from: { x: hit.x - (dx / length) * 5, y: hit.y - (dy / length) * 5 },
+      to: { x: hit.x + (dx / length) * 2, y: hit.y + (dy / length) * 2 },
+    };
+  };
+
   const drawGlass = (ctx: Ctx) => {
     if (!geo) return;
     const { topV, leftV, rightV, prismSize } = geo;
@@ -2261,10 +2267,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     ctx.fillStyle = tint;
     ctx.fill();
 
-    // Cross-fade the resting ray into the live traced one. Both are real solutions — the
-    // resting one is `buildGeometry`'s trace of the resting axis — so the cross-fade is a
-    // move from one refracted path to another, never from a decorative chord. In particular,
-    // a TIR bounce must not snap on at full strength on the first boundary pixel.
+    // Fade the true traced path in with pointer depth, including TIR.
     const strokeInternal = (legs: typeof rest.legs, alpha: number) => {
       if (alpha <= 0.001) return;
       ctx.beginPath();
@@ -2281,8 +2284,17 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       ctx.stroke();
       ctx.globalAlpha = 1;
     };
-    strokeInternal(rest.legs, 1 - opticalWeight);
-    if (optics) strokeInternal(optics.legs, opticalWeight);
+    // Clear at rest: only the live interaction paints internal traced legs.
+    strokeInternal(internalDrawing(), opticalWeight);
+    const hinge = entryHinge();
+    if (hinge) {
+      ctx.beginPath();
+      ctx.moveTo(hinge.from.x, hinge.from.y);
+      ctx.lineTo(hinge.to.x, hinge.to.y);
+      ctx.strokeStyle = isDark ? "rgba(255,251,242,0.95)" : "rgba(105,99,90,0.95)";
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+    }
 
     if (optics && opticalWeight > 0.01 && optics.tir && optics.legs.length) {
       const rim = optics.legs[0].to;
@@ -2347,18 +2359,18 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     }
   };
 
-  /** Short wavelength-dependent rays begin on the exit surface, never inside glass.
-   * Cauchy's approximation n(λ) = A + B / λ², λ in micrometres. The full-bleed
-   * field remains an artistic exaggeration of these physically ordered directions.
+  /** Short ordered rays are emitted outside the surface. At rest a TIR contact
+   * uses a composed subcritical angle: artistic licence, not a through-ray claim.
+   * Interaction uses the unmodified traced exit and Cauchy dispersion.
    */
-  const drawSpectralExit = (ctx: Ctx) => {
-    if (!geo || !optics || opticalWeight <= 0.01 || !optics.exitFacet || !optics.legs.length)
-      return;
-    const last = optics.legs[optics.legs.length - 1];
+  const spectralRays = (record: ReturnType<typeof tracePrism>, resting: boolean) => {
+    if (!geo || !record.legs.length || (!resting && !record.exitFacet)) return [];
+    const last = resting ? record.legs[0] : record.legs[record.legs.length - 1];
+    const facetName = resting ? last.facet : record.exitFacet;
     const facet =
-      optics.exitFacet === "right"
+      facetName === "right"
         ? [geo.rightV, geo.topV]
-        : optics.exitFacet === "base"
+        : facetName === "base"
           ? [geo.leftV, geo.rightV]
           : [geo.topV, geo.leftV];
     const edgeLength = dist(facet[0], facet[1]) || 1;
@@ -2366,48 +2378,65 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       x: (facet[1].x - facet[0].x) / edgeLength,
       y: (facet[1].y - facet[0].y) / edgeLength,
     };
+    const normal = { x: -tangent.y, y: tangent.x };
     const legLength = dist(last.from, last.to) || 1;
     const incoming = {
       x: (last.to.x - last.from.x) / legLength,
       y: (last.to.y - last.from.y) / legLength,
     };
-    let normal = { x: -tangent.y, y: tangent.x };
-    if (incoming.x * normal.x + incoming.y * normal.y < 0) normal = { x: -normal.x, y: -normal.y };
-    const sinInternal = incoming.x * tangent.x + incoming.y * tangent.y;
-    const wavelengths = [0.65, 0.61, 0.59, 0.55, 0.5, 0.46, 0.43];
-    for (const [i, wavelength] of wavelengths.entries()) {
-      const index = 1.4868 + 0.004 / (wavelength * wavelength);
+    const signedSin = incoming.x * tangent.x + incoming.y * tangent.y;
+    // A real desktop ray reflects here. Only the resting illustration substitutes an
+    // angle; never alter tracePrism or silently defeat its total-reflection guard.
+    const sinInternal = resting && last.tir ? Math.sign(signedSin) * 0.42 : signedSin;
+    const origin = resting ? geo.exit : record.exit;
+    const length = geo.prismSize * 0.22;
+    return [0.65, 0.61, 0.59, 0.55, 0.5, 0.46, 0.43].flatMap((wavelength, band) => {
+      const index = 1.4868 + 0.004 / wavelength ** 2;
       const sinOut = index * sinInternal;
-      if (Math.abs(sinOut) >= 1) continue; // this wavelength is still totally reflected
+      if (Math.abs(sinOut) >= 1) return [];
       const cosOut = Math.sqrt(1 - sinOut * sinOut);
       const direction = {
         x: normal.x * cosOut + tangent.x * sinOut,
         y: normal.y * cosOut + tangent.y * sinOut,
       };
-      const length = geo.prismSize * 0.22;
-      const band = BANDS[i];
-      const gradient = ctx.createLinearGradient(
-        optics.exit.x,
-        optics.exit.y,
-        optics.exit.x + direction.x * length,
-        optics.exit.y + direction.y * length,
-      );
-      const color = isDark ? band.dark : band.light;
-      const pathLength = optics.legs.reduce((sum, leg) => sum + dist(leg.from, leg.to), 0);
-      // A gentle blue-weighted scattering loss (Rayleigh ∝ 1/λ⁴), combined with absorption.
-      const transmission = Math.exp(
-        (-pathLength / geo.prismSize) * (0.08 + 0.005 / wavelength ** 4),
-      );
-      gradient.addColorStop(0, rgba(color, 0.7 * transmission));
-      gradient.addColorStop(1, rgba(color, 0));
-      ctx.strokeStyle = gradient;
-      ctx.globalAlpha = opticalWeight;
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.moveTo(optics.exit.x, optics.exit.y);
-      ctx.lineTo(optics.exit.x + direction.x * length, optics.exit.y + direction.y * length);
-      ctx.stroke();
-    }
+
+      return [
+        {
+          from: origin,
+          to: { x: origin.x + direction.x * length, y: origin.y + direction.y * length },
+          direction,
+          wavelength,
+          band,
+        },
+      ];
+    });
+  };
+
+  const drawSpectralExit = (ctx: Ctx) => {
+    if (!geo) return;
+    const paint = (record: ReturnType<typeof tracePrism>, resting: boolean, weight: number) => {
+      if (weight <= 0.001) return;
+      for (const ray of spectralRays(record, resting)) {
+        const band = BANDS[ray.band];
+        const color = isDark ? band.dark : band.light;
+        const gradient = ctx.createLinearGradient(ray.from.x, ray.from.y, ray.to.x, ray.to.y);
+        const pathLength = record.legs.reduce((sum, leg) => sum + dist(leg.from, leg.to), 0);
+        const transmission = Math.exp(
+          (-pathLength / geo!.prismSize) * (0.08 + 0.005 / ray.wavelength ** 4),
+        );
+        gradient.addColorStop(0, rgba(color, 0.7 * transmission));
+        gradient.addColorStop(1, rgba(color, 0));
+        ctx.strokeStyle = gradient;
+        ctx.globalAlpha = weight;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(ray.from.x, ray.from.y);
+        ctx.lineTo(ray.to.x, ray.to.y);
+        ctx.stroke();
+      }
+    };
+    paint(geo.restOptics, true, 1 - opticalWeight);
+    if (optics) paint(optics, false, opticalWeight);
     ctx.globalAlpha = 1;
   };
 
@@ -3153,6 +3182,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
           entryMode: "left-run" as const,
           entryU: 0.58,
           beamAngle: BEAM_ANGLE_WIDE,
+          restingOrigin: "refracted-facet" as const,
           restOptics: tracePrism(
             { x: 0, y: 0 },
             { x: 0, y: 0 },
@@ -3168,6 +3198,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
           sweep: { from: 0, to: 0 },
           prime: 0,
         }),
+        restingDrawing: {
+          internalLegs: internalDrawing(),
+          hinge: entryHinge(),
+          exitRays: geo ? spectralRays(geo.restOptics, true) : [],
+        },
         version,
         /** The strand specs themselves (angle, band, span, resolve point) — QA reads these. */
         specs: geo?.strands ?? [],
