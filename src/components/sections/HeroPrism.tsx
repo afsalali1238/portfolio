@@ -278,7 +278,8 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     resizeObs.observe(hero);
 
     // The headline's entrance animation settles a frame or two after mount; re-measure once
-    // fonts are in so the beam leaves the real full stop, not the fallback.
+    // fonts are in so the beam's landing is derived from the real display type, not the
+    // fallback snapshot.
     document.fonts?.ready.then(() => queueResize()).catch(() => undefined);
 
     const visObs = new IntersectionObserver(

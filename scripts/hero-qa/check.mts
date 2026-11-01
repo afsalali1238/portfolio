@@ -3,18 +3,26 @@
  *
  *   node tools/hero-qa.mjs                     # capture real layouts (+ browser stills)
  *   cd scripts/hero-qa && npm i && npm run check
+ *   npm run compose                            # the same layouts, composed with the page's type
+ *   npm run bench                              # what a frame costs, headlessly
  *
  * Writes design/hero-phase<N>/phase<N>-engine-*.png (N from HERO_PHASE, default 7): the
- * engine's own contribution, with no type. The composited stills come from tools/hero-qa.mjs.
+ * engine's own contribution, with no type. The composited stills come from compose.mts (or,
+ * with a browser, tools/hero-qa.mjs).
  *
- * Pins the things that have broken this effect before, plus the four contracts of the phase 6
- * composition (full-bleed fan, dot → line continuum, glass on its facets, current that catches
- * the cursor):
+ * Pins the things that have broken this effect before, plus the contracts of the current
+ * composition:
  *
  *   1. Continuity: every strand's P(0) is the dispersion origin, exactly.
- *   2. Coverage: the fan reaches all four edges of the section, not just the right third.
- *   3. Optics: entry and exit are parametric points on the prism's facets, never free-floating.
- *   4. Interaction: strands bend toward the pointer, and never overshoot it.
+ *   2. Coverage: the fan reaches all four edges of the section.
+ *   3. Optics: the resting ray is a real refraction (or TIR then refraction), entry and exit are
+ *      parametrised on the facets the trace names, and the source is outside the entry plane.
+ *   4. Composition: the beam enters at the frame edge, crosses a headline line, and is painted
+ *      *before* the dissolve while everything crisp around the glass is painted after it.
+ *   5. The wave: the illustrated ripple is visible, bounded by its envelope, and exactly zero at
+ *      both ends, so it lands on the hinge the tracer computed.
+ *   6. Interaction: strands bend toward the pointer and never overshoot it; inside the glass the
+ *      catch releases and the fan follows the traced exit.
  */
 import assert from "node:assert/strict";
 import { createCanvas } from "@napi-rs/canvas";
@@ -145,18 +153,205 @@ for (const file of files) {
     assert.ok(span >= minimum, `sweep is only ${span}° (needs ${minimum}°)`);
   });
 
-  check("entry and exit ride the facets (parametric, not free-floating)", () => {
+  check("entry and exit ride the facets the trace names (parametric, not free-floating)", () => {
     const onSegment = (
       p: { x: number; y: number },
       a: { x: number; y: number },
       b: { x: number; y: number },
       t: number,
     ) => near(p.x, a.x + (b.x - a.x) * t, 0.01) && near(p.y, a.y + (b.y - a.y) * t, 0.01);
-    assert.ok(onSegment(geo.exit, geo.topV, geo.rightV, 0.56), "exit is not on the right facet");
-    const t = geo.mobile ? 0.46 : 0.4;
     assert.ok(
-      onSegment(geo.hit, geo.topV, geo.leftV, t),
-      `entry is not on the left facet at t = ${t}`,
+      onSegment(geo.hit, geo.topV, geo.leftV, geo.entryU),
+      `entry is not on the left facet at u = ${geo.entryU}`,
+    );
+    // The exit is wherever refraction (or TIR then refraction) actually put it — so it is
+    // checked against the facet the trace names, not against a hard-coded corner.
+    const facets = {
+      left: [geo.topV, geo.leftV] as const,
+      base: [geo.leftV, geo.rightV] as const,
+      right: [geo.rightV, geo.topV] as const,
+    };
+    const facet = facets[geo.restOptics.exitFacet as keyof typeof facets];
+    assert.ok(facet, `the resting ray never leaves the glass (facet "${geo.restOptics.exitFacet}")`);
+    const [a, b] = facet;
+    const edgeLength = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+    const t = ((geo.exit.x - a.x) * (b.x - a.x) + (geo.exit.y - a.y) * (b.y - a.y)) / edgeLength ** 2;
+    assert.ok(t >= -1e-6 && t <= 1 + 1e-6, `exit parameter ${t.toFixed(2)} is past the facet ends`);
+    assert.ok(onSegment(geo.exit, a, b, t), "exit is not on the facet the trace names");
+    assert.ok(
+      near(geo.exit.x, geo.restOptics.exit.x, 0.01) &&
+        near(geo.exit.y, geo.restOptics.exit.y, 0.01),
+      "the dispersion origin is not the traced exit",
+    );
+  });
+
+  check("the resting ray is a real refraction, not a composed chord", () => {
+    const traced = geo.restOptics;
+    assert.ok(traced.legs.length >= 1, "the resting ray has no internal leg");
+    // Snell, on the resting trace.
+    assert.ok(
+      near(Math.sin(traced.theta1), 1.5 * Math.sin(traced.theta2), 1e-6),
+      "Snell's law fails on the resting ray",
+    );
+    // The drawn internal leg has to obey it too: compare the first leg's direction with the
+    // refracted direction the trace computed from the incident axis.
+    const leg = traced.legs[0];
+    const dx = leg.to.x - leg.from.x;
+    const dy = leg.to.y - leg.from.y;
+    const length = Math.hypot(dx, dy) || 1;
+    const facetLength = Math.hypot(geo.leftV.x - geo.topV.x, geo.leftV.y - geo.topV.y) || 1;
+    const tx = (geo.leftV.x - geo.topV.x) / facetLength;
+    const ty = (geo.leftV.y - geo.topV.y) / facetLength;
+    assert.ok(
+      near(Math.abs((dx * tx + dy * ty) / length), Math.sin(traced.theta2), 1e-6),
+      "the drawn resting leg does not obey Snell",
+    );
+    // …and if the resting geometry does reflect internally, it must not emit from the
+    // reflecting facet. This is measured, not assumed: it is a property of the entry angle.
+    if (traced.tir) {
+      assert.notEqual(
+        traced.exitFacet,
+        traced.firstFacet,
+        "the resting fan leaves the totally reflecting facet",
+      );
+    }
+  });
+
+  check("the source is outside the entry plane, at the frame edge", () => {
+    // Outer side of the left facet: the prism's centroid is inside, the source must not be.
+    const fx = geo.leftV.x - geo.topV.x;
+    const fy = geo.leftV.y - geo.topV.y;
+    const side = (p: { x: number; y: number }) =>
+      Math.sign((fx) * (p.y - geo.topV.y) - fy * (p.x - geo.topV.x));
+    assert.notEqual(side(geo.source), side(geo.prismCenter), "source is behind the entry plane");
+    const span = Math.hypot(geo.hit.x - geo.source.x, geo.hit.y - geo.source.y);
+    assert.ok(span >= 240, `incident span ${span.toFixed(1)}px is a stub`);
+    // The light enters at the frame edge, not in the middle of the picture: that is what
+    // separates a beam from a decorative leader line.
+    assert.ok(
+      geo.source.x <= 3 || geo.source.y <= 3,
+      `source (${geo.source.x.toFixed(1)}, ${geo.source.y.toFixed(1)}) is inside the frame`,
+    );
+    assert.ok(
+      geo.source.y >= -0.5 && geo.source.y <= geo.heroH + 0.5,
+      "source left the frame vertically",
+    );
+  });
+
+  check("the beam crosses the headline, and the type stays above it", () => {
+    // The optical axis must pass through a display line — the point of the pass.
+    const crosses = (rect: { left: number; top: number; right: number; bottom: number }) => {
+      for (let i = 0; i <= 200; i++) {
+        const s = i / 200;
+        const p = ray.beamAxisAt(s);
+        if (p.x >= rect.left && p.x <= rect.right && p.y >= rect.top && p.y <= rect.bottom)
+          return true;
+      }
+      return false;
+    };
+    const displayLines = layout.textRects.slice(0, 2);
+    assert.ok(
+      displayLines.some(crosses),
+      "the beam does not cross the headline: it is still a leader line",
+    );
+
+    // Layering, as a contract: the beam is painted before the dissolve (so type stencils thin
+    // it where it passes behind a word) and the glass is painted after it.
+    const layers = (geo as unknown as { layers: readonly string[] }).layers;
+    const at = (name: string) => layers.indexOf(name);
+    assert.ok(at("beam") >= 0 && at("dissolve") > at("beam"), "the beam is not behind the type");
+    assert.ok(at("glass") > at("dissolve"), "the glass is thinned by the dissolve");
+    // …and the HTML text really is above the canvas: the shell paints at z-0, the copy at z-10.
+    const heroSource = readFileSync(join(here, "../../src/components/sections/Hero.tsx"), "utf8");
+    assert.ok(
+      /<HeroPrism[^>]*className="[^"]*z-0/.test(heroSource),
+      "the canvas is not behind the content (HeroPrism is not z-0)",
+    );
+    assert.ok(
+      /<Container[^>]*className="[^"]*z-10/.test(heroSource),
+      "the content is not above the canvas (Container is not z-10)",
+    );
+  });
+
+  check("everything painted over the type is clear of it", () => {
+    // Order is: beam → dissolve → glass/core/colour. The dissolve stencils are paper-coloured
+    // and radial, so whatever is painted *after* it must not overlap type — otherwise the
+    // stencil would be painted over by a crisp facet and the word behind it would lose its
+    // contrast. That is checked here on the geometry, not on pixels: a dark-theme hairline and
+    // the plate grain have comparable amplitude, so a pixel diff would prove nothing.
+    const rects = [
+      ...layout.textRects.map((r) => ({ name: "type", ...r })),
+      ...layout.tiles.map((tile) => ({
+        name: "tile",
+        left: tile.x,
+        right: tile.x + tile.width,
+        top: tile.top,
+        bottom: tile.bottom,
+      })),
+    ];
+    const pad = 4;
+    const inside = (p: { x: number; y: number }) =>
+      rects.find(
+        (r) =>
+          p.x > r.left - pad && p.x < r.right + pad && p.y > r.top - pad && p.y < r.bottom + pad,
+      )?.name;
+    const probes: { what: string; p: { x: number; y: number } }[] = [];
+    for (const vertex of [geo.topV, geo.leftV, geo.rightV, geo.hit, geo.exit]) {
+      probes.push({ what: "prism", p: vertex });
+    }
+    for (const leg of geo.restOptics.legs) {
+      for (let i = 0; i <= 40; i++) {
+        const f = i / 40;
+        probes.push({
+          what: `refracted leg (${leg.facet})`,
+          p: { x: leg.from.x + (leg.to.x - leg.from.x) * f, y: leg.from.y + (leg.to.y - leg.from.y) * f },
+        });
+      }
+    }
+    for (const probe of probes) {
+      assert.ok(
+        !inside(probe.p),
+        `${probe.what} at (${probe.p.x.toFixed(0)}, ${probe.p.y.toFixed(0)}) lands on ${
+          inside(probe.p) ?? "type"
+        } and is painted over the dissolve`,
+      );
+    }
+    // The incident beam, by contrast, is *meant* to cross the headline.
+    const beamCrosses = Array.from({ length: 200 }, (_, i) => inside(ray.beamAxisAt(i / 200)));
+    assert.ok(beamCrosses.some(Boolean), "the beam no longer crosses any type box");
+  });
+
+  check("the illustrated field is wavy, bounded, and lands exactly on the hinge", () => {
+    // The ripple is an illustration of the electromagnetic field around a straight optical
+    // axis (see hero-ray.ts). Three properties make it safe to draw at page scale:
+    //   1. it is exactly zero at both ends — it cannot detach the beam from its source, and it
+    //      cannot tug the beam off the hinge the ray tracer computed;
+    //   2. it is visible: a wavy line nobody can see is a straight line;
+    //   3. it is bounded by its amplitude, so it can never wander into the copy as a scribble.
+    const start = ray.sampleBeam(0);
+    assert.ok(near(start.offset, 0, 1e-9), `ripple is ${start.offset} at the source`);
+    const end = ray.sampleBeam(1);
+    assert.ok(near(end.offset, 0, 1e-9), `ripple is ${end.offset} at the facet`);
+    assert.ok(
+      near(end.x, geo.hit.x, 0.01) && near(end.y, geo.hit.y, 0.01),
+      "the illustrated beam does not end on the live entry point",
+    );
+    const amplitude = geo.interaction.beam.amplitude;
+    let peak = 0;
+    for (let i = 1; i < 200; i++) {
+      const p = ray.sampleBeam(i / 200);
+      peak = Math.max(peak, Math.abs(p.offset));
+      assert.ok(Math.abs(p.offset) <= amplitude * 1.02, `ripple ${p.offset} exceeds its envelope`);
+    }
+    assert.ok(
+      peak >= amplitude * 0.6,
+      `peak ripple ${peak.toFixed(1)}px of a ${amplitude.toFixed(1)}px envelope: the wave is not visible`,
+    );
+    // A hairline nobody can see is what the previous pass shipped: 0.4 px. Below ~6 px on a
+    // desktop the crest is indistinguishable from the beam's own bloom.
+    assert.ok(
+      amplitude >= (geo.mobile ? 4 : 6),
+      `ripple amplitude ${amplitude.toFixed(1)}px is not visible`,
     );
   });
 
@@ -181,17 +376,6 @@ for (const file of files) {
       near(geo.core.x, geo.exit.x, 0.01) && near(geo.core.y, geo.exit.y, 0.01),
       "core ≠ exit",
     );
-  });
-
-  check("beam source is copy-safe and clears the facet", () => {
-    assert.ok(
-      geo.source.x >= 0 && geo.source.x <= layout.container.right + 0.5,
-      "source off-frame",
-    );
-    if (geo.entryMode === "sentence") {
-      const span = Math.hypot(geo.hit.x - geo.source.x, geo.hit.y - geo.source.y);
-      assert.ok(span >= 90, `sentence entry span ${span.toFixed(1)}px is a stub`);
-    }
   });
 
   check("no strand is allowed to shout over the copy", () => {
@@ -485,6 +669,34 @@ for (const file of files) {
         `live strand ${i} stops inside frame`,
       );
     }
+  });
+
+  check("reduced motion paints one stable, complete still", () => {
+    // The still is what a `prefers-reduced-motion` visitor sees. It must be finished (the prime
+    // line fully grown, no half-drawn state), and it must be identical frame to frame: two
+    // paints from the same settled engine have to be byte-identical, or the page is animating
+    // behind a preference that says it should not be.
+    const still = createHeroRay();
+    still.setTheme(capture.dark);
+    still.setLayout(layout);
+    const a = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
+    const b = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
+    still.paintStill(a.getContext("2d") as never);
+    still.paintStill(b.getContext("2d") as never);
+    const da = a.getContext("2d").getImageData(0, 0, a.width, a.height).data;
+    const db = b.getContext("2d").getImageData(0, 0, b.width, b.height).data;
+    assert.equal(da.length, db.length, "still dimensions differ between paints");
+    let changed = 0;
+    let painted = 0;
+    for (let i = 0; i < da.length; i += 4) {
+      if (da[i + 3] > 4) painted += 1;
+      if (da[i] !== db[i] || da[i + 1] !== db[i + 1] || da[i + 2] !== db[i + 2]) changed += 1;
+    }
+    assert.equal(changed, 0, `${changed} pixels drift between two stills: the still animates`);
+    assert.ok(painted > 500, `only ${painted} painted pixels — the still is empty`);
+    // The beam is part of that still.
+    const axis = still.beamAxisAt(0.5);
+    assert.ok(Number.isFinite(axis.x) && Number.isFinite(axis.y), "the still has no beam");
   });
 
   check("geometry responds to layout, not to the section's percentage", () => {

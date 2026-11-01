@@ -1,15 +1,39 @@
 /**
  * hero-ray — the drawing engine behind the hero's dispersion field.
  *
- * Phase 6 composition: the field is the hero, not a graphic beside it.
+ * Phase 8 composition: one beam crosses the page, the glass bends it, the page dissolves it.
  *
- *   the closing sentence of the headline emits a coherent ray
+ *   light enters from the left edge of the hero
+ *     → it travels across the composition, passing *behind* the headline
  *     → it strikes the left facet of a glass prism
  *     → it travels through the glass as one neutral ray
  *     → colours appear only as the light leaves the glass
  *     → and that point disperses in every direction that has room,
  *       growing from specks of dust into whole strands of light,
  *       until the strands cross the entire section and leave the frame.
+ *
+ * ## The beam: one ray, one illustrated field
+ *
+ * The incident beam has two separable things on it, and keeping them apart is what makes the
+ * page honest:
+ *
+ *   1. **The optical axis** is a *straight* ray from the source to the live entry point on the
+ *      left facet. Light travels in a straight line in a uniform medium, so every optical
+ *      quantity comes from this axis: the angle of incidence, the hinge on the facet, Snell's
+ *      law inside the glass, the Fresnel ghost. It is the only thing the physics sees.
+ *   2. **The visible ripple** around that axis is an illustration of the electromagnetic field,
+ *      not the path a photon takes. A page-scale drawing cannot be literal here: visible light
+ *      is ~400–700 nm, some six orders of magnitude below one pixel, so the drawn wavelength is
+ *      magnified accordingly and the drawn amplitude is a stylistic exaggeration. Its envelope
+ *      is exactly zero at the source and at the facet, so the ripple can never detach the beam
+ *      from its origin or land anywhere but on the hinge.
+ *
+ * The colour is generated at the exit facet, never in the incident beam: the light that enters
+ * the glass is neutral warm-white on ink and neutral silver on paper.
+ *
+ * The resting ray is a *traced* ray, not a composed chord: `buildGeometry` runs the same
+ * `tracePrism` the pointer uses, so the internal leg is refracted at rest too. The full-bleed
+ * fan around the exit remains an artistic exaggeration (see BANDS and the sweep below).
  *
  * What changed in this revision, and why:
  *
@@ -35,9 +59,12 @@
  *      real DOM (see ./hero-layout). Nothing is a percentage of the section — except the
  *      sweep of the fan, which is a direction, not a position.
  *   2. Continuity. Each strand's displacement envelope E(s) = sin(πs)^0.85 is exactly 0 at
- *      both ends, so P(0) is the exit point to the last float and no tip detaches.
- *   3. Legibility. The dissolve thins everything that crosses a type box, so the field can
- *      be full-bleed without ever costing a word its contrast.
+ *      both ends, so P(0) is the exit point to the last float and no tip detaches. The beam's
+ *      ripple obeys the same rule against its own axis.
+ *   3. Legibility. The dissolve thins everything that crosses a type box — including the beam,
+ *      which is painted *before* it — so light can pass behind the words without ever costing
+ *      one of them its contrast. The facet contact is painted after it, so the hinge stays
+ *      crisp where there is no type to protect.
  *
  * No canvas shadow blur anywhere: every soft edge is a gradient or a cached sprite, and every
  * geometry-dependent background gradients are cached per geometry version and theme.
@@ -120,8 +147,67 @@ const GLASS_MAX_INK = 20;
 /** Hovering a tile dims every other band to this fraction. */
 const TILE_DIM = 0.42;
 
+/* --------------------------------------------------------------- the incident beam */
+
+/**
+ * The illustrated field on the beam (see the file header): a slow travelling ripple around a
+ * straight optical axis.
+ *
+ * The numbers are deliberately conservative. The previous pass drew 0.4 px of wobble, which
+ * nobody can see; a loose cable is the opposite failure. One spatial frequency plus a weak
+ * second harmonic, two cycles across the run and a crest every six seconds reads as *light
+ * with a field*, not as a drawn wire.
+ */
+const BEAM_WAVE = {
+  /** spatial cycles along the visible run (long enough to read as a wavelength, not a comb) */
+  cycles: 2.0,
+  /** second harmonic: breaks the pure sine so crests are not all identical */
+  harmonic: 0.26,
+  harmonicCycles: 2.35,
+  /** phase speed, Hz — one crest travels the whole run in about six seconds */
+  hz: 0.16,
+  /** fraction of the run over which the ripple grows in from the source … */
+  fadeIn: 0.17,
+  /** … and settles onto the facet: exactly zero at s = 1, so the hinge is never tugged */
+  fadeOut: 0.2,
+  /** amplitude as a fraction of the run, clamped: ~19 px at 1440, ~7 px on a phone */
+  amplitudeOfRun: 0.021,
+  amplitudeMin: 5,
+  amplitudeMax: 19,
+} as const;
+
+/**
+ * The beam's approach angle, radians, in screen space (y down): on wide screens the light
+ * descends into the left facet from upper-left; on portrait it rises from lower-left, because
+ * the copy is full width and there is no upper-left corner left to enter from.
+ *
+ * A beam that approaches the left facet from the left **must** descend into it, otherwise the
+ * incident ray crosses the prism's own left facet before reaching the entry point and the
+ * geometry stops describing a prism. Within that family the resting behaviour is a property of
+ * the triangle, not a choice: at 13° of descent the entry lands near 41° of incidence, close to
+ * the critical angle, and the refracted ray inside the glass is at ~24° to the far facet normal
+ * — past that facet's own critical angle. It is therefore **totally internally reflected** and
+ * leaves through the base. Shallow descents (≈ 36–41° of incidence) refract straight out of the
+ * right facet instead. Both are drawn as traced rays; `restOptics` says which one this layout
+ * produced, and QA asserts the reflection never emits from the facet it reflects off.
+ *
+ * Portrait rises at 14°, which lands well inside the window where the ray refracts out of the
+ * right facet.
+ */
+const BEAM_ANGLE_WIDE = 13 * DEG;
+const BEAM_ANGLE_PORTRAIT = -14 * DEG;
+
+/** Pointer hover eases the beam: this is the time constant, ms. */
+const BEAM_HOVER_TAU_MS = 160;
+
 const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+/** Hermite step: 0 at e0, 1 at e1, with zero slope at both ends. */
+const smoothstep = (e0: number, e1: number, x: number) => {
+  const t = clamp((x - e0) / (e1 - e0 || 1e-6), 0, 1);
+  return t * t * (3 - 2 * t);
+};
 
 export type Rgb = readonly [number, number, number];
 
@@ -269,8 +355,8 @@ export const BANDS: readonly BandSpec[] = [
 
 /* ------------------------------------------------------------------ geometry contract */
 
-/** Minimum length of the incident ray before it is rerouted to the top edge. */
-const ENTRY_MIN_SPAN = 96;
+/** Below this width the hero uses the portrait composition (the copy is full-bleed). */
+const PORTRAIT_MAX_W = 768;
 
 type Vec = { x: number; y: number };
 
@@ -317,10 +403,21 @@ export type HeroGeometry = {
   hit: Vec;
   /** the sole dispersion origin: P(0) of every strand, on the exit facet */
   exit: Vec;
-  /** the beam's origin */
+  /** the beam's origin: where the light enters the frame */
   source: Vec;
-  /** how far the beam had to be rerouted to reach the facet */
-  entryMode: "sentence" | "top-edge";
+  /**
+   * Where the composition put the beam's landing on the left facet:
+   * "left-run" = it crosses the hero from the left edge (wide screens),
+   * "corner-rise" = it rises from the lower-left into the corner glass (portrait).
+   * Both are a straight approach; neither is a reroute.
+   */
+  entryMode: "left-run" | "corner-rise";
+  /** resting parameter on the left facet, top → bottom */
+  entryU: number;
+  /** the beam's approach angle in radians (screen space, y down) */
+  beamAngle: number;
+  /** the traced optics at rest: the internal leg is refracted even when nobody is pointing */
+  restOptics: ReturnType<typeof tracePrism>;
   /** the dispersion origin == exit; named because the copy talks about the core */
   core: Vec;
   strands: Strand[];
@@ -606,6 +703,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   let pointerEase = 0; // 0..1, 80 ms follow — how much the pointer is influencing the field
   let hoverTile = -1; // index of the stat tile under the pointer, -1 for none
   let headlineHover = false;
+  /** Eased copy of `headlineHover`: the beam answers the cursor, it does not snap at it. */
+  let beamGlow = 0;
   const surges: { x: number; y: number; at: number; seed: number }[] = [];
   let surgeLife = 0; // ms since the most recent surge started
 
@@ -627,14 +726,14 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       fanTurn = 0;
       fanSpread = 1;
       opticalWeight = 0;
-      entryU = geo.mobile ? 0.46 : 0.4;
+      entryU = geo.entryU;
       return;
     }
     const { topV, leftV, rightV, source, exit, prismSize } = geo;
     const dx = leftV.x - topV.x;
     const dy = leftV.y - topV.y;
     const projection = ((pointerX - topV.x) * dx + (pointerY - topV.y) * dy) / (dx * dx + dy * dy);
-    const baseU = geo.mobile ? 0.46 : 0.4;
+    const baseU = geo.entryU;
     entryU = lerp(baseU, clamp(projection, 0.12, 0.86), pointerInGlass);
     liveHit = onFacet(topV, leftV, entryU);
     // Distance from the facet gives the boundary a gentle, local onset.
@@ -696,63 +795,133 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
   const buildGeometry = () => {
     if (!layout) return;
-    const { heroW, heroH, thesisLine, copyRight, container } = layout;
-    const mobile = heroW < 768;
+    const { heroW, heroH, thesisLine } = layout;
+    const mobile = heroW < PORTRAIT_MAX_W;
 
+    // Portrait gets a slightly smaller prism on purpose: it has to sit clear of the display
+    // type *and* stay inside a 390 px frame, and those two constraints only meet here.
     const prismSize = mobile
-      ? clamp(Math.min(heroW, heroH) * 0.26, 84, 136)
+      ? clamp(Math.min(heroW, heroH) * 0.24, 76, 108)
       : clamp(Math.min(heroW, heroH) * 0.32, 150, 262);
 
-    // Equilateral prism, apex up. Circumradius r = size / √3.
+    // Equilateral prism, apex up. Circumradius r = size / √3, half-width r·cos30°.
     const r = prismSize / Math.sqrt(3);
+    const halfW = r * 0.866;
 
     /**
-     * The core is the one fixed point of the composition: the dispersion origin, the exit
-     * point on the right facet, and the thing the eye lands on. On desktop it sits on the
-     * hero's optical centre-right — clear of the copy, central enough to be the centrepiece.
+     * The composition hangs off one point: **where the beam lands on the left facet**.
+     *
+     * Everything else is derived from it. The glass is hung so that the landing sits on its
+     * facet at `entryU`; the beam is a straight run back from that landing to the frame edge;
+     * and the dispersion origin is whatever the traced refracted ray exits through. Moving a
+     * single anchor therefore moves the whole picture coherently, and no part of it can drift
+     * away from the optics.
+     *
+     * `entryU` sits near the apex on wide screens. That is not decorative: with the beam
+     * descending from upper-left, the refracted ray leaves the near-apex entry heading down
+     * the body, strikes the far facet **above** the critical angle (total internal
+     * reflection — a real, measured consequence of this geometry, not a chosen effect),
+     * reflects down through the glass and leaves through the base. Entering lower on the
+     * facet makes that reflected leg long and flat, and it ends up doubling the base rim;
+     * entering near the apex makes it a clean vertical drop through the middle of the glass.
      */
-    // Portrait: the glass hangs in the top-right corner and the dispersion falls down the
-    // page like a curtain. The copy is full-width there, so the light goes where the words
-    // are not — down, and out to the left along the bottom third.
-    const core: Vec = mobile
-      ? { x: heroW * 0.84, y: heroH * 0.13 }
-      : {
-          x: clamp(heroW * 0.665, copyRight + prismSize * 0.85, heroW - prismSize * 0.55),
-          y: heroH * 0.44,
-        };
+    const entryU = mobile ? 0.56 : 0.26;
+    const beamAngle = mobile ? BEAM_ANGLE_PORTRAIT : BEAM_ANGLE_WIDE;
+    const tanA = Math.tan(beamAngle);
 
-    // The core rides the right facet at u = 0.56 of the way down from the apex, so the
-    // prism's position is *derived* from the core rather than tuned beside it.
-    const exitU = 0.56;
-    const apex = { x: 0, y: -r };
-    const bottomRight = { x: r * 0.866, y: r * 0.5 };
-    const exitRel = {
-      x: apex.x + (bottomRight.x - apex.x) * exitU,
-      y: apex.y + (bottomRight.y - apex.y) * exitU,
-    };
-    const prismCenter: Vec = { x: core.x - exitRel.x, y: core.y - exitRel.y };
-    const topV: Vec = { x: prismCenter.x, y: prismCenter.y - r };
-    const leftV: Vec = { x: prismCenter.x - r * 0.866, y: prismCenter.y + r * 0.5 };
-    const rightV: Vec = { x: prismCenter.x + r * 0.866, y: prismCenter.y + r * 0.5 };
-    const exit = onFacet(topV, rightV, exitU);
-    const hit = onFacet(topV, leftV, mobile ? 0.46 : 0.4);
+    // Offsets of the landing point from the prism's centroid, for this entryU.
+    const entryRelX = -halfW * entryU;
+    const entryRelY = -r * (1 - 1.5 * entryU);
 
-    // The beam leaves the sentence's full stop — unless that would be a stub, in which case
-    // it enters from the top edge over the copy-safe right column.
-    let source: Vec = {
-      x: Math.min(thesisLine.right + 6, container.right),
-      y: thesisLine.baselineY,
-    };
-    let entryMode: HeroGeometry["entryMode"] = "sentence";
+    /**
+     * The landing height: in the gap between the closing sentence and the body copy — above
+     * the lede, below the italic line — so the beam crosses the display type and never has to
+     * run through a paragraph to reach the glass. Portrait has no such gap (the copy is full
+     * width), so the glass hangs in the top-right corner instead and the beam rises to it.
+     */
+    let centre: Vec;
     if (mobile) {
-      // On portrait the desktop fallback sits to the right of the prism, behind the
-      // entry face. Start above and to its left so the incident ray reaches that face first.
-      source = { x: Math.max(0, topV.x - prismSize * 0.85), y: 0 };
-      entryMode = "top-edge";
-    } else if (dist(source, hit) < ENTRY_MIN_SPAN) {
-      source = { x: Math.min(copyRight + 40, container.right - 24), y: heroH * 0.06 };
-      entryMode = "top-edge";
+      /**
+       * Portrait: the copy is full width, so there is no quiet band to land in — the glass
+       * hangs in the top-right corner instead and the beam rises to it from the lower left.
+       * The landing height is chosen so the beam crosses the two display lines at a workable
+       * angle of incidence; the summary above explains why the *angle*, not the length, is
+       * the constraint. The lower bound keeps the landing below the display type outright if
+       * a layout ever squeezes it out of the gap.
+       */
+      // Clear the display type horizontally, and the top edge vertically. Both are measured:
+      // on portrait the glass has nowhere to hide, so it has to be placed rather than tuned.
+      const displayRight = layout.textRects
+        .slice(0, 2)
+        .reduce((acc, rect) => Math.max(acc, rect.right), layout.container.left);
+      const margin = Math.max(8, heroW * 0.026);
+      const clearOfType = displayRight + halfW + margin;
+      centre = {
+        x: Math.min(heroW - halfW - 6, Math.max(clearOfType, heroW * 0.72)),
+        // The apex stays on the page: a clipped vertex is the one thing that stops the shape
+        // reading as a solid object.
+        y: r + Math.max(7, heroH * 0.014),
+      };
+    } else {
+      const landingY = clamp(thesisLine.baselineY + prismSize * 0.1, heroH * 0.28, heroH * 0.44);
+      const centreY = landingY - entryRelY;
+      // Whatever copy shares the glass's vertical band has to stay clear of the body: the
+      // clearance is derived from the rects that actually overlap that band, not from the
+      // widest text on the page (the CTA row is far below the glass and must not push it).
+      const bandTop = centreY - r;
+      const bandBottom = centreY + r * 0.5;
+      const bandRight = layout.textRects.reduce(
+        (acc, rect) =>
+          rect.bottom > bandTop && rect.top < bandBottom ? Math.max(acc, rect.right) : acc,
+        layout.container.left,
+      );
+      const centreX = Math.min(heroW - halfW - 14, Math.max(heroW * 0.625, bandRight + halfW + 22));
+      centre = { x: centreX, y: centreY };
     }
+
+    const prismCenter: Vec = centre;
+    const topV: Vec = { x: centre.x, y: centre.y - r };
+    const leftV: Vec = { x: centre.x - halfW, y: centre.y + r * 0.5 };
+    const rightV: Vec = { x: centre.x + halfW, y: centre.y + r * 0.5 };
+    const hit = onFacet(topV, leftV, entryU);
+
+    /**
+     * The beam's origin, walked back along the optical axis from the landing.
+     *
+     * The light should enter **at the frame edge**, not somewhere inside the picture: a beam
+     * that begins in the middle of the hero reads as a decorative leader line, which is
+     * exactly what this pass is fixing. So the run is whatever takes the axis to x = 0 (or to
+     * the top edge on a short, wide viewport) — the *length* gives way, never the angle: the
+     * incidence is what the optics read.
+     */
+    const edge = mobile ? 2 : 0;
+    const runToEdge = (hit.x - edge) / Math.max(0.2, Math.cos(beamAngle));
+    const run = clamp(runToEdge, 260, 1400);
+    let source: Vec = { x: hit.x - run * Math.cos(beamAngle), y: hit.y - run * tanA };
+    // A short hero: keep the length it can hold and give up the run, not the direction.
+    const margin = mobile ? 2 : 18;
+    if (source.y < margin) source = { x: hit.x - (hit.y - margin) / tanA, y: margin };
+    else if (source.y > heroH - margin)
+      source = { x: hit.x - (hit.y - (heroH - margin)) / tanA, y: heroH - margin };
+    if (source.x < edge) source = { x: edge, y: hit.y - (hit.x - edge) * tanA };
+
+    /**
+     * The resting optics: the same `tracePrism` the pointer drives, run once on the resting
+     * axis. The internal leg is therefore a refracted ray at rest as well — the still, the
+     * reduced-motion frame and the first frame of interaction all show a real solution.
+     */
+    const restOptics = tracePrism(source, hit, topV, leftV, rightV);
+    const exitU = 0.56;
+    // A degenerate trace (a ray that never leaves) still needs an origin on the exit facet.
+    const exit = restOptics.exitFacet ? restOptics.exit : onFacet(topV, rightV, exitU);
+
+    /**
+     * The dispersion origin is the traced exit point: refraction — or, where the geometry
+     * demands it, total internal reflection followed by refraction — is what decides where the
+     * light leaves, not a fixed corner of the glass. Move the beam, the pointer or the prism and
+     * the fan's origin moves with the optics.
+     */
+    const core = exit;
 
     /**
      * The sweep. On desktop the fan opens from up-left (-128°) through the right (0°) to
@@ -811,11 +980,16 @@ export function createHeroRay(options: HeroRayOptions = {}) {
             : spec.ghost
               ? 2.3
               : 0.75 + Math.min(1, Math.abs(Math.sin(spec.angle / 2)) * 1.5) * 0.55,
+        // Left-side lanes are the ones the beam has to outshine: they are deliberately
+        // near-invisible on ink, where a stray warm hairline competes with the beam's own
+        // halo, and a touch more present on paper, where the plate grain swallows them.
         alpha:
           (dir.x < -0.15
             ? spec.index === 1 || spec.index === 19
-              ? 0.08
-              : 0.008
+              ? isDark
+                ? 0.03
+                : 0.07
+              : 0.006
             : spec.ghost
               ? 0.008
               : 1) *
@@ -920,7 +1094,10 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       hit,
       exit,
       source,
-      entryMode,
+      entryMode: mobile ? "corner-rise" : "left-run",
+      entryU,
+      beamAngle,
+      restOptics,
       core,
       strands,
       targets,
@@ -1150,6 +1327,69 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
     cacheKey = key;
     cacheCtx = ctx;
+  };
+
+  /* ----------------------------------------------------------- the incident beam */
+
+  /**
+   * The straight optical axis of the incident beam, source → live entry.
+   *
+   * This is the only geometry the light *has*: the source is fixed, the entry slides along
+   * the facet while the pointer is inside the glass, and the axis between them is a chord.
+   * Everything drawn on top of it is illustration.
+   */
+  const beamAxis = () => {
+    if (!geo) return null;
+    const hit = liveHit ?? geo.hit;
+    const dx = hit.x - geo.source.x;
+    const dy = hit.y - geo.source.y;
+    const len = Math.hypot(dx, dy) || 1;
+    return { hit, dx, dy, len, nx: -dy / len, ny: dx / len };
+  };
+
+  /** Peak transverse displacement of the ripple, px. Scales with the run, never off the page. */
+  const beamAmplitude = (len: number) =>
+    clamp(len * BEAM_WAVE.amplitudeOfRun, BEAM_WAVE.amplitudeMin, BEAM_WAVE.amplitudeMax) *
+    (1 + beamGlow * 0.4) *
+    (1 + surgeEnergy * 0.3);
+
+  /**
+   * The ripple's envelope: zero at the source, zero at the facet, one in between.
+   *
+   * Both ends are exact, not asymptotic. At s = 1 the displacement is 0 to the last float, so
+   * the illustrated field lands on the hinge the ray tracer computed and can never tug the
+   * refracting point sideways — that is what keeps the surface response attached to the facet
+   * instead of following a decorative curve.
+   */
+  const beamEnvelope = (s: number) =>
+    smoothstep(0, BEAM_WAVE.fadeIn, s) * smoothstep(1, 1 - BEAM_WAVE.fadeOut, s);
+
+  /**
+   * Transverse displacement of the illustrated field at s ∈ [0, 1], in px.
+   *
+   * One slow travelling wave plus a weak second harmonic. The harmonic is what stops the beam
+   * reading as a bent wire: a single sine has evenly spaced identical crests, and the eye reads
+   * that as a shape. A little asymmetry around a long wavelength reads as a *field*.
+   */
+  const beamOffset = (s: number, amp: number) => {
+    const phase = time * TAU * BEAM_WAVE.hz;
+    const wave =
+      Math.sin(TAU * BEAM_WAVE.cycles * s - phase + 0.7) +
+      Math.sin(TAU * BEAM_WAVE.harmonicCycles * s - phase * 1.7 + 2.1) * BEAM_WAVE.harmonic;
+    // Normalised by the harmonic sum, so `amp` is a true bound: the crest can reach it and
+    // never exceed it. That is what lets the corridor be asserted instead of estimated.
+    return (wave / (1 + BEAM_WAVE.harmonic)) * amp * beamEnvelope(s);
+  };
+
+  /** A point on the illustrated beam. `s = 1` is the live entry point, by construction. */
+  const beamPoint = (s: number, amp: number): Vec => {
+    const axis = beamAxis();
+    if (!axis || !geo) return { x: 0, y: 0 };
+    const off = beamOffset(s, amp);
+    return {
+      x: geo.source.x + axis.dx * s + axis.nx * off,
+      y: geo.source.y + axis.dy * s + axis.ny * off,
+    };
   };
 
   /* -------------------------------------------------------------------- layers */
@@ -1776,59 +2016,117 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     ctx.globalAlpha = 1;
   };
 
-  /** Layer — the incident ray, overshooting its facet a touch so it can't read as a stub. */
+  /**
+   * Layer — the incident beam.
+   *
+   * Four parts, each doing one job:
+   *
+   *   1. **The body of light**: a straight, soft halo along the optical axis. Straight because
+   *      that is where the ray is; soft because light that crosses a page has bloom.
+   *   2. **The illustrated field**: the travelling ripple, drawn as the beam's hairline core
+   *      plus a hot inner filament. This is the part the eye reads as "wave", and it rides the
+   *      axis rather than replacing it — the envelope is zero at both ends, so the ripple can
+   *      neither detach from the source nor miss the facet.
+   *   3. **The photon packet**: a short bright bunch climbing the same curve, so the beam has a
+   *      direction of travel instead of being a static shape.
+   *   4. **The Fresnel ghost**: the small fraction of the beam that reflects off the entry face,
+   *      drawn from the axis only when the pointer is inside the glass.
+   *
+   * This runs *before* `drawDissolve` on purpose. The type stencils are paper-coloured, so the
+   * beam is thinned exactly where it passes behind a word and stays bright in the gaps between
+   * glyphs: light behind type, not light over it. The facet end of the beam is clear of every
+   * text rect, so the hinge and the entry spark keep their full strength after the dissolve.
+   */
   const drawBeam = (ctx: Ctx) => {
     if (!geo || !beamGrad) return;
-    const { source } = geo;
-    const hit = liveHit ?? geo.hit;
-    const dx = hit.x - source.x;
-    const dy = hit.y - source.y;
-    const len = Math.hypot(dx, dy) || 1;
-    const nx = -dy / len;
-    const ny = dx / len;
-    const steps = 36;
-    const amp = 0.4 * (1 + surgeEnergy * 0.4);
-    const overshoot = 0;
+    const axis = beamAxis();
+    if (!axis) return;
+    const { hit, dx, dy, len, nx, ny } = axis;
+    const source = geo.source;
+    const amp = beamAmplitude(len);
+    const steps = len > 360 ? 46 : 24;
 
-    ctx.beginPath();
-    for (let i = 0; i <= steps; i++) {
-      const s = i / steps;
-      const env = Math.sin(Math.PI * s);
-      const wobble =
-        (Math.sin(s * 2.4 * Math.PI - time * 1.5) + Math.sin(s * 4.9 * Math.PI + time) * 0.22) *
-        amp *
-        env;
-      const t = s + (overshoot / len) * s;
-      const x = source.x + dx * t + nx * wobble;
-      const y = source.y + dy * t + ny * wobble;
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
+    /** The rippled centreline into the current path. */
+    const trace = (scale: number) => {
+      ctx.beginPath();
+      for (let i = 0; i <= steps; i++) {
+        const s = i / steps;
+        const off = beamOffset(s, amp) * scale;
+        const x = source.x + dx * s + nx * off;
+        const y = source.y + dy * s + ny * off;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+    };
 
-    ctx.strokeStyle = beamGrad;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    const beamBoost = headlineHover ? 1.3 : 1;
-    ctx.globalAlpha = Math.min(1, 0.1 * beamBoost);
-    ctx.lineWidth = 12;
+    ctx.strokeStyle = beamGrad;
+
+    /**
+     * 1. The bloom. Straight along the axis, and *stacked* rather than drawn as one wide
+     *    stroke: a single 13 px stroke at 9% is a flat grey band with two hard edges, which
+     *    reads as a smear on the paper and as a shadow on the ink. Three diminishing strokes
+     *    fall off the way a real glow does. On paper everything is tighter and fainter — ink
+     *    spreads, so the same alpha reads as a smudge rather than as light.
+     */
+    const halo = isDark
+      ? ([
+          [19, 0.028],
+          [11, 0.05],
+        ] as const)
+      : ([
+          [14, 0.018],
+          [8, 0.03],
+        ] as const);
+    const bloomGain = 1 + beamGlow * 0.3;
+    for (const [width, alpha] of halo) {
+      ctx.globalAlpha = Math.min(1, alpha * bloomGain);
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(source.x, source.y);
+      ctx.lineTo(hit.x, hit.y);
+      ctx.stroke();
+    }
+
+    // 2. The field. A faint wide pass gives the ripple a body so its crests are not wires…
+    ctx.globalAlpha = (isDark ? 0.13 : 0.085) + beamGlow * 0.07;
+    ctx.lineWidth = 5;
+    trace(1);
     ctx.stroke();
-    // The incident ray is the one line on the glass's left flank: it carries weight.
+    // …the hairline is the beam itself, and it carries the weight of the composition…
     ctx.globalAlpha = 1;
-    ctx.lineWidth = 1.8 * (headlineHover ? 1.2 : 1);
+    ctx.lineWidth = 1.8 * (1 + beamGlow * 0.15);
+    trace(1);
     ctx.stroke();
+    // …and a hot filament down the middle keeps it reading as light rather than ink.
     ctx.strokeStyle = "rgba(255,252,245,0.55)";
     ctx.lineWidth = 0.9;
+    trace(1);
     ctx.stroke();
-    // A slow, travelling packet of light, clipped to the same source-to-facet ray.
-    const p = (time * 0.12) % 1;
-    const tail = Math.max(0, p - 0.09);
-    ctx.beginPath();
-    ctx.moveTo(source.x + dx * tail, source.y + dy * tail);
-    ctx.lineTo(source.x + dx * p, source.y + dy * p);
-    ctx.strokeStyle = isDark ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.9)";
-    ctx.lineWidth = 2.2;
-    ctx.globalAlpha = Math.sin(Math.PI * p) * 0.7;
-    ctx.stroke();
+    ctx.strokeStyle = beamGrad;
+
+    // 3. The packet: a short bunch riding the same curve, brightest mid-run.
+    const p = (time * 0.11) % 1;
+    const tail = Math.max(0, p - 0.07);
+    if (p > 0.02 && tail > 0) {
+      ctx.beginPath();
+      for (let i = 0; i <= 8; i++) {
+        const s = lerp(tail, p, i / 8);
+        const off = beamOffset(s, amp);
+        const x = source.x + dx * s + nx * off;
+        const y = source.y + dy * s + ny * off;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = isDark ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.9)";
+      ctx.lineWidth = 2.1;
+      ctx.globalAlpha = Math.sin(Math.PI * p) * 0.66;
+      ctx.stroke();
+      ctx.strokeStyle = beamGrad;
+    }
+
+    // 4. The Fresnel ghost: measured from the axis, never from the ripple.
     if (optics && pointerInGlass > 0.01) {
       ctx.beginPath();
       ctx.moveTo(hit.x, hit.y);
@@ -1851,6 +2149,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   const drawGlass = (ctx: Ctx) => {
     if (!geo) return;
     const { topV, leftV, rightV, prismSize } = geo;
+    // `geo` is a mutable capture: read what the closures need into locals first.
+    const rest = geo.restOptics;
     const hit = liveHit ?? geo.hit;
     const exit = fanOrigin ?? geo.exit;
     const warm = isDark ? BANDS[2].dark : BANDS[2].light;
@@ -1938,21 +2238,16 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     ctx.fillStyle = tint;
     ctx.fill();
 
-    // Cross-fade the resting composition into the exact traced path. In particular,
-    // do not let the TIR bounce snap on at full strength on the first boundary pixel.
-    const strokeInternal = (traced: boolean, alpha: number) => {
+    // Cross-fade the resting ray into the live traced one. Both are real solutions — the
+    // resting one is `buildGeometry`'s trace of the resting axis — so the cross-fade is a
+    // move from one refracted path to another, never from a decorative chord. In particular,
+    // a TIR bounce must not snap on at full strength on the first boundary pixel.
+    const strokeInternal = (legs: typeof rest.legs, alpha: number) => {
       if (alpha <= 0.001) return;
       ctx.beginPath();
       ctx.moveTo(hit.x, hit.y);
-      if (traced && optics) {
-        for (const leg of optics.legs) ctx.lineTo(leg.to.x, leg.to.y);
-      } else {
-        ctx.lineTo(geo!.exit.x, geo!.exit.y);
-      }
-      const pathLength =
-        traced && optics
-          ? optics.legs.reduce((sum, leg) => sum + dist(leg.from, leg.to), 0)
-          : dist(hit, geo!.exit);
+      for (const leg of legs) ctx.lineTo(leg.to.x, leg.to.y);
+      const pathLength = legs.reduce((sum, leg) => sum + dist(leg.from, leg.to), 0) || 1;
       // Beer–Lambert attenuation: longer paths through the glass lose more light.
       ctx.globalAlpha = alpha * Math.exp((-0.12 * pathLength) / prismSize);
       ctx.strokeStyle = isDark ? "rgba(255,251,242,0.95)" : "rgba(105,99,90,0.95)";
@@ -1963,8 +2258,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       ctx.stroke();
       ctx.globalAlpha = 1;
     };
-    strokeInternal(false, 1 - opticalWeight);
-    strokeInternal(true, opticalWeight);
+    strokeInternal(rest.legs, 1 - opticalWeight);
+    if (optics) strokeInternal(optics.legs, opticalWeight);
 
     if (optics && opticalWeight > 0.01 && optics.tir && optics.legs.length) {
       const rim = optics.legs[0].to;
@@ -2489,6 +2784,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const beamLen = dist(source, hit) || 1;
     const fanLen = spine ? dist(core, spineTarget) || 1 : 1;
     const totalLen = beamLen + fanLen;
+    const beamAmp = beamAmplitude(beamLen);
 
     // --- motes: a fixed field drifting slowly, brighter toward the fan
     const moteCount = isDark ? 26 : 20;
@@ -2516,12 +2812,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const head = ((time * 0.16 + p / packets) % 1) * totalLen;
       const fade = Math.min(1, Math.min(head, totalLen - head) / 40);
       if (fade <= 0) continue;
+      // On the incident run the packets ride the illustrated field (the same curve the beam
+      // is drawn on); past the exit they ride the clay spine. Same param, same speed.
       const point =
         head <= beamLen
-          ? {
-              x: lerp(source.x, hit.x, head / beamLen),
-              y: lerp(source.y, hit.y, head / beamLen),
-            }
+          ? beamPoint(head / beamLen, beamAmp)
           : {
               x: lerp(core.x, spineTarget.x, (head - beamLen) / fanLen),
               y: lerp(core.y, spineTarget.y, (head - beamLen) / fanLen),
@@ -2611,50 +2906,97 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     ctx.restore();
   };
 
+  /**
+   * The layer order, as data.
+   *
+   * Two things about this list are contracts, not style:
+   *
+   *   - `beam` is painted **before** `dissolve`. The dissolve's stencils are paper-coloured
+   *     and radial, so the beam is thinned exactly where it crosses type and stays bright in
+   *     the gaps between glyphs. That is what lets light pass *behind* the headline instead of
+   *     over it, and it is why nothing has to be redrawn on top of the words.
+   *   - `glass`, `core` and the colour in `glass`/`spectrum` are painted **after** it, at full
+   *     strength. The glass and its hinge never overlap a text rect at any supported layout,
+   *     so they can stay crisp — and the exit spectrum must never be dimmed by a stencil.
+   *
+   * QA reads this through `geometry().layers` and asserts the order, so the list cannot drift
+   * from the painting without the suite failing.
+   */
+  const SCENE_LAYERS = [
+    "plate",
+    "fan",
+    "beam",
+    "dissolve",
+    "glass",
+    "core",
+    "interaction",
+    "atmosphere",
+  ] as const;
+
+  const paintLayer = (ctx: Ctx, layer: (typeof SCENE_LAYERS)[number]) => {
+    if (!geo) return;
+    switch (layer) {
+      // The drafting plate (cached raster) and the ambient wash that lights the section.
+      case "plate": {
+        drawPlate(ctx);
+        drawAmbient(ctx);
+        break;
+      }
+      // The spectral body, the hairline continuum it lives in, and the plasma.
+      case "fan": {
+        fillAll();
+        drawRibbons(ctx);
+        for (let i = 0; i < geo.strands.length; i++) {
+          if (geo.strands[i].ghost) drawStrand(ctx, i);
+        }
+        for (let i = 0; i < geo.strands.length; i++) {
+          if (!geo.strands[i].ghost) drawStrand(ctx, i);
+        }
+        drawPlasma(ctx);
+        drawPrime(ctx);
+        break;
+      }
+      // The incident beam — behind the type, see above.
+      case "beam": {
+        drawBeam(ctx);
+        break;
+      }
+      // Type is thinned here; everything below is painted after it.
+      case "dissolve": {
+        drawDissolve(ctx);
+        break;
+      }
+      // The glass that receives the beam, the colour that leaves it, and the contact point.
+      case "glass": {
+        drawGlass(ctx);
+        drawSpectralExit(ctx);
+        drawEntrySpark(ctx);
+        break;
+      }
+      // The core, then the filaments that ground the fan on the catalogue.
+      case "core": {
+        drawCore(ctx);
+        drawGrounds(ctx);
+        break;
+      }
+      // The current reaching for the cursor, then the click wavefronts.
+      case "interaction": {
+        drawCatch(ctx);
+        drawSurges(ctx);
+        break;
+      }
+      case "atmosphere": {
+        drawAtmosphere(ctx);
+        break;
+      }
+    }
+  };
+
   const drawScene = (ctx: Ctx) => {
     if (!geo) return;
     ctx.clearRect(0, 0, geo.heroW, geo.heroH);
-
     ensureCaches(ctx);
-
-    // Layer 1 — the plate (cached raster) and the ambient wash that lights the whole section
-    drawPlate(ctx);
-    drawAmbient(ctx);
-
-    // Layers 2–3 — the spectral body, the hairline continuum it lives in, and the plasma
-    fillAll();
-    drawRibbons(ctx);
-    for (let i = 0; i < geo.strands.length; i++) {
-      if (geo.strands[i].ghost) drawStrand(ctx, i);
-    }
-    for (let i = 0; i < geo.strands.length; i++) {
-      if (!geo.strands[i].ghost) drawStrand(ctx, i);
-    }
-    drawPlasma(ctx);
-    drawPrime(ctx);
-
-    // The dissolve sits between the field and the things that must stay bright: the light
-    // behind the words is thinned here, then the beam, glass, core and filaments are painted
-    // over it at full strength.
-    drawDissolve(ctx);
-
-    // The incident ray, then the glass that receives it
-    drawBeam(ctx);
-    drawGlass(ctx);
-    drawSpectralExit(ctx);
-    drawEntrySpark(ctx);
-
-    // The core, then the filaments that ground the fan on the catalogue
-    drawCore(ctx);
-    drawGrounds(ctx);
-
-    // Interaction: the current reaching for the cursor, then the click wavefronts
-    drawCatch(ctx);
-    drawSurges(ctx);
-
-    // Layer 6 — atmosphere
-    drawAtmosphere(ctx);
-
+    for (const layer of SCENE_LAYERS) paintLayer(ctx, layer);
     if (debug) drawDebug(ctx);
   };
 
@@ -2736,6 +3078,9 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         !!geo && pointerActive && inTri(geo.topV, geo.leftV, geo.rightV, pointerX, pointerY);
       pointerInGlass += ((inside ? 1 : 0) - pointerInGlass) * (1 - Math.exp(-dtMs / 180));
       if (pointerInGlass < 0.001 && !inside) pointerInGlass = 0;
+      // Hovering the headline eases the beam up rather than switching it: a snap at the
+      // boundary reads as a bug, a 160 ms rise reads as the light noticing the cursor.
+      beamGlow += ((headlineHover ? 1 : 0) - beamGlow) * (1 - Math.exp(-dtMs / BEAM_HOVER_TAU_MS));
       updateOptics();
 
       drawScene(ctx);
@@ -2755,6 +3100,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       opticalWeight = 0;
       hoverTile = -1;
       headlineHover = false;
+      beamGlow = 0;
       surges.length = 0;
       catches.length = 0;
       advanceJitter();
@@ -2781,7 +3127,16 @@ export function createHeroRay(options: HeroRayOptions = {}) {
           exit: { x: 0, y: 0 },
           core: { x: 0, y: 0 },
           source: { x: 0, y: 0 },
-          entryMode: "top-edge" as const,
+          entryMode: "left-run" as const,
+          entryU: 0.58,
+          beamAngle: BEAM_ANGLE_WIDE,
+          restOptics: tracePrism(
+            { x: 0, y: 0 },
+            { x: 0, y: 0 },
+            { x: 0, y: 0 },
+            { x: 0, y: 0 },
+            { x: 0, y: 0 },
+          ),
           strands: [] as Strand[],
           targets: [] as Vec[],
           normals: [] as Vec[],
@@ -2801,6 +3156,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
           },
         })),
         steps: STRAND_STEPS,
+        /** The paint order, in order: QA pins the beam-before-dissolve contract here. */
+        layers: SCENE_LAYERS,
         /** QA: how much of each lane runs through the body, and where the stroke opens. */
         glass: { ink: glassInk, gates, pad: GLASS_MAX_INK },
         jitterBucket,
@@ -2813,7 +3170,19 @@ export function createHeroRay(options: HeroRayOptions = {}) {
           fanOrigin,
           fanTurn,
           fanSpread,
-          beam: { width: 1.8, alpha: 1 },
+          /**
+           * The incident beam's drawn weight, read by the QA dominance invariant. The width
+           * includes the soft halo: on ink the beam's read is the halo as much as the core,
+           * so comparing only the 1.8 px hairline would understate it by 7×.
+           */
+          beam: {
+            width: (1.8 + (isDark ? 13 : 10)) * (1 + beamGlow * 0.15),
+            alpha: 1,
+            glow: beamGlow,
+            amplitude: geo
+              ? beamAmplitude(Math.hypot(geo.hit.x - geo.source.x, geo.hit.y - geo.source.y))
+              : 0,
+          },
           hoverTile,
           headlineHover,
           surges: surges.length,
@@ -2845,6 +3214,31 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         y: geo.core.y + strand.dir.y * (s * strand.length) + strand.normal.y * off,
       };
     },
+    /**
+     * QA: sample the incident beam's *illustrated* curve (axis + ripple) without painting.
+     * `s = 1` is byte-identical to the live entry point the ray tracer used.
+     */
+    sampleBeam(s: number) {
+      if (!geo) return { x: 0, y: 0, offset: 0 };
+      const axis = beamAxis();
+      if (!axis) return { x: 0, y: 0, offset: 0 };
+      const amp = beamAmplitude(axis.len);
+      const offset = beamOffset(s, amp);
+      return {
+        x: geo.source.x + axis.dx * s + axis.nx * offset,
+        y: geo.source.y + axis.dy * s + axis.ny * offset,
+        offset,
+      };
+    },
+    /** QA: the beam's optical axis as a function of s (a straight line, by definition). */
+    beamAxisAt(s: number) {
+      if (!geo) return { x: 0, y: 0 };
+      const hit = liveHit ?? geo.hit;
+      return {
+        x: lerp(geo.source.x, hit.x, s),
+        y: lerp(geo.source.y, hit.y, s),
+      };
+    },
     /** QA: settle the strand buffers without painting (pointer off, t = 4.6). */
     settle() {
       time = 4.6;
@@ -2860,6 +3254,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       opticalWeight = 0;
       hoverTile = -1;
       headlineHover = false;
+      beamGlow = 0;
       surges.length = 0;
       catches.length = 0;
       advanceJitter();
