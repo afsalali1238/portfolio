@@ -81,9 +81,7 @@ function TheMoatMovedPage() {
           </SectionReveal>
 
           <article className="mt-10 space-y-6 text-base leading-relaxed text-ink-soft md:text-lg">
-            <p>
-              For as long as I can remember, people loved saying the same sentence:
-            </p>
+            <p>For as long as I can remember, people loved saying the same sentence:</p>
 
             <div className="my-6 border-l-2 border-ink py-2 pl-6">
               <p className="font-serif text-2xl italic leading-snug text-ink">
@@ -95,7 +93,9 @@ function TheMoatMovedPage() {
             <p>
               It was the universal anthem of the sideline spectator. And back then, you could roll
               your eyes at it because the response was obvious:{" "}
-              <strong className="font-medium text-ink">Ideas are cheap. Execution is everything.</strong>
+              <strong className="font-medium text-ink">
+                Ideas are cheap. Execution is everything.
+              </strong>
             </p>
 
             <p>
@@ -105,9 +105,7 @@ function TheMoatMovedPage() {
               minimum viable product.
             </p>
 
-            <p>
-              Building was the moat. If you could build, you were in the game.
-            </p>
+            <p>Building was the moat. If you could build, you were in the game.</p>
 
             <p>
               Then came the first wave of cloud frameworks and no-code tools. Building got slightly
@@ -117,9 +115,7 @@ function TheMoatMovedPage() {
               round before anyone caught up.
             </p>
 
-            <p className="font-medium text-ink">
-              Today, both of those moats are completely dead.
-            </p>
+            <p className="font-medium text-ink">Today, both of those moats are completely dead.</p>
 
             <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">
               1. The Collapse of First-Mover Advantage
@@ -205,13 +201,14 @@ function TheMoatMovedPage() {
             </ul>
 
             <p>
-              These people are not customers. <strong className="text-ink">They are tourists.</strong>
+              These people are not customers.{" "}
+              <strong className="text-ink">They are tourists.</strong>
             </p>
 
             <p>
               They arrived because your product was novel, shiny, and practically free. The moment
-              you ask them to pay full price, they evaporate. The moment a shinier clone appears with
-              two more buttons, they migrate.
+              you ask them to pay full price, they evaporate. The moment a shinier clone appears
+              with two more buttons, they migrate.
             </p>
 
             <p>
@@ -230,8 +227,8 @@ function TheMoatMovedPage() {
             </p>
 
             <p>
-              We tell founders to treat their startup like their baby. To pour their soul into it. To
-              defend it against the world.
+              We tell founders to treat their startup like their baby. To pour their soul into it.
+              To defend it against the world.
             </p>
 
             <p>
@@ -241,8 +238,8 @@ function TheMoatMovedPage() {
             </p>
 
             <p>
-              Your product is not your baby. It is an economic instrument. Its only job is to solve a
-              painful, specific problem for a specific group of humans who are willing to exchange
+              Your product is not your baby. It is an economic instrument. Its only job is to solve
+              a painful, specific problem for a specific group of humans who are willing to exchange
               hard-earned cash for the relief it provides.
             </p>
 
@@ -253,9 +250,9 @@ function TheMoatMovedPage() {
 
             <p>
               Building a feature is safe. In your code editor, you control every variable. You can
-              dream that your product is at the very top of the market. Being a &ldquo;founder&rdquo;
-              gives you an identity, a title, a sense of purpose, and an inflated sense of
-              self-worth. It feels like real work.
+              dream that your product is at the very top of the market. Being a
+              &ldquo;founder&rdquo; gives you an identity, a title, a sense of purpose, and an
+              inflated sense of self-worth. It feels like real work.
             </p>
 
             <p>The moment you show it to the public, the reality test begins.</p>
@@ -271,17 +268,15 @@ function TheMoatMovedPage() {
             </p>
 
             <p>
-              The market does not care how much you love your code. The market only cares whether the
-              bleeding stopped.
+              The market does not care how much you love your code. The market only cares whether
+              the bleeding stopped.
             </p>
 
             <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">
               4. The Big Pockets Reality
             </h2>
 
-            <p>
-              Here is the unvarnished commercial truth that nobody likes to say out loud:
-            </p>
+            <p>Here is the unvarnished commercial truth that nobody likes to say out loud:</p>
 
             <div className="my-6 border-l-2 border-ink py-2 pl-6">
               <p className="font-serif text-2xl italic leading-snug text-ink">
@@ -291,8 +286,8 @@ function TheMoatMovedPage() {
             </div>
 
             <p>
-              The moment you prove there is real revenue in a niche, you will be confronted by one of
-              two players:
+              The moment you prove there is real revenue in a niche, you will be confronted by one
+              of two players:
             </p>
 
             <ol className="space-y-3 pl-4 border-l rule-hair text-ink-soft">
@@ -312,8 +307,8 @@ function TheMoatMovedPage() {
             </p>
 
             <p>
-              If your only defense was the software itself, you are dead in the water. You cannot win
-              a capital war against infinite checkbooks with pure code.
+              If your only defense was the software itself, you are dead in the water. You cannot
+              win a capital war against infinite checkbooks with pure code.
             </p>
 
             <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">
@@ -347,18 +342,16 @@ function TheMoatMovedPage() {
                   II. Customers Who Aren&rsquo;t Tourists
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                  Stop chasing volume. One hundred paying customers who rely on your tool to run their
-                  livelihood are worth ten thousand tourists who signed up because your launch was
-                  trending. To get those customers, you have to dive into the unglamorous, messy mud
-                  of real-world operations — clinical pharmacy workflows, construction procurement,
-                  physiotherapy tracking, local logistics.
+                  Stop chasing volume. One hundred paying customers who rely on your tool to run
+                  their livelihood are worth ten thousand tourists who signed up because your launch
+                  was trending. To get those customers, you have to dive into the unglamorous, messy
+                  mud of real-world operations — clinical pharmacy workflows, construction
+                  procurement, physiotherapy tracking, local logistics.
                 </p>
               </div>
 
               <div className="rounded-lg bg-paper-deep/50 p-6">
-                <h3 className="font-serif text-2xl text-ink">
-                  III. The Uncopyable Way You Do It
-                </h3>
+                <h3 className="font-serif text-2xl text-ink">III. The Uncopyable Way You Do It</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-soft">
                   Anyone can copy what you built. Nobody can copy{" "}
                   <strong className="text-ink">the way you do it</strong>: your specific
@@ -381,9 +374,9 @@ function TheMoatMovedPage() {
             </p>
 
             <p>
-              I build out of pure, unadulterated curiosity. I build because giving an operator modern
-              AI tools is genuinely like giving a chimp an assault rifle: you can suddenly demolish
-              friction that used to take enterprise committees three quarters to address.
+              I build out of pure, unadulterated curiosity. I build because giving an operator
+              modern AI tools is genuinely like giving a chimp an assault rifle: you can suddenly
+              demolish friction that used to take enterprise committees three quarters to address.
             </p>
 
             <p>But I do it with open eyes.</p>

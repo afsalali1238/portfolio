@@ -109,9 +109,9 @@ function EnergyLedgerPage() {
 
             <div className="my-8 border-l-2 border-ink py-2 pl-6">
               <p className="font-serif text-2xl italic leading-snug text-ink">
-                We speak about artificial intelligence as though it floats weightlessly in the ether.
-                It does not. Silicon runs on substations, cooling towers, and diverted river water.
-                We are transacting directly in joules.
+                We speak about artificial intelligence as though it floats weightlessly in the
+                ether. It does not. Silicon runs on substations, cooling towers, and diverted river
+                water. We are transacting directly in joules.
               </p>
             </div>
 
@@ -125,12 +125,15 @@ function EnergyLedgerPage() {
 
             <p>
               You write:{" "}
-              <em>&ldquo;Hey, can you help me brainstorm five polite ways to say no to this meeting?&rdquo;</em>
+              <em>
+                &ldquo;Hey, can you help me brainstorm five polite ways to say no to this
+                meeting?&rdquo;
+              </em>
             </p>
 
             <p>
-              The model replies with 150 words of corporate boilerplate. You skim the first sentence,
-              close the tab, and never look at it again.
+              The model replies with 150 words of corporate boilerplate. You skim the first
+              sentence, close the tab, and never look at it again.
             </p>
 
             <p>
@@ -142,33 +145,38 @@ function EnergyLedgerPage() {
 
             <p>
               To generate those words, your prompt had to travel to a hyper-scale data center —
-              likely sitting in Virginia, Iowa, or Dublin. It had to be routed across clusters of tens
-              of thousands of specialized accelerators running at scorching thermal limits. Every
-              parameter lookup, every matrix multiplication across hundreds of billions of weights,
-              requires physical current to overcome electrical resistance.
+              likely sitting in Virginia, Iowa, or Dublin. It had to be routed across clusters of
+              tens of thousands of specialized accelerators running at scorching thermal limits.
+              Every parameter lookup, every matrix multiplication across hundreds of billions of
+              weights, requires physical current to overcome electrical resistance.
             </p>
 
             <p>
               A frontier model returning a breezy{" "}
               <strong className="font-medium text-ink">&ldquo;hello&rdquo;</strong> consumes the
               watt-hours that could have kept an LED reading lamp burning in your room for minutes.*
-              If you ask it to generate an image or run an agentic multi-turn loop, you are consuming
-              the energy needed to boil a kettle of water.
+              If you ask it to generate an image or run an agentic multi-turn loop, you are
+              consuming the energy needed to boil a kettle of water.
             </p>
 
             <p className="border-l-2 border-ink-mute/30 py-1 pl-3 text-xs italic text-ink-mute">
-              *Google measured 0.24 Wh as the median Gemini text prompt in their environmental disclosures.
-              When multiplied across billions of daily global queries, inference compute rivals the
-              power demands of sovereign industrial nations.
+              *Google measured 0.24 Wh as the median Gemini text prompt in their environmental
+              disclosures. When multiplied across billions of daily global queries, inference
+              compute rivals the power demands of sovereign industrial nations.
             </p>
 
             <p>
               If every time you opened an AI chat window, a real candle melted on your desk or a
               physical cup of water boiled away in front of you, you would hesitate before typing:{" "}
-              <em>&ldquo;Can you rewrite this email to make it sound slightly friendlier?&rdquo;</em>
+              <em>
+                &ldquo;Can you rewrite this email to make it sound slightly friendlier?&rdquo;
+              </em>
             </p>
 
-            <p>Because the energy is invisible, we treat it as infinite. But physics does not accept IOUs.</p>
+            <p>
+              Because the energy is invisible, we treat it as infinite. But physics does not accept
+              IOUs.
+            </p>
 
             <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">
               2. Tokens Are the New Energy Currency
@@ -181,22 +189,24 @@ function EnergyLedgerPage() {
 
             <ul className="space-y-3 pl-4 border-l rule-hair text-ink-soft">
               <li>
-                <strong className="text-ink">Gold</strong> was money because you had to burn physical
-                calories and diesel fuel to dig tons of earth to find a few ounces. You could not fake
-                the energy cost.
+                <strong className="text-ink">Gold</strong> was money because you had to burn
+                physical calories and diesel fuel to dig tons of earth to find a few ounces. You
+                could not fake the energy cost.
               </li>
               <li>
-                <strong className="text-ink">The Petrodollar</strong> worked because paper bills were
-                tied to barrels of crude oil — literal barrels of dense, combustible work.
+                <strong className="text-ink">The Petrodollar</strong> worked because paper bills
+                were tied to barrels of crude oil — literal barrels of dense, combustible work.
               </li>
               <li>
-                <strong className="text-ink">Bitcoin</strong> made the connection explicit with Proof of
-                Work: converting raw hash-power and electrical current into cryptographic scarcity.
+                <strong className="text-ink">Bitcoin</strong> made the connection explicit with
+                Proof of Work: converting raw hash-power and electrical current into cryptographic
+                scarcity.
               </li>
             </ul>
 
             <p>
-              Now we enter the Fourth Era: <strong className="text-ink">The Compute Economy</strong>.
+              Now we enter the Fourth Era: <strong className="text-ink">The Compute Economy</strong>
+              .
             </p>
 
             <p>
@@ -209,21 +219,19 @@ function EnergyLedgerPage() {
               3. The Great ESG Hypocrisy
             </h2>
 
-            <p>
-              This brings us to the great modern theatre of corporate virtue signalling.
-            </p>
+            <p>This brings us to the great modern theatre of corporate virtue signalling.</p>
 
             <p>
-              Corporate boards love to publish slick 90-page sustainability reports. They ban plastic
-              straws in cafeterias, calculate carbon offsets on employee flights, and lecture the
-              public on ESG governance.
+              Corporate boards love to publish slick 90-page sustainability reports. They ban
+              plastic straws in cafeterias, calculate carbon offsets on employee flights, and
+              lecture the public on ESG governance.
             </p>
 
             <p>
               Meanwhile, inside those same enterprises, teams are firing off millions of automated
               inference calls per week to generate corporate filler, summarise internal PDFs that
-              nobody reads, and power internal chatbots that answer questions already answered on the
-              company wiki.
+              nobody reads, and power internal chatbots that answer questions already answered on
+              the company wiki.
             </p>
 
             <div className="my-8 rounded-lg bg-paper-deep/70 p-6 md:p-8">
@@ -244,9 +252,7 @@ function EnergyLedgerPage() {
               4. The Operator&rsquo;s Discipline
             </h2>
 
-            <p>
-              Knowing that every token carries a physical debt changes how you build.
-            </p>
+            <p>Knowing that every token carries a physical debt changes how you build.</p>
 
             <p>
               At <strong className="text-ink">forthe.tech</strong>, this understanding is our moral
@@ -258,8 +264,8 @@ function EnergyLedgerPage() {
                 <h3 className="font-serif text-xl text-ink">I. No Vapourware, No Toys</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-soft">
                   We don&rsquo;t chain twenty agentic loops together just to prove we can. If a
-                  deterministic line of TypeScript or an Excel formula solves the problem, you use the
-                  formula. You do not burn megawatts for vanity.
+                  deterministic line of TypeScript or an Excel formula solves the problem, you use
+                  the formula. You do not burn megawatts for vanity.
                 </p>
               </div>
 
@@ -267,8 +273,8 @@ function EnergyLedgerPage() {
                 <h3 className="font-serif text-xl text-ink">II. The 14-Day Reality Test</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-soft">
                   If software isn&rsquo;t actively eliminating friction for a real human within two
-                  weeks, it gets turned off. Zombie servers burning idle inference are an insult to the
-                  physical grid that powers them.
+                  weeks, it gets turned off. Zombie servers burning idle inference are an insult to
+                  the physical grid that powers them.
                 </p>
               </div>
 
@@ -283,8 +289,8 @@ function EnergyLedgerPage() {
             </div>
 
             <p className="pt-4">
-              The compute economy is already here. The only question is whether we will treat it with
-              the reverence that physical energy demands — or drown in our own automated noise.
+              The compute economy is already here. The only question is whether we will treat it
+              with the reverence that physical energy demands — or drown in our own automated noise.
             </p>
           </article>
 

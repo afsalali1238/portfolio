@@ -158,9 +158,7 @@ function EmpathyMoatPage() {
               The Audience of One Advantage
             </h2>
 
-            <p>
-              When you build for a single real person with a real name and phone number:
-            </p>
+            <p>When you build for a single real person with a real name and phone number:</p>
 
             <ul className="space-y-3 pl-4 border-l rule-hair text-ink-soft">
               <li>
@@ -169,22 +167,23 @@ function EmpathyMoatPage() {
                 If not, it dies before you write code.
               </li>
               <li>
-                <strong className="text-ink">Feedback is visceral:</strong> Strangers churn silently.
-                Someone who loves you tells you the onboarding is confusing right across the dining
-                table in a voice you cannot ignore.
+                <strong className="text-ink">Feedback is visceral:</strong> Strangers churn
+                silently. Someone who loves you tells you the onboarding is confusing right across
+                the dining table in a voice you cannot ignore.
               </li>
               <li>
-                <strong className="text-ink">Finishing gets easier:</strong> The last 10% of software
-                is pure grind. Summoning discipline for an imaginary user is hard. Summoning
-                discipline because someone is waiting on you tomorrow morning is effortless.
+                <strong className="text-ink">Finishing gets easier:</strong> The last 10% of
+                software is pure grind. Summoning discipline for an imaginary user is hard.
+                Summoning discipline because someone is waiting on you tomorrow morning is
+                effortless.
               </li>
             </ul>
 
             <div className="my-8 rounded-lg bg-paper-deep/70 p-6 md:p-8">
               <p className="font-serif text-2xl text-ink">
                 Start with an audience of one. If you can make Tuesday genuinely better for one
-                person you love, you have built something real. The other thousand people will follow
-                the relief.
+                person you love, you have built something real. The other thousand people will
+                follow the relief.
               </p>
             </div>
           </article>

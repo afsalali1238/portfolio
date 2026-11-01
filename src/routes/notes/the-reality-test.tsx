@@ -121,10 +121,10 @@ function RealityTestPage() {
 
             <p>
               When you step out of your editor and show your creation to a stranger, you enter the
-              arena of unvarnished truth. The market doesn&rsquo;t care that you didn&rsquo;t sleep on
-              Thursday. It doesn&rsquo;t care that your backend is a masterclass in clean architecture.
-              If the tool doesn&rsquo;t eliminate their specific, agonizing friction within sixty
-              seconds, they close the tab and never return.
+              arena of unvarnished truth. The market doesn&rsquo;t care that you didn&rsquo;t sleep
+              on Thursday. It doesn&rsquo;t care that your backend is a masterclass in clean
+              architecture. If the tool doesn&rsquo;t eliminate their specific, agonizing friction
+              within sixty seconds, they close the tab and never return.
             </p>
 
             <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">
@@ -138,13 +138,22 @@ function RealityTestPage() {
 
             <ul className="space-y-3 pl-4 border-l rule-hair text-ink-soft">
               <li>
-                <em>&ldquo;The conversion rate is low because we don&rsquo;t have dark mode yet.&rdquo;</em>
+                <em>
+                  &ldquo;The conversion rate is low because we don&rsquo;t have dark mode
+                  yet.&rdquo;
+                </em>
               </li>
               <li>
-                <em>&ldquo;People aren&rsquo;t signing up because the onboarding flow needs three more steps.&rdquo;</em>
+                <em>
+                  &ldquo;People aren&rsquo;t signing up because the onboarding flow needs three more
+                  steps.&rdquo;
+                </em>
               </li>
               <li>
-                <em>&ldquo;Let me rewrite the database layer in Rust before we do customer outreach.&rdquo;</em>
+                <em>
+                  &ldquo;Let me rewrite the database layer in Rust before we do customer
+                  outreach.&rdquo;
+                </em>
               </li>
             </ul>
 
@@ -161,8 +170,8 @@ function RealityTestPage() {
 
             <p>
               To survive as an operator, you must cure yourself of this romantic disease. At{" "}
-              <strong className="text-ink">forthe.tech</strong>, every build is subjected to a strict
-              operating contract:
+              <strong className="text-ink">forthe.tech</strong>, every build is subjected to a
+              strict operating contract:
             </p>
 
             <div className="space-y-4 pt-2">
@@ -170,8 +179,8 @@ function RealityTestPage() {
                 <h3 className="font-serif text-xl text-ink">1. Name the Person</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-soft">
                   Never build for an anonymous demographic. Before writing a line of code, name the
-                  exact human who has the problem. If it&rsquo;s your wife, a pharmacist in Deira, or
-                  a logistics dispatcher in Jebel Ali, you know who has to say yes.
+                  exact human who has the problem. If it&rsquo;s your wife, a pharmacist in Deira,
+                  or a logistics dispatcher in Jebel Ali, you know who has to say yes.
                 </p>
               </div>
 
@@ -179,8 +188,8 @@ function RealityTestPage() {
                 <h3 className="font-serif text-xl text-ink">2. The Two-Week Verdict</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-soft">
                   Deploy a working version within 14 days and put it directly into their hands. If
-                  they aren&rsquo;t using it organically by day 15, do not add ten more features. Ask
-                  why the pain wasn&rsquo;t sharp enough.
+                  they aren&rsquo;t using it organically by day 15, do not add ten more features.
+                  Ask why the pain wasn&rsquo;t sharp enough.
                 </p>
               </div>
 
@@ -188,7 +197,8 @@ function RealityTestPage() {
                 <h3 className="font-serif text-xl text-ink">3. Kill Without Ceremony</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-soft">
                   If the software failed the reality test, shut down the server, archive the repo,
-                  and write down what broke. Never keep zombie apps alive to protect your founder ego.
+                  and write down what broke. Never keep zombie apps alive to protect your founder
+                  ego.
                 </p>
               </div>
             </div>
