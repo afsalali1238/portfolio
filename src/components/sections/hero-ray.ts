@@ -800,9 +800,20 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
     // Portrait gets a slightly smaller prism on purpose: it has to sit clear of the display
     // type *and* stay inside a 390 px frame, and those two constraints only meet here.
-    const prismSize = mobile
+    const preferredSize = mobile
       ? clamp(Math.min(heroW, heroH) * 0.24, 76, 108)
       : clamp(Math.min(heroW, heroH) * 0.32, 150, 262);
+    // Below `lg` the hero's copy is still one full-width column, so the glass has no column of
+    // its own to sit in — it has to fit the room left beside the words. Sizing it from that
+    // room keeps it inside the frame at every width instead of clipping the right vertex on
+    // tablets. The half-width of the triangle is exactly `size / 2` (r·cos30° with r = size/√3),
+    // which makes the budget a single subtraction.
+    const prismSize = mobile
+      ? preferredSize
+      : Math.min(
+          preferredSize,
+          Math.max(140, heroW - 24 - layout.copyRight - Math.max(16, heroW * 0.022)),
+        );
 
     // Equilateral prism, apex up. Circumradius r = size / √3, half-width r·cos30°.
     const r = prismSize / Math.sqrt(3);
@@ -875,7 +886,17 @@ export function createHeroRay(options: HeroRayOptions = {}) {
           rect.bottom > bandTop && rect.top < bandBottom ? Math.max(acc, rect.right) : acc,
         layout.container.left,
       );
-      const centreX = Math.min(heroW - halfW - 14, Math.max(heroW * 0.625, bandRight + halfW + 22));
+      /**
+       * Centre-right, measured against the content column rather than the viewport: the glass
+       * is the right-hand anchor of a left-aligned composition, so its position has to read
+       * the same on a 1024 laptop and a 1920 monitor. Three bounds, in order of authority:
+       * the copy it shares a band with, the column's centre-right target, and the frame edge.
+       */
+      const target =
+        layout.container.left + (layout.container.right - layout.container.left) * 0.75;
+      const clearance = bandRight + halfW + 24;
+      const ceiling = heroW - halfW - Math.max(14, heroW * 0.02);
+      const centreX = Math.min(ceiling, Math.max(clearance, target));
       centre = { x: centreX, y: centreY };
     }
 
@@ -894,12 +915,14 @@ export function createHeroRay(options: HeroRayOptions = {}) {
      * the top edge on a short, wide viewport) — the *length* gives way, never the angle: the
      * incidence is what the optics read.
      */
-    const edge = mobile ? 2 : 0;
+    const edge = 0;
     const runToEdge = (hit.x - edge) / Math.max(0.2, Math.cos(beamAngle));
     const run = clamp(runToEdge, 260, 1400);
     let source: Vec = { x: hit.x - run * Math.cos(beamAngle), y: hit.y - run * tanA };
-    // A short hero: keep the length it can hold and give up the run, not the direction.
-    const margin = mobile ? 2 : 18;
+    // A short hero: keep the length it can hold and give up the run, not the direction. The
+    // source may sit exactly on the frame edge — the ripple's envelope is zero there, so the
+    // beam fades in from the edge rather than starting in mid-air.
+    const margin = 0;
     if (source.y < margin) source = { x: hit.x - (hit.y - margin) / tanA, y: margin };
     else if (source.y > heroH - margin)
       source = { x: hit.x - (hit.y - (heroH - margin)) / tanA, y: heroH - margin };

@@ -23,16 +23,37 @@ Because the prism's position is solved from the landing, the beam and the glass 
 apart, and because the origin is the *traced* exit, the fan cannot drift from the glass
 either. Moving one number moves the whole picture coherently.
 
-| viewport | beam source | landing on the left facet | dispersion origin |
-| --- | --- | --- | --- |
-| 1440 | left frame edge, (0, 65) | (897, 278) | base facet, (948, 425) |
-| 1024 | left frame edge, (0, 109) | (678, 269) | base facet, (729, 417) |
-| 390 | lower left, (2, 135) | (311, 55) | right facet, (365, 57) |
+| viewport | prism centre | beam source | landing on the left facet | dispersion origin |
+| --- | --- | --- | --- | --- |
+| 1440 | (1008, 300) · 70 % of the column | left frame edge, (0, 38) | (975, 265) | base facet |
+| 1024 | (753, 302) · 75 % | left frame edge, (0, 95) | (720, 267) | base facet |
+| 390 | (333, 57) · corner | lower left, (0, 135) | (311, 55) | right facet |
 
-The prism sits at `max(62.5 % of width, copy right + half-width + 22)` on wide screens — the
-copy-side constraint is now derived from **only the text rects that share the glass's vertical
-band**, not from the widest text on the page. The CTA row is 80 px below the glass, and it used
-to shove the prism to the right for no reason.
+### The glass is centre-right of the *column*, not of the viewport
+
+The prism is the right-hand anchor of a left-aligned composition, so its position is measured
+against the content column (`.mx-auto max-w-6xl`), not against the window. That is what makes it
+read the same on a 1024 laptop and a 1920 monitor instead of drifting further right as the
+window grows:
+
+```
+centreX = clamp(band + halfW + 24, column.left + 0.75·column, frame − halfW − 2 %)
+```
+
+- **band** is the copy that actually shares the glass's vertical band — the display type — not
+  the widest text on the page. The lede and CTA row sit below it and must not shove the glass.
+- **The size is part of that budget.** Below `lg` the hero's copy is still one full-width column,
+  so the glass has no column of its own to sit in. Its size is capped by the room left beside
+  the words, `min(preferred, frame − 24 − copyRight − margin)`; without that cap the right
+  vertex clipped the frame around 840 px wide. The triangle's half-width is exactly `size / 2`,
+  which makes the budget a single subtraction.
+- **The source is allowed to sit exactly on the frame boundary.** On a very wide window the run
+  reaches the top edge before the left edge; the ripple's envelope is zero there, so the light
+  fades in from the edge rather than starting in mid-air.
+
+A width sweep from 640 to 2560 px keeps all of it true: no clipped vertex, the column-relative
+position between 55 % and 88 %, an incident span above 240 px, and a source on the frame edge
+at every width.
 
 ### Why the beam descends from upper-left
 
@@ -171,16 +192,18 @@ live DOM and screenshots the real page.
 cd scripts/hero-qa && HERO_PHASE=qa npm run check
 ```
 
-27 invariants per captured layout (108 total). New or rewritten in this pass:
+28 invariants per captured layout (112 total). New or rewritten in this pass:
 
 ```
 ✓ the resting ray is a real refraction, not a composed chord   (Snell on the resting legs)
 ✓ the source is outside the entry plane, at the frame edge
 ✓ the beam crosses the headline, and the type stays above it   (incl. layer order + DOM z)
 ✓ everything painted over the type is clear of it              (geometry, not pixels)
+✓ the glass is whole and centre-right, sized to the room it has
 ✓ the illustrated field is wavy, bounded, and lands exactly on the hinge
 ✓ reduced motion paints one stable, complete still             (byte-identical paints)
 ✓ entry and exit ride the facets the trace names               (was: hard-coded corners)
+✓ the incident beam is drawn along the legs the trace returned  (was: sampled on a chord)
 ```
 
 ```

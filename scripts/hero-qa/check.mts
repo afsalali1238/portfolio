@@ -217,6 +217,41 @@ for (const file of files) {
     }
   });
 
+  check("the glass is whole and centre-right, sized to the room it has", () => {
+    // The prism is the right-hand anchor of a left-aligned composition. Three things have to
+    // be true together, and they are what the "put the triangle centre-right" note asked for:
+    //   1. no vertex is clipped by the frame;
+    //   2. the body sits in the centre-right band of the *content column*, not of the viewport;
+    //   3. when the copy leaves it a narrow slot (one-column layouts below `lg`), the glass
+    //      shrinks to fit rather than crowding or clipping the right edge.
+    const inside =
+      geo.leftV.x >= 0 &&
+      geo.rightV.x <= geo.heroW + 0.5 &&
+      geo.topV.y >= 0 &&
+      geo.rightV.y <= geo.heroH + 0.5;
+    assert.ok(
+      inside,
+      `glass is clipped: left ${geo.leftV.x.toFixed(0)}, right ${geo.rightV.x.toFixed(0)} of ${geo.heroW}, apex ${geo.topV.y.toFixed(0)}`,
+    );
+    // The triangle's half-width is exactly size / 2, so this also checks that the size really
+    // is what the frames show.
+    assert.ok(
+      near(geo.rightV.x - geo.topV.x, geo.prismSize / 2, 0.5),
+      "the prism's half-width does not match its size",
+    );
+    const column = layout.container.right - layout.container.left;
+    const relative = (geo.prismCenter.x - layout.container.left) / (column || 1);
+    if (geo.mobile) {
+      // Portrait: the glass hangs in the top-right corner of a full-width column.
+      assert.ok(relative > 0.6, `portrait glass is not in the right corner (${relative.toFixed(2)})`);
+    } else {
+      assert.ok(
+        relative >= 0.55 && relative <= 0.88,
+        `glass sits at ${(relative * 100).toFixed(0)}% of the column, not centre-right`,
+      );
+    }
+  });
+
   check("the source is outside the entry plane, at the frame edge", () => {
     // Outer side of the left facet: the prism's centroid is inside, the source must not be.
     const fx = geo.leftV.x - geo.topV.x;
@@ -226,10 +261,11 @@ for (const file of files) {
     assert.notEqual(side(geo.source), side(geo.prismCenter), "source is behind the entry plane");
     const span = Math.hypot(geo.hit.x - geo.source.x, geo.hit.y - geo.source.y);
     assert.ok(span >= 240, `incident span ${span.toFixed(1)}px is a stub`);
-    // The light enters at the frame edge, not in the middle of the picture: that is what
-    // separates a beam from a decorative leader line.
+    // The light enters at the frame boundary, not in the middle of the picture: that is what
+    // separates a beam from a decorative leader line. It leaves through the left edge on the
+    // captured layouts, and through the top edge when the frame is wider than the run is long.
     assert.ok(
-      geo.source.x <= 3 || geo.source.y <= 3,
+      geo.source.x <= 0.5 || geo.source.y <= 0.5,
       `source (${geo.source.x.toFixed(1)}, ${geo.source.y.toFixed(1)}) is inside the frame`,
     );
     assert.ok(
@@ -478,23 +514,29 @@ for (const file of files) {
     }
     assert.ok(crossings >= 3, `only ${crossings} lanes cross the body — the clip is not exercised`);
 
-    // The one line that is allowed through: the incident ray, from the facet to the core.
+    // The one line that is allowed through: the refracted ray. It is sampled along the legs the
+    // trace actually returned — not along the straight chord from entry to exit, which is only
+    // the same line when nothing reflects. The bright stroke has to be *on the path*, so its
+    // luminance must beat the glass around it at every step.
     const px = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height).data;
     const lum = (x: number, y: number) => {
       const i = (y * canvas.width + x) * 4;
       return 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2];
     };
+    const legs = live.restOptics.legs;
+    assert.ok(legs.length >= 1, "the resting ray has no internal leg");
     let lo = Number.POSITIVE_INFINITY;
     let hi = Number.NEGATIVE_INFINITY;
-    for (let t = 0.3; t <= 0.8; t += 0.02) {
-      const l = lum(
-        Math.round(hit.x + (exit.x - hit.x) * t),
-        Math.round(hit.y + (exit.y - hit.y) * t),
-      );
-      if (l < lo) lo = l;
-      if (l > hi) hi = l;
+    for (const leg of legs) {
+      for (let t = 0.25; t <= 0.8; t += 0.02) {
+        const x = Math.round(leg.from.x + (leg.to.x - leg.from.x) * t);
+        const y = Math.round(leg.from.y + (leg.to.y - leg.from.y) * t);
+        const l = lum(x, y);
+        if (l < lo) lo = l;
+        if (l > hi) hi = l;
+      }
     }
-    assert.ok(hi - lo > 30, `the incident ray is missing (contrast ${(hi - lo).toFixed(1)})`);
+    assert.ok(hi - lo > 30, `the refracted ray is missing (contrast ${(hi - lo).toFixed(1)})`);
   });
 
   check("the current catches the pointer, and never overshoots it", () => {
