@@ -92,15 +92,17 @@ function WhatsAppOperatingSystemPage() {
             </p>
 
             <p>
-              Multimillion-dollar construction deals close on voice notes. Hundred-truck supply chains
-              are coordinated inside group chats. Home chefs cook authentic regional feasts for
-              hundreds of residents in high-rise towers, and the entire transaction — menu, allergy
-              check, location pin, and confirmation — happens in a green chat bubble.
+              Multimillion-dollar construction deals close on voice notes. Hundred-truck supply
+              chains are coordinated inside group chats. Home chefs cook authentic regional feasts
+              for hundreds of residents in high-rise towers, and the entire transaction — menu,
+              allergy check, location pin, and confirmation — happens in a green chat bubble.
             </p>
 
             <p>
               When tech founders look at this behaviour, their immediate instinct is to say:{" "}
-              <em>&ldquo;This is chaotic. Let&rsquo;s build a marketplace app to capture this!&rdquo;</em>
+              <em>
+                &ldquo;This is chaotic. Let&rsquo;s build a marketplace app to capture this!&rdquo;
+              </em>
             </p>
 
             <p>
@@ -134,17 +136,18 @@ function WhatsAppOperatingSystemPage() {
             </p>
 
             <p>
-              A clean, mobile-first visual menu where neighbours browse home kitchens nearby, tap the
-              dishes they want, and hit &ldquo;Order&rdquo;. That button does not trigger a checkout
-              gateway. It opens WhatsApp directly with a pre-formatted message sent straight to the
-              home cook:
+              A clean, mobile-first visual menu where neighbours browse home kitchens nearby, tap
+              the dishes they want, and hit &ldquo;Order&rdquo;. That button does not trigger a
+              checkout gateway. It opens WhatsApp directly with a pre-formatted message sent
+              straight to the home cook:
             </p>
 
             <div className="my-6 rounded-md bg-paper-deep/70 p-4 font-mono text-xs text-ink-soft">
               Salam Chef Sarah! I&rsquo;d like to order:
               <br />• 2x Hyderabadi Dum Biryani
               <br />• 1x Raita
-              <br />Delivery to: Torch Tower, Dubai Marina, Apt 1402. Total: AED 70.
+              <br />
+              Delivery to: Torch Tower, Dubai Marina, Apt 1402. Total: AED 70.
             </div>
 
             <p>
@@ -168,8 +171,8 @@ function WhatsAppOperatingSystemPage() {
             </p>
 
             <p>
-              Instead, our system reads the WhatsApp delivery notes via Claude vision OCR, parses the
-              purchase order numbers, validates trip coordinates, and automatically updates the
+              Instead, our system reads the WhatsApp delivery notes via Claude vision OCR, parses
+              the purchase order numbers, validates trip coordinates, and automatically updates the
               central freight ledger. The driver changes nothing about their daily routine. The
               software bends to human reality — not the other way around.
             </p>

@@ -34,7 +34,15 @@ export const DISPATCHES: Dispatch[] = [
       linkedin: "https://www.linkedin.com/in/afsalali1238/",
       twitter: "https://x.com/afsalali1238",
     },
-    relatedWorks: ["provia", "pharmarab", "physioarab", "kine", "nxtdoorchef", "terrarium", "novibe"],
+    relatedWorks: [
+      "provia",
+      "pharmarab",
+      "physioarab",
+      "kine",
+      "nxtdoorchef",
+      "terrarium",
+      "novibe",
+    ],
     tags: ["Curiosity", "Frontier AI", "Operators", "Building in Public", "Dubai"],
   },
   {

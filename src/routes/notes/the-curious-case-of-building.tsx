@@ -81,9 +81,7 @@ function CuriousCasePage() {
           </SectionReveal>
 
           <article className="mt-10 space-y-6 text-base leading-relaxed text-ink-soft md:text-lg">
-            <p>
-              The wall between having an idea and building it just came down.
-            </p>
+            <p>The wall between having an idea and building it just came down.</p>
 
             <p>
               Since then, I&rsquo;ve been building for the tech. Literally:{" "}
@@ -118,16 +116,16 @@ function CuriousCasePage() {
 
             <p>
               Something &ldquo;revolutionary&rdquo; launches every single morning. By the next
-              afternoon, it is already yesterday&rsquo;s news, replaced by another drop that promises
-              to rewrite how humans think and work.
+              afternoon, it is already yesterday&rsquo;s news, replaced by another drop that
+              promises to rewrite how humans think and work.
             </p>
 
             <p>
               Entire industries get disrupted by a single feature release. Products that took small
-              companies five years of sweat to construct become a throwaway checkbox in the next model
-              update. We watch cycles of panic layoffs across tech, followed by sheepish rehiring six
-              months later once the compute bills roll in and the sloppy, unguided code breaks in
-              production.
+              companies five years of sweat to construct become a throwaway checkbox in the next
+              model update. We watch cycles of panic layoffs across tech, followed by sheepish
+              rehiring six months later once the compute bills roll in and the sloppy, unguided code
+              breaks in production.
             </p>
 
             <p>
@@ -142,9 +140,7 @@ function CuriousCasePage() {
 
             <p>So I filter.</p>
 
-            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">
-              The Filter in Dubai
-            </h2>
+            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">The Filter in Dubai</h2>
 
             <p>
               Around a demanding operations job and family life in Dubai, my time is finite. I
@@ -154,9 +150,9 @@ function CuriousCasePage() {
             <p>
               I follow what ships, but I filter the deluge through people who see further. I&rsquo;m
               fortunate to share an office with leaders like Sathish Jeyakumar and Chakir QATAB, and
-              to trade notes inside Uttam Gupta&rsquo;s community. When you put a new tool in front of
-              seasoned operators and engineers, the hype evaporates fast. Between them, I can separate
-              genuine step-changes from marketing noise.
+              to trade notes inside Uttam Gupta&rsquo;s community. When you put a new tool in front
+              of seasoned operators and engineers, the hype evaporates fast. Between them, I can
+              separate genuine step-changes from marketing noise.
             </p>
 
             <p>And once the noise is gone, I don&rsquo;t just read about the new tools.</p>
@@ -173,8 +169,8 @@ function CuriousCasePage() {
 
             <p>
               When a new capability drops, I don&rsquo;t read the documentation cover-to-cover and
-              theorize. I open an editor, pick a problem that is irritating me or someone near me, and
-              see if the tool can actually solve it.
+              theorize. I open an editor, pick a problem that is irritating me or someone near me,
+              and see if the tool can actually solve it.
             </p>
 
             <p>I build because I am insatiably curious about the possibilities:</p>
@@ -185,8 +181,8 @@ function CuriousCasePage() {
                 leverage of a senior software team?
               </li>
               <li>
-                <strong className="text-ink">What happens</strong> when multi-agent systems stop being
-                an academic paper and start handling real workflows?
+                <strong className="text-ink">What happens</strong> when multi-agent systems stop
+                being an academic paper and start handling real workflows?
               </li>
               <li>
                 <strong className="text-ink">What happens</strong> when you strip away roadmap
@@ -203,8 +199,8 @@ function CuriousCasePage() {
 
             <p>
               For two years, all of this lived scattered across local directories and private
-              folders. If someone asked what I did, I would default to describing my day job, leaving
-              this entire body of exploration hidden.
+              folders. If someone asked what I did, I would default to describing my day job,
+              leaving this entire body of exploration hidden.
             </p>
 
             <p>
@@ -213,17 +209,13 @@ function CuriousCasePage() {
             </p>
 
             <p>
-              For the tech. For better or worse. Not as a portfolio of polished SaaS launches, but as
-              an open field laboratory of what happens when curiosity meets frontier tools.
+              For the tech. For better or worse. Not as a portfolio of polished SaaS launches, but
+              as an open field laboratory of what happens when curiosity meets frontier tools.
             </p>
 
-            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">
-              The Grounding Truth
-            </h2>
+            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">The Grounding Truth</h2>
 
-            <p>
-              Here is the one rule that keeps me honest while exploring this frontier:
-            </p>
+            <p>Here is the one rule that keeps me honest while exploring this frontier:</p>
 
             <div className="my-8 rounded-lg bg-paper-deep/70 p-6 md:p-8">
               <p className="font-serif text-2xl text-ink">
@@ -235,8 +227,8 @@ function CuriousCasePage() {
 
             <p>
               Nobody values how complex your build was. Nobody cares what prompt scaffolding you
-              chained together or what model size you ran underneath. The compute doesn&rsquo;t matter
-              to the person on the other end.
+              chained together or what model size you ran underneath. The compute doesn&rsquo;t
+              matter to the person on the other end.
             </p>
 
             <p>
@@ -245,7 +237,8 @@ function CuriousCasePage() {
             </p>
 
             <p>
-              The wall is down. The possibilities are wider than they have ever been in our lifetime.
+              The wall is down. The possibilities are wider than they have ever been in our
+              lifetime.
             </p>
 
             <p className="font-serif text-2xl italic text-ink pt-4">

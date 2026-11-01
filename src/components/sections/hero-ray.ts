@@ -5,8 +5,8 @@
  *
  *   the closing sentence of the headline emits a coherent ray
  *     → it strikes the left facet of a glass prism
- *     → inside the glass it splits into seven hues
- *     → they leave the right facet at one incandescent point
+ *     → it travels through the glass as one neutral ray
+ *     → colours appear only as the light leaves the glass
  *     → and that point disperses in every direction that has room,
  *       growing from specks of dust into whole strands of light,
  *       until the strands cross the entire section and leave the frame.
@@ -23,11 +23,11 @@
  *      continuum is what makes it look like light finding its path instead of a fan of
  *      vector lines.
  *   3. **A prism that reads as glass.** Three shaded faces, a real rim (ink edge + inner
- *      white), the dispersion visible *inside* the glass as it splits, a caustic pool under
- *      the base and glints at the vertices.
+ *      white), a single neutral ray through the glass, a caustic pool under the base and
+ *      glints at the vertices. Dispersion begins at the exit.
  *   4. **The current catches the cursor.** Strands within reach bend toward the pointer, and
- *      the nearest ones throw a jittered filament at it, so the field behaves like charge
- *      rather than like a picture.
+ *      the nearest ones throw a jittered filament at it. Inside the glass the catch releases,
+ *      and a Snell/Fresnel ray trace takes over instead.
  *
  * Three invariants this file exists to protect:
  *
@@ -40,7 +40,7 @@
  *      be full-bleed without ever costing a word its contrast.
  *
  * No canvas shadow blur anywhere: every soft edge is a gradient or a cached sprite, and every
- * gradient is cached per geometry version and theme.
+ * geometry-dependent background gradients are cached per geometry version and theme.
  *
  * The engine is framework-free and DOM-free (Ctx is a structural subset of the browser's
  * CanvasRenderingContext2D) so the same code paints in React and renders headlessly.
@@ -411,6 +411,108 @@ const rayExit = (from: Vec, dir: Vec, w: number, h: number) => {
   return Number.isFinite(best) ? best : Math.hypot(w, h);
 };
 
+/** A geometrical ray in an equilateral glass prism. Angles are measured from normals. */
+export function tracePrism(source: Vec, entry: Vec, top: Vec, left: Vec, right: Vec) {
+  const n = 1.5;
+  const critical = Math.asin(1 / n);
+  const normalize = (v: Vec): Vec => {
+    const length = Math.hypot(v.x, v.y) || 1;
+    return { x: v.x / length, y: v.y / length };
+  };
+  const dot = (a: Vec, b: Vec) => a.x * b.x + a.y * b.y;
+  const cross = (a: Vec, b: Vec) => a.x * b.y - a.y * b.x;
+  const tangent = normalize({ x: left.x - top.x, y: left.y - top.y });
+  const inward = { x: tangent.y, y: -tangent.x };
+  const incident = normalize({ x: entry.x - source.x, y: entry.y - source.y });
+  const cosIn = clamp(dot(incident, inward), 0, 1);
+  const sinIn = clamp(dot(incident, tangent), -1, 1);
+  const theta1 = Math.atan2(Math.abs(sinIn), cosIn);
+  const theta2 = Math.asin(sinIn / n);
+  let direction = {
+    x: inward.x * Math.cos(theta2) + tangent.x * Math.sin(theta2),
+    y: inward.y * Math.cos(theta2) + tangent.y * Math.sin(theta2),
+  };
+  const reflected = {
+    x: incident.x - 2 * cosIn * inward.x,
+    y: incident.y - 2 * cosIn * inward.y,
+  };
+  const fresnel = Math.min(0.12, 0.04 + 0.96 * Math.pow(1 - cosIn, 5));
+  const facets = [
+    { name: "left" as const, a: top, b: left },
+    { name: "base" as const, a: left, b: right },
+    { name: "right" as const, a: right, b: top },
+  ];
+  let point = entry;
+  let last = "left";
+  let firstAngle = 0;
+  let firstFacet = "";
+  let tir = false;
+  let exitDirection = direction;
+  let exitFacet = "";
+  const legs: { from: Vec; to: Vec; facet: string; tir: boolean }[] = [];
+  // Multiple bounces matter: the reflected ray can also undergo TIR at the base.
+  for (let bounce = 0; bounce < 8; bounce++) {
+    let best = Infinity;
+    let face: (typeof facets)[number] | undefined;
+    for (const f of facets) {
+      if (f.name === last) continue;
+      const edge = { x: f.b.x - f.a.x, y: f.b.y - f.a.y };
+      const delta = { x: f.a.x - point.x, y: f.a.y - point.y };
+      const den = cross(direction, edge);
+      if (Math.abs(den) < 1e-9) continue;
+      const distance = cross(delta, edge) / den;
+      const u = cross(delta, direction) / den;
+      if (distance > 1e-6 && u >= -1e-8 && u <= 1 + 1e-8 && distance < best) {
+        best = distance;
+        face = f;
+      }
+    }
+    if (!face) break;
+    const end = { x: point.x + direction.x * best, y: point.y + direction.y * best };
+    const edge = normalize({ x: face.b.x - face.a.x, y: face.b.y - face.a.y });
+    let normal = { x: -edge.y, y: edge.x };
+    if (dot(direction, normal) < 0) normal = { x: -normal.x, y: -normal.y };
+    const cosine = clamp(dot(direction, normal), 0, 1);
+    const angle = Math.acos(cosine);
+    const reflects = angle > critical;
+    if (bounce === 0) {
+      firstAngle = angle;
+      firstFacet = face.name;
+      tir = reflects;
+    }
+    legs.push({ from: point, to: end, facet: face.name, tir: reflects });
+    point = end;
+    if (!reflects) {
+      const signedSin = dot(direction, edge) * n;
+      const outCos = Math.sqrt(Math.max(0, 1 - signedSin * signedSin));
+      exitDirection = {
+        x: normal.x * outCos + edge.x * signedSin,
+        y: normal.y * outCos + edge.y * signedSin,
+      };
+      exitFacet = face.name;
+      break;
+    }
+    direction = { x: direction.x - 2 * cosine * normal.x, y: direction.y - 2 * cosine * normal.y };
+    last = face.name;
+  }
+  const deviation = exitFacet ? Math.acos(clamp(dot(incident, exitDirection), -1, 1)) : 0;
+  return {
+    theta1,
+    theta2: Math.abs(theta2),
+    firstAngle,
+    firstFacet,
+    critical,
+    tir,
+    legs,
+    exit: point,
+    exitFacet,
+    exitDirection,
+    reflected,
+    fresnel,
+    deviation,
+  };
+}
+
 /* ------------------------------------------------------------------------- context */
 
 /** Minimal 2D context surface — satisfied by both DOM canvas and node-canvas. */
@@ -500,11 +602,63 @@ export function createHeroRay(options: HeroRayOptions = {}) {
    * Interaction state. All of it is additive and decays to rest, so the still, the reel and
    * the reduced-motion frame all come out identical to the idle composition.
    */
+  let pointerInGlass = 0;
   let pointerEase = 0; // 0..1, 80 ms follow — how much the pointer is influencing the field
   let hoverTile = -1; // index of the stat tile under the pointer, -1 for none
   let headlineHover = false;
   const surges: { x: number; y: number; at: number; seed: number }[] = [];
   let surgeLife = 0; // ms since the most recent surge started
+
+  let liveHit: Vec | null = null;
+  let optics: ReturnType<typeof tracePrism> | null = null;
+  let fanOrigin: Vec | null = null;
+  let fanTurn = 0;
+  let fanSpread = 1;
+  let opticalWeight = 0;
+  let entryU = 0.4;
+  const deltaMin = 2 * Math.asin(1.5 * Math.sin(Math.PI / 6)) - Math.PI / 3;
+
+  const updateOptics = () => {
+    if (!geo) return;
+    if (pointerInGlass === 0) {
+      liveHit = null;
+      optics = null;
+      fanOrigin = null;
+      fanTurn = 0;
+      fanSpread = 1;
+      opticalWeight = 0;
+      entryU = geo.mobile ? 0.46 : 0.4;
+      return;
+    }
+    const { topV, leftV, rightV, source, exit, prismSize } = geo;
+    const dx = leftV.x - topV.x;
+    const dy = leftV.y - topV.y;
+    const projection = ((pointerX - topV.x) * dx + (pointerY - topV.y) * dy) / (dx * dx + dy * dy);
+    const baseU = geo.mobile ? 0.46 : 0.4;
+    entryU = lerp(baseU, clamp(projection, 0.12, 0.86), pointerInGlass);
+    liveHit = onFacet(topV, leftV, entryU);
+    // Distance from the facet gives the boundary a gentle, local onset.
+    const depth = clamp(
+      Math.hypot(pointerX - liveHit.x, pointerY - liveHit.y) / (prismSize * 0.2),
+      0,
+      1,
+    );
+    const active = pointerInGlass * depth;
+    opticalWeight = active;
+    const target = tracePrism(source, liveHit, topV, leftV, rightV);
+    optics = target;
+    fanOrigin = { x: lerp(exit.x, target.exit.x, active), y: lerp(exit.y, target.exit.y, active) };
+    // The full-bleed field is an artistic sweep, not a literal narrow beam. Rotate it
+    // relative to its resting lane while preserving its coverage and ordering.
+    const targetAngle = Math.atan2(target.exitDirection.y, target.exitDirection.x);
+    const restAngle = geo.mobile ? Math.PI / 2 : 0;
+    const difference = Math.atan2(
+      Math.sin(targetAngle - restAngle),
+      Math.cos(targetAngle - restAngle),
+    );
+    fanTurn = clamp(difference, -0.45, 0.45) * active;
+    fanSpread = 1 + 0.35 * clamp((target.deviation - deltaMin) / deltaMin, 0, 1) * active;
+  };
 
   /** The drafting plate is rasterised once per geometry/theme and blitted thereafter. */
   let plate: Surface | null = null;
@@ -590,7 +744,12 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       y: thesisLine.baselineY,
     };
     let entryMode: HeroGeometry["entryMode"] = "sentence";
-    if (dist(source, hit) < ENTRY_MIN_SPAN) {
+    if (mobile) {
+      // On portrait the desktop fallback sits to the right of the prism, behind the
+      // entry face. Start above and to its left so the incident ray reaches that face first.
+      source = { x: Math.max(0, topV.x - prismSize * 0.85), y: 0 };
+      entryMode = "top-edge";
+    } else if (dist(source, hit) < ENTRY_MIN_SPAN) {
       source = { x: Math.min(copyRight + 40, container.right - 24), y: heroH * 0.06 };
       entryMode = "top-edge";
     }
@@ -646,10 +805,22 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         ribbon: spine ? band.ribbon * (mobile ? 1 : 1.55) : 0,
         // 0° (straight out of the frame) resolves first; the further from it, the longer the
         // strand stays as specks and dashes.
-        resolve: spec.ghost
-          ? 2.3
-          : 0.75 + Math.min(1, Math.abs(Math.sin(spec.angle / 2)) * 1.5) * 0.55,
-        alpha: (spec.ghost ? 0.4 : 1) * (mobile ? 0.86 : 1) * damped(spec.angle),
+        resolve:
+          dir.x < -0.15
+            ? 1.85
+            : spec.ghost
+              ? 2.3
+              : 0.75 + Math.min(1, Math.abs(Math.sin(spec.angle / 2)) * 1.5) * 0.55,
+        alpha:
+          (dir.x < -0.15
+            ? spec.index === 1 || spec.index === 19
+              ? 0.08
+              : 0.008
+            : spec.ghost
+              ? 0.008
+              : 1) *
+          (mobile ? 0.86 : 1) *
+          damped(spec.angle),
         ghost: spec.ghost,
       };
     };
@@ -676,7 +847,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
     // …plus three ghosts that cross the copy itself. They are far too faint to compete with
     // the type, and they are what stops the left half of the hero from looking abandoned.
-    const ghostAngles = mobile ? [196] : [171, 184, 199];
+    const ghostAngles = mobile ? [196] : [171, 199];
     for (const [k, degrees] of ghostAngles.entries()) {
       strands.push(
         makeStrand({
@@ -780,11 +951,22 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     if (!strand) return;
     const band = BANDS[strand.band];
     const buf = strandBufs[index];
-    const core = geo.core;
+    const core = fanOrigin ?? geo.core;
+    const angle =
+      strand.angle +
+      fanTurn +
+      (strand.angle - (geo.mobile ? Math.PI / 2 : 0)) * (fanSpread - 1) * 0.15;
+    const dir = { x: Math.cos(angle), y: Math.sin(angle) };
+    const normal = { x: -dir.y, y: dir.x };
+    const length =
+      fanTurn || fanSpread !== 1
+        ? Math.max(120, rayExit(core, dir, geo.heroW, geo.heroH) * OVERSHOOT)
+        : strand.length;
 
     const amp = strand.amplitude * (1 + surgeEnergy * 0.35);
     const omega = time * TAU * strand.hz;
-    const catching = pointerEase > 0.015;
+    const catchEase = pointerEase * (1 - pointerInGlass);
+    const catching = catchEase > 0.015;
     const shiver = (catching ? 1 : 0.45) * (strand.ghost ? 0.4 : 1);
 
     /**
@@ -798,15 +980,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     let catchWeight = 0;
     if (catching) {
       const rel = { x: leanX - core.x, y: leanY - core.y };
-      const along = clamp(
-        (rel.x * strand.dir.x + rel.y * strand.dir.y) / strand.length,
-        0.05,
-        0.95,
-      );
-      const gx = core.x + strand.dir.x * (along * strand.length);
-      const gy = core.y + strand.dir.y * (along * strand.length);
+      const along = clamp((rel.x * dir.x + rel.y * dir.y) / length, 0.05, 0.95);
+      const gx = core.x + dir.x * (along * length);
+      const gy = core.y + dir.y * (along * length);
       const gap = Math.hypot(leanX - gx, leanY - gy);
-      if (gap < CATCH_RADIUS) catchWeight = Math.pow(1 - gap / CATCH_RADIUS, 1.05) * pointerEase;
+      if (gap < CATCH_RADIUS) catchWeight = Math.pow(1 - gap / CATCH_RADIUS, 1.05) * catchEase;
     }
 
     let nearest = Number.POSITIVE_INFINITY;
@@ -825,8 +1003,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         (0.45 + 0.55 * travel);
       // Electric shiver: quantised to the 24 fps bucket, so it crackles. The caught section
       // shivers hardest — that is the part the current is running through.
-      let x = core.x + strand.dir.x * (s * strand.length) + strand.normal.x * off;
-      let y = core.y + strand.dir.y * (s * strand.length) + strand.normal.y * off;
+      let x = core.x + dir.x * (s * length) + normal.x * off;
+      let y = core.y + dir.y * (s * length) + normal.y * off;
 
       /**
        * The catch, per sample: each point leans toward the cursor by a fraction of its own
@@ -859,8 +1037,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         shiver *
         env *
         (1 + (lean > 0 ? 1 : 0) * 0.9);
-      x += strand.normal.x * jitter;
-      y += strand.normal.y * jitter;
+      x += normal.x * jitter;
+      y += normal.y * jitter;
 
       if (catching) {
         const d = Math.hypot(leanX - x, leanY - y);
@@ -948,14 +1126,13 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       return g;
     });
 
-    // The beam warms as it travels: it starts as ink on paper, arrives as light.
+    // A neutral beam: dark silver on paper for contrast, warm white on ink.
     const { source, hit } = geo;
-    const clay = BANDS[2];
     const b = ctx.createLinearGradient(source.x, source.y, hit.x, hit.y);
-    b.addColorStop(0, rgba(isDark ? clay.dark : clay.light, 0));
-    b.addColorStop(0.2, rgba(isDark ? clay.dark : clay.light, isDark ? 0.3 : 0.22));
-    b.addColorStop(0.78, rgba(isDark ? clay.dark : clay.light, isDark ? 0.62 : 0.5));
-    b.addColorStop(1, rgba(isDark ? PAPER : INK, isDark ? 0.5 : 0.26));
+    const silver: Rgb = isDark ? [255, 251, 241] : [105, 99, 90];
+    b.addColorStop(0, rgba(silver, 0.6));
+    b.addColorStop(0.2, rgba(silver, 0.9));
+    b.addColorStop(1, rgba(silver, 1));
     beamGrad = b;
 
     // Glass shell stays white-only: any warm stop in the shell reads as beige paper.
@@ -1323,10 +1500,10 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const head = Math.max(2, Math.round(grown * STRAND_STEPS));
 
     const gradient = ctx.createLinearGradient(
-      geo.core.x,
-      geo.core.y,
-      strand.dir.x * strand.length + geo.core.x,
-      strand.dir.y * strand.length + geo.core.y,
+      (fanOrigin ?? geo.core).x,
+      (fanOrigin ?? geo.core).y,
+      strand.dir.x * strand.length + (fanOrigin ?? geo.core).x,
+      strand.dir.y * strand.length + (fanOrigin ?? geo.core).y,
     );
     gradient.addColorStop(0, rgba(colour, 0.55));
     gradient.addColorStop(0.18, rgba(colour, 0.9));
@@ -1335,8 +1512,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
+    // The prime obeys the same glass keep-clear gate as every other strand.
+    const door = gates[geo.prime] ?? 0;
+    if (head <= door) return;
     // Haze: the line has body, a ruler-thin stroke does not read as light.
-    traceRange(ctx, buf, 0, head);
+    traceRange(ctx, buf, door, head);
     ctx.strokeStyle = gradient;
     ctx.globalAlpha = clamp(voice * 0.22, 0, 1);
     ctx.lineWidth = 10;
@@ -1362,11 +1542,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const seed = 1 - grown * 0.45;
     const seedR = 3.4 * seed;
     const seedGradient = ctx.createRadialGradient(
-      geo.core.x,
-      geo.core.y,
+      (fanOrigin ?? geo.core).x,
+      (fanOrigin ?? geo.core).y,
       0,
-      geo.core.x,
-      geo.core.y,
+      (fanOrigin ?? geo.core).x,
+      (fanOrigin ?? geo.core).y,
       seedR * 6,
     );
     seedGradient.addColorStop(0, isDark ? "rgba(255,255,252,0.95)" : "rgba(255,255,255,0.98)");
@@ -1374,7 +1554,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     seedGradient.addColorStop(1, rgba(colour, 0));
     ctx.fillStyle = seedGradient;
     ctx.beginPath();
-    ctx.arc(geo.core.x, geo.core.y, seedR * 6, 0, TAU);
+    ctx.arc((fanOrigin ?? geo.core).x, (fanOrigin ?? geo.core).y, seedR * 6, 0, TAU);
     ctx.fill();
 
     // The head of the line: a bright bead that leads the growth and dissolves into the lane.
@@ -1599,15 +1779,16 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   /** Layer — the incident ray, overshooting its facet a touch so it can't read as a stub. */
   const drawBeam = (ctx: Ctx) => {
     if (!geo || !beamGrad) return;
-    const { source, hit } = geo;
+    const { source } = geo;
+    const hit = liveHit ?? geo.hit;
     const dx = hit.x - source.x;
     const dy = hit.y - source.y;
     const len = Math.hypot(dx, dy) || 1;
     const nx = -dy / len;
     const ny = dx / len;
     const steps = 36;
-    const amp = 2.4 * (1 + surgeEnergy * 0.4);
-    const overshoot = 6;
+    const amp = 0.4 * (1 + surgeEnergy * 0.4);
+    const overshoot = 0;
 
     ctx.beginPath();
     for (let i = 0; i <= steps; i++) {
@@ -1628,13 +1809,35 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     const beamBoost = headlineHover ? 1.3 : 1;
-    ctx.globalAlpha = Math.min(1, 0.18 * beamBoost);
-    ctx.lineWidth = 7;
+    ctx.globalAlpha = Math.min(1, 0.1 * beamBoost);
+    ctx.lineWidth = 12;
     ctx.stroke();
     // The incident ray is the one line on the glass's left flank: it carries weight.
-    ctx.globalAlpha = Math.min(1, 0.92 * beamBoost);
-    ctx.lineWidth = 1.35 * (headlineHover ? 1.2 : 1);
+    ctx.globalAlpha = 1;
+    ctx.lineWidth = 1.8 * (headlineHover ? 1.2 : 1);
     ctx.stroke();
+    ctx.strokeStyle = "rgba(255,252,245,0.55)";
+    ctx.lineWidth = 0.9;
+    ctx.stroke();
+    // A slow, travelling packet of light, clipped to the same source-to-facet ray.
+    const p = (time * 0.12) % 1;
+    const tail = Math.max(0, p - 0.09);
+    ctx.beginPath();
+    ctx.moveTo(source.x + dx * tail, source.y + dy * tail);
+    ctx.lineTo(source.x + dx * p, source.y + dy * p);
+    ctx.strokeStyle = isDark ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.9)";
+    ctx.lineWidth = 2.2;
+    ctx.globalAlpha = Math.sin(Math.PI * p) * 0.7;
+    ctx.stroke();
+    if (optics && pointerInGlass > 0.01) {
+      ctx.beginPath();
+      ctx.moveTo(hit.x, hit.y);
+      ctx.lineTo(hit.x + optics.reflected.x * 100, hit.y + optics.reflected.y * 100);
+      ctx.strokeStyle = isDark ? "#fffaf0" : "#655f57";
+      ctx.globalAlpha = optics.fresnel * pointerInGlass;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    }
     ctx.globalAlpha = 1;
   };
 
@@ -1642,14 +1845,14 @@ export function createHeroRay(options: HeroRayOptions = {}) {
    * The glass.
    *
    * Read as a solid, not an outline: a shell with a value split across its facets, a crisp rim
-   * (ink edge + inner white), the dispersion that happens *inside* it — seven hairlines
-   * leaving the entry point and converging on the exit — a caustic pool under the base, and a
-   * glint at each vertex. The internal fan is the drawing's one piece of exposition: it shows
-   * where the colours come from instead of asserting them.
+   * (ink edge + inner white), one neutral ray, a caustic pool and glints at each vertex.
+   * Spectral colour is drawn separately, outside the exit facet.
    */
   const drawGlass = (ctx: Ctx) => {
     if (!geo) return;
-    const { topV, leftV, rightV, hit, exit, prismSize } = geo;
+    const { topV, leftV, rightV, prismSize } = geo;
+    const hit = liveHit ?? geo.hit;
+    const exit = fanOrigin ?? geo.exit;
     const warm = isDark ? BANDS[2].dark : BANDS[2].light;
 
     const centroid = {
@@ -1666,11 +1869,20 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     };
 
     // --- 1. the caustic pool: light that did not leave the prism, pooled warm on the paper
-    const poolX = rightV.x - prismSize * 0.34;
+    const poolX =
+      rightV.x -
+      prismSize * 0.34 +
+      (optics
+        ? clamp(
+            (optics.deviation - deltaMin) * prismSize * 0.3,
+            -prismSize * 0.2,
+            prismSize * 0.2,
+          ) * pointerInGlass
+        : 0);
     const poolY = rightV.y + prismSize * 0.11;
     const poolR = prismSize * 0.58;
     const pool = ctx.createRadialGradient(poolX, poolY, 0, poolX, poolY, poolR);
-    pool.addColorStop(0, rgba(warm, isDark ? 0.2 : 0.14));
+    pool.addColorStop(0, rgba(warm, (isDark ? 0.2 : 0.14) * (1 + pointerInGlass * 0.7)));
     pool.addColorStop(0.45, rgba(warm, isDark ? 0.07 : 0.05));
     pool.addColorStop(1, rgba(warm, 0));
     ctx.fillStyle = pool;
@@ -1726,57 +1938,44 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     ctx.fillStyle = tint;
     ctx.fill();
 
-    /**
-     * --- 4. one ray through the glass.
-     *
-     * The light crosses the body undispersed: a single line from the incident facet to the
-     * core. The colours only appear where it leaves — the separation happens at the exit
-     * facet, not inside the body, so the left of the triangle carries one line and not a
-     * cable of parallel hairlines. What fans inside the glass is a false reading of the
-     * same drawing, and it was the thing cluttering the incident facet.
-     */
-    const along = (t: number, bow: number) => {
-      // The ray is a shallow arc, so it reads as refraction rather than a ruler line.
-      const mid = { x: (hit.x + exit.x) / 2, y: (hit.y + exit.y) / 2 };
-      const c = { x: mid.x + bow * 0.3, y: mid.y + bow };
-      const u = 1 - t;
-      return {
-        x: u * u * hit.x + 2 * u * t * c.x + t * t * exit.x,
-        y: u * u * hit.y + 2 * u * t * c.y + t * t * exit.y,
-      };
-    };
-
-    const traceRay = (from: number, to: number, bow: number) => {
+    // Cross-fade the resting composition into the exact traced path. In particular,
+    // do not let the TIR bounce snap on at full strength on the first boundary pixel.
+    const strokeInternal = (traced: boolean, alpha: number) => {
+      if (alpha <= 0.001) return;
       ctx.beginPath();
-      for (let k = 0; k <= 20; k++) {
-        const t = lerp(from, to, k / 20);
-        const p = along(t, bow);
-        if (k === 0) ctx.moveTo(p.x, p.y);
-        else ctx.lineTo(p.x, p.y);
+      ctx.moveTo(hit.x, hit.y);
+      if (traced && optics) {
+        for (const leg of optics.legs) ctx.lineTo(leg.to.x, leg.to.y);
+      } else {
+        ctx.lineTo(geo!.exit.x, geo!.exit.y);
       }
-    };
-
-    // The body of the ray: one line, widening a hair as it approaches the exit.
-    traceRay(0, 1, 0);
-    ctx.strokeStyle = isDark ? "rgba(255,252,246,0.62)" : "rgba(27,24,21,0.4)";
-    ctx.lineWidth = 1.2;
-    ctx.stroke();
-    traceRay(0.2, 1, 0);
-    ctx.strokeStyle = isDark ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.8)";
-    ctx.lineWidth = 1.05;
-    ctx.stroke();
-
-    // …and the colours peel off it only in the last stretch, at the facet where they leave.
-    for (const [i, band] of BANDS.entries()) {
-      const colour = isDark ? band.dark : band.light;
-      const bow = (i - 3) * prismSize * 0.026;
-      traceRay(0.74, 1, bow);
-      ctx.strokeStyle = rgba(colour, 1);
-      ctx.globalAlpha = band.flagship ? 0.5 : 0.3;
-      ctx.lineWidth = band.flagship ? 1.05 : 0.75;
+      const pathLength =
+        traced && optics
+          ? optics.legs.reduce((sum, leg) => sum + dist(leg.from, leg.to), 0)
+          : dist(hit, geo!.exit);
+      // Beer–Lambert attenuation: longer paths through the glass lose more light.
+      ctx.globalAlpha = alpha * Math.exp((-0.12 * pathLength) / prismSize);
+      ctx.strokeStyle = isDark ? "rgba(255,251,242,0.95)" : "rgba(105,99,90,0.95)";
+      ctx.lineWidth = 1.8;
       ctx.stroke();
+      ctx.strokeStyle = "rgba(255,255,250,0.55)";
+      ctx.lineWidth = 0.9;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    };
+    strokeInternal(false, 1 - opticalWeight);
+    strokeInternal(true, opticalWeight);
+
+    if (optics && opticalWeight > 0.01 && optics.tir && optics.legs.length) {
+      const rim = optics.legs[0].to;
+      const flash = ctx.createRadialGradient(rim.x, rim.y, 0, rim.x, rim.y, prismSize * 0.09);
+      flash.addColorStop(0, `rgba(255,255,255,${0.7 * opticalWeight})`);
+      flash.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = flash;
+      ctx.beginPath();
+      ctx.arc(rim.x, rim.y, prismSize * 0.09, 0, TAU);
+      ctx.fill();
     }
-    ctx.globalAlpha = 1;
 
     // --- 5. the rim: ink edge outside, a white highlight just inside it. Two hairlines at
     //        two values is what makes a shape read as an object with thickness.
@@ -1830,10 +2029,74 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     }
   };
 
+  /** Short wavelength-dependent rays begin on the exit surface, never inside glass.
+   * Cauchy's approximation n(λ) = A + B / λ², λ in micrometres. The full-bleed
+   * field remains an artistic exaggeration of these physically ordered directions.
+   */
+  const drawSpectralExit = (ctx: Ctx) => {
+    if (!geo || !optics || opticalWeight <= 0.01 || !optics.exitFacet || !optics.legs.length)
+      return;
+    const last = optics.legs[optics.legs.length - 1];
+    const facet =
+      optics.exitFacet === "right"
+        ? [geo.rightV, geo.topV]
+        : optics.exitFacet === "base"
+          ? [geo.leftV, geo.rightV]
+          : [geo.topV, geo.leftV];
+    const edgeLength = dist(facet[0], facet[1]) || 1;
+    const tangent = {
+      x: (facet[1].x - facet[0].x) / edgeLength,
+      y: (facet[1].y - facet[0].y) / edgeLength,
+    };
+    const legLength = dist(last.from, last.to) || 1;
+    const incoming = {
+      x: (last.to.x - last.from.x) / legLength,
+      y: (last.to.y - last.from.y) / legLength,
+    };
+    let normal = { x: -tangent.y, y: tangent.x };
+    if (incoming.x * normal.x + incoming.y * normal.y < 0) normal = { x: -normal.x, y: -normal.y };
+    const sinInternal = incoming.x * tangent.x + incoming.y * tangent.y;
+    const wavelengths = [0.65, 0.61, 0.59, 0.55, 0.5, 0.46, 0.43];
+    for (const [i, wavelength] of wavelengths.entries()) {
+      const index = 1.4868 + 0.004 / (wavelength * wavelength);
+      const sinOut = index * sinInternal;
+      if (Math.abs(sinOut) >= 1) continue; // this wavelength is still totally reflected
+      const cosOut = Math.sqrt(1 - sinOut * sinOut);
+      const direction = {
+        x: normal.x * cosOut + tangent.x * sinOut,
+        y: normal.y * cosOut + tangent.y * sinOut,
+      };
+      const length = geo.prismSize * 0.22;
+      const band = BANDS[i];
+      const gradient = ctx.createLinearGradient(
+        optics.exit.x,
+        optics.exit.y,
+        optics.exit.x + direction.x * length,
+        optics.exit.y + direction.y * length,
+      );
+      const color = isDark ? band.dark : band.light;
+      const pathLength = optics.legs.reduce((sum, leg) => sum + dist(leg.from, leg.to), 0);
+      // A gentle blue-weighted scattering loss (Rayleigh ∝ 1/λ⁴), combined with absorption.
+      const transmission = Math.exp(
+        (-pathLength / geo.prismSize) * (0.08 + 0.005 / wavelength ** 4),
+      );
+      gradient.addColorStop(0, rgba(color, 0.7 * transmission));
+      gradient.addColorStop(1, rgba(color, 0));
+      ctx.strokeStyle = gradient;
+      ctx.globalAlpha = opticalWeight;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(optics.exit.x, optics.exit.y);
+      ctx.lineTo(optics.exit.x + direction.x * length, optics.exit.y + direction.y * length);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  };
+
   /** Entry spark: the facet lights where the beam lands. */
   const drawEntrySpark = (ctx: Ctx) => {
     if (!geo) return;
-    const { hit } = geo;
+    const hit = liveHit ?? geo.hit;
     const warm = isDark ? BANDS[2].dark : BANDS[2].light;
     const r = 6.5 * (1 + surgeEnergy * 0.4);
     const spark = ctx.createRadialGradient(hit.x, hit.y, 0, hit.x, hit.y, r);
@@ -1854,7 +2117,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
    */
   const drawCore = (ctx: Ctx) => {
     if (!geo) return;
-    const { exit, prismSize } = geo;
+    const { prismSize } = geo;
+    const exit = fanOrigin ?? geo.exit;
     const pulse = 1 + Math.sin(time * TAU * 1.5) * 0.05 + surgeEnergy * 0.5;
     const warm = isDark ? BANDS[2].dark : BANDS[2].light;
     const voice = isDark ? 1 : 0.94;
@@ -2377,6 +2641,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     // The incident ray, then the glass that receives it
     drawBeam(ctx);
     drawGlass(ctx);
+    drawSpectralExit(ctx);
     drawEntrySpark(ctx);
 
     // The core, then the filaments that ground the fan on the catalogue
@@ -2467,6 +2732,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       leanX += (pointerX - leanX) * ease;
       leanY += (pointerY - leanY) * ease;
       pointerEase += ((pointerActive ? 1 : 0) - pointerEase) * ease;
+      const inside =
+        !!geo && pointerActive && inTri(geo.topV, geo.leftV, geo.rightV, pointerX, pointerY);
+      pointerInGlass += ((inside ? 1 : 0) - pointerInGlass) * (1 - Math.exp(-dtMs / 180));
+      if (pointerInGlass < 0.001 && !inside) pointerInGlass = 0;
+      updateOptics();
 
       drawScene(ctx);
     },
@@ -2476,6 +2746,13 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       surgeEnergy = 0;
       pointerActive = false;
       pointerEase = 0;
+      pointerInGlass = 0;
+      liveHit = null;
+      optics = null;
+      fanOrigin = null;
+      fanTurn = 0;
+      fanSpread = 1;
+      opticalWeight = 0;
       hoverTile = -1;
       headlineHover = false;
       surges.length = 0;
@@ -2530,6 +2807,13 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         branches: (geo?.strands.length ?? 0) * FORK_AT.length,
         interaction: {
           pointerEase,
+          pointerInGlass,
+          entryU,
+          optics,
+          fanOrigin,
+          fanTurn,
+          fanSpread,
+          beam: { width: 1.8, alpha: 1 },
           hoverTile,
           headlineHover,
           surges: surges.length,
@@ -2567,6 +2851,13 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       surgeEnergy = 0;
       pointerActive = false;
       pointerEase = 0;
+      pointerInGlass = 0;
+      liveHit = null;
+      optics = null;
+      fanOrigin = null;
+      fanTurn = 0;
+      fanSpread = 1;
+      opticalWeight = 0;
       hoverTile = -1;
       headlineHover = false;
       surges.length = 0;

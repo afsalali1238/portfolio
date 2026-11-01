@@ -128,9 +128,7 @@ function FirstHitIsFreePage() {
               daily output. Nobody wrote it down; it just settled in.
             </p>
 
-            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">
-              Then It Costs Money
-            </h2>
+            <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">Then It Costs Money</h2>
 
             <p>The free tier runs out by 10:30 AM.</p>
 
@@ -147,9 +145,9 @@ function FirstHitIsFreePage() {
             </h2>
 
             <p>
-              Everyone knows the famous drawing of the horse: the rear half is rendered in hyper-realistic,
-              meticulous Da Vinci Renaissance detail, and the front half degrades into a childish stick
-              figure scribbled with a dying crayon.
+              Everyone knows the famous drawing of the horse: the rear half is rendered in
+              hyper-realistic, meticulous Da Vinci Renaissance detail, and the front half degrades
+              into a childish stick figure scribbled with a dying crayon.
             </p>
 
             <p>
@@ -188,8 +186,8 @@ function FirstHitIsFreePage() {
             </p>
 
             <p>
-              I use frontier AI daily across logistics, clinical translation tools, and systems. But I
-              maintain strict operating hygiene:
+              I use frontier AI daily across logistics, clinical translation tools, and systems. But
+              I maintain strict operating hygiene:
             </p>
 
             <ul className="space-y-3 pl-4 border-l rule-hair text-ink-soft">
@@ -199,13 +197,14 @@ function FirstHitIsFreePage() {
                 production, you have no business shipping it.
               </li>
               <li>
-                <strong className="text-ink">2. Do the first 20 minutes in analog.</strong> Structure
-                the problem in your own journal or whiteboard before touching the keyboard.
+                <strong className="text-ink">2. Do the first 20 minutes in analog.</strong>{" "}
+                Structure the problem in your own journal or whiteboard before touching the
+                keyboard.
               </li>
               <li>
                 <strong className="text-ink">3. Maintain unassisted reps.</strong> Write long-form
-                thoughts by hand. Debate with real operators in the room. If you can&rsquo;t hold the
-                logic in your head, the software will collapse under you.
+                thoughts by hand. Debate with real operators in the room. If you can&rsquo;t hold
+                the logic in your head, the software will collapse under you.
               </li>
             </ul>
 
