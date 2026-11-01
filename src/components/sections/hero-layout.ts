@@ -47,7 +47,11 @@ export type LayoutSnapshot = {
   heroH: number;
   /** right edge of the copy block (h1 ∪ ledger), hero-relative */
   copyRight: number;
-  /** the closing sentence's ink extent plus its true baseline */
+  /**
+   * The closing sentence's ink extent plus its true baseline. The beam's landing height is
+   * derived from the baseline (it lands in the gap just below the display type), so this is
+   * the one piece of type the composition is anchored to.
+   */
   thesisLine: { left: number; right: number; baselineY: number };
   /** the four stat tiles, left → right */
   tiles: TileRect[];

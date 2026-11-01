@@ -168,6 +168,15 @@ No `shadowBlur`, no allocation in the frame loop, one cached raster for the draf
   rects, never from percentages.
 - `scripts/hero-qa/check.mts` — the invariants above, plus stills.
 
+## Phase 8 — the beam crosses the page
+
+The pointing sentence-start beam and the fixed right-facet exit described above were replaced
+in phase 8: the beam now enters at the frame edge, crosses the headline, lands near the apex,
+and the resting ray is a real refraction — in these layouts the refracted ray is totally
+internally reflected at the far facet and leaves through the base, so the fan originates
+there. See `../hero-phase8/README.md` for the current composition. The sections above are kept
+as the design history that explains how the field, the glass and the interaction were built.
+
 ## Interactive optics update
 
 The incident beam is neutral and dominant; the quiet-side lanes are now deliberately much

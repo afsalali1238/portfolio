@@ -4,7 +4,9 @@
   "type": "module",
   "description": "Headless stills + invariant checks for the hero dispersion field (design tooling, not shipped).",
   "scripts": {
-    "check": "tsx check.mts"
+    "check": "tsx check.mts",
+    "compose": "tsx compose.mts",
+    "bench": "tsx bench.mts"
   },
   "dependencies": {
     "@napi-rs/canvas": "^1.1.0"
