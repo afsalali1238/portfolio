@@ -21,7 +21,7 @@ import { createCanvas } from "@napi-rs/canvas";
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createHeroRay } from "../../src/components/sections/hero-ray.ts";
+import { BANDS, createHeroRay, tracePrism } from "../../src/components/sections/hero-ray.ts";
 
 /** Mirrors the engine's CATCH_STANDOFF: strands wrap the cursor, they never land on it. */
 const STANDOFF = 36;
@@ -203,9 +203,11 @@ for (const file of files) {
     );
     for (const strand of geo.specs) {
       assert.ok(
-        strand.alpha > 0.3 && strand.alpha <= 1,
+        strand.alpha > 0 && strand.alpha <= 1,
         `strand ${strand.index} alpha ${strand.alpha}`,
       );
+      if (strand.dir.x < -0.15)
+        assert.ok(strand.alpha <= 0.12, `left-side strand ${strand.index} is too bright`);
     }
   });
 
@@ -368,6 +370,121 @@ for (const file of files) {
       join(shotsDir, `phase${PHASE}-engine-${capture.name}-catch.png`),
       composite(canvas, layout, capture.dark).toBuffer("image/png"),
     );
+  });
+
+  check("one light enters: the incident beam outweighs every left lane", () => {
+    const beam = geo.interaction.beam;
+    for (const strand of geo.specs.filter((item) => item.dir.x < -0.15)) {
+      const band = BANDS[strand.band];
+      const laneInk =
+        strand.alpha * Math.max(band.lightAlpha, band.darkAlpha) * 1.4 * strand.width * 1.5;
+      assert.ok(beam.alpha * beam.width >= 4 * laneInk, `left lane ${strand.index} competes`);
+    }
+  });
+
+  check("inside glass bends toward the normal at three pointer depths", () => {
+    const canvas = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
+    const live = createHeroRay();
+    live.setLayout(layout);
+    const facet = { x: (geo.topV.x + geo.leftV.x) / 2, y: (geo.topV.y + geo.leftV.y) / 2 };
+    for (const depth of [0.3, 0.6, 0.9]) {
+      live.setPointer(
+        facet.x + (geo.prismCenter.x - facet.x) * depth,
+        facet.y + (geo.prismCenter.y - facet.y) * depth,
+        true,
+      );
+      for (let i = 0; i < 120; i++) live.paint(canvas.getContext("2d") as never, 16);
+      const state = live.geometry().interaction;
+      assert.ok(state.optics && state.optics.legs.length, "missing internal ray");
+      const optics = state.optics!;
+      assert.ok(
+        near(Math.sin(optics.theta1), 1.5 * Math.sin(optics.theta2), 1e-6),
+        "Snell's law failed",
+      );
+      assert.ok(optics.theta2 <= optics.theta1 + 1e-8, "ray bent away from normal");
+      assert.equal(
+        optics.legs[0].tir,
+        optics.firstAngle > optics.critical,
+        "critical angle ignored",
+      );
+      assert.ok(state.pointerInGlass > 0.99, "glass mode did not settle");
+      const leg = optics.legs[0];
+      const dx = leg.to.x - leg.from.x,
+        dy = leg.to.y - leg.from.y;
+      const length = Math.hypot(dx, dy);
+      const facetLength = Math.hypot(geo.leftV.x - geo.topV.x, geo.leftV.y - geo.topV.y);
+      const tx = (geo.leftV.x - geo.topV.x) / facetLength;
+      const ty = (geo.leftV.y - geo.topV.y) / facetLength;
+      assert.ok(
+        near(Math.abs((dx * tx + dy * ty) / length), Math.sin(optics.theta2), 1e-6),
+        "drawn internal leg does not obey Snell",
+      );
+    }
+  });
+
+  check("total internal reflection follows the facet and exits elsewhere", () => {
+    const entry = {
+      x: geo.topV.x + (geo.leftV.x - geo.topV.x) * 0.4,
+      y: geo.topV.y + (geo.leftV.y - geo.topV.y) * 0.4,
+    };
+    const source = { x: entry.x - Math.sqrt(3) * 100, y: entry.y - 100 };
+    const traced = tracePrism(source, entry, geo.topV, geo.leftV, geo.rightV);
+    assert.equal(traced.firstFacet, "right");
+    assert.ok(traced.firstAngle > traced.critical && traced.tir, "TIR was not detected");
+    assert.ok(traced.legs.length >= 2 && traced.legs[0].tir, "reflected leg is missing");
+    assert.notEqual(traced.exitFacet, "right", "fan incorrectly exits the reflecting facet");
+    const a = traced.legs[0],
+      b = traced.legs[1];
+    const incoming = { x: a.to.x - a.from.x, y: a.to.y - a.from.y };
+    const reflected = { x: b.to.x - b.from.x, y: b.to.y - b.from.y };
+    const tangent = {
+      x: (geo.rightV.x - geo.topV.x) / geo.prismSize,
+      y: (geo.rightV.y - geo.topV.y) / geo.prismSize,
+    };
+    const projection = (v: { x: number; y: number }) =>
+      (v.x * tangent.x + v.y * tangent.y) / Math.hypot(v.x, v.y);
+    assert.ok(near(projection(incoming), projection(reflected), 1e-6), "reflection angle is wrong");
+  });
+
+  check("the catch releases when the pointer settles inside the glass", () => {
+    const canvas = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
+    const live = createHeroRay();
+    live.setLayout(layout);
+    live.setPointer(geo.prismCenter.x, geo.prismCenter.y, true);
+    for (let i = 0; i < 120; i++) live.paint(canvas.getContext("2d") as never, 16);
+    assert.equal(live.geometry().interaction.catches.length, 0);
+  });
+
+  check("the live fan follows the actual exit and still reaches the frame", () => {
+    const canvas = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
+    const live = createHeroRay();
+    live.setLayout(layout);
+    live.setPointer(geo.prismCenter.x, geo.prismCenter.y, true);
+    for (let i = 0; i < 150; i++) live.paint(canvas.getContext("2d") as never, 16);
+    const state = live.geometry();
+    assert.ok(state.interaction.optics?.exitFacet, "traced light has no exit");
+    const exit = state.interaction.optics!.exit;
+    const origin = state.interaction.fanOrigin!;
+    assert.ok(
+      Math.hypot(origin.x - exit.x, origin.y - exit.y) < 0.1,
+      "fan is not at the traced exit",
+    );
+    if (state.interaction.optics!.tir && state.interaction.optics!.firstFacet === "right") {
+      assert.notEqual(
+        state.interaction.optics!.exitFacet,
+        "right",
+        "fan leaves a totally reflecting face",
+      );
+    }
+    for (const [i, strand] of state.strands.entries()) {
+      assert.ok(
+        strand.tip.x <= 0 ||
+          strand.tip.x >= layout.heroW ||
+          strand.tip.y <= 0 ||
+          strand.tip.y >= layout.heroH,
+        `live strand ${i} stops inside frame`,
+      );
+    }
   });
 
   check("geometry responds to layout, not to the section's percentage", () => {

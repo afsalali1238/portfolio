@@ -167,3 +167,24 @@ No `shadowBlur`, no allocation in the frame loop, one cached raster for the draf
 - `src/components/sections/hero-layout.ts` — unchanged; the composition still comes from measured
   rects, never from percentages.
 - `scripts/hero-qa/check.mts` — the invariants above, plus stills.
+
+## Interactive optics update
+
+The incident beam is neutral and dominant; the quiet-side lanes are now deliberately much
+fainter, with at most two visible companions. On portrait the beam starts above and to the
+left of the glass, so it actually approaches the entry face. The core and full-bleed sweep
+remain an artistic composition, not a literal narrow projection of the spectrum.
+
+When a pointer enters the triangle, the current releases over a 180 ms time constant. Its
+projection moves the entry point, and `tracePrism` refracts the incoming direction with
+`n = 1.5`, intersects the real triangle facets, and reflects at the critical angle until a
+ray can leave. The fan follows that exit; short Cauchy-index spectral rays appear only
+outside it. A Schlick reflection and a moving caustic give the boundary and base a local
+response. The resting ray cross-fades to the traced path with pointer depth to avoid a jump
+at the surface. The broad fan's turn and spread are bounded artistic exaggerations to retain
+the composition, not a wavelength-by-wavelength simulation of the whole background.
+
+The QA harness tests Snell's law on the actual internal leg, critical-angle reflection,
+beam dominance, catch release, and the live fan's exit and frame coverage in addition to the
+original composition checks. Set `HERO_PHASE=qa` when running it to write temporary review
+stills without replacing the checked-in phase 7 reference images.
