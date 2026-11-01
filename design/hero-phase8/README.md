@@ -16,17 +16,17 @@ The composition now hangs off a single point: **where the beam lands on the left
 entry landing (left facet, u = 0.26 wide / 0.56 portrait)
   ├─ the glass is hung so the landing sits on its facet
   ├─ the beam is a straight run back from the landing to the frame edge
-  └─ the dispersion origin is the traced exit of the refracted ray
+  └─ the dispersion origin is the first far-facet contact of the refracted ray
 ```
 
 Because the prism's position is solved from the landing, the beam and the glass cannot drift
-apart, and because the origin is the *traced* exit, the fan cannot drift from the glass
+apart, and because the origin is the first *traced far-facet contact*, the fan cannot drift from the glass
 either. Moving one number moves the whole picture coherently.
 
 | viewport | prism centre | beam source | landing on the left facet | dispersion origin |
 | --- | --- | --- | --- | --- |
-| 1440 | (1008, 300) · 70 % of the column | left frame edge, (0, 38) | (975, 265) | base facet |
-| 1024 | (753, 302) · 75 % | left frame edge, (0, 95) | (720, 267) | base facet |
+| 1440 | (1008, 300) · 70 % of the column | left frame edge, (0, 38) | (975, 265) | right facet (composed emission) |
+| 1024 | (753, 302) · 75 % | left frame edge, (0, 95) | (720, 267) | right facet (composed emission) |
 | 390 | (333, 57) · corner | lower left, (0, 135) | (311, 55) | right facet |
 
 ### The glass is centre-right of the *column*, not of the viewport
@@ -62,9 +62,8 @@ ray crosses the prism's own left facet before it reaches the entry point and the
 describing a prism. That fixes the family of usable approach angles. Inside that family the
 resting outcome is a property of the triangle, not a design choice — §2 measures it.
 
-The entry point is placed near the apex (`u = 0.26`) because that is what makes the reflected
-leg a clean vertical drop through the middle of the glass. Entering lower on the facet makes
-that leg long and flat, and it ends up doubling the base rim.
+The entry point remains near the apex (`u = 0.26`). Its physical trace still contains a
+reflected downward leg on desktop, but that leg is no longer painted at rest.
 
 ## 2. The physics, stated precisely
 
@@ -76,18 +75,21 @@ every one of these relationships, so the table cannot drift from the code:
 | 1440 · 1024 | 16.7° | 11.0° | right @ 49.0° | 41.8° | **TIR at the right facet**, exits the base at 106.7° |
 | 390 | 44.4° | 27.8° | right @ 32.2° | 41.8° | refracts straight out of the right facet at 23.0° |
 
-The wide-screen resting beam arrives shallowly, so the internal ray strikes the far facet well
-past its critical angle and is totally internally reflected. That is the honest outcome for
-this composition, and it is why the dispersion origin sits on the **base** facet instead of
-being pinned to the right one. QA asserts the consequence rather than the assumption: whenever
-`restOptics.tir` is true, the exit facet is not the reflecting facet.
+The wide-screen physical trace undergoes TIR at the far facet and exits through the base.
+`restOptics` retains this record unchanged, including Snell's law and the reflecting facet;
+interaction still paints the true traced legs and emits at the actual traced exit.
 
-The portrait beam arrives more steeply from below and refracts straight out — a different but
-equally real solution.
+**The resting composition is deliberately not that physical through-ray.** Its origin is
+`restOptics.legs[0].to`, the first far-facet contact (`restingOrigin: "refracted-facet"`).
+No internal legs are painted at rest. Seven short wavelength-ordered rays leave this contact.
+Where the first contact is TIR, the illustration substitutes a signed internal sine of 0.42
+(a subcritical angle), then applies Cauchy's index per wavelength. This is an explicit artistic
+licence to show dispersion on the right flank, not a claim that a TIR facet transmits light.
+The live calculation never substitutes this angle and retains the `|sinOut| >= 1` skip.
 
-Both are traced by the same `tracePrism`, and the resting drawing strokes the legs that trace
-returned. The fan is still an artistic exaggeration of the *dispersion* that follows; it is not
-a wavelength-by-wavelength projection.
+Portrait already transmits at the right facet, so its resting rays use the first traced leg's
+actual incoming direction. Short caps are `prismSize * 0.22`; the full-bleed fan remains an
+artistic exaggeration, not a simulation.
 
 ## 3. The wavy beam
 
@@ -129,36 +131,43 @@ plate → fan → beam → dissolve → glass · spectral exit · entry spark �
 `drawDissolve` paints paper-coloured radial stencils over the type boxes, one per line, sized
 to the line. Because the beam is painted **before** it, the beam is thinned exactly where it
 crosses a word and stays bright in the gaps between glyphs, inside counters, and around the
-line — light separated by type, not light over type. Because the glass and the refracted leg
+line — light separated by type, not light over type. Because the glass and the short spectral rays
 are painted **after** it, the glass stays crisp; QA pins that with a geometric clearance check
-(the glass, its vertices, the entry hinge and the whole refracted leg must be ≥ 4 px clear of
+(the glass, its vertices, the entry hinge and the short spectral rays must be ≥ 4 px clear of
 every text and tile rect — verified on all four captured layouts).
 
 The layer order is data (`SCENE_LAYERS`), exposed through `geometry().layers`, and asserted by
 the suite, so the painting and the invariant cannot drift apart.
 
-## 5. The resting ray is traced
+## 5. Clear glass at rest; true multi-segment optics on interaction
 
-`buildGeometry` now runs `tracePrism` on the resting axis and stores `restOptics`. The resting
-drawing strokes **those legs**; the pointer's trace cross-fades over them by pointer depth.
-There is no composed chord left in the engine, so the still, the reduced-motion frame, the
-first frame of interaction and the fully-interacted frame are all real refractions.
+`buildGeometry` stores the complete `restOptics` trace but uses its first far-facet contact
+for the resting origin. The drawing paints no internal traced legs at rest, only a neutral
+entry hinge extending 2 px into the glass. Body, facets, fold ramp, rim, specular streak,
+vertex glints and caustic pool remain. Pointer depth fades in the live legs (including TIR),
+while the resting spectrum fades out and the live spectrum fades in at the true exit.
+Reduced motion paints a stable, complete resting composition.
+
+The QA geometry exposes the same internal-segment selection, hinge and spectral-ray helper
+consumed by the painter. Checks require no resting internal legs, an entry hinge, at least
+three distinct wavelength-monotone rays outside the triangle, and clearance from text/tile
+rects for all resting exit rays. No grain-sensitive hairline pixel-diff assertion is used.
 
 ## 6. Portrait
 
 The copy is full width, so there is no quiet band to land in and no upper-left corner to enter
 from. Portrait flips the vertical: the glass sits in the top-right corner (sized 76–108 px so
 it fits a 390 px frame *and* clears the display type, both measured), and the beam **rises**
-from the lower-left frame edge at 14° into the entry facet. Incidence ≈ 14° — again a real
-solution, and this one refracts straight out of the right facet. The fan still falls down the
+from the lower-left frame edge at 14° into the entry facet. The approach angle is −14°; incidence is 44.4° from the normal, and this
+refracts straight out of the right facet. The fan still falls down the
 page as a curtain.
 
 ## 7. What is still illustrative
 
 - The **full-bleed fan** is an artistic exaggeration of dispersion, with bounded turn/spread
   during interaction. It is not a wavelength-by-wavelength simulation.
-- The short Cauchy-index rays at the exit *are* ordered by refractive index, but their length
-  and the broad field around them are composition.
+- The short Cauchy-index rays are ordered by refractive index. Their length and the broad
+  field are composition; the resting desktop TIR contact uses an illustrative angle (§2).
 - The **ripple** is an illustration of the field (see §2).
 - The **caustic pool** and the bloom are light-art, not photometry.
 
@@ -210,12 +219,16 @@ cd scripts/hero-qa && HERO_PHASE=qa npm run check
 cd scripts/hero-qa && npm run bench
 ```
 
-Engine cost, same harness, same machine, interleaved runs at 1440×720:
+Engine cost at 1440×720 in this session (medians, same harness before/after):
 
-| | baseline (`main`) | phase 8 |
+| | before | clear resting glass + resting spectrum |
 | --- | --- | --- |
-| composed still | **2.92–2.94 ms** | **2.92–2.95 ms** |
-| live (pointer, 200 frames) | **3.10–3.24 ms** | **3.11–3.17 ms** |
+| composed still | 3.50 ms | 3.50 ms |
+| live | 3.82 ms | 3.69 ms |
 
-No regression; the 2.4 ms figure in the phase 7 notes was not reproducible on this machine for
-either build, so it is not claimed here.
+112 checks pass across the four captured layouts. Full-bleed coverage, prime-lane tolerance,
+physical trace invariants, catch release and stable reduced-motion paints remain asserted.
+The catch test now compares equal scene clocks (30 × 16 ms), rather than a settled t=4.6s
+wave against a live t=0.48s wave. ESLint, TypeScript and production build pass.
+These refreshed stills are offline compositions, not browser screenshots; real-browser visual
+review and the tablet/very-wide layout sweep remain owed.

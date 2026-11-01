@@ -171,7 +171,9 @@ for (const file of files) {
       base: [geo.leftV, geo.rightV] as const,
       right: [geo.rightV, geo.topV] as const,
     };
-    const facet = facets[geo.restOptics.exitFacet as keyof typeof facets];
+    assert.equal(geo.restingOrigin, "refracted-facet");
+    if (!geo.mobile) assert.notEqual(geo.restOptics.firstFacet, "base");
+    const facet = facets[geo.restOptics.firstFacet as keyof typeof facets];
     assert.ok(facet, `the resting ray never leaves the glass (facet "${geo.restOptics.exitFacet}")`);
     const [a, b] = facet;
     const edgeLength = Math.hypot(b.x - a.x, b.y - a.y) || 1;
@@ -179,9 +181,9 @@ for (const file of files) {
     assert.ok(t >= -1e-6 && t <= 1 + 1e-6, `exit parameter ${t.toFixed(2)} is past the facet ends`);
     assert.ok(onSegment(geo.exit, a, b, t), "exit is not on the facet the trace names");
     assert.ok(
-      near(geo.exit.x, geo.restOptics.exit.x, 0.01) &&
-        near(geo.exit.y, geo.restOptics.exit.y, 0.01),
-      "the dispersion origin is not the traced exit",
+      near(geo.exit.x, geo.restOptics.legs[0].to.x, 0.01) &&
+        near(geo.exit.y, geo.restOptics.legs[0].to.y, 0.01),
+      "the dispersion origin is not the first far-facet contact",
     );
   });
 
@@ -335,11 +337,11 @@ for (const file of files) {
     for (const vertex of [geo.topV, geo.leftV, geo.rightV, geo.hit, geo.exit]) {
       probes.push({ what: "prism", p: vertex });
     }
-    for (const leg of geo.restOptics.legs) {
+    for (const leg of geo.restingDrawing.exitRays) {
       for (let i = 0; i <= 40; i++) {
         const f = i / 40;
         probes.push({
-          what: `refracted leg (${leg.facet})`,
+          what: "spectral exit ray",
           p: { x: leg.from.x + (leg.to.x - leg.from.x) * f, y: leg.from.y + (leg.to.y - leg.from.y) * f },
         });
       }
@@ -475,14 +477,14 @@ for (const file of files) {
     );
   });
 
-  check("the glass stays clear: crossings open past the rim, one ray through the body", () => {
+  check("the glass stays clear: crossings open past the rim, only the hinge enters at rest", () => {
     // The gates are computed while the buffers are filled, so a paint has to land first.
     const canvas = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
     ray.paintStill(canvas.getContext("2d") as never);
     const live = ray.geometry() as typeof geo & {
       glass: { ink: number[]; gates: number[]; pad: number };
     };
-    const { topV, leftV, rightV, hit, exit } = live;
+    const { topV, leftV, rightV } = live;
     const inPrism = (x: number, y: number) => {
       const side = (p: { x: number; y: number }, q: { x: number; y: number }) =>
         (q.x - p.x) * (y - p.y) - (q.y - p.y) * (x - p.x);
@@ -514,29 +516,29 @@ for (const file of files) {
     }
     assert.ok(crossings >= 3, `only ${crossings} lanes cross the body — the clip is not exercised`);
 
-    // The one line that is allowed through: the refracted ray. It is sampled along the legs the
-    // trace actually returned — not along the straight chord from entry to exit, which is only
-    // the same line when nothing reflects. The bright stroke has to be *on the path*, so its
-    // luminance must beat the glass around it at every step.
-    const px = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height).data;
-    const lum = (x: number, y: number) => {
-      const i = (y * canvas.width + x) * 4;
-      return 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2];
-    };
-    const legs = live.restOptics.legs;
-    assert.ok(legs.length >= 1, "the resting ray has no internal leg");
-    let lo = Number.POSITIVE_INFINITY;
-    let hi = Number.NEGATIVE_INFINITY;
-    for (const leg of legs) {
-      for (let t = 0.25; t <= 0.8; t += 0.02) {
-        const x = Math.round(leg.from.x + (leg.to.x - leg.from.x) * t);
-        const y = Math.round(leg.from.y + (leg.to.y - leg.from.y) * t);
-        const l = lum(x, y);
-        if (l < lo) lo = l;
-        if (l > hi) hi = l;
+    const drawing = live.restingDrawing;
+    assert.equal(drawing.internalLegs.length, 0, "rest paints internal traced legs");
+    assert.ok(drawing.hinge, "entry hinge is missing");
+    assert.ok(Math.hypot(drawing.hinge.to.x - live.hit.x,
+      drawing.hinge.to.y - live.hit.y) <= 2.01, "hinge extends into the body");
+    assert.ok(drawing.exitRays.length >= 3, "several colours must emit at rest");
+    let previousAngle: number | undefined;
+    let order = 0;
+    for (const ray of drawing.exitRays) {
+      const angle = Math.atan2(ray.direction.y, ray.direction.x);
+      if (previousAngle !== undefined) {
+        const delta = Math.atan2(Math.sin(angle - previousAngle), Math.cos(angle - previousAngle));
+        assert.ok(Math.abs(delta) > 1e-6, "exit rays coincide");
+        if (!order) order = Math.sign(delta);
+        assert.equal(Math.sign(delta), order, "wavelength order reverses");
+      }
+      previousAngle = angle;
+      for (let t = 0.05; t <= 1; t += 0.05) {
+        assert.ok(!inPrism(ray.from.x + (ray.to.x - ray.from.x) * t,
+          ray.from.y + (ray.to.y - ray.from.y) * t), "exit ray enters the body");
       }
     }
-    assert.ok(hi - lo > 30, `the refracted ray is missing (contrast ${(hi - lo).toFixed(1)})`);
+
   });
 
   check("the current catches the pointer, and never overshoots it", () => {
@@ -547,7 +549,8 @@ for (const file of files) {
     const idle = createHeroRay();
     idle.setTheme(capture.dark);
     idle.setLayout(layout);
-    idle.settle();
+    // Compare identical scene clocks, not a t=4.6s still against t=0.48s live waves.
+    for (let i = 0; i < 30; i++) idle.paint(ctx, 16);
     const before = Array.from({ length: geo.strands.length }, (_, i) =>
       Math.min(
         ...Array.from({ length: 49 }, (_, k) => {
