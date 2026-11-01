@@ -93,6 +93,13 @@ const JITTER_FPS = 24;
 
 /* ---------------------------------------------------------------- interaction */
 
+/**
+ * The prime line: one strand leaves the origin as a single dot and grows into a line. The
+ * growth is on the scene clock, so a still (time = 4.6 s) is always the finished line.
+ */
+const PRIME_DELAY_S = 0.45;
+const PRIME_DRAW_S = 1.9;
+
 /** A surge's whole life, and the pointer's follow time constant. */
 const SURGE_LIFE_MS = 950;
 const POINTER_TAU_MS = 80;
@@ -320,6 +327,8 @@ export type HeroGeometry = {
   grounds: { from: Vec; to: Vec; band: number }[];
   /** the angular sweep of the fan, in degrees: QA + the docs quote it */
   sweep: { from: number; to: number };
+  /** index of the prime strand: the one line that grows out of the dot */
+  prime: number;
 };
 
 const onFacet = (a: Vec, b: Vec, t: number): Vec => ({
@@ -632,6 +641,28 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       );
     }
 
+    /**
+     * The prime line: the one strand that grows out of the dot.
+     *
+     * It takes the lane that leaves the glass horizontally (on portrait: straight down), and
+     * it takes the clay hue whatever band it landed on — the accent is the point, this is the
+     * single stroke the eye is meant to follow. Its growth is on the scene clock, so a still
+     * is always the finished line and reduced motion never sees it half-drawn.
+     */
+    const primeTarget = (mobile ? 92 : 0) * DEG;
+    let prime = 0;
+    let primeGap = Number.POSITIVE_INFINITY;
+    for (const strand of strands) {
+      if (strand.ghost) continue;
+      // Spines only: a hairline cannot carry an accent.
+      if (strand.ribbon <= 0) continue;
+      const gap = Math.abs(strand.angle - primeTarget);
+      if (gap < primeGap) {
+        primeGap = gap;
+        prime = strand.index;
+      }
+    }
+
     const targets = strands.map((strand) => ({
       x: core.x + strand.dir.x * strand.length,
       y: core.y + strand.dir.y * strand.length,
@@ -679,6 +710,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       spans: strands.map((strand) => strand.length),
       grounds,
       sweep,
+      prime,
     };
     version += 1;
   };
@@ -1200,6 +1232,112 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         ctx.stroke();
         ctx.strokeStyle = gradient;
       }
+    }
+
+    ctx.globalAlpha = 1;
+  };
+
+  /**
+   * The prime line — "one line should come: it starts as a dot, then it becomes a line."
+   *
+   * Every other strand in the field is a continuum read all at once. This one is read as a
+   * *gesture*: a single point of light at the origin, then a short comet tail, then a line
+   * that keeps extending along its lane until it leaves the frame. It is drawn first and
+   * heaviest of the whole fan — solid where the others are still specks — so the eye follows
+   * it out of the glass before it notices the fan at all.
+   *
+   * The growth rides the scene clock, which means a composed still (t = 4.6 s) is always the
+   * finished line, and reduced motion never sees a half-drawn one.
+   */
+  const drawPrime = (ctx: Ctx) => {
+    if (!geo) return;
+    const strand = geo.strands[geo.prime];
+    const buf = strandBufs[geo.prime];
+    if (!strand || !buf) return;
+    // Clay, whatever band the prime lane landed on: this is the accent stroke of the hero.
+    const band = BANDS[2];
+    const colour = isDark ? band.dark : band.light;
+    const voice = bandVoice(strand.band) * strand.alpha;
+
+    const raw = clamp((time - PRIME_DELAY_S) / PRIME_DRAW_S, 0, 1);
+    // Decelerating growth: the head leaves fast and settles into its lane.
+    const grown = raw >= 1 ? 1 : 1 - Math.pow(1 - raw, 3);
+    // A minimum of two samples, so the first frames are a dot rather than nothing.
+    const head = Math.max(2, Math.round(grown * STRAND_STEPS));
+
+    const gradient = ctx.createLinearGradient(
+      geo.core.x,
+      geo.core.y,
+      strand.dir.x * strand.length + geo.core.x,
+      strand.dir.y * strand.length + geo.core.y,
+    );
+    gradient.addColorStop(0, rgba(colour, 0.55));
+    gradient.addColorStop(0.18, rgba(colour, 0.9));
+    gradient.addColorStop(1, rgba(colour, 1));
+
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    // Haze: the line has body, a ruler-thin stroke does not read as light.
+    traceRange(ctx, buf, 0, head);
+    ctx.strokeStyle = gradient;
+    ctx.globalAlpha = clamp(voice * 0.22, 0, 1);
+    ctx.lineWidth = 10;
+    ctx.stroke();
+
+    // The line itself: heavier than any other stroke in the field, by design.
+    ctx.globalAlpha = clamp(voice * 0.98, 0, 1);
+    ctx.lineWidth = 2.1;
+    ctx.stroke();
+
+    // White-hot core, on ink. On paper it would vanish into the cream, so light theme keeps
+    // the saturated clay and only adds a hairline of pale ink-mixed light.
+    ctx.strokeStyle = isDark ? "rgba(255,252,246,0.9)" : rgba(mix(colour, INK, 0.18), 1);
+    ctx.globalAlpha = clamp(voice * (isDark ? 0.65 : 0.8), 0, 1);
+    ctx.lineWidth = 0.9;
+    ctx.stroke();
+
+    /**
+     * The dot it started from. While the line is still growing this is the only thing on
+     * screen; once grown it stays as the seed point at the origin, which is also why the
+     * core looks like it has a pin in it.
+     */
+    const seed = 1 - grown * 0.45;
+    const seedR = 3.4 * seed;
+    const seedGradient = ctx.createRadialGradient(
+      geo.core.x,
+      geo.core.y,
+      0,
+      geo.core.x,
+      geo.core.y,
+      seedR * 6,
+    );
+    seedGradient.addColorStop(0, isDark ? "rgba(255,255,252,0.95)" : "rgba(255,255,255,0.98)");
+    seedGradient.addColorStop(0.28, rgba(colour, 0.7));
+    seedGradient.addColorStop(1, rgba(colour, 0));
+    ctx.fillStyle = seedGradient;
+    ctx.beginPath();
+    ctx.arc(geo.core.x, geo.core.y, seedR * 6, 0, TAU);
+    ctx.fill();
+
+    // The head of the line: a bright bead that leads the growth and dissolves into the lane.
+    const headFade = 1 - Math.pow(grown, 3);
+    if (headFade > 0.02) {
+      const hx = buf[head * 2];
+      const hy = buf[head * 2 + 1];
+      const r = 14 * headFade + 5;
+      const headGlow = ctx.createRadialGradient(hx, hy, 0, hx, hy, r);
+      headGlow.addColorStop(0, isDark ? "rgba(255,255,252,0.95)" : "rgba(255,255,255,0.98)");
+      headGlow.addColorStop(0.22, rgba(colour, 0.75));
+      headGlow.addColorStop(1, rgba(colour, 0));
+      ctx.fillStyle = headGlow;
+      ctx.beginPath();
+      ctx.arc(hx, hy, r, 0, TAU);
+      ctx.fill();
+      ctx.fillStyle = isDark ? "rgba(255,252,246,0.95)" : rgba(mix(colour, INK, 0.1), 1);
+      ctx.beginPath();
+      ctx.arc(hx, hy, 1.9 * headFade + 0.6, 0, TAU);
+      ctx.fill();
     }
 
     ctx.globalAlpha = 1;
@@ -2083,6 +2221,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       if (!geo.strands[i].ghost) drawStrand(ctx, i);
     }
     drawPlasma(ctx);
+    drawPrime(ctx);
 
     // The dissolve sits between the field and the things that must stay bright: the light
     // behind the words is thinned here, then the beam, glass, core and filaments are painted
@@ -2226,6 +2365,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
           spans: [] as number[],
           grounds: [] as { from: Vec; to: Vec; band: number }[],
           sweep: { from: 0, to: 0 },
+          prime: 0,
         }),
         version,
         /** The strand specs themselves (angle, band, span, resolve point) — QA reads these. */

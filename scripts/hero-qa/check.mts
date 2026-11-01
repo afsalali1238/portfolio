@@ -220,6 +220,25 @@ for (const file of files) {
     }
   });
 
+  check("one prime line grows out of the dot, on the open lane", () => {
+    const prime = geo.specs[geo.prime];
+    assert.ok(prime, `prime index ${geo.prime} is not a strand`);
+    assert.ok(
+      !prime.ghost,
+      "the prime line is a ghost — it has to be the loudest stroke, not the quietest",
+    );
+    assert.ok(prime.ribbon > 0, "the prime line is a hairline");
+    // Desktop: out of the glass horizontally. Portrait: straight down the page.
+    const target = ((geo.mobile ? 92 : 0) * Math.PI) / 180;
+    const off = Math.abs(
+      Math.atan2(Math.sin(prime.angle - target), Math.cos(prime.angle - target)),
+    );
+    assert.ok(
+      off < (20 * Math.PI) / 180,
+      `prime lane is ${((off * 180) / Math.PI).toFixed(0)}° off target`,
+    );
+  });
+
   check("engine paints through the node canvas (Ctx subset is portable)", () => {
     const canvas = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
     const ctx = canvas.getContext("2d");

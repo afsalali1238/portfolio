@@ -48,6 +48,24 @@ The staircase is scaled per strand by `resolve` (0.75–1.3): strands with room 
 resolve early, strands that have to cross the copy stay beaded for longer. That is why the field
 looks *alive* on the right and *distant* on the left, instead of like a symmetric firework.
 
+## 2b. One line comes out of the dot
+
+The whole fan is a continuum read at once. On top of it, **one** stroke is read as a gesture:
+
+- a single point of light at the origin (the seed dot, which then stays pinned in the core);
+- a bright head that leaves it and **draws the line** along its lane over ~1.9 s, decelerating
+  into the lane so it settles rather than stops;
+- once grown, the heaviest stroke in the field — clay, 2.1 px body, a 10 px haze and a hot core,
+  where every other strand is still specks, dashes or a 1 px hairline.
+
+It always takes the lane that leaves the glass horizontally (portrait: straight down), and it
+takes the clay hue regardless of which band it landed on: it is the accent of the hero, not a
+member of the fan. The growth rides the scene clock, so a composed still (`t = 4.6 s`) is always
+the finished line and reduced motion never sees a half-drawn one.
+
+Stills: `phase7-page-1440x780-growth.png` catches it mid-draw, `phase7-page-1440x780.png` is the
+finished line.
+
 ## 3. A prism that reads as glass
 
 The old triangle was an outline with a few chords. It is now built as an object:
@@ -92,6 +110,7 @@ grounding filaments only appear then, so the idle still has no leader lines to e
 | `phase7-page-390x820.png`              | composed with type, portrait               |
 | `phase7-engine-*.png`                  | the engine alone (from the invariant suite) |
 | `phase7-engine-*-catch.png`            | the engine with the pointer live            |
+| `phase7-page-1440x780-growth.png`      | the prime line mid-draw (0.7 s in)          |
 
 The `page` stills are composed offline from the same captured layouts the invariant suite uses
 (type is redrawn at the measured rects, so it is a faithful — not pixel-identical — proxy for
@@ -113,6 +132,7 @@ Fifteen invariants per captured layout, including the four new contracts:
 ✓ the origin sits on the exit facet, not beside it
 ✓ dots resolve into a line: every lit strand ends as a continuous filament
 ✓ the current catches the pointer, and never overshoots it
+✓ one prime line grows out of the dot, on the open lane
 ```
 
 Engine cost, measured headlessly at 1440×720 through the same `Ctx` subset:
