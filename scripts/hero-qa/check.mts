@@ -253,6 +253,64 @@ for (const file of files) {
     );
   });
 
+  check("the glass stays clear: crossings open past the rim, one ray through the body", () => {
+    // The gates are computed while the buffers are filled, so a paint has to land first.
+    const canvas = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
+    ray.paintStill(canvas.getContext("2d") as never);
+    const live = ray.geometry() as typeof geo & {
+      glass: { ink: number[]; gates: number[]; pad: number };
+    };
+    const { topV, leftV, rightV, hit, exit } = live;
+    const inPrism = (x: number, y: number) => {
+      const side = (p: { x: number; y: number }, q: { x: number; y: number }) =>
+        (q.x - p.x) * (y - p.y) - (q.y - p.y) * (x - p.x);
+      const d1 = side(topV, leftV);
+      const d2 = side(leftV, rightV);
+      const d3 = side(rightV, topV);
+      return !((d1 < 0 || d2 < 0 || d3 < 0) && (d1 > 0 || d2 > 0 || d3 > 0));
+    };
+
+    let crossings = 0;
+    for (let i = 0; i < live.strands.length; i += 1) {
+      const ink = live.glass.ink[i];
+      const gate = live.glass.gates[i];
+      assert.ok(ink >= 0 && Number.isFinite(ink), `strand ${i} has no glass measurement`);
+      if (ink > live.glass.pad) {
+        crossings += 1;
+        assert.ok(gate > 0, `strand ${i} runs ${ink.toFixed(0)}px through the body unclipped`);
+        if (gate < live.steps) {
+          const buf = ray.strandBuffer(i);
+          assert.ok(buf, `strand ${i} has no buffer`);
+          assert.ok(
+            !inPrism(buf[gate * 2], buf[gate * 2 + 1]),
+            `strand ${i} still opens inside the glass`,
+          );
+        }
+      } else {
+        assert.equal(gate, 0, `strand ${i} was cut but only grazes the body`);
+      }
+    }
+    assert.ok(crossings >= 3, `only ${crossings} lanes cross the body — the clip is not exercised`);
+
+    // The one line that is allowed through: the incident ray, from the facet to the core.
+    const px = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height).data;
+    const lum = (x: number, y: number) => {
+      const i = (y * canvas.width + x) * 4;
+      return 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2];
+    };
+    let lo = Number.POSITIVE_INFINITY;
+    let hi = Number.NEGATIVE_INFINITY;
+    for (let t = 0.3; t <= 0.8; t += 0.02) {
+      const l = lum(
+        Math.round(hit.x + (exit.x - hit.x) * t),
+        Math.round(hit.y + (exit.y - hit.y) * t),
+      );
+      if (l < lo) lo = l;
+      if (l > hi) hi = l;
+    }
+    assert.ok(hi - lo > 30, `the incident ray is missing (contrast ${(hi - lo).toFixed(1)})`);
+  });
+
   check("the current catches the pointer, and never overshoots it", () => {
     const canvas = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
     const ctx = canvas.getContext("2d") as never;

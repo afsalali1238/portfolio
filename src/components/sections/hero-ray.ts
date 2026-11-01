@@ -110,6 +110,13 @@ const CATCH_MAX = 132;
 const CATCH_STANDOFF = 36;
 /** The filament stops short of the cursor: attracted, never grabbed. */
 const CATCH_GAP = 10;
+
+/**
+ * How much of a lane may run inside the prism before the stroke is cut at the far rim, in px.
+ * Above this the lane is crossing the body; below it the lane only clips a corner and keeps
+ * its origin at the core.
+ */
+const GLASS_MAX_INK = 20;
 /** Hovering a tile dims every other band to this fraction. */
 const TILE_DIM = 0.42;
 
@@ -337,6 +344,46 @@ const onFacet = (a: Vec, b: Vec, t: number): Vec => ({
 });
 
 const dist = (a: Vec, b: Vec) => Math.hypot(a.x - b.x, a.y - b.y);
+
+/**
+ * The prism's keep-clear zone: the triangle, grown by a margin.
+ *
+ * Nothing but glass is drawn inside it. A strand that leaves the core toward the left would
+ * otherwise be seen *through* the glass — a cable of near-parallel hairlines crossing the
+ * body — which is what turned the left facet into a tangle. The zone lets a strand start
+ * where it actually leaves the glass, so the fracture stays a fracture: one ray in, light out.
+ */
+type ClearZone = { a: Vec; b: Vec; c: Vec; k: number };
+
+const makeClear = (a: Vec, b: Vec, c: Vec, pad: number): ClearZone => {
+  const cx = (a.x + b.x + c.x) / 3;
+  const cy = (a.y + b.y + c.y) / 3;
+  const reach = (p: Vec) => Math.hypot(p.x - cx, p.y - cy);
+  const r = Math.max(reach(a), reach(b), reach(c)) || 1;
+  return {
+    a,
+    b,
+    c,
+    k: Math.min(2, (r + pad) / r),
+  };
+};
+
+const inTri = (a: Vec, b: Vec, c: Vec, x: number, y: number) => {
+  const side = (p: Vec, q: Vec) => (q.x - p.x) * (y - p.y) - (q.y - p.y) * (x - p.x);
+  const d1 = side(a, b);
+  const d2 = side(b, c);
+  const d3 = side(c, a);
+  const neg = d1 < 0 || d2 < 0 || d3 < 0;
+  const pos = d1 > 0 || d2 > 0 || d3 > 0;
+  return !(neg && pos);
+};
+
+const inClear = (z: ClearZone, x: number, y: number) => {
+  const cx = (z.a.x + z.b.x + z.c.x) / 3;
+  const cy = (z.a.y + z.b.y + z.c.y) / 3;
+  // Pull the *point* in by k, so the test is against the triangle grown by k — not shrunk.
+  return inTri(z.a, z.b, z.c, cx + (x - cx) / z.k, cy + (y - cy) / z.k);
+};
 
 /**
  * Deterministic hash → [0, 1). Used for plasma jitter so a frame can be reproduced exactly:
@@ -853,6 +900,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     }
     catches.length = 0;
     for (let i = 0; i < (geo?.strands.length ?? 0); i++) fillStrand(i);
+    computeGates();
   };
 
   /* -------------------------------------------------------------------- caches */
@@ -1181,6 +1229,9 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
     const colour = isDark ? band.dark : band.light;
     const gradient = strandGrads[index] ?? rgba(colour, 1);
+    // Where the strand is allowed to exist. Strands that cross the glass open just past it.
+    const door = gates[index] ?? 0;
+    if (door >= STRAND_STEPS) return;
 
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -1188,7 +1239,10 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     ctx.globalAlpha = clamp(alpha, 0, 1);
 
     // Haze: a wide, faint version of the solid length, so strands have body, not just an edge.
-    const solidFrom = Math.round(Math.min(0.95, 0.38 * strand.resolve) * STRAND_STEPS);
+    const solidFrom = Math.max(
+      door,
+      Math.round(Math.min(0.95, 0.38 * strand.resolve) * STRAND_STEPS),
+    );
     traceRange(ctx, buf, solidFrom, STRAND_STEPS);
     ctx.lineWidth = strand.width * (strand.ribbon > 0 ? 7 : 5);
     ctx.globalAlpha = clamp(alpha * (strand.ribbon > 0 ? 0.14 : 0.1), 0, 1);
@@ -1196,7 +1250,10 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
     ctx.globalAlpha = clamp(alpha, 0, 1);
     for (const region of REGIONS) {
-      const from = Math.round(Math.min(1, region.from * strand.resolve) * STRAND_STEPS);
+      const from = Math.max(
+        door,
+        Math.round(Math.min(1, region.from * strand.resolve) * STRAND_STEPS),
+      );
       const to = Math.round(Math.min(1, region.to * strand.resolve) * STRAND_STEPS);
       if (to - from < 1) continue;
       traceRange(ctx, buf, from, to);
@@ -1209,7 +1266,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     // White-hot filament: only the clay spine carries one, and only past the halfway mark —
     // that is where the dispersion's centre of energy reads as light rather than pigment.
     if (band.flagship && !strand.ghost) {
-      traceRange(ctx, buf, Math.round(0.55 * STRAND_STEPS), STRAND_STEPS);
+      traceRange(ctx, buf, Math.max(door, Math.round(0.55 * STRAND_STEPS)), STRAND_STEPS);
       ctx.strokeStyle = isDark ? "rgba(255,252,246,0.85)" : "rgba(255,255,255,0.6)";
       ctx.globalAlpha = clamp(alpha * 0.4, 0, 1);
       ctx.lineWidth = 0.6;
@@ -1223,8 +1280,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const speed = 0.075 + hash(index * 7 + 3, 21) * 0.055;
       const p = (time * speed + hash(index * 11 + 5, 23)) % 1;
       const head = Math.round(p * STRAND_STEPS);
-      const tail = Math.max(0, head - 4);
-      if (head - tail >= 2 && p > 0.06) {
+      const tail = Math.max(door, head - 4);
+      if (head - tail >= 2 && tail > door && p > 0.06) {
         traceRange(ctx, buf, tail, head);
         ctx.strokeStyle = isDark ? "rgba(255,252,246,0.95)" : rgba(mix(colour, INK, 0.2), 1);
         ctx.globalAlpha = clamp(alpha * 0.55 * Math.sin(Math.PI * p), 0, 1);
@@ -1344,6 +1401,54 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   };
 
   /** Soft spectral wedges: the broad wash the hairlines travel inside. */
+  /** The prism's keep-clear zone, rebuilt whenever the geometry changes. */
+  let clearZone: ClearZone | null = null;
+  let clearKey = "";
+  const zone = (): ClearZone | null => {
+    if (!geo) return null;
+    const key = `${version}:${geo.prismSize}:${Math.round(geo.exit.x)}`;
+    if (clearZone && key === clearKey) return clearZone;
+    clearZone = makeClear(geo.topV, geo.leftV, geo.rightV, 18);
+    clearKey = key;
+    return clearZone;
+  };
+
+  /**
+   * Where each strand is allowed to open, as a sample index. `0` means "at the core".
+   *
+   * A lane that merely grazes the glass keeps its origin, so the fan still converges on the
+   * point of light the composition hangs on. A lane that would *cross* the body (the ones
+   * heading out of the left side, and the ones that run down through the base) opens on the
+   * far side instead — otherwise the prism is a window onto a cable of hairlines, which is
+   * exactly what made its left flank read as a tangle. On paper the glass hides them anyway;
+   * on ink it does not, and that is where the tangle was visible.
+   */
+  const gates: number[] = [];
+  const glassInk: number[] = [];
+  const computeGates = () => {
+    gates.length = 0;
+    glassInk.length = 0;
+    const z = zone();
+    for (let i = 0; i < (geo?.strands.length ?? 0); i++) {
+      const strand = geo!.strands[i];
+      const buf = strandBufs[i];
+      if (!z) {
+        gates.push(0);
+        glassInk.push(0);
+        continue;
+      }
+      let inside = 0;
+      let door = 0;
+      for (let k = 0; k <= STRAND_STEPS; k++) {
+        if (inClear(z, buf[k * 2], buf[k * 2 + 1])) inside += 1;
+        else if (door === 0) door = k;
+      }
+      const ink = (inside / (STRAND_STEPS + 1)) * strand.length;
+      glassInk.push(ink);
+      gates.push(ink > GLASS_MAX_INK ? door : 0);
+    }
+  };
+
   const drawRibbons = (ctx: Ctx) => {
     if (!geo) return;
     for (let i = 0; i < geo.strands.length; i++) {
@@ -1353,7 +1458,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const nx = strand.normal.x;
       const ny = strand.normal.y;
       const voice = bandVoice(strand.band) * strand.alpha;
-      const start = Math.round(0.14 * STRAND_STEPS);
+      const start = Math.max(Math.round(0.14 * STRAND_STEPS), gates[i] ?? 0);
+      if (start >= STRAND_STEPS) continue;
 
       ctx.globalAlpha = clamp(voice * (1 + surgeEnergy * 0.2), 0, 1);
       ctx.fillStyle =
@@ -1398,6 +1504,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       if (strand.ribbon <= 0) continue;
       const band = BANDS[strand.band];
       const buf = strandBufs[i];
+      const gate = gates[i] ?? 0;
+      if (gate >= STRAND_STEPS) continue;
       const lane = strand.length;
       const nrm = strand.normal;
       const colour = isDark ? band.dark : band.light;
@@ -1408,10 +1516,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
       // --- anchors: sparse, so the segments between them are straight and angular
       ctx.beginPath();
-      ctx.moveTo(buf[0], buf[1]);
+      ctx.moveTo(buf[gate * 2], buf[gate * 2 + 1]);
       for (let k = 1; k <= STRIKE_ANCHORS; k++) {
         const s = k / STRIKE_ANCHORS;
-        const at = Math.round(s * STRAND_STEPS);
+        const at = Math.max(gate, Math.round(s * STRAND_STEPS));
+        if (at === gate) continue;
         const env = Math.pow(Math.sin(Math.PI * s), 0.9);
         const offset =
           (hash(i * 97 + k * 31 + 7, frame) - 0.5) * 2 * strikeAmp * Math.pow(s, 0.45) * env;
@@ -1441,6 +1550,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       for (let b = 0; b < FORK_AT.length; b++) {
         const sPos = FORK_AT[b] + (hash(i * 19 + b * 7 + 3, 0) - 0.5) * 0.08;
         const at = Math.round(sPos * STRAND_STEPS);
+        if (at <= gate) continue;
         const rootX = buf[at * 2];
         const rootY = buf[at * 2 + 1];
         const seed = hash(i * 131 + b * 37 + 17, frame);
@@ -1518,11 +1628,12 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     const beamBoost = headlineHover ? 1.3 : 1;
-    ctx.globalAlpha = Math.min(1, 0.16 * beamBoost);
-    ctx.lineWidth = 6.5;
+    ctx.globalAlpha = Math.min(1, 0.18 * beamBoost);
+    ctx.lineWidth = 7;
     ctx.stroke();
-    ctx.globalAlpha = Math.min(1, 0.82 * beamBoost);
-    ctx.lineWidth = 1.2 * (headlineHover ? 1.2 : 1);
+    // The incident ray is the one line on the glass's left flank: it carries weight.
+    ctx.globalAlpha = Math.min(1, 0.92 * beamBoost);
+    ctx.lineWidth = 1.35 * (headlineHover ? 1.2 : 1);
     ctx.stroke();
     ctx.globalAlpha = 1;
   };
@@ -1574,25 +1685,36 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
     // --- 3. the three faces. A prism seen head-on is one shape; a prism seen as glass is
     //        three faces at three values with one bright edge between them.
+    // The near face: the one turned toward the light, from the apex down the incident side.
     const nearFace = ctx.createLinearGradient(topV.x, topV.y, leftV.x, leftV.y);
     nearFace.addColorStop(0, isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.5)");
     nearFace.addColorStop(1, isDark ? "rgba(255,255,255,0.01)" : "rgba(255,255,255,0.12)");
-    ctx.beginPath();
-    ctx.moveTo(topV.x, topV.y);
-    ctx.lineTo(leftV.x, leftV.y);
-    ctx.lineTo(centroid.x, centroid.y);
-    ctx.closePath();
+    trace();
     ctx.fillStyle = nearFace;
     ctx.fill();
 
-    const farFace = ctx.createLinearGradient(rightV.x, rightV.y, centroid.x, centroid.y);
-    farFace.addColorStop(0, isDark ? "rgba(0,0,0,0.16)" : "rgba(0,0,0,0.045)");
-    farFace.addColorStop(1, isDark ? "rgba(0,0,0,0.02)" : "rgba(0,0,0,0.006)");
-    ctx.beginPath();
-    ctx.moveTo(topV.x, topV.y);
-    ctx.lineTo(rightV.x, rightV.y);
-    ctx.lineTo(centroid.x, centroid.y);
-    ctx.closePath();
+    /**
+     * The far face, over it. The fold between the two faces is a *ramp*, not a cut: a polygon
+     * seam is a value step of one pixel, and on ink that step reads as a hairline crossing the
+     * body — a stroke where there should be glass. Twelve pixels of transition is still a fold
+     * (the eye reads an edge at any gradient above ~3 levels) and it is no longer a line.
+     */
+    const foldX = centroid.x - topV.x;
+    const foldY = centroid.y - topV.y;
+    const foldLen = Math.hypot(foldX, foldY) || 1;
+    const nx = -foldY / foldLen;
+    const ny = foldX / foldLen;
+    const ramp = Math.max(8, prismSize * 0.055);
+    const farFace = ctx.createLinearGradient(
+      topV.x - nx * ramp,
+      topV.y - ny * ramp,
+      topV.x + nx * ramp,
+      topV.y + ny * ramp,
+    );
+    farFace.addColorStop(0, "rgba(0,0,0,0)");
+    farFace.addColorStop(0.55, isDark ? "rgba(0,0,0,0.09)" : "rgba(0,0,0,0.03)");
+    farFace.addColorStop(1, isDark ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.045)");
+    trace();
     ctx.fillStyle = farFace;
     ctx.fill();
 
@@ -1604,33 +1726,57 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     ctx.fillStyle = tint;
     ctx.fill();
 
-    // --- 4. the dispersion inside the glass: seven hairlines, hit → exit. This is the one
-    //        piece of exposition in the drawing — it shows where the colours come from.
+    /**
+     * --- 4. one ray through the glass.
+     *
+     * The light crosses the body undispersed: a single line from the incident facet to the
+     * core. The colours only appear where it leaves — the separation happens at the exit
+     * facet, not inside the body, so the left of the triangle carries one line and not a
+     * cable of parallel hairlines. What fans inside the glass is a false reading of the
+     * same drawing, and it was the thing cluttering the incident facet.
+     */
+    const along = (t: number, bow: number) => {
+      // The ray is a shallow arc, so it reads as refraction rather than a ruler line.
+      const mid = { x: (hit.x + exit.x) / 2, y: (hit.y + exit.y) / 2 };
+      const c = { x: mid.x + bow * 0.3, y: mid.y + bow };
+      const u = 1 - t;
+      return {
+        x: u * u * hit.x + 2 * u * t * c.x + t * t * exit.x,
+        y: u * u * hit.y + 2 * u * t * c.y + t * t * exit.y,
+      };
+    };
+
+    const traceRay = (from: number, to: number, bow: number) => {
+      ctx.beginPath();
+      for (let k = 0; k <= 20; k++) {
+        const t = lerp(from, to, k / 20);
+        const p = along(t, bow);
+        if (k === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+      }
+    };
+
+    // The body of the ray: one line, widening a hair as it approaches the exit.
+    traceRay(0, 1, 0);
+    ctx.strokeStyle = isDark ? "rgba(255,252,246,0.62)" : "rgba(27,24,21,0.4)";
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    traceRay(0.2, 1, 0);
+    ctx.strokeStyle = isDark ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.8)";
+    ctx.lineWidth = 1.05;
+    ctx.stroke();
+
+    // …and the colours peel off it only in the last stretch, at the facet where they leave.
     for (const [i, band] of BANDS.entries()) {
       const colour = isDark ? band.dark : band.light;
       const bow = (i - 3) * prismSize * 0.026;
-      ctx.beginPath();
-      ctx.moveTo(hit.x, hit.y);
-      ctx.quadraticCurveTo(
-        (hit.x + exit.x) / 2 + bow * 0.3,
-        (hit.y + exit.y) / 2 + bow,
-        exit.x,
-        exit.y,
-      );
+      traceRay(0.74, 1, bow);
       ctx.strokeStyle = rgba(colour, 1);
-      ctx.globalAlpha = band.flagship ? 0.5 : 0.34;
-      ctx.lineWidth = band.flagship ? 1.05 : 0.8;
+      ctx.globalAlpha = band.flagship ? 0.5 : 0.3;
+      ctx.lineWidth = band.flagship ? 1.05 : 0.75;
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
-
-    // The undispersed core of the beam, continuing through the glass.
-    ctx.beginPath();
-    ctx.moveTo(hit.x, hit.y);
-    ctx.lineTo(exit.x, exit.y);
-    ctx.strokeStyle = isDark ? "rgba(255,252,246,0.55)" : "rgba(255,255,255,0.9)";
-    ctx.lineWidth = 1.3;
-    ctx.stroke();
 
     // --- 5. the rim: ink edge outside, a white highlight just inside it. Two hairlines at
     //        two values is what makes a shape read as an object with thickness.
@@ -2378,6 +2524,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
           },
         })),
         steps: STRAND_STEPS,
+        /** QA: how much of each lane runs through the body, and where the stroke opens. */
+        glass: { ink: glassInk, gates, pad: GLASS_MAX_INK },
         jitterBucket,
         branches: (geo?.strands.length ?? 0) * FORK_AT.length,
         interaction: {

@@ -72,9 +72,12 @@ The old triangle was an outline with a few chords. It is now built as an object:
 
 - a **caustic pool** of warm light on the paper under the base;
 - a body gradient plus **three faces at three values** (near face lit, far face shaded, a warm
-  tint at the exit corner);
-- the **dispersion happening inside the glass** — seven hairlines leaving the entry point and
-  converging on the exit, so the colours are explained, not asserted;
+  tint at the exit corner), separated by a **fold that ramps over ~12 px** instead of a polygon
+  seam — a seam is a one-pixel value step, and on ink that reads as a hairline crossing the
+  body, which is exactly the tangle this pass removed;
+- **one ray through the body** — the light crosses the glass undispersed, and the colours only
+  peel off in the last quarter, where the beam meets the exit facet. The left flank therefore
+  carries a single line: one ray in, and nothing else inside the glass;
 - a **double rim**: ink edge outside, white highlight just inside — two hairlines at two values
   is what makes a shape read as a material;
 - a specular streak along the incident facet and a glint at each vertex;
@@ -83,6 +86,17 @@ The old triangle was an outline with a few chords. It is now built as an object:
 The prism is equilateral and apex-up, and both the entry and the exit are **parametric points on
 its facets** (`exit` is `u = 0.56` down the right facet, `entry` is `u = 0.40` down the left),
 so the light physically rides the geometry rather than floating beside it.
+
+### The glass is a keep-clear zone
+
+The prism plus 18 px is a zone no strand may be drawn through. A lane that merely grazes the
+body keeps its origin at the core — the fan still converges on the point of light, which is
+what the composition hangs on. A lane that would *cross* the body (more than 20 px of it
+inside) opens on the far side instead, so the field leaves the glass from its rim rather than
+showing through it. On paper the nearly opaque body hid most of that anyway; on ink it did
+not, and a cable of near-parallel hairlines across the body was the thing making the left
+facet read as a knot. QA pins the rule: every crossing lane's stroke must open outside the
+triangle, and the incident ray must actually be drawn.
 
 ## 4. The current catches the cursor
 
@@ -133,6 +147,7 @@ Fifteen invariants per captured layout, including the four new contracts:
 ✓ dots resolve into a line: every lit strand ends as a continuous filament
 ✓ the current catches the pointer, and never overshoots it
 ✓ one prime line grows out of the dot, on the open lane
+✓ the glass stays clear: crossings open past the rim, one ray through the body
 ```
 
 Engine cost, measured headlessly at 1440×720 through the same `Ctx` subset:
