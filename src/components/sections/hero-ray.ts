@@ -796,21 +796,70 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
   const buildGeometry = () => {
     if (!layout) return;
-    const { heroW, heroH, thesisLine } = layout;
+    // A local alias: the measurements below are read inside closures, where TypeScript cannot
+    // carry the null-narrowing of the mutable module-level `layout`.
+    const snapshot = layout;
+    const { heroW, heroH, thesisLine } = snapshot;
     const mobile = heroW < PORTRAIT_MAX_W;
 
-    // Portrait gets a slightly smaller prism on purpose: it has to sit clear of the display
-    // type *and* stay inside a 390 px frame, and those two constraints only meet here.
+    /**
+     * How big the glass wants to be. Portrait takes a smaller share of the frame than desktop
+     * because it has to sit in the margin beside the copy — but the cap scales with the frame,
+     * not a fixed 108 px: on a 320 px phone the margin *is* ~90 px, while a 640 px tablet in
+     * portrait has a third of the page free and should not get the same thumbnail. The real
+     * limit is the slot below; this is only the preference.
+     */
     const preferredSize = mobile
-      ? clamp(Math.min(heroW, heroH) * 0.24, 76, 108)
+      ? clamp(Math.min(heroW, heroH) * 0.34, 76, 160)
       : clamp(Math.min(heroW, heroH) * 0.32, 150, 262);
-    // Below `lg` the hero's copy is still one full-width column, so the glass has no column of
-    // its own to sit in — it has to fit the room left beside the words. Sizing it from that
-    // room keeps it inside the frame at every width instead of clipping the right vertex on
-    // tablets. The half-width of the triangle is exactly `size / 2` (r·cos30° with r = size/√3),
-    // which makes the budget a single subtraction.
+
+    /**
+     * The room the glass is allowed to occupy, measured off the type.
+     *
+     * Below `lg` the hero's copy is still one full-width column, so the glass has no column of
+     * its own to sit in — it has to fit the room left beside the words. On portrait that room is
+     * the band right of **the lines the glass actually shares a height with**, which is the
+     * headline: the italic is the longest line on the page and sits *below* the glass's base, so
+     * measuring it would under-ask for room the glass never needs.
+     */
+    const portraitGutter = Math.max(8, heroW * 0.026);
+    /** The apex is pinned to the top edge, so the band is known before the size is. */
+    const portraitApex = Math.max(7, heroH * 0.014);
+    /** Clear air between the last glyph of the display type and the glass's left vertex. */
+    const PORTRAIT_GLASS_GAP = 12;
+    /** …and between the glass's base and the first line of the italic below it. */
+    const PORTRAIT_BASE_GAP = 10;
+    /**
+     * Portrait size: the smaller of "how wide the margin is" and "how tall the band beside the
+     * headline is".
+     *
+     * The apex is pinned to the top edge, so the triangle's height is fixed by its size
+     * (1.5·r = 0.866·size) and it can only grow downwards until its base meets the closing
+     * line. Both bounds are solved in closed form, so the size and the slot it has to fit can
+     * never disagree — the old code had a preference and a clamp and no relationship between
+     * them, which is why a 480 px phone drew the same 108 px triangle as a 360 px one, pinned
+     * 6 px from the frame edge with no gutter.
+     */
+    const portraitHeadline = snapshot.textRects[0];
+    const portraitThesis = snapshot.textRects[1] ?? portraitHeadline;
+    const portraitMaxHeight = portraitThesis
+      ? (portraitThesis.top - PORTRAIT_BASE_GAP - portraitApex) / 0.866
+      : Number.POSITIVE_INFINITY;
+    const portraitMaxWidth =
+      heroW -
+      (portraitHeadline?.right ?? snapshot.container.left) -
+      portraitGutter * 2 -
+      PORTRAIT_GLASS_GAP;
+    const portraitSize = clamp(
+      Math.min(preferredSize, portraitMaxHeight, portraitMaxWidth),
+      46,
+      160,
+    );
+
+    // The half-width of the triangle is exactly `size / 2` (r·cos30° with r = size/√3), which
+    // makes both budgets a single subtraction.
     const prismSize = mobile
-      ? preferredSize
+      ? portraitSize
       : Math.min(
           preferredSize,
           Math.max(140, heroW - 24 - layout.copyRight - Math.max(16, heroW * 0.022)),
@@ -867,18 +916,18 @@ export function createHeroRay(options: HeroRayOptions = {}) {
        * the constraint. The lower bound keeps the landing below the display type outright if
        * a layout ever squeezes it out of the gap.
        */
-      // Clear the display type horizontally, and the top edge vertically. Both are measured:
-      // on portrait the glass has nowhere to hide, so it has to be placed rather than tuned.
-      const displayRight = layout.textRects
-        .slice(0, 2)
-        .reduce((acc, rect) => Math.max(acc, rect.right), layout.container.left);
-      const margin = Math.max(8, heroW * 0.026);
-      const clearOfType = displayRight + halfW + margin;
+      // The glass squares up to the right gutter, which is the anchor the size was fitted
+      // against — so the clearance to the headline is a consequence, not a second fudge. If a
+      // layout ever makes the copy too wide even for the minimum size, the glass gives way to
+      // the words (it slides left, under the type) rather than pushing them.
+      const clearOfType =
+        (portraitHeadline?.right ?? snapshot.container.left) + PORTRAIT_GLASS_GAP + halfW;
+      const anchored = heroW - halfW - portraitGutter;
       centre = {
-        x: Math.min(heroW - halfW - 6, Math.max(clearOfType, heroW * 0.72)),
+        x: Math.min(Math.max(anchored, clearOfType), Math.max(heroW - halfW - 2, anchored)),
         // The apex stays on the page: a clipped vertex is the one thing that stops the shape
         // reading as a solid object.
-        y: r + Math.max(7, heroH * 0.014),
+        y: r + portraitApex,
       };
     } else {
       /**
@@ -893,10 +942,10 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         // widest text on the page (the CTA row is far below the glass and must not push it).
         const bandTop = centreY - r;
         const bandBottom = centreY + r * 0.5;
-        const bandRight = layout.textRects.reduce(
+        const bandRight = snapshot.textRects.reduce(
           (acc, rect) =>
             rect.bottom > bandTop && rect.top < bandBottom ? Math.max(acc, rect.right) : acc,
-          layout.container.left,
+          snapshot.container.left,
         );
         /**
          * The glass aims at the **middle of the column**, not at a right-hand anchor: the
@@ -913,7 +962,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
          * never by a chosen offset.
          */
         const target =
-          layout.container.left + (layout.container.right - layout.container.left) * 0.5;
+          snapshot.container.left + (snapshot.container.right - snapshot.container.left) * 0.5;
         const clearance = bandRight + halfW + 24;
         const ceiling = heroW - halfW - Math.max(14, heroW * 0.02);
         const centreX = Math.min(ceiling, Math.max(clearance, target));
@@ -941,7 +990,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
        */
       const thread = (hitX: number) => {
         const belowThesis = thesisLine.bottom + 10 + (hitX - thesisLine.right) * tanA;
-        const lede = layout.textRects
+        const lede = snapshot.textRects
           .filter((rect) => rect.top > thesisLine.baselineY)
           .sort((a, b) => a.top - b.top)[0];
         if (!lede) return belowThesis;
@@ -995,15 +1044,27 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const core = exit;
 
     /**
-     * The sweep. On desktop the fan opens from up-left (-128°) through the right (0°) to
-     * down-left (+118°): 246° of dispersion, which is what puts light on the top edge, the
+     * The sweep. On desktop the fan opens from up-left (-166°) through the right (0°) to
+     * down-left (+164°): 330° of dispersion, which is what puts light on the top edge, the
      * bottom edge, the right edge and both left corners without aiming bands at the words.
-     * Portrait screens turn the same fan to face the empty right-hand side.
+     * Portrait screens turn the same fan to face the empty right-hand side — the copy is full
+     * width there, so "the empty side" means the margin *beside* the words, not the whole page.
      */
     const sweep = mobile ? { from: 12, to: 178 } : { from: -166, to: 164 };
     const count = BANDS.length * BAND_STRANDS;
 
     const quiet = layout.ledger.quietRects;
+    /**
+     * How much of a lane runs through type. Everything that crosses a word is quieter — the
+     * dissolve thins it further, so a strand passing behind the copy reads as light seen
+     * through paper rather than as a stroke drawn on top of it.
+     *
+     * Portrait leans on this much harder than desktop: there the fan has to live in the narrow
+     * margin beside a full-width column, so a lane that drifts over the paragraph would be the
+     * brightest thing on a 390 px screen. The desktop factor stays tiny (0.16) because the fan
+     * is the section's centrepiece and the copy sits in its own column.
+     */
+    const copyDamping = mobile ? 0.55 : 0.16;
     const damped = (angle: number) => {
       const dir = { x: Math.cos(angle), y: Math.sin(angle) };
       let hits = 0;
@@ -1016,7 +1077,28 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         )
           hits += 1;
       }
-      return 1 - (hits / 10) * 0.16;
+      return 1 - (hits / 10) * copyDamping;
+    };
+
+    /**
+     * Portrait containment: a lane's exit height decides how bright it is allowed to be.
+     *
+     * On a phone the glass hangs in the top-right corner and the page below it is the page —
+     * headline, paragraph, buttons, then the stat panel. Lanes that leave through the right
+     * edge near the glass carry the dispersion; lanes that would run the height of the section
+     * have nothing left to describe and only put colour on the type and the panel. So the fan
+     * fades with exit height: full strength across the band beside the display type, half by
+     * the time it is level with the paragraph, and a quarter by the buttons. Desktop is
+     * untouched — there the fan is meant to reach every edge.
+     */
+    const containPortrait = (dir: Vec): number => {
+      if (!mobile) return 1;
+      const reach = rayExit(core, dir, heroW, heroH);
+      const exitY = core.y + dir.y * reach;
+      const from = heroH * 0.22;
+      const to = heroH * 0.5;
+      if (exitY <= from) return 1;
+      return clamp(1 - ((exitY - from) / (to - from)) * 0.75, 0.25, 1);
     };
 
     const makeStrand = (spec: {
@@ -1065,7 +1147,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
               ? 0.008
               : 1) *
           (mobile ? 0.86 : 1) *
-          damped(spec.angle),
+          damped(spec.angle) *
+          containPortrait(dir),
         ghost: spec.ghost,
       };
     };
@@ -3130,7 +3213,12 @@ export function createHeroRay(options: HeroRayOptions = {}) {
           heroW: fallbackW,
           heroH: fallbackH,
           copyRight: margin * 0.6,
-          thesisLine: { left: margin, right: margin, baselineY: fallbackH * 0.3 },
+          thesisLine: {
+            left: margin,
+            right: margin,
+            baselineY: fallbackH * 0.3,
+            bottom: fallbackH * 0.33,
+          },
           tiles: [],
           container: { left: margin, right: fallbackW - margin },
           columns: [],

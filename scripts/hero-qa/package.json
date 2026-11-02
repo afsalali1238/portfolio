@@ -6,7 +6,8 @@
   "scripts": {
     "check": "tsx check.mts",
     "compose": "tsx compose.mts",
-    "bench": "tsx bench.mts"
+    "bench": "tsx bench.mts",
+    "sweep": "tsx sweep.mts"
   },
   "dependencies": {
     "@napi-rs/canvas": "^1.1.0"
