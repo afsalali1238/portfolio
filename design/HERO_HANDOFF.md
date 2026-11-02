@@ -169,15 +169,17 @@ Plus one soft radial paper lift (`paper` @ 0.35, `r = 0.55·max(w,h)`) centred o
 
 ## 7. Interaction
 
-| Trigger                  | Response                                                                                                              | Timing                            |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
-| Idle                     | ribbons undulate, photons climb the beam, core breathes                                                               | 1.5 Hz core, 0.15–0.25 Hz strands |
-| Pointer move over hero   | core attracts real Tesla arcs (2 chords + branches); strands lean ≤10px within 170px                                  | τ = 90 ms follow                  |
-| Pointer idle 2.6 s       | lean + arcs release                                                                                                   | ease-out                          |
-| Click / tap              | surge: `E=1` → amplitude ×1.35, glow ×1.6, white-out core 80 ms, shockwave ring 8→238px, decay `exp(−t/280)`, ≤950 ms |                                   |
-| Hover a stat tile        | that tile's grounding filament + its band surge; other bands dim to 0.45                                              | 150 ms                            |
-| Hover the headline       | incident ray brightens ×1.3                                                                                           | 150 ms                            |
-| `prefers-reduced-motion` | one composed still via `paintStill`, no rAF ever                                                                      |                                   |
+| Trigger                  | Response                                                                                                              | Timing                                         |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Idle                     | ribbons undulate, photons climb the beam, core breathes                                                               | 1.5 Hz core, 0.15–0.25 Hz strands              |
+| Pointer move over hero   | core attracts real Tesla arcs (2 chords + branches); strands lean ≤10px within 170px                                  | τ = 90 ms follow                               |
+| Pointer idle 2.6 s       | lean + arcs release                                                                                                   | ease-out                                       |
+| Click / tap              | surge: `E=1` → amplitude ×1.35, glow ×1.6, white-out core 80 ms, shockwave ring 8→238px, decay `exp(−t/280)`, ≤950 ms |                                                |
+| Hover a stat tile        | that tile's grounding filament + its band surge; other bands dim to 0.45                                              | 150 ms                                         |
+| Hover the headline       | incident ray brightens ×1.3                                                                                           | 150 ms                                         |
+| No hover capability      | synthetic point drifts on a slow lissajous **inside** the glass (0.16·size < inradius), so a phone still refracts     | 0.37 / 0.53 Hz, resumes 6 s after a real touch |
+| Nothing interacts 2.5 s  | the loop paints every other callback — 30 fps, dt measured between paints so the ripple keeps its speed               | halves idle CPU                                |
+| `prefers-reduced-motion` | one composed still via `paintStill`, no rAF ever                                                                      |                                                |
 
 ## 8. Performance rules
 
@@ -187,6 +189,10 @@ Plus one soft radial paper lift (`paper` @ 0.35, `r = 0.55·max(w,h)`) centred o
 - Flat `Float32Array` point buffers per strand (`STRAND_STEPS = 40`); no per-frame object allocation.
 - `dpr = min(devicePixelRatio, 2)`; context transform absorbs it, all maths in CSS px.
 - Pause on `IntersectionObserver` (< 2% visible), `visibilitychange`, `blur`.
+- **Idle at 30 fps.** The field animates at 0.16 Hz, so half-rate is invisible; the engine is
+  handed the real delta between paints, never a fixed 16 ms, or the ripple would slow down.
+- **Never a bare hero.** `.hero-wash` paints the ambient wash in CSS from the server HTML; the
+  shell retires it on the engine's first painted frame (`data-hero-painted`).
 - Budget: **≤ 4 ms** CPU per frame at 1440×800 @1× CPU throttle; ≤ 12 ms at 6× throttle. Log paint cost behind `?heroDebug=1`.
 - `ResizeObserver` → rAF-coalesced resize, never per event.
 

@@ -62,6 +62,11 @@ export function Hero() {
       data-hero
       className="relative overflow-hidden pt-12 pb-12 sm:pt-16 md:pt-24 md:pb-16"
     >
+      {/* First paint: the field is drawn by the engine, which cannot run until hydration, so
+          the section starts with the ambient wash in CSS and retires it on the engine's first
+          frame (`data-hero-painted`). Without it a cold load shows an empty hero. */}
+      <div aria-hidden="true" className="hero-wash pointer-events-none absolute inset-0 z-0" />
+
       {/* Background: one ray, one prism, one restrained dispersion fan (full-bleed) */}
       <HeroPrism className="absolute inset-0 z-0 h-full w-full" />
 

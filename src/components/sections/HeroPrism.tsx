@@ -17,6 +17,22 @@ const MAX_BACKING_PIXELS = 2_200_000;
  * only release when the pointer has truly gone (it also releases on pointerleave/blur).
  */
 const POINTER_IDLE_RELEASE_MS = 45_000;
+/**
+ * Ambient motion runs at half rate once nothing has interacted for this long. The field's own
+ * animation is a 0.16 Hz ripple — 30 fps and 60 fps are indistinguishable — so the idle hero
+ * stops paying for frames it cannot show. The engine is handed the real time between paints,
+ * so the ripple does not slow down, it just moves in bigger steps.
+ */
+const IDLE_HALF_RATE_AFTER_MS = 2_500;
+/** Just under one 30 fps frame, so a 60 Hz display paints every second callback. */
+const HALF_RATE_MIN_STEP_MS = 1000 / 30 - 2;
+/**
+ * Touch screens never hover, so there is nothing to refract. After this long without a real
+ * touch the shell feeds the engine a synthetic point that drifts inside the glass, which keeps
+ * the hero alive on phones without pretending a cursor exists. A real touch takes over
+ * immediately and holds for the same window, so the two never fight.
+ */
+const AUTONOMOUS_RESUME_MS = 6_000;
 
 /** Debug hook shape exposed at ?heroDebug=1 so the headless harness can read real rects. */
 type HeroDebugWindow = {
@@ -71,6 +87,12 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     });
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     let prefersReduced = motionQuery.matches;
+    // A device that cannot hover has no cursor for the field to answer, so it answers itself.
+    const hoverQuery = window.matchMedia("(hover: hover)");
+    let autonomous = !hoverQuery.matches;
+    const onHoverChange = (e: MediaQueryListEvent) => {
+      autonomous = !e.matches;
+    };
 
     let rafId = 0;
     let running = false;
@@ -80,11 +102,17 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     let cssH = 0;
     let rectLeft = 0;
     let rectTop = 0;
-    let lastTs = 0;
-    let lastPointerTs = 0;
+    let lastPaintTs = 0;
+    // Start "warm": the entrance (the prime line growing out of the dot) is the one moment the
+    // hero should run at full rate, so the half-rate path only opens once it has had its 2.5 s.
+    let lastPointerTs = performance.now();
+    let lastRealPointerAt = 0;
     let lastClientX = 0;
     let lastClientY = 0;
     let pointerInside = false;
+    /** Cached per resize: the anchor the autonomous drift orbits and how wide to make it. */
+    let anchor: { x: number; y: number; size: number } | null = null;
+    let painted = false;
 
     const debug =
       typeof window !== "undefined" && new URLSearchParams(window.location.search).has("heroDebug");
@@ -106,6 +134,23 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       const pixels = w * h * base * base;
       if (pixels <= MAX_BACKING_PIXELS) return base;
       return Math.max(1, base * Math.sqrt(MAX_BACKING_PIXELS / pixels));
+    };
+
+    /**
+     * The hero ships with a CSS stand-in for the ambient wash (see `.hero-wash`), so the
+     * section is never bare while it waits for hydration. The first real frame retires it —
+     * once, and only after something has actually been painted, so a slow device keeps the
+     * placeholder instead of flashing empty.
+     */
+    const markPainted = () => {
+      if (painted) return;
+      painted = true;
+      hero.dataset.heroPainted = "";
+    };
+
+    const paintStill = () => {
+      ray.paintStill(drawCtx);
+      markPainted();
     };
 
     /** Measure the page, then size the canvas. Coalesced into rAF by the observer below. */
@@ -130,7 +175,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       sized = true;
       // Outside the loop (paused, hidden, reduced motion) the still has to be re-composed.
-      if (!running) ray.paintStill(drawCtx);
+      if (!running) paintStill();
       if (debug) console.log(`[hero] commit ${(performance.now() - commitStarted).toFixed(2)}`);
     };
 
@@ -148,6 +193,12 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       const snapshot = measureHero(hero);
       if (debug) console.log(`[hero] measure ${(performance.now() - tMeasure).toFixed(2)}`);
       ray.setLayout(snapshot);
+      const measured = ray.geometry();
+      anchor = {
+        x: measured.prismCenter.x,
+        y: measured.prismCenter.y,
+        size: measured.prismSize,
+      };
       if (debug) {
         // ?heroDebug=1 — hand the measured snapshot + live geometry to the QA harness.
         (window as unknown as HeroDebugWindow).__hero = {
@@ -158,7 +209,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
 
       if (!running || !sized) {
         commitCanvas();
-        if (!running) ray.paintStill(drawCtx);
+        if (!running) paintStill();
       } else {
         // Canvas keeps its current size and is CSS-stretched until the drag settles. The
         // commit then waits for idle time, so it never lands mid-gesture or mid-frame.
@@ -192,16 +243,33 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       if (!running) return;
       rafId = requestAnimationFrame(frame);
 
-      const dt = lastTs === 0 ? 16 : Math.min(MAX_DELTA_MS, ts - lastTs);
-      lastTs = ts;
+      const elapsed = lastPaintTs === 0 ? 16 : ts - lastPaintTs;
+      const idleFor = performance.now() - lastPointerTs;
+      // Idle: paint every other callback. Skipping here (rather than inside the engine) keeps
+      // the ripple's phase honest, because dt is measured between paints, not between frames.
+      if (idleFor > IDLE_HALF_RATE_AFTER_MS && elapsed < HALF_RATE_MIN_STEP_MS) return;
+      lastPaintTs = ts;
 
-      // The current stays attached while the cursor rests inside the hero: only a pointer
-      // that has genuinely gone (left the section, or the window lost focus) is released.
-      if (performance.now() - lastPointerTs > POINTER_IDLE_RELEASE_MS) ray.setPointer(0, 0, false);
+      const drifting = autonomous && performance.now() - lastRealPointerAt > AUTONOMOUS_RESUME_MS;
+      if (drifting && anchor && anchor.size > 0) {
+        // A lissajous well inside the triangle's inradius (0.16·size < r/2), so the synthetic
+        // point never crosses the body's edge and the refraction never pops.
+        const t = ts / 1000;
+        ray.setPointer(
+          anchor.x + Math.sin(t * 0.37) * anchor.size * 0.16,
+          anchor.y + Math.sin(t * 0.53 + 1.1) * anchor.size * 0.16,
+          true,
+        );
+      } else if (idleFor > POINTER_IDLE_RELEASE_MS) {
+        // The current stays attached while the cursor rests inside the hero: only a pointer
+        // that has genuinely gone (left the section, or the window lost focus) is released.
+        ray.setPointer(0, 0, false);
+      }
 
       const started = performance.now();
       ray.setDebug(debugVisible());
-      ray.paint(drawCtx, dt);
+      ray.paint(drawCtx, Math.min(MAX_DELTA_MS, elapsed));
+      markPainted();
       lastPaintCost = performance.now() - started;
       // ?heroDebug=1 logs one frame in twenty; data-perf (QA only) logs every frame.
       if (debug && (hero.dataset.perf === "1" || Math.random() < 0.05)) {
@@ -213,7 +281,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       const shouldRun = inView && !document.hidden && !prefersReduced;
       if (shouldRun && !running) {
         running = true;
-        lastTs = 0;
+        lastPaintTs = 0;
         rafId = requestAnimationFrame(frame);
         return;
       }
@@ -221,7 +289,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
         running = false;
         cancelAnimationFrame(rafId);
         rafId = 0;
-        if (prefersReduced) ray.paintStill(drawCtx);
+        if (prefersReduced) paintStill();
       }
     };
 
@@ -236,6 +304,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     const onPointerMove = (e: PointerEvent) => {
       lastClientX = e.clientX;
       lastClientY = e.clientY;
+      lastRealPointerAt = performance.now();
       const x = e.clientX - rectLeft;
       const y = e.clientY - rectTop;
       const inside = x >= 0 && x <= cssW && y >= -40 && y <= cssH + 40;
@@ -245,6 +314,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     };
 
     const onPointerDown = (e: PointerEvent) => {
+      lastRealPointerAt = performance.now();
       const x = e.clientX - rectLeft;
       const y = e.clientY - rectTop;
       if (x < 0 || x > cssW || y < 0 || y > cssH) return;
@@ -293,7 +363,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
 
     const themeObs = new MutationObserver(() => {
       ray.setTheme(document.documentElement.classList.contains("dark"));
-      if (!running) ray.paintStill(drawCtx);
+      if (!running) paintStill();
     });
     themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 
@@ -320,14 +390,17 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     document.addEventListener("pointerleave", onPointerLeave);
     document.addEventListener("visibilitychange", onVisibility);
     motionQuery.addEventListener("change", onMotionChange);
+    hoverQuery.addEventListener("change", onHoverChange);
 
     resize();
-    if (prefersReduced) ray.paintStill(drawCtx);
+    if (prefersReduced) paintStill();
     else syncLoop();
 
     return () => {
       running = false;
       cancelAnimationFrame(rafId);
+      // The hero may remount (route change): leave the CSS stand-in armed for the next engine.
+      delete hero.dataset.heroPainted;
       if (commitTimer !== undefined) clearTimeout(commitTimer);
       resizeObs.disconnect();
       visObs.disconnect();
@@ -340,6 +413,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       document.removeEventListener("pointerleave", onPointerLeave);
       document.removeEventListener("visibilitychange", onVisibility);
       motionQuery.removeEventListener("change", onMotionChange);
+      hoverQuery.removeEventListener("change", onHoverChange);
     };
   }, []);
 
