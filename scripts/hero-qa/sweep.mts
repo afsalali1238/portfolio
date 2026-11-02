@@ -36,7 +36,8 @@ import type { LayoutSnapshot } from "../../src/components/sections/hero-layout.t
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, "../..");
-const outDir = join(repo, "design/hero-phase9");
+const PHASE = process.env.HERO_PHASE ?? "10";
+const outDir = join(repo, `design/hero-phase${PHASE}`);
 mkdirSync(outDir, { recursive: true });
 
 /* ------------------------------------------------------------------ fonts */
@@ -447,116 +448,175 @@ const overlaps = (a: Rect, b: Rect, pad = 0) =>
   a.top < b.bottom + pad &&
   a.bottom > b.top - pad;
 
+const SCROLL_POINTS = [0, 0.5, 1] as const;
+const TRIPTYCH_VIEWPORTS = new Set([
+  "1440x780",
+  "1440x780-dark",
+  "1024x768",
+  "390x820",
+  "390x820-dark",
+]);
+const writeAllFrames = process.argv.includes("--all-frames");
+
 for (const vp of selected) {
   const layout = modelLayout(vp.w);
   const dark = Boolean(vp.dark);
+  const name = dark ? `${vp.name}-dark` : vp.name;
 
   // A real offscreen plate surface, the same contract the browser shell provides.
   let plateCanvas: ReturnType<typeof createCanvas> | undefined;
-  const ray = createHeroRay({
-    createSurface: (width, height) => {
-      const surface = plateCanvas ?? createCanvas(Math.max(1, width), Math.max(1, height));
-      if (surface.width < width || surface.height < height) {
-        surface.width = Math.max(surface.width, width);
-        surface.height = Math.max(surface.height, height);
-      }
-      const ctx = surface.getContext("2d") as unknown as SKRSContext2D;
-      ctx.clearRect(0, 0, surface.width, surface.height);
-      return { ctx: ctx as unknown as Ctx, width, height, image: surface as unknown };
-    },
-  });
-  ray.setTheme(dark);
-  ray.setLayout(layout);
-  const g = ray.geometry();
+  const makeRay = () =>
+    createHeroRay({
+      createSurface: (width, height) => {
+        const surface = plateCanvas ?? createCanvas(Math.max(1, width), Math.max(1, height));
+        plateCanvas = surface;
+        if (surface.width < width || surface.height < height) {
+          surface.width = Math.max(surface.width, width);
+          surface.height = Math.max(surface.height, height);
+        }
+        const ctx = surface.getContext("2d") as unknown as SKRSContext2D;
+        ctx.clearRect(0, 0, surface.width, surface.height);
+        return { ctx: ctx as unknown as Ctx, width, height, image: surface as unknown };
+      },
+    });
 
   const W = Math.round(layout.heroW);
   const H = Math.round(layout.heroH);
   const layer = createCanvas(W, H);
-  ray.paintStill(layer.getContext("2d") as unknown as Ctx);
-  const out = createCanvas(W, H);
-  const ctx = out.getContext("2d") as unknown as SKRSContext2D;
-  ctx.fillStyle = theme(dark).paper;
-  ctx.fillRect(0, 0, W, H);
-  ctx.drawImage(layer, 0, 0);
-  drawType(ctx, layout, dark);
-  const name = dark ? `${vp.name}-dark` : vp.name;
-  writeFileSync(join(outDir, `${name}.png`), out.toBuffer("image/png"));
+  const layerCtx = layer.getContext("2d") as unknown as Ctx;
 
-  /* --- assertions ------------------------------------------------------- */
-  const glassBox: Rect = {
-    left: Math.min(g.topV.x, g.leftV.x, g.rightV.x),
-    right: Math.max(g.topV.x, g.leftV.x, g.rightV.x),
-    top: Math.min(g.topV.y, g.leftV.y, g.rightV.y),
-    bottom: Math.max(g.topV.y, g.leftV.y, g.rightV.y),
-  };
-  const clip = [
-    g.leftV.x >= 0,
-    g.rightV.x <= layout.heroW,
-    g.topV.y >= 0,
-    g.leftV.y <= layout.heroH,
-  ].every(Boolean);
-  if (!clip) {
-    fail(
-      name,
-      `glass is clipped: [${glassBox.left.toFixed(0)},${glassBox.top.toFixed(0)}] → [${glassBox.right.toFixed(0)},${glassBox.bottom.toFixed(0)}] in ${W}x${H}`,
+  let restGeo: ReturnType<ReturnType<typeof makeRay>["geometry"]> | undefined;
+  let restGlassBox: Rect = { left: 0, right: 0, top: 0, bottom: 0 };
+  let restTypeGap: number = Number.NaN;
+  const scrollSummary: string[] = [];
+
+  for (const p of SCROLL_POINTS) {
+    const ray = makeRay();
+    ray.setTheme(dark);
+    ray.setLayout(layout);
+    if (p === 0) {
+      ray.paintStill(layerCtx);
+    } else {
+      ray.setScroll(p);
+      ray.setTime(3.0);
+      for (let i = 0; i < 100; i++) ray.paint(layerCtx, 16);
+    }
+    const g = ray.geometry();
+    const label = `${name}@p=${p}`;
+
+    const shouldWrite = p === 1 || writeAllFrames || TRIPTYCH_VIEWPORTS.has(name);
+    if (shouldWrite) {
+      const out = createCanvas(W, H);
+      const ctx = out.getContext("2d") as unknown as SKRSContext2D;
+      ctx.fillStyle = theme(dark).paper;
+      ctx.fillRect(0, 0, W, H);
+      ctx.drawImage(layer, 0, 0);
+      drawType(ctx, layout, dark);
+      const suffix = p === 0 ? "p0" : p === 0.5 ? "p05" : "p1";
+      writeFileSync(join(outDir, `${name}-${suffix}.png`), out.toBuffer("image/png"));
+    }
+
+    /* --- assertions at this scroll progress ----------------------------- */
+    const glassBox: Rect = {
+      left: Math.min(g.topV.x, g.leftV.x, g.rightV.x),
+      right: Math.max(g.topV.x, g.leftV.x, g.rightV.x),
+      top: Math.min(g.topV.y, g.leftV.y, g.rightV.y),
+      bottom: Math.max(g.topV.y, g.leftV.y, g.rightV.y),
+    };
+    const clip = [
+      g.leftV.x >= 0,
+      g.rightV.x <= layout.heroW + 0.5,
+      g.topV.y >= 0,
+      g.leftV.y <= layout.heroH + 0.5,
+    ].every(Boolean);
+    if (!clip) {
+      fail(
+        label,
+        `glass is clipped: [${glassBox.left.toFixed(0)},${glassBox.top.toFixed(0)}] → [${glassBox.right.toFixed(0)},${glassBox.bottom.toFixed(0)}] in ${W}x${H}`,
+      );
+    }
+
+    const shared = layout.textRects.filter(
+      (r) => r.bottom > glassBox.top && r.top < glassBox.bottom,
+    );
+    const crowded = shared.filter((r) => overlaps(glassBox, r, 2));
+    if (crowded.length) {
+      fail(label, `glass sits on ${crowded.length} type box(es) it shares a band with`);
+    }
+
+    const tileCrowded = layout.tiles.filter((t) =>
+      overlaps(glassBox, { left: t.x, right: t.x + t.width, top: t.top, bottom: t.bottom }, 2),
+    );
+    if (tileCrowded.length) {
+      fail(label, `glass sits on ${tileCrowded.length} stat tile(s)`);
+    }
+
+    // The run must not cross the lede or the CTA row at any scroll progress.
+    let unwanted = 0;
+    for (let i = 0; i <= 400; i++) {
+      const pt = ray.beamAxisAt(i / 400);
+      for (const rect of layout.textRects.slice(2))
+        if (
+          overlaps(
+            { ...rect, left: rect.left, right: rect.right },
+            { left: pt.x - 1, right: pt.x + 1, top: pt.y - 1, bottom: pt.y + 1 },
+          )
+        )
+          unwanted += 1;
+    }
+    if (unwanted > 0) fail(label, `the beam crosses the body copy in ${unwanted} samples`);
+
+    // Portrait containment at every scroll progress (including p = 1): no loud lane reaches the
+    // stat panel, checked on the live rotated/shifted strand tips.
+    if (g.mobile) {
+      const panelTop = Math.min(...layout.tiles.map((t) => t.top)) - 24;
+      const origin = g.interaction.scroll.origin;
+      const turn = g.interaction.fanTurn;
+      const spread = g.interaction.fanSpread;
+      const loud = (g.specs as { angle: number; length: number; alpha: number }[]).filter((s) => {
+        const liveAngle = s.angle + turn + (s.angle - Math.PI / 2) * (spread - 1) * 0.15;
+        const dy = Math.sin(liveAngle);
+        const dx = Math.cos(liveAngle);
+        // Where this lane intersects the hero box boundary.
+        let tExit = Number.POSITIVE_INFINITY;
+        if (Math.abs(dx) > 1e-6) {
+          const tx = ((dx > 0 ? layout.heroW : 0) - origin.x) / dx;
+          if (tx > 0) tExit = Math.min(tExit, tx);
+        }
+        if (Math.abs(dy) > 1e-6) {
+          const ty = ((dy > 0 ? layout.heroH : 0) - origin.y) / dy;
+          if (ty > 0) tExit = Math.min(tExit, ty);
+        }
+        const exitY = origin.y + dy * (Number.isFinite(tExit) ? tExit : s.length);
+        return exitY > panelTop && s.alpha > 0.35;
+      }).length;
+      if (loud > 0) fail(label, `${loud} lane(s) reach the stat panel at strength`);
+    }
+
+    if (p === 0) {
+      restGeo = g;
+      restGlassBox = glassBox;
+      const bandRight = shared.reduce((acc, r) => Math.max(acc, r.right), -Infinity);
+      restTypeGap = Number.isFinite(bandRight) ? glassBox.left - bandRight : Number.NaN;
+    }
+    scrollSummary.push(
+      `y=${Math.round(g.interaction.scroll.origin.y)}(u=${g.interaction.scroll.entryU.toFixed(2)})`,
     );
   }
 
-  const shared = layout.textRects.filter((r) => r.bottom > glassBox.top && r.top < glassBox.bottom);
-  const crowded = shared.filter((r) => overlaps(glassBox, r, 2));
-  if (crowded.length) {
-    fail(name, `glass sits on ${crowded.length} type box(es) it shares a band with`);
+  if (restGeo) {
+    console.log(
+      `  ${name.padEnd(16)} ${String(W).padStart(4)}x${String(H).padStart(4)}`,
+      `glass ${Math.round(restGeo.prismSize).toString().padStart(3)}px @ [${Math.round(restGlassBox.left)},${Math.round(restGlassBox.top)}]`,
+      `typeGap=${Number.isFinite(restTypeGap) ? Math.round(restTypeGap) : "—"}`.padEnd(12),
+      `p{0,0.5,1}: ${scrollSummary.join(" → ")}`,
+    );
   }
-
-  // The run must not cross the lede or the CTA row: crossing display type is the design,
-  // crossing a paragraph is a legibility bug.
-  const beamAt = (s: number) => {
-    const hit = g.hit;
-    return { x: g.source.x + (hit.x - g.source.x) * s, y: g.source.y + (hit.y - g.source.y) * s };
-  };
-  let unwanted = 0;
-  for (let i = 0; i <= 400; i++) {
-    const p = beamAt(i / 400);
-    for (const rect of layout.textRects.slice(2))
-      if (
-        overlaps(
-          { ...rect, left: rect.left, right: rect.right },
-          { left: p.x - 1, right: p.x + 1, top: p.y - 1, bottom: p.y + 1 },
-        )
-      )
-        unwanted += 1;
-  }
-  if (unwanted > 0) fail(name, `the beam crosses the body copy in ${unwanted} samples`);
-
-  // Portrait containment: a lane that exits level with the stat panel or below it has nothing
-  // left to describe, so it must arrive there quiet. This is the invariant that keeps the fan
-  // from painting the whole page on a phone, where the copy has no column of its own.
-  if (g.mobile) {
-    const panelTop = Math.min(...layout.tiles.map((t) => t.top)) - 24;
-    const loud = (
-      g.specs as { dir: { x: number; y: number }; length: number; alpha: number }[]
-    ).filter((s) => g.exit.y + s.dir.y * s.length > panelTop && s.alpha > 0.35).length;
-    if (loud > 0) fail(name, `${loud} lane(s) reach the stat panel at strength`);
-  }
-
-  // Gap to the type the glass actually shares a band with — `copyRight` is the widest line on
-  // the page, which is the italic on portrait, and the italic sits *below* the glass's base.
-  const bandRight = shared.reduce((acc, r) => Math.max(acc, r.right), -Infinity);
-  console.log(
-    `  ${name.padEnd(16)} ${String(W).padStart(4)}x${String(H).padStart(4)}`,
-    `glass ${Math.round(g.prismSize).toString().padStart(3)}px @ [${Math.round(glassBox.left)},${Math.round(glassBox.top)}]`,
-    `rightGap=${Math.round(layout.heroW - glassBox.right)}`,
-    `typeGap=${Number.isFinite(bandRight) ? Math.round(glassBox.left - bandRight) : "—"}`.padEnd(
-      14,
-    ),
-    `fan=${g.specs.filter((s: { alpha: number }) => s.alpha > 0.05).length}/${g.specs.length}`,
-    `→ design/hero-phase9/${name}.png`,
-  );
 }
 
 console.log(
   failures === 0
-    ? `\nsweep clean: ${selected.length} viewport(s), every layout assertion held.`
+    ? `\nsweep clean: ${selected.length} viewport(s) × ${SCROLL_POINTS.length} scroll states, every layout assertion held.`
     : `\n${failures} layout assertion(s) failed.`,
 );
 process.exit(failures === 0 ? 0 : 1);

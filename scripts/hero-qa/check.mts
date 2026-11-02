@@ -29,7 +29,12 @@ import { createCanvas } from "@napi-rs/canvas";
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { BANDS, createHeroRay, tracePrism } from "../../src/components/sections/hero-ray.ts";
+import {
+  BANDS,
+  SCROLL_LIFTS_LIGHT,
+  createHeroRay,
+  tracePrism,
+} from "../../src/components/sections/hero-ray.ts";
 
 /** Mirrors the engine's CATCH_STANDOFF: strands wrap the cursor, they never land on it. */
 const STANDOFF = 36;
@@ -37,7 +42,7 @@ import type { LayoutSnapshot } from "../../src/components/sections/hero-layout.t
 
 const here = dirname(fileURLToPath(import.meta.url));
 const dataDir = join(here, "data");
-const PHASE = process.env.HERO_PHASE ?? "7";
+const PHASE = process.env.HERO_PHASE ?? "10";
 const shotsDir = join(here, `../../design/hero-phase${PHASE}`);
 mkdirSync(shotsDir, { recursive: true });
 const files = readdirSync(dataDir)
@@ -174,10 +179,14 @@ for (const file of files) {
     assert.equal(geo.restingOrigin, "refracted-facet");
     if (!geo.mobile) assert.notEqual(geo.restOptics.firstFacet, "base");
     const facet = facets[geo.restOptics.firstFacet as keyof typeof facets];
-    assert.ok(facet, `the resting ray never leaves the glass (facet "${geo.restOptics.exitFacet}")`);
+    assert.ok(
+      facet,
+      `the resting ray never leaves the glass (facet "${geo.restOptics.exitFacet}")`,
+    );
     const [a, b] = facet;
     const edgeLength = Math.hypot(b.x - a.x, b.y - a.y) || 1;
-    const t = ((geo.exit.x - a.x) * (b.x - a.x) + (geo.exit.y - a.y) * (b.y - a.y)) / edgeLength ** 2;
+    const t =
+      ((geo.exit.x - a.x) * (b.x - a.x) + (geo.exit.y - a.y) * (b.y - a.y)) / edgeLength ** 2;
     assert.ok(t >= -1e-6 && t <= 1 + 1e-6, `exit parameter ${t.toFixed(2)} is past the facet ends`);
     assert.ok(onSegment(geo.exit, a, b, t), "exit is not on the facet the trace names");
     assert.ok(
@@ -245,7 +254,10 @@ for (const file of files) {
     const relative = (geo.prismCenter.x - layout.container.left) / (column || 1);
     if (geo.mobile) {
       // Portrait: the glass hangs in the top-right corner of a full-width column.
-      assert.ok(relative > 0.6, `portrait glass is not in the right corner (${relative.toFixed(2)})`);
+      assert.ok(
+        relative > 0.6,
+        `portrait glass is not in the right corner (${relative.toFixed(2)})`,
+      );
     } else {
       assert.ok(
         relative >= 0.55 && relative <= 0.88,
@@ -259,7 +271,7 @@ for (const file of files) {
     const fx = geo.leftV.x - geo.topV.x;
     const fy = geo.leftV.y - geo.topV.y;
     const side = (p: { x: number; y: number }) =>
-      Math.sign((fx) * (p.y - geo.topV.y) - fy * (p.x - geo.topV.x));
+      Math.sign(fx * (p.y - geo.topV.y) - fy * (p.x - geo.topV.x));
     assert.notEqual(side(geo.source), side(geo.prismCenter), "source is behind the entry plane");
     const span = Math.hypot(geo.hit.x - geo.source.x, geo.hit.y - geo.source.y);
     assert.ok(span >= 240, `incident span ${span.toFixed(1)}px is a stub`);
@@ -342,7 +354,10 @@ for (const file of files) {
         const f = i / 40;
         probes.push({
           what: "spectral exit ray",
-          p: { x: leg.from.x + (leg.to.x - leg.from.x) * f, y: leg.from.y + (leg.to.y - leg.from.y) * f },
+          p: {
+            x: leg.from.x + (leg.to.x - leg.from.x) * f,
+            y: leg.from.y + (leg.to.y - leg.from.y) * f,
+          },
         });
       }
     }
@@ -519,8 +534,10 @@ for (const file of files) {
     const drawing = live.restingDrawing;
     assert.equal(drawing.internalLegs.length, 0, "rest paints internal traced legs");
     assert.ok(drawing.hinge, "entry hinge is missing");
-    assert.ok(Math.hypot(drawing.hinge.to.x - live.hit.x,
-      drawing.hinge.to.y - live.hit.y) <= 2.01, "hinge extends into the body");
+    assert.ok(
+      Math.hypot(drawing.hinge.to.x - live.hit.x, drawing.hinge.to.y - live.hit.y) <= 2.01,
+      "hinge extends into the body",
+    );
     assert.ok(drawing.exitRays.length >= 3, "several colours must emit at rest");
     let previousAngle: number | undefined;
     let order = 0;
@@ -534,11 +551,15 @@ for (const file of files) {
       }
       previousAngle = angle;
       for (let t = 0.05; t <= 1; t += 0.05) {
-        assert.ok(!inPrism(ray.from.x + (ray.to.x - ray.from.x) * t,
-          ray.from.y + (ray.to.y - ray.from.y) * t), "exit ray enters the body");
+        assert.ok(
+          !inPrism(
+            ray.from.x + (ray.to.x - ray.from.x) * t,
+            ray.from.y + (ray.to.y - ray.from.y) * t,
+          ),
+          "exit ray enters the body",
+        );
       }
     }
-
   });
 
   check("the current catches the pointer, and never overshoots it", () => {
@@ -753,6 +774,267 @@ for (const file of files) {
       !near(moved.exit.y, geo.exit.y, 0.5),
       "exit didn't follow the section height — geometry may be hard-coded",
     );
+  });
+
+  check("scroll band: glass, exit rays, and beam stay inside the frame and clear of type", () => {
+    const canvas = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
+    const ctx = canvas.getContext("2d") as never;
+    const rects = [
+      ...layout.textRects.map((r) => ({ name: "type", ...r })),
+      ...layout.tiles.map((tile) => ({
+        name: "tile",
+        left: tile.x,
+        right: tile.x + tile.width,
+        top: tile.top,
+        bottom: tile.bottom,
+      })),
+    ];
+    const pad = 4;
+    const hitsObstacle = (p: { x: number; y: number }) =>
+      rects.find(
+        (r) =>
+          p.x > r.left - pad && p.x < r.right + pad && p.y > r.top - pad && p.y < r.bottom + pad,
+      )?.name;
+
+    const states: ReturnType<typeof ray.geometry>[] = [];
+    for (const p of [0, 0.5, 1]) {
+      const live = createHeroRay();
+      live.setTheme(capture.dark);
+      live.setLayout(layout);
+      live.setScroll(p);
+      live.setTime(3.0);
+      for (let i = 0; i < 100; i++) live.paint(ctx, 16);
+      const state = live.geometry();
+      states.push(state);
+
+      assert.ok(
+        state.leftV.x >= 0 &&
+          state.rightV.x <= state.heroW + 0.5 &&
+          state.topV.y >= 0 &&
+          state.rightV.y <= state.heroH + 0.5,
+        `scroll=${p} clips glass: topV.y=${state.topV.y.toFixed(1)}, rightV.y=${state.rightV.y.toFixed(1)}`,
+      );
+      const maxShift = SCROLL_LIFTS_LIGHT ? state.scrollBand.up : state.scrollBand.down;
+      assert.ok(
+        Math.abs(state.interaction.scroll.shiftY) <= maxShift + 1e-6,
+        `scroll=${p} shiftY ${state.interaction.scroll.shiftY.toFixed(1)} exceeds band ${maxShift.toFixed(1)}`,
+      );
+
+      for (const vertex of [
+        state.topV,
+        state.leftV,
+        state.rightV,
+        state.interaction.scroll.hit,
+        state.interaction.scroll.origin,
+      ]) {
+        const hitName = hitsObstacle(vertex);
+        assert.ok(
+          !hitName,
+          `scroll=${p} point (${vertex.x.toFixed(0)}, ${vertex.y.toFixed(0)}) lands on ${hitName}`,
+        );
+      }
+      for (const leg of state.restingDrawing.exitRays) {
+        for (let i = 0; i <= 20; i++) {
+          const f = i / 20;
+          const pt = {
+            x: leg.from.x + (leg.to.x - leg.from.x) * f,
+            y: leg.from.y + (leg.to.y - leg.from.y) * f,
+          };
+          const hitName = hitsObstacle(pt);
+          assert.ok(!hitName, `scroll=${p} spectral exit ray lands on ${hitName}`);
+        }
+      }
+      for (let i = 0; i <= 200; i++) {
+        const pt = live.beamAxisAt(i / 200);
+        for (const body of layout.textRects.slice(2)) {
+          assert.ok(
+            !(
+              pt.x >= body.left - 1 &&
+              pt.x <= body.right + 1 &&
+              pt.y >= body.top - 1 &&
+              pt.y <= body.bottom + 1
+            ),
+            `scroll=${p} incident beam crosses body copy at (${pt.x.toFixed(0)}, ${pt.y.toFixed(0)})`,
+          );
+        }
+      }
+      if (p === 1) {
+        writeFileSync(
+          join(shotsDir, `phase${PHASE}-engine-${capture.name}-scroll.png`),
+          composite(canvas, layout, capture.dark).toBuffer("image/png"),
+        );
+      }
+    }
+
+    // Coherent optical motion from p=0 to p=1: entry, internal leg, and dispersion origin all move.
+    const at0 = states[0].interaction.scroll;
+    const at1 = states[2].interaction.scroll;
+    const sign = SCROLL_LIFTS_LIGHT ? -1 : 1;
+    assert.ok(
+      (at1.hit.y - at0.hit.y) * sign > 12,
+      `incident entry barely moved vertically (${at0.hit.y.toFixed(1)} → ${at1.hit.y.toFixed(1)})`,
+    );
+    assert.ok(
+      (at1.origin.y - at0.origin.y) * sign > 12,
+      `dispersion origin barely moved vertically (${at0.origin.y.toFixed(1)} → ${at1.origin.y.toFixed(1)})`,
+    );
+    assert.ok(at1.internalLeg, "scrolled glass did not trace an internal refracted leg");
+    assert.ok(
+      near(at1.internalLeg!.from.x, at1.hit.x, 0.05) &&
+        near(at1.internalLeg!.from.y, at1.hit.y, 0.05) &&
+        near(at1.internalLeg!.to.x, at1.origin.x, 0.05) &&
+        near(at1.internalLeg!.to.y, at1.origin.y, 0.05),
+      "scrolled internal leg does not bridge live entry and dispersion origin",
+    );
+  });
+
+  check(
+    "scroll entry stays in [0.12, 0.86] and paintStill() is byte-identical after scroll",
+    () => {
+      const a = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
+      const b = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
+      const scratch = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
+      const live = createHeroRay();
+      live.setTheme(capture.dark);
+      live.setLayout(layout);
+
+      // Baseline still before any scroll has touched the engine.
+      live.paintStill(a.getContext("2d") as never);
+
+      for (const p of [0, 0.25, 0.5, 0.75, 1]) {
+        live.setScroll(p);
+        for (let i = 0; i < 90; i++) live.paint(scratch.getContext("2d") as never, 16);
+        const u = live.geometry().interaction.scroll.entryU;
+        assert.ok(
+          u >= 0.12 - 1e-9 && u <= 0.86 + 1e-9,
+          `scroll=${p} entryU=${u} escaped [0.12,0.86]`,
+        );
+      }
+
+      // Reduced-motion / still render after heavy scroll must be byte-identical to baseline.
+      live.paintStill(b.getContext("2d") as never);
+      const afterStill = live.geometry().interaction.scroll;
+      assert.equal(afterStill.target, 0, "paintStill did not reset scrollTarget");
+      assert.equal(afterStill.ease, 0, "paintStill did not reset scrollEase");
+      assert.equal(afterStill.shiftY, 0, "paintStill did not reset shiftY");
+
+      const da = a.getContext("2d").getImageData(0, 0, a.width, a.height).data;
+      const db = b.getContext("2d").getImageData(0, 0, b.width, b.height).data;
+      let diff = 0;
+      for (let i = 0; i < da.length; i++) if (da[i] !== db[i]) diff += 1;
+      assert.equal(diff, 0, `${diff} RGBA bytes leaked from scroll into paintStill()`);
+    },
+  );
+
+  check("scroll easing converges on real dtMs and scrubs smoothly up and down", () => {
+    const canvas = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
+    const ctx = canvas.getContext("2d") as never;
+
+    // 1. Convergence within 1 s at 60 fps, and reversible back to 0 when scrolling up.
+    const live = createHeroRay();
+    live.setLayout(layout);
+    live.setScroll(1);
+    for (let i = 0; i < 64; i++) live.paint(ctx, 16);
+    assert.ok(
+      Math.abs(live.geometry().interaction.scroll.ease - 1) < 0.01,
+      `scrollEase ${live.geometry().interaction.scroll.ease.toFixed(4)} did not converge to 1 in 1s`,
+    );
+    live.setScroll(0);
+    for (let i = 0; i < 64; i++) live.paint(ctx, 16);
+    assert.ok(
+      live.geometry().interaction.scroll.ease < 0.01,
+      `scrollEase ${live.geometry().interaction.scroll.ease.toFixed(4)} did not return to 0 on upward scroll`,
+    );
+
+    // 2. Real dtMs independence: 30 frames × 16 ms vs 15 frames × 32 ms (480 ms either way).
+    const r60 = createHeroRay();
+    const r30 = createHeroRay();
+    r60.setLayout(layout);
+    r30.setLayout(layout);
+    r60.setScroll(1);
+    r30.setScroll(1);
+    for (let i = 0; i < 30; i++) r60.paint(ctx, 16);
+    for (let i = 0; i < 15; i++) r30.paint(ctx, 32);
+    assert.ok(
+      near(r60.geometry().interaction.scroll.ease, r30.geometry().interaction.scroll.ease, 0.002),
+      "scroll easing depends on frame count instead of real dtMs",
+    );
+  });
+
+  check("pointer precedence: inside the glass entryU follows the pointer, then hands back", () => {
+    const canvas = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
+    const ctx = canvas.getContext("2d") as never;
+    const live = createHeroRay();
+    live.setLayout(layout);
+    live.setScroll(1);
+    for (let i = 0; i < 100; i++) live.paint(ctx, 16);
+    const scrolled = live.geometry();
+    const scrollOnlyU = scrolled.interaction.entryU;
+
+    // Place pointer inside the shifted glass near u = 0.72 along its left facet.
+    const facetPt = {
+      x: scrolled.topV.x + (scrolled.leftV.x - scrolled.topV.x) * 0.72,
+      y: scrolled.topV.y + (scrolled.leftV.y - scrolled.topV.y) * 0.72,
+    };
+    const px = facetPt.x + (scrolled.prismCenter.x - facetPt.x) * 0.45;
+    const py = facetPt.y + (scrolled.prismCenter.y - facetPt.y) * 0.45;
+    const fdx = scrolled.leftV.x - scrolled.topV.x;
+    const fdy = scrolled.leftV.y - scrolled.topV.y;
+    const expectedU = Math.max(
+      0.12,
+      Math.min(
+        0.86,
+        ((px - scrolled.topV.x) * fdx + (py - scrolled.topV.y) * fdy) / (fdx * fdx + fdy * fdy),
+      ),
+    );
+
+    live.setPointer(px, py, true);
+    for (let i = 0; i < 120; i++) live.paint(ctx, 16);
+    const withPointer = live.geometry().interaction;
+    assert.ok(withPointer.pointerInGlass > 0.99, "pointer did not enter the shifted glass");
+    assert.ok(
+      near(withPointer.entryU, expectedU, 0.005),
+      `entryU ${withPointer.entryU.toFixed(3)} ignored pointer (${expectedU.toFixed(3)})`,
+    );
+
+    // Release pointer: optics hand cleanly back to scroll.
+    live.setPointer(0, 0, false);
+    for (let i = 0; i < 120; i++) live.paint(ctx, 16);
+    const handedBack = live.geometry().interaction;
+    assert.equal(handedBack.pointerInGlass, 0, "pointerInGlass did not release");
+    assert.ok(
+      near(handedBack.entryU, scrollOnlyU, 0.005),
+      `entryU ${handedBack.entryU.toFixed(3)} did not hand back to scroll (${scrollOnlyU.toFixed(3)})`,
+    );
+  });
+
+  check("scroll keeps strand continuity, full-bleed tips, and reuses strand buffers", () => {
+    const canvas = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
+    const ctx = canvas.getContext("2d") as never;
+    const live = createHeroRay();
+    live.setLayout(layout);
+    const initialBufs = Array.from({ length: geo.strands.length }, (_, i) => live.strandBuffer(i));
+
+    for (const p of [0.5, 1]) {
+      live.setScroll(p);
+      for (let i = 0; i < 90; i++) live.paint(ctx, 16);
+      const state = live.geometry();
+      const origin = state.interaction.scroll.origin;
+      for (const [i, strand] of state.strands.entries()) {
+        assert.equal(live.strandBuffer(i), initialBufs[i], `strand ${i} reallocated its buffer`);
+        assert.ok(
+          near(strand.root.x, origin.x, 0.01) && near(strand.root.y, origin.y, 0.01),
+          `scroll=${p} strand ${i} root detached from live origin`,
+        );
+        assert.ok(
+          strand.tip.x <= 0 ||
+            strand.tip.x >= layout.heroW ||
+            strand.tip.y <= 0 ||
+            strand.tip.y >= layout.heroH,
+          `scroll=${p} strand ${i} stopped inside the frame`,
+        );
+      }
+    }
   });
 }
 
