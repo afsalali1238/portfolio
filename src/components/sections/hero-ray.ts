@@ -2007,6 +2007,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     placedHitX = NaN,
     placedHitY = NaN;
   let glassGrad: Gradient | null = null;
+  let nearFaceGrad: Gradient | null = null;
+  let farFaceGrad: Gradient | null = null;
   let ambientGrad: Gradient | null = null;
   let dissolveKey = "";
   let dissolveCtx: Ctx | null = null;
@@ -2094,6 +2096,30 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       glass.addColorStop(1, "rgba(255,255,255,0.82)");
     }
     glassGrad = glass;
+
+    const near = ctx.createLinearGradient(topV.x, topV.y, leftV.x, leftV.y);
+    near.addColorStop(0, isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.5)");
+    near.addColorStop(1, isDark ? "rgba(255,255,255,0.01)" : "rgba(255,255,255,0.12)");
+    nearFaceGrad = near;
+
+    const centroidX = (topV.x + leftV.x + rightV.x) / 3;
+    const centroidY = (topV.y + leftV.y + rightV.y) / 3;
+    const foldX = centroidX - topV.x;
+    const foldY = centroidY - topV.y;
+    const foldLen = Math.hypot(foldX, foldY) || 1;
+    const nx = -foldY / foldLen;
+    const ny = foldX / foldLen;
+    const ramp = Math.max(8, geo.prismSize * 0.055);
+    const far = ctx.createLinearGradient(
+      topV.x - nx * ramp,
+      topV.y - ny * ramp,
+      topV.x + nx * ramp,
+      topV.y + ny * ramp,
+    );
+    far.addColorStop(0, "rgba(0,0,0,0)");
+    far.addColorStop(0.55, isDark ? "rgba(0,0,0,0.09)" : "rgba(0,0,0,0.03)");
+    far.addColorStop(1, isDark ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.045)");
+    farFaceGrad = far;
 
     const warm = isDark ? BANDS[2].dark : BANDS[2].light;
     const ambRadius = Math.hypot(heroW, heroH) * 0.95;
@@ -3191,9 +3217,19 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     // --- 3. the three faces. A prism seen head-on is one shape; a prism seen as glass is
     //        three faces at three values with one bright edge between them.
     // The near face: the one turned toward the light, from the apex down the incident side.
-    const nearFace = ctx.createLinearGradient(litA.x, litA.y, litB.x, litB.y);
-    nearFace.addColorStop(0, isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.5)");
-    nearFace.addColorStop(1, isDark ? "rgba(255,255,255,0.01)" : "rgba(255,255,255,0.12)");
+    const nearFace =
+      nearFaceGrad &&
+      litA.x === topV.x &&
+      litA.y === topV.y &&
+      litB.x === leftV.x &&
+      litB.y === leftV.y
+        ? nearFaceGrad
+        : (() => {
+            const nf = ctx.createLinearGradient(litA.x, litA.y, litB.x, litB.y);
+            nf.addColorStop(0, isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.5)");
+            nf.addColorStop(1, isDark ? "rgba(255,255,255,0.01)" : "rgba(255,255,255,0.12)");
+            return nf;
+          })();
     trace();
     ctx.fillStyle = nearFace;
     ctx.fill();
@@ -3204,21 +3240,26 @@ export function createHeroRay(options: HeroRayOptions = {}) {
      * body — a stroke where there should be glass. Twelve pixels of transition is still a fold
      * (the eye reads an edge at any gradient above ~3 levels) and it is no longer a line.
      */
-    const foldX = centroid.x - topV.x;
-    const foldY = centroid.y - topV.y;
-    const foldLen = Math.hypot(foldX, foldY) || 1;
-    const nx = -foldY / foldLen;
-    const ny = foldX / foldLen;
-    const ramp = Math.max(8, prismSize * 0.055);
-    const farFace = ctx.createLinearGradient(
-      topV.x - nx * ramp,
-      topV.y - ny * ramp,
-      topV.x + nx * ramp,
-      topV.y + ny * ramp,
-    );
-    farFace.addColorStop(0, "rgba(0,0,0,0)");
-    farFace.addColorStop(0.55, isDark ? "rgba(0,0,0,0.09)" : "rgba(0,0,0,0.03)");
-    farFace.addColorStop(1, isDark ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.045)");
+    const farFace =
+      farFaceGrad ??
+      (() => {
+        const foldX = centroid.x - topV.x;
+        const foldY = centroid.y - topV.y;
+        const foldLen = Math.hypot(foldX, foldY) || 1;
+        const nx = -foldY / foldLen;
+        const ny = foldX / foldLen;
+        const ramp = Math.max(8, prismSize * 0.055);
+        const ff = ctx.createLinearGradient(
+          topV.x - nx * ramp,
+          topV.y - ny * ramp,
+          topV.x + nx * ramp,
+          topV.y + ny * ramp,
+        );
+        ff.addColorStop(0, "rgba(0,0,0,0)");
+        ff.addColorStop(0.55, isDark ? "rgba(0,0,0,0.09)" : "rgba(0,0,0,0.03)");
+        ff.addColorStop(1, isDark ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.045)");
+        return ff;
+      })();
     trace();
     ctx.fillStyle = farFace;
     ctx.fill();

@@ -44,6 +44,8 @@ const AUTONOMOUS_RESUME_MS = 6_000;
 const SCROLL_WAKE_MS = 400;
 /** Keep the complete source ignition at display rate, even with a stationary pointer. */
 const CLICK_WAKE_MS = 850;
+/** After this long without interaction, the rAF loop quietly rests at 0 fps. */
+const SLEEP_IDLE_AFTER_MS = 20_000;
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
@@ -316,6 +318,24 @@ export function HeroPrism({
       const scrollOwnsField = scrollProgress > 0.02 || now - lastScrollTs <= AUTONOMOUS_RESUME_MS;
       const drifting =
         autonomous && !scrollOwnsField && now - lastRealPointerAt > AUTONOMOUS_RESUME_MS;
+
+      // After prolonged total idle, quietly rest at 0 fps until user interaction.
+      const canSleep =
+        pointerIdle &&
+        scrollIdle &&
+        !pointerInside &&
+        now - lastPointerTs > SLEEP_IDLE_AFTER_MS &&
+        now - lastScrollTs > SLEEP_IDLE_AFTER_MS &&
+        now - lastClickTs > SLEEP_IDLE_AFTER_MS;
+      if (canSleep && !drifting) {
+        running = false;
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+        ray.paint(drawCtx, Math.min(MAX_DELTA_MS, elapsed));
+        markPainted();
+        return;
+      }
+
       if (drifting && anchor && anchor.size > 0) {
         // A lissajous well inside the triangle's inradius (0.16·size < r/2), so the synthetic
         // point never crosses the body's edge and the refraction never pops.
@@ -363,6 +383,12 @@ export function HeroPrism({
       }
     };
 
+    const wakeLoop = () => {
+      if (!running && inView && !document.hidden && !prefersReduced) {
+        syncLoop();
+      }
+    };
+
     /**
      * Pointer position in hero-local CSS px.
      *
@@ -396,7 +422,10 @@ export function HeroPrism({
       if (!activeTouch || activeTouch.isStageTouch) {
         ray.setPointer(x, y, inside);
       }
-      if (inside) lastPointerTs = performance.now();
+      if (inside) {
+        lastPointerTs = performance.now();
+        wakeLoop();
+      }
     };
 
     const onPointerDown = (e: PointerEvent) => {
@@ -404,6 +433,9 @@ export function HeroPrism({
       const x = e.clientX - rectLeft;
       const y = e.clientY - rectTop;
       if (x < 0 || x > cssW || y < 0 || y > cssH) return;
+
+      lastPointerTs = performance.now();
+      wakeLoop();
 
       if (e.pointerType === "touch") {
         if (e.isPrimary === false) return;
@@ -501,7 +533,10 @@ export function HeroPrism({
       if (prefersReduced) return;
       scrollProgress = clamp01((heroDocTop - rectTop) / Math.max(1, cssH));
       ray.setScroll(scrollProgress);
-      if (inView) lastScrollTs = performance.now();
+      if (inView) {
+        lastScrollTs = performance.now();
+        wakeLoop();
+      }
     };
 
     const onVisibility = () => syncLoop();
@@ -520,6 +555,7 @@ export function HeroPrism({
         cyclePreset: () => {
           if (prefersReduced) return "rest";
           lastClickTs = performance.now();
+          wakeLoop();
           if (sourceMode === "custom") {
             ray.resetSource();
             setMode("rest");
@@ -540,6 +576,7 @@ export function HeroPrism({
         reset: () => {
           if (prefersReduced) return;
           lastClickTs = performance.now();
+          wakeLoop();
           ray.resetSource();
           setMode("rest");
         },
@@ -572,6 +609,7 @@ export function HeroPrism({
     // Tile coupling: read the hovered tile from data attributes rather than attaching twelve
     // listeners — the engine only needs to know which band to light.
     const onHeroPointerOver = (e: PointerEvent) => {
+      wakeLoop();
       const target = e.target as Element | null;
       const tile = target?.closest?.("[data-hero-tile]");
       const tiles = Array.from(hero.querySelectorAll<HTMLElement>("[data-hero-tile]"));
