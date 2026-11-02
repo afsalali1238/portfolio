@@ -29,7 +29,7 @@ function StatLink({
     <Link
       to="/works"
       search={filterKey === "all" ? {} : { filter: filterKey }}
-      className="group flex flex-col justify-between rounded-md p-3.5 sm:p-4 text-left transition-colors duration-150 hover:bg-paper-deep/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+      className="group flex flex-col justify-between rounded-md p-3.5 sm:p-4 text-left transition-colors duration-150 hover:bg-paper-deep/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
       aria-label={`${value} builds — ${label}. See them.`}
       data-hero-tile
     >
@@ -138,7 +138,7 @@ export function Hero() {
         {/* Shipped & verified metrics — stat tiles that pre-filter the catalogue */}
         <div
           data-hero-tiles
-          className="mt-12 sm:mt-14 grid grid-cols-2 gap-3 sm:gap-4 rounded-lg bg-paper/90 p-4 sm:p-6 backdrop-blur-xs text-sm md:grid-cols-4 border rule-hair"
+          className="mt-12 sm:mt-14 grid grid-cols-2 gap-3 sm:gap-4 rounded-lg bg-paper/35 p-4 sm:p-6 backdrop-blur-md text-sm md:grid-cols-4 border rule-hair"
         >
           <StatLink label="Total shipped" value={String(projectCount)} filterKey="all" />
           <StatLink label="Live on the internet" value={String(liveCount)} filterKey="live" />
