@@ -888,13 +888,20 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         layout.container.left,
       );
       /**
-       * Centre-right, measured against the content column rather than the viewport: the glass
-       * is the right-hand anchor of a left-aligned composition, so its position has to read
-       * the same on a 1024 laptop and a 1920 monitor. Three bounds, in order of authority:
-       * the copy it shares a band with, the column's centre-right target, and the frame edge.
+       * The glass aims at the **middle of the column**, not at a right-hand anchor: the
+       * dispersion is the section's centrepiece, so the shape that creates it has to sit on
+       * the composition's centre line rather than pinned to the frame edge. Measured against
+       * the content column rather than the viewport, which is what makes it read the same on a
+       * 1024 laptop and a 1920 monitor.
+       *
+       * Three bounds, in order of authority: the copy it shares a band with, that centre, and
+       * the frame edge. The centre is only the *aim* — on this composition the display type
+       * reaches roughly the middle of the page, so in practice the copy's clearance is what
+       * decides, and the glass settles just past the last glyph instead of somewhere out on
+       * the right shoulder. That is the intended reading: the glass is held back by the words,
+       * never by a chosen offset.
        */
-      const target =
-        layout.container.left + (layout.container.right - layout.container.left) * 0.75;
+      const target = layout.container.left + (layout.container.right - layout.container.left) * 0.5;
       const clearance = bandRight + halfW + 24;
       const ceiling = heroW - halfW - Math.max(14, heroW * 0.02);
       const centreX = Math.min(ceiling, Math.max(clearance, target));
