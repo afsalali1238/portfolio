@@ -7,7 +7,6 @@ import {
   liveCount,
   forPeopleCount,
   sourceCount,
-  numberWord,
 } from "../../data/projects";
 import { RevealWord } from "./hero-helpers";
 import { HeroPrism, type HeroPrismControl, type HeroSourceMode } from "./HeroPrism";
@@ -143,11 +142,10 @@ export function Hero() {
               </span>
             </h1>
 
-            {/* max-w-md keeps the paragraph at three lines while clearing the glass's band. */}
+            {/* max-w-md keeps the paragraph while clearing the glass's band. */}
             <p className="max-w-md text-base leading-relaxed text-ink-soft md:text-lg">
               Documenting what happens when the wall between having an idea and building it
-              disappears. {numberWord(projectCount)} quiet tools, public code, and honest field
-              notes.
+              disappears.
             </p>
 
             {/* `sm:w-fit`: the row's box is measured, so it must not be wider than its buttons. */}
