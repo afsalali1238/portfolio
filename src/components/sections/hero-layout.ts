@@ -48,11 +48,11 @@ export type LayoutSnapshot = {
   /** right edge of the copy block (h1 ∪ ledger), hero-relative */
   copyRight: number;
   /**
-   * The closing sentence's ink extent plus its true baseline. The beam's landing height is
-   * derived from the baseline (it lands in the gap just below the display type), so this is
-   * the one piece of type the composition is anchored to.
+   * The closing sentence's ink extent, its true baseline and its line-box bottom. The beam's
+   * landing height is solved against the gap between this box and the paragraph below it, so
+   * this is the one piece of type the whole composition is anchored to.
    */
-  thesisLine: { left: number; right: number; baselineY: number };
+  thesisLine: { left: number; right: number; baselineY: number; bottom: number };
   /** the four stat tiles, left → right */
   tiles: TileRect[];
   /** the Container's content box */
@@ -167,7 +167,7 @@ function fallbackSnapshot(w: number, h: number): LayoutSnapshot {
     heroW: w,
     heroH: h,
     copyRight: right * 0.58,
-    thesisLine: { left, right: right * 0.56, baselineY: h * 0.3 },
+    thesisLine: { left, right: right * 0.56, baselineY: h * 0.3, bottom: h * 0.3 + h * 0.03 },
     tiles: [0, 1, 2, 3].map((i) => {
       const cx = lerpNumbers(left, right, (i + 0.5) / 4);
       return { x: cx - 60, top: h * 0.72, bottom: h * 0.9, cx, width: 120 };
@@ -231,6 +231,13 @@ export function measureHero(hero: HTMLElement): LayoutSnapshot {
       thesisRect,
       thesisRect.bottom - (thesisRect.bottom - thesisRect.top) * 0.24,
     ),
+    /**
+     * The bottom of the line box, not of the ink. `hero-ray` threads the incident beam through
+     * the gap between this sentence and the paragraph below, and that gap is measured from the
+     * box the browser actually laid out — a descender extent would leave the beam sitting on
+     * the baseline, which is exactly where it used to cut through the last word.
+     */
+    bottom: thesisRect.bottom,
   };
 
   const ledeEl = copyEl?.querySelector<HTMLElement>("p") ?? null;

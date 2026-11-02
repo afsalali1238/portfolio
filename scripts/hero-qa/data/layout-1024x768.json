@@ -12,7 +12,8 @@
   "thesisLine": {
    "left": 40,
    "right": 528.015625,
-   "baselineY": 246.359375
+   "baselineY": 246.359375,
+   "bottom": 255
   },
   "tiles": [
    {

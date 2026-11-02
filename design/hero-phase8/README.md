@@ -25,8 +25,8 @@ either. Moving one number moves the whole picture coherently.
 
 | viewport | prism centre                                      | beam source               | landing on the left facet | dispersion origin |
 | -------- | ------------------------------------------------- | ------------------------- | ------------------------- | ----------------- |
-| 1440     | (823, 359) · 57 % of the hero, 59 % of the column | left frame edge, (0, 90)  | (793, 278)                | (868, 303)        |
-| 1024     | (667, 351) · 65 %                                 | left frame edge, (0, 118) | (637, 269)                | (712, 295)        |
+| 1440     | (823, 388) · 57 % of the hero, 59 % of the column | left frame edge, (0, 119) | (793, 307)                | (868, 333)        |
+| 1024     | (667, 376) · 65 %                                 | left frame edge, (0, 145) | (637, 296)                | (712, 322)        |
 | 390      | (337, 64) · corner                                | lower left, (0, 135)      | right facet               | right facet       |
 
 ### The glass aims at the _column's middle_, not at a right-hand anchor
@@ -78,6 +78,28 @@ positions are from the original capture.
 A width sweep from 640 to 2560 px keeps all of it true: no clipped vertex, the column-relative
 position between 55 % and 88 %, an incident span above 240 px, and a source on the frame edge
 at every width.
+
+### The landing height is solved, not tuned
+
+The glass hangs off the landing point, so "where does the light come in" and "how high is the
+prism" are the same question. That height used to be `baseline + 10 % of the prism size`, which
+put the run about 30 px too high: it crossed the last word of the closing sentence ("asked.") on
+its way to the facet. Moving it down by eye has a narrow window — 50 px lower and the run is
+inside the first line of the paragraph instead — so it is solved against both boxes:
+
+```
+y(x) = landingY − (hitX − x)·tan(13°)
+
+below the italic   landingY ≥ thesis.bottom + 10 + (hitX − thesis.right)·tan13°
+above the lede     landingY ≤ lede.top      − 12 + (hitX − lede.right)·tan13°
+landingY           = the midpoint of that window
+```
+
+At 1440 the window is 300–314 px, so the run now passes cleanly between the display type and the
+body copy, and the glass sits 29 px lower (centre y 388 instead of 359). The solve is done in two
+passes because the landing sets the glass and the glass sets where the landing sits on the facet.
+If a layout ever closes the window — a wrapped lede, a short hero — the sentence wins: passing
+under light type is merely ugly, passing through a paragraph costs legibility.
 
 ### Why the beam descends from upper-left
 
