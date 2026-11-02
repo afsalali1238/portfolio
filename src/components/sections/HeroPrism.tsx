@@ -35,6 +35,8 @@ const HALF_RATE_MIN_STEP_MS = 1000 / 30 - 2;
 const AUTONOMOUS_RESUME_MS = 6_000;
 /** How long a scroll gesture keeps the loop at full 60 fps before dropping back to 30 fps idle. */
 const SCROLL_WAKE_MS = 400;
+/** Keep the complete source ignition at display rate, even with a stationary pointer. */
+const CLICK_WAKE_MS = 850;
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
@@ -112,6 +114,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     // hero should run at full rate, so the half-rate path only opens once it has had its 2.5 s.
     let lastPointerTs = performance.now();
     let lastScrollTs = 0;
+    let lastClickTs = -Infinity;
     let scrollProgress = 0;
     let wasDrifting = false;
     let lastRealPointerAt = 0;
@@ -260,7 +263,13 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       const scrollIdle = now - lastScrollTs > SCROLL_WAKE_MS;
       // Idle: paint every other callback. Skipping here (rather than inside the engine) keeps
       // the ripple's phase honest, because dt is measured between paints, not between frames.
-      if (pointerIdle && scrollIdle && elapsed < HALF_RATE_MIN_STEP_MS) return;
+      if (
+        pointerIdle &&
+        scrollIdle &&
+        now - lastClickTs > CLICK_WAKE_MS &&
+        elapsed < HALF_RATE_MIN_STEP_MS
+      )
+        return;
       lastPaintTs = ts;
 
       const scrollOwnsField = scrollProgress > 0.02 || now - lastScrollTs <= AUTONOMOUS_RESUME_MS;
@@ -331,11 +340,31 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     };
 
     const onPointerDown = (e: PointerEvent) => {
-      lastRealPointerAt = performance.now();
+      if (
+        prefersReduced ||
+        e.button !== 0 ||
+        (e.target instanceof Element && e.target.closest("a, button, [role='button']"))
+      )
+        return;
       const x = e.clientX - rectLeft;
       const y = e.clientY - rectTop;
       if (x < 0 || x > cssW || y < 0 || y > cssH) return;
-      ray.addSurge(x, y);
+      lastRealPointerAt = performance.now();
+      lastClickTs = lastRealPointerAt;
+      ray.placeSource(x, y);
+    };
+
+    const onDoubleClick = (e: MouseEvent) => {
+      if (
+        prefersReduced ||
+        (e.target instanceof Element && e.target.closest("a, button, [role='button']"))
+      )
+        return;
+      const x = e.clientX - rectLeft,
+        y = e.clientY - rectTop;
+      if (x < 0 || x > cssW || y < 0 || y > cssH) return;
+      lastClickTs = performance.now();
+      ray.resetSource();
     };
 
     const onPointerLeave = () => {
@@ -414,6 +443,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
 
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("pointerdown", onPointerDown, { passive: true });
+    window.addEventListener("dblclick", onDoubleClick, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("blur", onPointerLeave);
     document.addEventListener("pointerleave", onPointerLeave);
@@ -438,6 +468,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       hero.removeEventListener("pointerover", onHeroPointerOver);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("dblclick", onDoubleClick);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("blur", onPointerLeave);
       document.removeEventListener("pointerleave", onPointerLeave);

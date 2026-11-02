@@ -7,7 +7,8 @@
     "check": "tsx check.mts",
     "compose": "tsx compose.mts",
     "bench": "tsx bench.mts",
-    "sweep": "tsx sweep.mts"
+    "sweep": "tsx sweep.mts",
+    "check:source": "tsx source-placement.mts"
   },
   "dependencies": {
     "@napi-rs/canvas": "^1.1.0"

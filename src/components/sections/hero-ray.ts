@@ -564,7 +564,14 @@ const rayExit = (from: Vec, dir: Vec, w: number, h: number) => {
 };
 
 /** A geometrical ray in an equilateral glass prism. Angles are measured from normals. */
-export function tracePrism(source: Vec, entry: Vec, top: Vec, left: Vec, right: Vec) {
+export function tracePrism(
+  source: Vec,
+  entry: Vec,
+  top: Vec,
+  left: Vec,
+  right: Vec,
+  entryFacet: "left" | "base" | "right" = "left",
+) {
   const n = 1.5;
   const critical = Math.asin(1 / n);
   const normalize = (v: Vec): Vec => {
@@ -573,7 +580,9 @@ export function tracePrism(source: Vec, entry: Vec, top: Vec, left: Vec, right: 
   };
   const dot = (a: Vec, b: Vec) => a.x * b.x + a.y * b.y;
   const cross = (a: Vec, b: Vec) => a.x * b.y - a.y * b.x;
-  const tangent = normalize({ x: left.x - top.x, y: left.y - top.y });
+  const entryA = entryFacet === "left" ? top : entryFacet === "base" ? left : right;
+  const entryB = entryFacet === "left" ? left : entryFacet === "base" ? right : top;
+  const tangent = normalize({ x: entryB.x - entryA.x, y: entryB.y - entryA.y });
   const inward = { x: tangent.y, y: -tangent.x };
   const incident = normalize({ x: entry.x - source.x, y: entry.y - source.y });
   const cosIn = clamp(dot(incident, inward), 0, 1);
@@ -595,7 +604,7 @@ export function tracePrism(source: Vec, entry: Vec, top: Vec, left: Vec, right: 
     { name: "right" as const, a: right, b: top },
   ];
   let point = entry;
-  let last = "left";
+  let last: string = entryFacet;
   let firstAngle = 0;
   let firstFacet = "";
   let tir = false;
@@ -662,6 +671,56 @@ export function tracePrism(source: Vec, entry: Vec, top: Vec, left: Vec, right: 
     reflected,
     fresnel,
     deviation,
+  };
+}
+
+/** Choose a visible facet and a comfortable landing away from its vertices. */
+export function sourceLanding(source: Vec, top: Vec, left: Vec, right: Vec) {
+  const faces = [
+    { name: "left" as const, a: top, b: left },
+    { name: "base" as const, a: left, b: right },
+    { name: "right" as const, a: right, b: top },
+  ];
+  const cross = (ax: number, ay: number, bx: number, by: number) => ax * by - ay * bx;
+  let best = Infinity;
+  let chosen = faces[0];
+  let chosenU = 0.5;
+  for (const face of faces) {
+    const dx = face.b.x - face.a.x,
+      dy = face.b.y - face.a.y;
+    // The right-hand normal of each directed edge points into the triangle.
+    if (cross(dx, dy, source.x - face.a.x, source.y - face.a.y) <= 0) continue;
+    const u = clamp(
+      ((source.x - face.a.x) * dx + (source.y - face.a.y) * dy) / (dx * dx + dy * dy || 1),
+      0.22,
+      0.78,
+    );
+    const x = face.a.x + dx * u,
+      y = face.a.y + dy * u;
+    // A source outside two planes can see only part of each face. Reject a landing
+    // if the segment would cross another facet before reaching it.
+    let visible = true;
+    for (const other of faces) {
+      if (other === face) continue;
+      const ex = other.b.x - other.a.x,
+        ey = other.b.y - other.a.y;
+      const den = cross(x - source.x, y - source.y, ex, ey);
+      if (Math.abs(den) < 1e-9) continue;
+      const t = cross(other.a.x - source.x, other.a.y - source.y, ex, ey) / den;
+      const v = cross(other.a.x - source.x, other.a.y - source.y, x - source.x, y - source.y) / den;
+      if (t > 1e-8 && t < 1 - 1e-8 && v >= 0 && v <= 1) visible = false;
+    }
+    const distance = Math.hypot(x - source.x, y - source.y);
+    if (visible && distance < best) {
+      best = distance;
+      chosen = face;
+      chosenU = u;
+    }
+  }
+  return {
+    facet: chosen.name,
+    u: chosenU,
+    hit: { x: lerp(chosen.a.x, chosen.b.x, chosenU), y: lerp(chosen.a.y, chosen.b.y, chosenU) },
   };
 }
 
@@ -763,6 +822,34 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   const surges: { x: number; y: number; at: number; seed: number }[] = [];
   let surgeLife = 0; // ms since the most recent surge started
 
+  // One reusable ignition; rapid clicks replace its pending source rather than queue effects.
+  const bang = { age: 1000, x: 0, y: 0, pending: false, reset: false, switched: true };
+  const rays = new Float32Array(16 * 3);
+  for (let i = 0; i < 16; i++) {
+    const angle = (TAU * i) / 16;
+    rays[i * 3] = Math.cos(angle);
+    rays[i * 3 + 1] = Math.sin(angle);
+    rays[i * 3 + 2] = 0.7 + (i % 4) * 0.12;
+  }
+  const pinnedSource: Vec = { x: 0, y: 0 };
+  let pinned = false;
+  let pinnedVersion = -1;
+  let pinnedShift = NaN;
+  let tracedX = NaN;
+  let tracedY = NaN;
+  let pinnedOptics: ReturnType<typeof tracePrism> | null = null;
+  const pinnedHit: Vec = { x: 0, y: 0 };
+  let pinnedU = 0.5;
+  let pinnedFacet: "left" | "base" | "right" = "left";
+  const fieldLight = () =>
+    bang.age < 80
+      ? 1 - (0.8 * bang.age) / 80
+      : bang.age < 380
+        ? 0.2
+        : bang.age < 700
+          ? 0.2 + (0.8 * (bang.age - 380)) / 320
+          : 1;
+
   let scrollTarget = 0; // 0..1, set by the shell from hero scroll progress
   let scrollEase = 0; // eased on real dtMs (τ = 140 ms)
   let lightShiftY = 0; // Plan B vertical travel (px), clamped inside geo.scrollBand
@@ -812,6 +899,48 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const travel = SCROLL_LIFTS_LIGHT ? -scrollBand.up : scrollBand.down;
     lightShiftY = travel * scrollEase;
     syncShiftedPrism();
+
+    if (pinned) {
+      const topV = liveTopV(),
+        leftV = liveLeftV(),
+        rightV = liveRightV();
+      if (
+        pinnedVersion !== version ||
+        pinnedShift !== lightShiftY ||
+        tracedX !== pinnedSource.x ||
+        tracedY !== pinnedSource.y ||
+        !pinnedOptics
+      ) {
+        const landing = sourceLanding(pinnedSource, topV, leftV, rightV);
+        pinnedHit.x = landing.hit.x;
+        pinnedHit.y = landing.hit.y;
+        pinnedU = landing.u;
+        pinnedFacet = landing.facet;
+        pinnedOptics = tracePrism(pinnedSource, pinnedHit, topV, leftV, rightV, pinnedFacet);
+        pinnedVersion = version;
+        pinnedShift = lightShiftY;
+        tracedX = pinnedSource.x;
+        tracedY = pinnedSource.y;
+      }
+      liveSource = pinnedSource;
+      liveHit = pinnedHit;
+      optics = pinnedOptics;
+      entryU = pinnedU;
+      fanOriginBuf.x = optics.exit.x;
+      fanOriginBuf.y = optics.exit.y;
+      fanOrigin = fanOriginBuf;
+      const angle = Math.atan2(optics.exitDirection.y, optics.exitDirection.x);
+      const restAngle = Math.atan2(geo.restOptics.exitDirection.y, geo.restOptics.exitDirection.x);
+      fanTurn = clamp(
+        Math.atan2(Math.sin(angle - restAngle), Math.cos(angle - restAngle)),
+        -0.9,
+        0.9,
+      );
+      fanSpread = 1 + 0.35 * clamp((optics.deviation - deltaMin) / deltaMin, 0, 1);
+      opticalWeight = 1;
+      scrollOpticalWeight = 0;
+      return;
+    }
 
     if (pointerInGlass === 0 && scrollEase === 0) {
       liveSource = null;
@@ -1622,6 +1751,13 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   let strandGrads: (Gradient | null)[] = [];
   let ribbonGrads: Gradient[] = [];
   let beamGrad: Gradient | null = null;
+  let placedBeamGrad: Gradient | null = null;
+  let placedBeamCtx: Ctx | null = null;
+  let placedBeamDark = false;
+  let placedBeamX = NaN,
+    placedBeamY = NaN,
+    placedHitX = NaN,
+    placedHitY = NaN;
   let glassGrad: Gradient | null = null;
 
   const ensureCaches = (ctx: Ctx) => {
@@ -1982,10 +2118,10 @@ export function createHeroRay(options: HeroRayOptions = {}) {
    * the rest. At rest every band returns 1, so the still never changes.
    */
   const bandVoice = (index: number) => {
-    if (hoverTile < 0) return 1;
+    if (hoverTile < 0) return fieldLight();
     const ground = geo?.grounds[hoverTile];
-    if (!ground) return 1;
-    return ground.band === index ? 1.4 : TILE_DIM;
+    if (!ground) return fieldLight();
+    return (ground.band === index ? 1.4 : TILE_DIM) * fieldLight();
   };
 
   /** Trace a stretch of a strand's buffer, in sample indices. */
@@ -2410,6 +2546,81 @@ export function createHeroRay(options: HeroRayOptions = {}) {
    * glyphs: light behind type, not light over it. The facet end of the beam is clear of every
    * text rect, so the hinge and the entry spark keep their full strength after the dissolve.
    */
+  /** Source seed and instrument-like ignition, all behind the type stencil. */
+  const drawIgnition = (ctx: Ctx) => {
+    const warm = isDark ? BANDS[2].dark : BANDS[2].light;
+    if (pinned && bang.age >= 80) {
+      const glow = ctx.createRadialGradient(
+        pinnedSource.x,
+        pinnedSource.y,
+        0,
+        pinnedSource.x,
+        pinnedSource.y,
+        9,
+      );
+      glow.addColorStop(0, isDark ? "rgba(255,255,250,0.95)" : rgba(warm, 0.95));
+      glow.addColorStop(0.3, rgba(warm, 0.55));
+      glow.addColorStop(1, rgba(warm, 0));
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(pinnedSource.x, pinnedSource.y, 9, 0, TAU);
+      ctx.fill();
+    }
+    if (bang.reset || bang.age < 40 || bang.age >= 350) return;
+    const t = bang.age - 40;
+    const x = bang.x,
+      y = bang.y;
+    if (t < 30) {
+      ctx.globalAlpha = 0.65;
+      ctx.strokeStyle = rgba(warm, 1);
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.arc(x, y, 6 * (1 - t / 30) + 1, 0, TAU);
+      ctx.stroke();
+    } else {
+      const p = clamp((t - 30) / 240, 0, 1),
+        fade = 1 - p;
+      const bloom = ctx.createRadialGradient(x, y, 0, x, y, 70);
+      bloom.addColorStop(
+        0,
+        isDark ? `rgba(255,255,248,${0.8 * fade})` : `rgba(255,250,239,${0.8 * fade})`,
+      );
+      bloom.addColorStop(0.16, rgba(warm, 0.45 * fade));
+      bloom.addColorStop(1, rgba(warm, 0));
+      ctx.fillStyle = bloom;
+      ctx.beginPath();
+      ctx.arc(x, y, 70, 0, TAU);
+      ctx.fill();
+      ctx.strokeStyle = rgba(warm, 1);
+      ctx.globalAlpha = fade * 0.7;
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.arc(x, y, 2 + p * 67, 0, TAU);
+      ctx.stroke();
+      ctx.globalAlpha = fade * 0.2;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(x, y, 2 + p * 46, 0, TAU);
+      ctx.stroke();
+      ctx.lineWidth = 0.8;
+      ctx.globalAlpha = fade * 0.8;
+      for (let i = 0; i < 16; i++) {
+        const dx = rays[i * 3],
+          dy = rays[i * 3 + 1],
+          size = rays[i * 3 + 2];
+        const a = 4 + p * 30 * size,
+          b = a + (4 + 13 * p) * fade * size;
+        const band = BANDS[i % BANDS.length];
+        ctx.strokeStyle = rgba(isDark ? band.dark : band.light, 1);
+        ctx.beginPath();
+        ctx.moveTo(x + dx * a, y + dy * a);
+        ctx.lineTo(x + dx * b, y + dy * b);
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+  };
+
   const drawBeam = (ctx: Ctx) => {
     if (!geo || !beamGrad) return;
     const axis = beamAxis();
@@ -2433,7 +2644,32 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.strokeStyle = beamGrad;
+    let liveBeamGrad = beamGrad;
+    if (pinned) {
+      if (
+        !placedBeamGrad ||
+        placedBeamCtx !== ctx ||
+        placedBeamDark !== isDark ||
+        placedBeamX !== source.x ||
+        placedBeamY !== source.y ||
+        placedHitX !== hit.x ||
+        placedHitY !== hit.y
+      ) {
+        placedBeamGrad = ctx.createLinearGradient(source.x, source.y, hit.x, hit.y);
+        const silver: Rgb = isDark ? [255, 251, 241] : [105, 99, 90];
+        placedBeamGrad.addColorStop(0, rgba(silver, 0.6));
+        placedBeamGrad.addColorStop(0.2, rgba(silver, 0.9));
+        placedBeamGrad.addColorStop(1, rgba(silver, 1));
+        placedBeamDark = isDark;
+        placedBeamX = source.x;
+        placedBeamY = source.y;
+        placedHitX = hit.x;
+        placedHitY = hit.y;
+        placedBeamCtx = ctx;
+      }
+      liveBeamGrad = placedBeamGrad;
+    }
+    ctx.strokeStyle = liveBeamGrad;
 
     /**
      * 1. The bloom. Straight along the axis, and *stacked* rather than drawn as one wide
@@ -2476,7 +2712,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     ctx.lineWidth = 0.9;
     trace(1);
     ctx.stroke();
-    ctx.strokeStyle = beamGrad;
+    ctx.strokeStyle = liveBeamGrad;
 
     // 3. The packet: a short bunch riding the same curve, brightest mid-run.
     const p = (time * 0.11) % 1;
@@ -2495,7 +2731,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       ctx.lineWidth = 2.1;
       ctx.globalAlpha = Math.sin(Math.PI * p) * 0.66;
       ctx.stroke();
-      ctx.strokeStyle = beamGrad;
+      ctx.strokeStyle = liveBeamGrad;
     }
 
     // 4. The Fresnel ghost: measured from the axis, never from the ripple.
@@ -2646,7 +2882,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       ctx.globalAlpha = 1;
     };
     // Clear at rest: only live pointer or scroll interaction paints internal traced legs.
-    strokeInternal(internalDrawing(), opticalWeight);
+    strokeInternal(
+      internalDrawing(),
+      opticalWeight *
+        Math.max(fieldLight(), bang.age >= 380 && bang.age < 550 ? 1 - (bang.age - 380) / 170 : 0),
+    );
     if (scrollOpticalWeight > 0.001 && optics && optics.legs.length > 0) {
       scrollLegBuf.length = 1;
       scrollLegBuf[0] = optics.legs[0];
@@ -2654,12 +2894,14 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     }
     const hinge = entryHinge();
     if (hinge) {
+      ctx.globalAlpha = fieldLight();
       ctx.beginPath();
       ctx.moveTo(hinge.from.x, hinge.from.y);
       ctx.lineTo(hinge.to.x, hinge.to.y);
       ctx.strokeStyle = isDark ? "rgba(255,251,242,0.95)" : "rgba(105,99,90,0.95)";
       ctx.lineWidth = 1.8;
       ctx.stroke();
+      ctx.globalAlpha = 1;
     }
 
     if (optics && opticalWeight > 0.01 && optics.tir && optics.legs.length) {
@@ -2796,7 +3038,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         gradient.addColorStop(0, rgba(color, 0.7 * transmission));
         gradient.addColorStop(1, rgba(color, 0));
         ctx.strokeStyle = gradient;
-        ctx.globalAlpha = weight;
+        ctx.globalAlpha = weight * fieldLight();
         ctx.lineWidth = 1.2;
         ctx.beginPath();
         ctx.moveTo(ray.from.x, ray.from.y);
@@ -2815,7 +3057,9 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     if (!geo) return;
     const hit = liveHit ?? shift(geo.hit);
     const warm = isDark ? BANDS[2].dark : BANDS[2].light;
-    const r = 6.5 * (1 + surgeEnergy * 0.4);
+    const impact = bang.age >= 380 && bang.age < 700 ? 1 - (bang.age - 380) / 320 : 0;
+    const r = 6.5 * (1 + impact * 1.4 + surgeEnergy * 0.4);
+    ctx.globalAlpha = Math.max(fieldLight(), impact);
     const spark = ctx.createRadialGradient(hit.x, hit.y, 0, hit.x, hit.y, r);
     spark.addColorStop(0, "rgba(255,255,252,0.92)");
     spark.addColorStop(0.3, rgba(warm, 0.4));
@@ -2824,6 +3068,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     ctx.beginPath();
     ctx.arc(hit.x, hit.y, r, 0, TAU);
     ctx.fill();
+    ctx.globalAlpha = 1;
   };
 
   /**
@@ -2835,6 +3080,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   const drawCore = (ctx: Ctx) => {
     if (!geo) return;
     const { prismSize } = geo;
+    ctx.globalAlpha = fieldLight();
     const exit = fanOrigin ?? shift(geo.exit);
     const pulse = 1 + Math.sin(time * TAU * 1.5) * 0.05 + surgeEnergy * 0.5;
     const warm = isDark ? BANDS[2].dark : BANDS[2].light;
@@ -2906,6 +3152,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       );
       ctx.fill();
     }
+    ctx.globalAlpha = 1;
   };
 
   /** Layer — grounding filaments: the field is reasoned onto the catalogue, one per tile. */
@@ -3397,7 +3644,51 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       }
       // The incident beam — behind the type, see above.
       case "beam": {
-        drawBeam(ctx);
+        const axis = beamAxis();
+        if (axis && bang.age >= 380) {
+          drawBeam(ctx);
+        } else if (axis) {
+          const start = bang.age < 80 ? clamp(bang.age / 80, 0, 1) : 0;
+          const end = bang.age < 80 ? 1 : bang.age < 120 ? 0 : clamp((bang.age - 120) / 260, 0, 1);
+          if (end > start) {
+            ctx.save();
+            const pad = 40;
+            ctx.beginPath();
+            ctx.moveTo(
+              axis.source.x + axis.dx * start + axis.nx * pad,
+              axis.source.y + axis.dy * start + axis.ny * pad,
+            );
+            ctx.lineTo(
+              axis.source.x + axis.dx * end + axis.nx * pad,
+              axis.source.y + axis.dy * end + axis.ny * pad,
+            );
+            ctx.lineTo(
+              axis.source.x + axis.dx * end - axis.nx * pad,
+              axis.source.y + axis.dy * end - axis.ny * pad,
+            );
+            ctx.lineTo(
+              axis.source.x + axis.dx * start - axis.nx * pad,
+              axis.source.y + axis.dy * start - axis.ny * pad,
+            );
+            ctx.closePath();
+            ctx.clip();
+            drawBeam(ctx);
+            ctx.restore();
+            if (bang.age >= 120 && bang.age < 380) {
+              const offset = beamOffset(end, beamAmplitude(axis.len));
+              const x = axis.source.x + axis.dx * end + axis.nx * offset,
+                y = axis.source.y + axis.dy * end + axis.ny * offset;
+              const glow = ctx.createRadialGradient(x, y, 0, x, y, 12);
+              glow.addColorStop(0, isDark ? "rgba(255,255,250,0.95)" : "rgba(120,88,65,0.9)");
+              glow.addColorStop(1, "rgba(220,150,100,0)");
+              ctx.fillStyle = glow;
+              ctx.beginPath();
+              ctx.arc(x, y, 12, 0, TAU);
+              ctx.fill();
+            }
+          }
+        }
+        drawIgnition(ctx);
         break;
       }
       // Type is thinned here; everything below is painted after it.
@@ -3505,6 +3796,25 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     setHeadlineHover(on: boolean) {
       headlineHover = on;
     },
+    /** Place a persistent source, or release it when the glass itself is pressed. */
+    placeSource(x: number, y: number) {
+      if (!geo || !Number.isFinite(x) || !Number.isFinite(y)) return;
+      const reset = inTri(liveTopV(), liveLeftV(), liveRightV(), x, y);
+      if (reset && !pinned && !(bang.pending && !bang.reset)) return;
+      bang.x = x;
+      bang.y = y;
+      bang.age = 0;
+      bang.pending = true;
+      bang.reset = reset;
+      bang.switched = false;
+    },
+    resetSource() {
+      if (!pinned && !(bang.pending && !bang.reset)) return;
+      bang.age = 0;
+      bang.pending = true;
+      bang.reset = true;
+      bang.switched = false;
+    },
     addSurge(x: number, y: number) {
       surges.push({ x, y, at: surgeLife, seed: surges.length });
       if (surges.length > 4) surges.shift();
@@ -3515,6 +3825,17 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       time += dtMs / 1000;
       advanceJitter();
       surgeLife += dtMs;
+      bang.age = Math.min(1000, bang.age + Math.max(0, dtMs));
+      if (bang.pending && !bang.switched && bang.age >= 80) {
+        pinned = !bang.reset;
+        if (pinned) {
+          pinnedSource.x = bang.x;
+          pinnedSource.y = bang.y;
+        }
+        pinnedVersion = -1;
+        bang.switched = true;
+        bang.pending = false;
+      }
       surgeEnergy = Math.max(0, surgeEnergy - dtMs / 900);
 
       // Ease scroll on real dtMs (never frame-count lerp) and sync the shifted prism first,
@@ -3548,6 +3869,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     /** one composed still, for reduced-motion visitors and for design review. */
     paintStill(ctx: Ctx) {
       time = 4.6;
+      bang.age = 1000;
+      bang.pending = false;
+      bang.switched = true;
+      pinned = false;
+      pinnedVersion = -1;
       surgeEnergy = 0;
       pointerActive = false;
       pointerEase = 0;
@@ -3652,6 +3978,13 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         interaction: {
           pointerEase,
           pointerInGlass,
+          sourcePlacement: {
+            pinned,
+            facet: pinned ? pinnedFacet : null,
+            age: bang.age,
+            light: fieldLight(),
+            progress: bang.age < 120 ? 0 : clamp((bang.age - 120) / 260, 0, 1),
+          },
           entryU,
           optics,
           fanOrigin: fanOrigin ? { ...fanOrigin } : null,
@@ -3745,6 +4078,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     /** QA: settle the strand buffers without painting (pointer & scroll off, t = 4.6). */
     settle() {
       time = 4.6;
+      bang.age = 1000;
+      bang.pending = false;
+      bang.switched = true;
+      pinned = false;
+      pinnedVersion = -1;
       surgeEnergy = 0;
       pointerActive = false;
       pointerEase = 0;
