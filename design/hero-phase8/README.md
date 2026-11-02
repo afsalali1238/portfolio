@@ -20,28 +20,29 @@ entry landing (left facet, u = 0.26 wide / 0.56 portrait)
 ```
 
 Because the prism's position is solved from the landing, the beam and the glass cannot drift
-apart, and because the origin is the first *traced far-facet contact*, the fan cannot drift from the glass
+apart, and because the origin is the first _traced far-facet contact_, the fan cannot drift from the glass
 either. Moving one number moves the whole picture coherently.
 
-| viewport | prism centre | beam source | landing on the left facet | dispersion origin |
-| --- | --- | --- | --- | --- |
-| 1440 | (1008, 300) · 70 % of the column | left frame edge, (0, 38) | (975, 265) | right facet (composed emission) |
-| 1024 | (753, 302) · 75 % | left frame edge, (0, 95) | (720, 267) | right facet (composed emission) |
-| 390 | (333, 57) · corner | lower left, (0, 135) | (311, 55) | right facet |
+| viewport | prism centre                                      | beam source               | landing on the left facet | dispersion origin |
+| -------- | ------------------------------------------------- | ------------------------- | ------------------------- | ----------------- |
+| 1440     | (823, 388) · 57 % of the hero, 59 % of the column | left frame edge, (0, 119) | (793, 307)                | (868, 333)        |
+| 1024     | (667, 376) · 65 %                                 | left frame edge, (0, 145) | (637, 296)                | (712, 322)        |
+| 390      | (337, 64) · corner                                | lower left, (0, 135)      | right facet               | right facet       |
 
-### The glass is centre-right of the *column*, not of the viewport
+### The glass aims at the _column's middle_, not at a right-hand anchor
 
-The prism is the right-hand anchor of a left-aligned composition, so its position is measured
-against the content column (`.mx-auto max-w-6xl`), not against the window. That is what makes it
-read the same on a 1024 laptop and a 1920 monitor instead of drifting further right as the
-window grows:
+The prism is the centrepiece of the section, so its position is solved against the content
+column (`.mx-auto max-w-6xl`), not against the window — that is what makes it read the same on a
+1024 laptop and a 1920 monitor instead of drifting further right as the window grows. The aim is
+the column's centre line; the copy is the only thing allowed to hold it back:
 
 ```
-centreX = clamp(band + halfW + 24, column.left + 0.75·column, frame − halfW − 2 %)
+centreX = clamp(band + halfW + 24, column.left + 0.5·column, frame − halfW − 2 %)
 ```
 
-- **band** is the copy that actually shares the glass's vertical band — the display type — not
-  the widest text on the page. The lede and CTA row sit below it and must not shove the glass.
+- **band** is the copy that actually shares the glass's vertical band — the display type, and at
+  rest also the top of the CTA row, whose box reaches up into that band. Everything below the
+  band (the rest of the lede and the buttons) sits under the glass and cannot push it.
 - **The size is part of that budget.** Below `lg` the hero's copy is still one full-width column,
   so the glass has no column of its own to sit in. Its size is capped by the room left beside
   the words, `min(preferred, frame − 24 − copyRight − margin)`; without that cap the right
@@ -51,9 +52,54 @@ centreX = clamp(band + halfW + 24, column.left + 0.75·column, frame − halfW �
   reaches the top edge before the left edge; the ripple's envelope is zero there, so the light
   fades in from the edge rather than starting in mid-air.
 
+The glass used to be pinned to the column's three-quarter mark, which parked the section's
+centrepiece out on the right shoulder with a wide empty margin beside it. It now settles where the
+copy lets it: **57 % of the hero at 1440** (823 px), so the triangle's base straddles the 50 %
+line and the fan fills the right half instead of the right third.
+
+Getting there is a pair of changes, because the copy's own footprint is the wall:
+
+- **The copy column is a little narrower.** The closing italic drops from 3.8 rem to 3.4 rem at
+  `xl`, and the lede from `max-w-xl` (576 px) to `max-w-md` (448 px) — still three lines at every
+  width in the sweep, so the hero's height is unchanged.
+- **The CTA row no longer stands in for its buttons.** The row is a flex container, so its box is
+  as wide as the column while the buttons inside it ended 250 px earlier; `sm:w-fit` makes the
+  measured rect the buttons' own extent. Without it, an invisible 250 px of empty row was what
+  held the glass out on the right.
+
+A **dead-centre** glass (50 %, the bottom panel of `phase8-prism-alignment.png`) stays out: the
+last column of the lede reaches within a few pixels of the triangle's left edge, so the 24 px
+clearance is what stops it. Anything further left has to come out of the copy, not the geometry.
+
+The captured layouts in `scripts/hero-qa/data` were updated for the new type scale — the
+horizontal extents of the thesis, lede and CTA rects, plus the derived quiet zones. Vertical
+positions are from the original capture.
+
 A width sweep from 640 to 2560 px keeps all of it true: no clipped vertex, the column-relative
 position between 55 % and 88 %, an incident span above 240 px, and a source on the frame edge
 at every width.
+
+### The landing height is solved, not tuned
+
+The glass hangs off the landing point, so "where does the light come in" and "how high is the
+prism" are the same question. That height used to be `baseline + 10 % of the prism size`, which
+put the run about 30 px too high: it crossed the last word of the closing sentence ("asked.") on
+its way to the facet. Moving it down by eye has a narrow window — 50 px lower and the run is
+inside the first line of the paragraph instead — so it is solved against both boxes:
+
+```
+y(x) = landingY − (hitX − x)·tan(13°)
+
+below the italic   landingY ≥ thesis.bottom + 10 + (hitX − thesis.right)·tan13°
+above the lede     landingY ≤ lede.top      − 12 + (hitX − lede.right)·tan13°
+landingY           = the midpoint of that window
+```
+
+At 1440 the window is 300–314 px, so the run now passes cleanly between the display type and the
+body copy, and the glass sits 29 px lower (centre y 388 instead of 359). The solve is done in two
+passes because the landing sets the glass and the glass sets where the landing sits on the facet.
+If a layout ever closes the window — a wrapped lede, a short hero — the sentence wins: passing
+under light type is merely ugly, passing through a paragraph costs legibility.
 
 ### Why the beam descends from upper-left
 
@@ -70,10 +116,10 @@ reflected downward leg on desktop, but that leg is no longer painted at rest.
 Measured from `geometry().restOptics` on the checked-in layouts — the invariant suite asserts
 every one of these relationships, so the table cannot drift from the code:
 
-| layout | incidence θ1 | refracted θ2 | first facet @ angle from normal | critical | outcome |
-| --- | --- | --- | --- | --- | --- |
-| 1440 · 1024 | 16.7° | 11.0° | right @ 49.0° | 41.8° | **TIR at the right facet**, exits the base at 106.7° |
-| 390 | 44.4° | 27.8° | right @ 32.2° | 41.8° | refracts straight out of the right facet at 23.0° |
+| layout      | incidence θ1 | refracted θ2 | first facet @ angle from normal | critical | outcome                                              |
+| ----------- | ------------ | ------------ | ------------------------------- | -------- | ---------------------------------------------------- |
+| 1440 · 1024 | 16.7°        | 11.0°        | right @ 49.0°                   | 41.8°    | **TIR at the right facet**, exits the base at 106.7° |
+| 390         | 44.4°        | 27.8°        | right @ 32.2°                   | 41.8°    | refracts straight out of the right facet at 23.0°    |
 
 The wide-screen physical trace undergoes TIR at the far facet and exits through the base.
 `restOptics` retains this record unchanged, including Snell's law and the reflecting facet;
@@ -94,7 +140,7 @@ artistic exaggeration, not a simulation.
 ## 3. The wavy beam
 
 The old beam had **0.4 px** of wobble — invisible. The new one is a real travelling wave, but
-it is drawn as an *illustration*, and the code says so:
+it is drawn as an _illustration_, and the code says so:
 
 - **The optical axis is straight.** Incidence, the hinge on the facet, the Fresnel ghost and
   everything the ray tracer consumes come from the straight source → entry chord. The physics
@@ -122,7 +168,7 @@ packet climbing the same curve. Hovering the headline eases all of it up over 16
 ## 4. Light behind the letters, type above the light
 
 The canvas was already behind the content (`HeroPrism` `z-0`, `Container` `z-10`). The change
-that makes the beam read as *behind the type* is the layer order inside the canvas:
+that makes the beam read as _behind the type_ is the layer order inside the canvas:
 
 ```
 plate → fan → beam → dissolve → glass · spectral exit · entry spark → core → interaction
@@ -157,7 +203,7 @@ rects for all resting exit rays. No grain-sensitive hairline pixel-diff assertio
 
 The copy is full width, so there is no quiet band to land in and no upper-left corner to enter
 from. Portrait flips the vertical: the glass sits in the top-right corner (sized 76–108 px so
-it fits a 390 px frame *and* clears the display type, both measured), and the beam **rises**
+it fits a 390 px frame _and_ clears the display type, both measured), and the beam **rises**
 from the lower-left frame edge at 14° into the entry facet. The approach angle is −14°; incidence is 44.4° from the normal, and this
 refracts straight out of the right facet. The fan still falls down the
 page as a curtain.
@@ -184,16 +230,16 @@ npm run compose -- 1440x780-dark live    # one layout, pointer inside the glass
 ```
 
 `compose.mts` reads the fonts straight out of `node_modules/@fontsource`, so it needs no setup.
-When a browser *is* available, `tools/hero-qa.mjs` is still the better answer: it measures the
+When a browser _is_ available, `tools/hero-qa.mjs` is still the better answer: it measures the
 live DOM and screenshots the real page.
 
-| file | what |
-| --- | --- |
-| `phase8-page-1440x780.png` | composed, light |
-| `phase8-page-1440x780-dark.png` | composed, dark |
+| file                                 | what                                             |
+| ------------------------------------ | ------------------------------------------------ |
+| `phase8-page-1440x780.png`           | composed, light                                  |
+| `phase8-page-1440x780-dark.png`      | composed, dark                                   |
 | `phase8-page-1440x780-dark-live.png` | pointer parked inside the glass: TIR → base exit |
-| `phase8-page-1024x768.png` | composed, 1024 |
-| `phase8-page-390x820.png` | composed, portrait |
+| `phase8-page-1024x768.png`           | composed, 1024                                   |
+| `phase8-page-390x820.png`            | composed, portrait                               |
 
 ## Measured
 
@@ -221,10 +267,10 @@ cd scripts/hero-qa && npm run bench
 
 Engine cost at 1440×720 in this session (medians, same harness before/after):
 
-| | before | clear resting glass + resting spectrum |
-| --- | --- | --- |
-| composed still | 3.50 ms | 3.50 ms |
-| live | 3.82 ms | 3.69 ms |
+|                | before  | clear resting glass + resting spectrum |
+| -------------- | ------- | -------------------------------------- |
+| composed still | 3.50 ms | 3.50 ms                                |
+| live           | 3.82 ms | 3.69 ms                                |
 
 112 checks pass across the four captured layouts. Full-bleed coverage, prime-lane tolerance,
 physical trace invariants, catch release and stable reduced-motion paints remain asserted.

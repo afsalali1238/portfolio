@@ -144,6 +144,38 @@
   background-size: 3px 3px;
 }
 
+/* Hero: the placeholder for the engine's ambient wash, painted from HTML instead of canvas so
+   the section is never bare before hydration. The shell sets data-hero-painted on the hero the
+   first time the engine actually paints, and the stand-in retires — the wash is never doubled. */
+.hero-wash {
+  /* The core sits right of centre at desktop and in the top-right corner on portrait, so the
+     stand-in follows it — a placeholder in the wrong place is worse than none. */
+  background: radial-gradient(
+    120% 95% at 58% 46%,
+    color-mix(in oklch, var(--accent-ink) 10%, transparent) 0%,
+    color-mix(in oklch, var(--accent-ink) 5%, transparent) 34%,
+    color-mix(in oklch, var(--accent-ink) 1.5%, transparent) 68%,
+    transparent 100%
+  );
+  opacity: 1;
+  transition: opacity 600ms ease;
+}
+
+@media (max-width: 767px) {
+  .hero-wash {
+    background: radial-gradient(
+      95% 70% at 84% 10%,
+      color-mix(in oklch, var(--accent-ink) 12%, transparent) 0%,
+      color-mix(in oklch, var(--accent-ink) 5%, transparent) 38%,
+      transparent 78%
+    );
+  }
+}
+
+[data-hero-painted] .hero-wash {
+  opacity: 0;
+}
+
 /* Hero headline: slides up from its own clip box on first paint (no JS needed). */
 @keyframes reveal-up {
   from {

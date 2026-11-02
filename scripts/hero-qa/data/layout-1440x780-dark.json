@@ -8,11 +8,12 @@
  "layout": {
   "heroW": 1440,
   "heroH": 720,
-  "copyRight": 789.328125,
+  "copyRight": 785,
   "thesisLine": {
    "left": 184,
-   "right": 745.015625,
-   "baselineY": 254.484375
+   "right": 684.175,
+   "baselineY": 254.484375,
+   "bottom": 265
   },
   "tiles": [
    {
@@ -72,19 +73,19 @@
    {
     "left": 184,
     "top": 202.984375,
-    "right": 745.015625,
+    "right": 684.175,
     "bottom": 264.984375
    },
    {
     "left": 184,
     "top": 288.984375,
-    "right": 760,
+    "right": 632,
     "bottom": 376.734375
    },
    {
     "left": 184,
     "top": 400.734375,
-    "right": 789.328125,
+    "right": 536,
     "bottom": 452.734375
    }
   ],
@@ -93,19 +94,19 @@
     {
      "left": 174,
      "top": 89.25,
-     "right": 755.015625,
+     "right": 694.175,
      "bottom": 274.984375
     },
     {
      "left": 174,
      "top": 278.984375,
-     "right": 770,
+     "right": 642,
      "bottom": 386.734375
     },
     {
      "left": 174,
      "top": 390.734375,
-     "right": 799.328125,
+     "right": 546,
      "bottom": 462.734375
     }
    ],

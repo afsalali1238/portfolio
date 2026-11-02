@@ -850,6 +850,12 @@ export function createHeroRay(options: HeroRayOptions = {}) {
      * the lede, below the italic line — so the beam crosses the display type and never has to
      * run through a paragraph to reach the glass. Portrait has no such gap (the copy is full
      * width), so the glass hangs in the top-right corner instead and the beam rises to it.
+     *
+     * On wide screens the height is *solved* against the two type boxes the run has to pass
+     * between (see `thread` below) rather than taken from the sentence's baseline: a beam that
+     * lands 30 px too high slices the last word of the italic line, and one that lands 50 px too
+     * low runs through the first line of the paragraph. The window between those two failures is
+     * only about 15 px tall, which is why it is measured and not tuned.
      */
     let centre: Vec;
     if (mobile) {
@@ -875,30 +881,81 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         y: r + Math.max(7, heroH * 0.014),
       };
     } else {
-      const landingY = clamp(thesisLine.baselineY + prismSize * 0.1, heroH * 0.28, heroH * 0.44);
-      const centreY = landingY - entryRelY;
-      // Whatever copy shares the glass's vertical band has to stay clear of the body: the
-      // clearance is derived from the rects that actually overlap that band, not from the
-      // widest text on the page (the CTA row is far below the glass and must not push it).
-      const bandTop = centreY - r;
-      const bandBottom = centreY + r * 0.5;
-      const bandRight = layout.textRects.reduce(
-        (acc, rect) =>
-          rect.bottom > bandTop && rect.top < bandBottom ? Math.max(acc, rect.right) : acc,
-        layout.container.left,
-      );
       /**
-       * Centre-right, measured against the content column rather than the viewport: the glass
-       * is the right-hand anchor of a left-aligned composition, so its position has to read
-       * the same on a 1024 laptop and a 1920 monitor. Three bounds, in order of authority:
-       * the copy it shares a band with, the column's centre-right target, and the frame edge.
+       * Hang the glass so the beam lands at `landingY`, and report where that landing ends up
+       * on the facet. The vertical position and the facet contact are one decision: the glass is
+       * hung off the landing point, which is what keeps the beam and the body from drifting apart.
        */
-      const target =
-        layout.container.left + (layout.container.right - layout.container.left) * 0.75;
-      const clearance = bandRight + halfW + 24;
-      const ceiling = heroW - halfW - Math.max(14, heroW * 0.02);
-      const centreX = Math.min(ceiling, Math.max(clearance, target));
-      centre = { x: centreX, y: centreY };
+      const hang = (landingY: number) => {
+        const centreY = landingY - entryRelY;
+        // Whatever copy shares the glass's vertical band has to stay clear of the body: the
+        // clearance is derived from the rects that actually overlap that band, not from the
+        // widest text on the page (the CTA row is far below the glass and must not push it).
+        const bandTop = centreY - r;
+        const bandBottom = centreY + r * 0.5;
+        const bandRight = layout.textRects.reduce(
+          (acc, rect) =>
+            rect.bottom > bandTop && rect.top < bandBottom ? Math.max(acc, rect.right) : acc,
+          layout.container.left,
+        );
+        /**
+         * The glass aims at the **middle of the column**, not at a right-hand anchor: the
+         * dispersion is the section's centrepiece, so the shape that creates it has to sit on
+         * the composition's centre line rather than pinned to the frame edge. Measured against
+         * the content column rather than the viewport, which is what makes it read the same on a
+         * 1024 laptop and a 1920 monitor.
+         *
+         * Three bounds, in order of authority: the copy it shares a band with, that centre, and
+         * the frame edge. The centre is only the *aim* — on this composition the display type
+         * reaches roughly the middle of the page, so in practice the copy's clearance is what
+         * decides, and the glass settles just past the last glyph instead of somewhere out on
+         * the right shoulder. That is the intended reading: the glass is held back by the words,
+         * never by a chosen offset.
+         */
+        const target =
+          layout.container.left + (layout.container.right - layout.container.left) * 0.5;
+        const clearance = bandRight + halfW + 24;
+        const ceiling = heroW - halfW - Math.max(14, heroW * 0.02);
+        const centreX = Math.min(ceiling, Math.max(clearance, target));
+        return { centre: { x: centreX, y: centreY }, hitX: centreX + entryRelX };
+      };
+
+      /**
+       * The landing height that threads the type.
+       *
+       * The run is a straight line, so its height at any x is fixed by the landing:
+       *
+       *     y(x) = landingY − (hitX − x)·tan(beamAngle)
+       *
+       * Two boxes have to stay out of its way, and they pull in opposite directions:
+       *
+       *   - at the right edge of the closing sentence the run must already be **below** it,
+       *     or the beam cuts through the last word (it did: the line crossed "asked.");
+       *   - at the right edge of the paragraph it must still be **above** it, or the beam has to
+       *     be dissolved across body copy to stay readable.
+       *
+       * Solving both for `landingY` gives a window; the middle of it is the landing that gives
+       * the run the most clearance from both. If a layout ever closes the window (a short hero,
+       * a wrapped lede) the sentence wins: passing under the light type is the failure that is
+       * merely ugly, passing through a paragraph is the one that costs legibility.
+       */
+      const thread = (hitX: number) => {
+        const belowThesis = thesisLine.bottom + 10 + (hitX - thesisLine.right) * tanA;
+        const lede = layout.textRects
+          .filter((rect) => rect.top > thesisLine.baselineY)
+          .sort((a, b) => a.top - b.top)[0];
+        if (!lede) return belowThesis;
+        const aboveLede = lede.top - 12 + (hitX - lede.right) * tanA;
+        return aboveLede > belowThesis ? (belowThesis + aboveLede) / 2 : belowThesis;
+      };
+
+      // One refinement pass: the landing sets the glass, the glass sets where the landing sits
+      // on the facet, and that is what the run's clearance is measured from.
+      const provisional = hang(
+        clamp(thesisLine.baselineY + prismSize * 0.1, heroH * 0.26, heroH * 0.46),
+      );
+      const landingY = clamp(thread(provisional.hitX), heroH * 0.26, heroH * 0.46);
+      centre = hang(landingY).centre;
     }
 
     const prismCenter: Vec = centre;
