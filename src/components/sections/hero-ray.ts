@@ -1157,6 +1157,10 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const snapshot = layout;
     const { heroW, heroH, thesisLine } = snapshot;
     const mobile = heroW < PORTRAIT_MAX_W;
+    const stage = snapshot.mobileStage;
+    const hasStage = Boolean(
+      mobile && stage && stage.right - stage.left > 60 && stage.bottom - stage.top > 60,
+    );
 
     /**
      * How big the glass wants to be. Portrait takes a smaller share of the frame than desktop
@@ -1212,14 +1216,20 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       160,
     );
 
+    const stageW = hasStage && stage ? stage.right - stage.left : 0;
+    const stageH = hasStage && stage ? stage.bottom - stage.top : 0;
+    const stageSize = clamp(Math.min(stageW * 0.38, stageH * 0.58), 84, 128);
+
     // The half-width of the triangle is exactly `size / 2` (r·cos30° with r = size/√3), which
     // makes both budgets a single subtraction.
-    const prismSize = mobile
-      ? portraitSize
-      : Math.min(
-          preferredSize,
-          Math.max(140, heroW - 24 - layout.copyRight - Math.max(16, heroW * 0.022)),
-        );
+    const prismSize = hasStage
+      ? stageSize
+      : mobile
+        ? portraitSize
+        : Math.min(
+            preferredSize,
+            Math.max(140, heroW - 24 - layout.copyRight - Math.max(16, heroW * 0.022)),
+          );
 
     // Equilateral prism, apex up. Circumradius r = size / √3, half-width r·cos30°.
     const r = prismSize / Math.sqrt(3);
@@ -1242,8 +1252,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
      * facet makes that reflected leg long and flat, and it ends up doubling the base rim;
      * entering near the apex makes it a clean vertical drop through the middle of the glass.
      */
-    const entryU = mobile ? 0.56 : 0.26;
-    const beamAngle = mobile ? BEAM_ANGLE_PORTRAIT : BEAM_ANGLE_WIDE;
+    const entryU = hasStage ? 0.36 : mobile ? 0.56 : 0.26;
+    const beamAngle = hasStage ? 18 * DEG : mobile ? BEAM_ANGLE_PORTRAIT : BEAM_ANGLE_WIDE;
     const tanA = Math.tan(beamAngle);
 
     // Offsets of the landing point from the prism's centroid, for this entryU.
@@ -1263,7 +1273,12 @@ export function createHeroRay(options: HeroRayOptions = {}) {
      * only about 15 px tall, which is why it is measured and not tuned.
      */
     let centre: Vec;
-    if (mobile) {
+    if (hasStage && stage) {
+      centre = {
+        x: stage.left + stageW * 0.5,
+        y: stage.top + stageH * 0.44,
+      };
+    } else if (mobile) {
       /**
        * Portrait: the copy is full width, so there is no quiet band to land in — the glass
        * hangs in the top-right corner instead and the beam rises to it from the lower left.
@@ -1459,7 +1474,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
      * Portrait screens turn the same fan to face the empty right-hand side — the copy is full
      * width there, so "the empty side" means the margin *beside* the words, not the whole page.
      */
-    const sweep = mobile ? { from: 12, to: 178 } : { from: -166, to: 164 };
+    const sweep = hasStage
+      ? { from: -40, to: 95 }
+      : mobile
+        ? { from: 12, to: 178 }
+        : { from: -166, to: 164 };
     const count = BANDS.length * BAND_STRANDS;
 
     const quiet = layout.ledger.quietRects;
@@ -1473,7 +1492,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
      * brightest thing on a 390 px screen. The desktop factor stays tiny (0.16) because the fan
      * is the section's centrepiece and the copy sits in its own column.
      */
-    const copyDamping = mobile ? 0.55 : 0.16;
+    const copyDamping = hasStage ? 0.25 : mobile ? 0.55 : 0.16;
     const damped = (angle: number) => {
       const dir = { x: Math.cos(angle), y: Math.sin(angle) };
       let hits = 0;
@@ -1584,7 +1603,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
     // …plus three ghosts that cross the copy itself. They are far too faint to compete with
     // the type, and they are what stops the left half of the hero from looking abandoned.
-    const ghostAngles = mobile ? [196] : [171, 199];
+    const ghostAngles = hasStage ? [175, 195] : mobile ? [196] : [171, 199];
     for (const [k, degrees] of ghostAngles.entries()) {
       strands.push(
         makeStrand({
@@ -1604,7 +1623,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
      * single stroke the eye is meant to follow. Its growth is on the scene clock, so a still
      * is always the finished line and reduced motion never sees it half-drawn.
      */
-    const primeTarget = (mobile ? 92 : 0) * DEG;
+    const primeTarget = (hasStage ? 18 : mobile ? 92 : 0) * DEG;
     let prime = 0;
     let primeGap = Number.POSITIVE_INFINITY;
     for (const strand of strands) {

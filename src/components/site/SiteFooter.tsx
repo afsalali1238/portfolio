@@ -17,13 +17,19 @@ export function SiteFooter() {
             <p className="max-w-md text-ink-soft">
               Have an idea, want to build something quiet, or just talk shop? Reach out.
             </p>
-            <div className="pt-2">
-              <a
-                href="mailto:here@forthe.tech"
+            <div className="pt-2 flex flex-wrap items-center gap-3">
+              <Link
+                to="/the-man-behind"
                 className="inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-5 text-sm font-medium text-paper transition-colors hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               >
-                here@forthe.tech
+                The Man Behind
                 <ArrowUpRight className="h-4 w-4" />
+              </Link>
+              <a
+                href="mailto:here@forthe.tech"
+                className="inline-flex min-h-11 items-center gap-2 rounded-md border rule-hair bg-paper px-4 text-sm font-medium text-ink transition-colors hover:bg-paper-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+              >
+                here@forthe.tech
               </a>
             </div>
           </div>
@@ -92,6 +98,12 @@ export function SiteFooter() {
               </Link>
               <Link to="/notes" className="inline-flex min-h-11 items-center hover:text-ink">
                 Notes
+              </Link>
+              <Link
+                to="/the-man-behind"
+                className="inline-flex min-h-11 items-center hover:text-ink"
+              >
+                The Man Behind
               </Link>
               <Link
                 to="/"

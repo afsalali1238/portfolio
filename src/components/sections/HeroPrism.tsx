@@ -146,7 +146,13 @@ export function HeroPrism({
     let lastClientX = 0;
     let lastClientY = 0;
     let pointerInside = false;
-    let activeTouch: { id: number; startX: number; startY: number; moved: boolean } | null = null;
+    let activeTouch: {
+      id: number;
+      startX: number;
+      startY: number;
+      moved: boolean;
+      isStageTouch: boolean;
+    } | null = null;
     let lastTapAt = 0;
     let lastTapX = 0;
     let lastTapY = 0;
@@ -373,6 +379,12 @@ export function HeroPrism({
         ) {
           activeTouch.moved = true;
         }
+        if (activeTouch.isStageTouch) {
+          lastPointerTs = performance.now();
+          const stageX = e.clientX - rectLeft;
+          const stageY = e.clientY - rectTop;
+          ray.setPointer(stageX, stageY, true);
+        }
       }
       lastClientX = e.clientX;
       lastClientY = e.clientY;
@@ -381,7 +393,9 @@ export function HeroPrism({
       const y = e.clientY - rectTop;
       const inside = x >= 0 && x <= cssW && y >= -40 && y <= cssH + 40;
       pointerInside = inside;
-      ray.setPointer(x, y, inside);
+      if (!activeTouch || activeTouch.isStageTouch) {
+        ray.setPointer(x, y, inside);
+      }
       if (inside) lastPointerTs = performance.now();
     };
 
@@ -393,8 +407,20 @@ export function HeroPrism({
 
       if (e.pointerType === "touch") {
         if (e.isPrimary === false) return;
-        activeTouch = { id: e.pointerId, startX: e.clientX, startY: e.clientY, moved: false };
+        const targetEl = e.target as Element | null;
+        const isStageTouch = Boolean(targetEl?.closest?.("[data-hero-stage]"));
+        activeTouch = {
+          id: e.pointerId,
+          startX: e.clientX,
+          startY: e.clientY,
+          moved: false,
+          isStageTouch,
+        };
         lastRealPointerAt = performance.now();
+        if (isStageTouch) {
+          lastPointerTs = performance.now();
+          ray.setPointer(x, y, true);
+        }
         return;
       }
 
@@ -409,7 +435,8 @@ export function HeroPrism({
       if (!activeTouch || e.pointerId !== activeTouch.id) return;
       const touch = activeTouch;
       activeTouch = null;
-      if (touch.moved || prefersReduced || shouldIgnoreHeroPointerTarget(e.target, hero)) return;
+      if (prefersReduced || shouldIgnoreHeroPointerTarget(e.target, hero)) return;
+      if (!touch.isStageTouch && touch.moved) return;
       const x = e.clientX - rectLeft;
       const y = e.clientY - rectTop;
       if (x < 0 || x > cssW || y < 0 || y > cssH) return;

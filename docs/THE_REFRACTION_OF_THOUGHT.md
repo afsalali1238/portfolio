@@ -1,4 +1,5 @@
 # The Refraction of Thought
+
 ### How Ideas Come to Life
 
 A single line of light enters from beyond the edge of the frame.
@@ -6,7 +7,8 @@ A single line of light enters from beyond the edge of the frame.
 It travels silently, crosses the plane of thought, and strikes the face of a heavy glass prism. At the far boundary, the light splits into colour, breaking into a restless, responsive field of paths that branch, shiver, and reach far past the boundaries of the canvas.
 
 The artwork brings together three visual archetypes:
-1. **The Hipgnosis prism** (*The Dark Side of the Moon*) — revealing the rich, hidden spectrum locked within what appeared singular.
+
+1. **The Hipgnosis prism** (_The Dark Side of the Moon_) — revealing the rich, hidden spectrum locked within what appeared singular.
 2. **Nikola Tesla’s luminous experiments** — high-frequency energy made observable, interactive, and alive.
 3. **Cosmic emergence** — the principle that structured, vast realities unfurl from modest, compact seeds.
 
@@ -14,7 +16,7 @@ This is not a demonstration of technical spectacle, and it is not an exercise in
 
 It is a portrait of a deeper conviction: **that bringing an idea to life demands passing through the dense friction of genuine learning, and that stacked understanding yields a creative reality far larger than the original thought.**
 
-***
+---
 
 ```
      THE INCIDENT BEAM               THE PRISM                   THE BRANCHING FIELD
@@ -27,18 +29,19 @@ It is a portrait of a deeper conviction: **that bringing an idea to life demands
                                  Refraction & Stacking
 ```
 
-***
+---
 
 ## 1. The Incident Beam: The Unbidden Spark
 
 Every real creation begins before there is an audience, a brief, or a plan.
 
 It begins as a quiet, stubborn intuition:
-*What if this could exist? Why does this feel unresolved? What would happen if I brought these two distant things together?*
+_What if this could exist? Why does this feel unresolved? What would happen if I brought these two distant things together?_
 
 The incoming line is singular. It arrives from outside the frame because genuine curiosity is already in motion long before it finds a formal title or a canvas.
 
 It reflects an essential posture:
+
 > **Born from genuine conviction, not because anyone asked.**
 
 You do not wait for external validation or permission to care deeply about an idea. True curiosity is self-igniting. It moves with direction, yet it remains fluid—alive with subtle motion, seeking form.
@@ -58,7 +61,7 @@ Anyone can entertain an abstract idea. In the mind, an idea remains weightless, 
 - The grit to stay with an elusive concept through weeks of false starts and confusion.
 - The willingness to dismantle your assumptions when the medium exposes their flaws.
 
-The prism is not a pedestal of effortless inspiration. It is the crucible of deliberate work. 
+The prism is not a pedestal of effortless inspiration. It is the crucible of deliberate work.
 
 You enter the glass with a simple, raw thought. You leave it transformed by what the journey demanded of you.
 
@@ -87,6 +90,7 @@ Beyond the glass, the paths do not settle into a sterile, static diagram. They h
 This is the magic of an idea that has truly crossed into the world.
 
 Once you build something—once you take a concept out of your head and manifest it into physical or visual form—it develops an energy of its own:
+
 - An experiment made for yourself unexpectedly unlocks a breakthrough for someone else.
 - A small, focused artifact sparks a completely new line of inquiry you could never have planned in advance.
 - The discipline you gained in making one thing becomes the effortless springboard for a radically different medium tomorrow.
@@ -107,14 +111,14 @@ The work of a thinker and maker is never a closed portfolio of finished trophies
 
 ## What the Image Remembers
 
-* **The Beam is the Spark:** The unprompted hunger to explore.
-* **The Prism is the Crucible:** The willingness to enter the dense medium of deep study and patient craft.
-* **The Field is the Emergence:** The boundless, compounding harvest of bringing thought into reality.
+- **The Beam is the Spark:** The unprompted hunger to explore.
+- **The Prism is the Crucible:** The willingness to enter the dense medium of deep study and patient craft.
+- **The Field is the Emergence:** The boundless, compounding harvest of bringing thought into reality.
 
 You do not discover what an idea is worth by leaving it safe inside your mind.  
 You discover what it is worth by daring to bring it to life.
 
-***
+---
 
 ```
        One line of curiosity.

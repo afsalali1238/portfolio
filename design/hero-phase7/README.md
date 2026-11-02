@@ -13,10 +13,10 @@ The fan used to be a wedge aimed off the right edge. It is now a **~330° sweep*
 still have left two dead corners) around one incandescent origin — the exit point on the
 prism's right facet:
 
-| viewport      | sweep         | why                                                                 |
-| ------------- | ------------- | ------------------------------------------------------------------- |
-| 1440 / 1024   | −166° → 164°  | strands reach the top, right, bottom and **both left corners**        |
-| 390 (portrait) | 12° → 178°   | the copy is full-width, so the light falls down the page instead     |
+| viewport       | sweep        | why                                                              |
+| -------------- | ------------ | ---------------------------------------------------------------- |
+| 1440 / 1024    | −166° → 164° | strands reach the top, right, bottom and **both left corners**   |
+| 390 (portrait) | 12° → 178°   | the copy is full-width, so the light falls down the page instead |
 
 Every strand's length is the distance from the origin to the frame along its own lane, overshot
 by 6%: tips leave the canvas rather than stopping inside it. Three **ghost** strands cross the
@@ -25,7 +25,7 @@ copy itself at 40% weight — they are what stops the left half of the hero from
 
 The origin is placed at the hero's optical centre-right (`0.665·w`, `0.44·h`), which is the
 closest it can come to the middle without the glass landing on the paragraph — the prism's
-position is then *derived* from it, so the two can never drift apart.
+position is then _derived_ from it, so the two can never drift apart.
 
 ## 2. Dot → dots → line
 
@@ -41,12 +41,12 @@ their own stroke pattern:
 0.39–1.00   one continuous filament
 ```
 
-A zero-length dash with a round cap *is* a dot, so the whole continuum is one gradient stroke —
+A zero-length dash with a round cap _is_ a dot, so the whole continuum is one gradient stroke —
 the alpha ramp in `strandGrads` is what hides the hand-over between stretches.
 
 The staircase is scaled per strand by `resolve` (0.75–1.3): strands with room in front of them
 resolve early, strands that have to cross the copy stay beaded for longer. That is why the field
-looks *alive* on the right and *distant* on the left, instead of like a symmetric firework.
+looks _alive_ on the right and _distant_ on the left, instead of like a symmetric firework.
 
 ## 2b. One line comes out of the dot
 
@@ -91,7 +91,7 @@ so the light physically rides the geometry rather than floating beside it.
 
 The prism plus 18 px is a zone no strand may be drawn through. A lane that merely grazes the
 body keeps its origin at the core — the fan still converges on the point of light, which is
-what the composition hangs on. A lane that would *cross* the body (more than 20 px of it
+what the composition hangs on. A lane that would _cross_ the body (more than 20 px of it
 inside) opens on the far side instead, so the field leaves the glass from its rim rather than
 showing through it. On paper the nearly opaque body hid most of that anyway; on ink it did
 not, and a cable of near-parallel hairlines across the body was the thing making the left
@@ -102,8 +102,8 @@ triangle, and the incident ray must actually be drawn.
 
 The field is charged, not decorated:
 
-- every strand within 360 px leans toward the pointer — each sample moves a fraction of *its
-  own* distance, so the strand bows into a smooth lens and can never overshoot;
+- every strand within 360 px leans toward the pointer — each sample moves a fraction of _its
+  own_ distance, so the strand bows into a smooth lens and can never overshoot;
 - a **36 px standoff** keeps the strands wrapping the cursor instead of pinching into a knot;
 - the two nearest strands throw a jittered filament across that gap (a random walk with one
   clean break, quantised to 24 fps, so it snaps like discharge);
@@ -116,15 +116,15 @@ grounding filaments only appear then, so the idle still has no leader lines to e
 
 ## Stills
 
-| file                                   | what                                        |
-| -------------------------------------- | ------------------------------------------- |
-| `phase7-page-1440x780.png`             | composed with type, light                   |
-| `phase7-page-1440x780-dark.png`        | composed with type, dark                    |
-| `phase7-page-1024x768.png`             | composed with type, 1024                    |
-| `phase7-page-390x820.png`              | composed with type, portrait               |
-| `phase7-engine-*.png`                  | the engine alone (from the invariant suite) |
-| `phase7-engine-*-catch.png`            | the engine with the pointer live            |
-| `phase7-page-1440x780-growth.png`      | the prime line mid-draw (0.7 s in)          |
+| file                              | what                                        |
+| --------------------------------- | ------------------------------------------- |
+| `phase7-page-1440x780.png`        | composed with type, light                   |
+| `phase7-page-1440x780-dark.png`   | composed with type, dark                    |
+| `phase7-page-1024x768.png`        | composed with type, 1024                    |
+| `phase7-page-390x820.png`         | composed with type, portrait                |
+| `phase7-engine-*.png`             | the engine alone (from the invariant suite) |
+| `phase7-engine-*-catch.png`       | the engine with the pointer live            |
+| `phase7-page-1440x780-growth.png` | the prime line mid-draw (0.7 s in)          |
 
 The `page` stills are composed offline from the same captured layouts the invariant suite uses
 (type is redrawn at the measured rects, so it is a faithful — not pixel-identical — proxy for
@@ -152,10 +152,10 @@ Fifteen invariants per captured layout, including the four new contracts:
 
 Engine cost, measured headlessly at 1440×720 through the same `Ctx` subset:
 
-|                  | ms/frame |
-| ---------------- | -------- |
-| 21 strands live  | **2.4**  |
-| composed still   | **1.9**  |
+|                 | ms/frame |
+| --------------- | -------- |
+| 21 strands live | **2.4**  |
+| composed still  | **1.9**  |
 
 No `shadowBlur`, no allocation in the frame loop, one cached raster for the drafting plate.
 

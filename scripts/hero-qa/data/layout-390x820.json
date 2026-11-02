@@ -1,145 +1,132 @@
 {
- "name": "390x820",
- "dark": false,
- "viewport": {
-  "w": 390,
-  "h": 820
- },
- "layout": {
-  "heroW": 390,
-  "heroH": 697,
-  "copyRight": 366,
-  "thesisLine": {
-   "left": 24,
-   "right": 290.015625,
-   "baselineY": 122.0859375,
-   "bottom": 127
+  "name": "390x820",
+  "dark": false,
+  "viewport": {
+    "w": 390,
+    "h": 820
   },
-  "tiles": [
-   {
-    "x": 41,
-    "top": 452,
-    "bottom": 536,
-    "cx": 115,
-    "width": 148
-   },
-   {
-    "x": 41,
-    "top": 548,
-    "bottom": 632,
-    "cx": 115,
-    "width": 148
-   },
-   {
-    "x": 201,
-    "top": 452,
-    "bottom": 536,
-    "cx": 275,
-    "width": 148
-   },
-   {
-    "x": 201,
-    "top": 548,
-    "bottom": 632,
-    "cx": 275,
-    "width": 148
-   }
-  ],
-  "container": {
-   "left": 24,
-   "right": 366
+  "layout": {
+    "heroW": 390,
+    "heroH": 697,
+    "copyRight": 366,
+    "thesisLine": {
+      "left": 24,
+      "right": 290.015625,
+      "baselineY": 122.0859375,
+      "bottom": 127
+    },
+    "tiles": [
+      {
+        "x": 41,
+        "top": 452,
+        "bottom": 536,
+        "cx": 115,
+        "width": 148
+      },
+      {
+        "x": 41,
+        "top": 548,
+        "bottom": 632,
+        "cx": 115,
+        "width": 148
+      },
+      {
+        "x": 201,
+        "top": 452,
+        "bottom": 536,
+        "cx": 275,
+        "width": 148
+      },
+      {
+        "x": 201,
+        "top": 548,
+        "bottom": 632,
+        "cx": 275,
+        "width": 148
+      }
+    ],
+    "container": {
+      "left": 24,
+      "right": 366
+    },
+    "columns": [52.5, 81.0, 109.5, 138.0, 166.5, 195.0, 223.5, 252.0, 280.5, 309.0, 337.5, 366.0],
+    "textRects": [
+      {
+        "left": 24,
+        "top": 48,
+        "right": 213.8125,
+        "bottom": 89.171875
+      },
+      {
+        "left": 24,
+        "top": 97.171875,
+        "right": 290.015625,
+        "bottom": 127
+      },
+      {
+        "left": 24,
+        "top": 151,
+        "right": 366,
+        "bottom": 255
+      },
+      {
+        "left": 24,
+        "top": 279,
+        "right": 366,
+        "bottom": 387
+      }
+    ],
+    "ledger": {
+      "quietRects": [
+        {
+          "left": 14,
+          "top": 38,
+          "right": 300.015625,
+          "bottom": 137
+        },
+        {
+          "left": 14,
+          "top": 141,
+          "right": 376,
+          "bottom": 265
+        },
+        {
+          "left": 14,
+          "top": 269,
+          "right": 376,
+          "bottom": 397
+        }
+      ],
+      "baselines": [
+        {
+          "y": 84.0859375,
+          "x0": 24,
+          "x1": 213.8125
+        },
+        {
+          "y": 122.0859375,
+          "x0": 24,
+          "x1": 290.015625
+        },
+        {
+          "y": 203,
+          "x0": 24,
+          "x1": 366
+        }
+      ],
+      "balance": 0.9384615384615385
+    }
   },
-  "columns": [
-   52.5,
-   81.0,
-   109.5,
-   138.0,
-   166.5,
-   195.0,
-   223.5,
-   252.0,
-   280.5,
-   309.0,
-   337.5,
-   366.0
-  ],
-  "textRects": [
-   {
-    "left": 24,
-    "top": 48,
-    "right": 213.8125,
-    "bottom": 89.171875
-   },
-   {
-    "left": 24,
-    "top": 97.171875,
-    "right": 290.015625,
-    "bottom": 127
-   },
-   {
-    "left": 24,
-    "top": 151,
-    "right": 366,
-    "bottom": 255
-   },
-   {
-    "left": 24,
-    "top": 279,
-    "right": 366,
-    "bottom": 387
-   }
-  ],
-  "ledger": {
-   "quietRects": [
-    {
-     "left": 14,
-     "top": 38,
-     "right": 300.015625,
-     "bottom": 137
-    },
-    {
-     "left": 14,
-     "top": 141,
-     "right": 376,
-     "bottom": 265
-    },
-    {
-     "left": 14,
-     "top": 269,
-     "right": 376,
-     "bottom": 397
-    }
-   ],
-   "baselines": [
-    {
-     "y": 84.0859375,
-     "x0": 24,
-     "x1": 213.8125
-    },
-    {
-     "y": 122.0859375,
-     "x0": 24,
-     "x1": 290.015625
-    },
-    {
-     "y": 203,
-     "x0": 24,
-     "x1": 366
-    }
-   ],
-   "balance": 0.9384615384615385
+  "canvasDataUrl": null,
+  "paintCostMs": 0.5764705882352942,
+  "html": {
+    "serif": "",
+    "serifItalic": "",
+    "sans": "",
+    "sansMedium": ""
+  },
+  "footer": {
+    "baselineY": 0,
+    "left": 0
   }
- },
- "canvasDataUrl": null,
- "paintCostMs": 0.5764705882352942,
- "html": {
-  "serif": "",
-  "serifItalic": "",
-  "sans": "",
-  "sansMedium": ""
- },
- "footer": {
-  "baselineY": 0,
-  "left": 0
- }
 }

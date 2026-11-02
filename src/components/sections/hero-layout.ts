@@ -63,6 +63,8 @@ export type LayoutSnapshot = {
   textRects: Rect[];
   /** the derived quiet zones + drafting references */
   ledger: Ledger;
+  /** optional dedicated mobile centerpiece stage */
+  mobileStage?: Rect | null;
 };
 
 const MIN_RECT = 8;
@@ -238,6 +240,7 @@ function fallbackSnapshot(w: number, h: number): LayoutSnapshot {
       baselines: [],
       balance: 0.5,
     },
+    mobileStage: null,
   };
 }
 
@@ -386,6 +389,14 @@ export function measureHero(hero: HTMLElement): LayoutSnapshot {
     });
   }
 
+  const stageEl = hero.querySelector<HTMLElement>("[data-hero-stage]");
+  const mobileStage = (() => {
+    if (!stageEl || stageEl.offsetParent === null) return null;
+    const r = stageEl.getBoundingClientRect();
+    if (r.width < 10 || r.height < 10) return null;
+    return toLocal(r, ox, oy);
+  })();
+
   return {
     heroW,
     heroH,
@@ -396,5 +407,6 @@ export function measureHero(hero: HTMLElement): LayoutSnapshot {
     columns,
     textRects,
     ledger: { quietRects, baselines, balance },
+    mobileStage,
   };
 }

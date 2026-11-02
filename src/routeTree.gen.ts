@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as TheManBehindRouteImport } from './routes/the-man-behind'
 import { Route as ThesisRouteImport } from './routes/thesis'
 import { Route as NotesIndexRouteImport } from './routes/notes/index'
 import { Route as NotesThe15MinuteRuleRouteImport } from './routes/notes/the-15-minute-rule'
@@ -26,6 +28,16 @@ import { Route as WorksIdRouteImport } from './routes/works/$id'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TheManBehindRoute = TheManBehindRouteImport.update({
+  id: '/the-man-behind',
+  path: '/the-man-behind',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ThesisRoute = ThesisRouteImport.update({
@@ -93,6 +105,8 @@ const WorksIdRoute = WorksIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/the-man-behind': typeof TheManBehindRoute
   '/thesis': typeof ThesisRoute
   '/notes/the-15-minute-rule': typeof NotesThe15MinuteRuleRoute
   '/notes/the-curious-case-of-building': typeof NotesTheCuriousCaseOfBuildingRoute
@@ -108,6 +122,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/the-man-behind': typeof TheManBehindRoute
   '/thesis': typeof ThesisRoute
   '/notes/the-15-minute-rule': typeof NotesThe15MinuteRuleRoute
   '/notes/the-curious-case-of-building': typeof NotesTheCuriousCaseOfBuildingRoute
@@ -124,6 +140,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/the-man-behind': typeof TheManBehindRoute
   '/thesis': typeof ThesisRoute
   '/notes/the-15-minute-rule': typeof NotesThe15MinuteRuleRoute
   '/notes/the-curious-case-of-building': typeof NotesTheCuriousCaseOfBuildingRoute
@@ -141,6 +159,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/contact'
+    | '/the-man-behind'
     | '/thesis'
     | '/notes/the-15-minute-rule'
     | '/notes/the-curious-case-of-building'
@@ -156,6 +176,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/contact'
+    | '/the-man-behind'
     | '/thesis'
     | '/notes/the-15-minute-rule'
     | '/notes/the-curious-case-of-building'
@@ -171,6 +193,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/contact'
+    | '/the-man-behind'
     | '/thesis'
     | '/notes/the-15-minute-rule'
     | '/notes/the-curious-case-of-building'
@@ -187,6 +211,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ContactRoute: typeof ContactRoute
+  TheManBehindRoute: typeof TheManBehindRoute
   ThesisRoute: typeof ThesisRoute
   NotesThe15MinuteRuleRoute: typeof NotesThe15MinuteRuleRoute
   NotesTheCuriousCaseOfBuildingRoute: typeof NotesTheCuriousCaseOfBuildingRoute
@@ -208,6 +234,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/the-man-behind': {
+      id: '/the-man-behind'
+      path: '/the-man-behind'
+      fullPath: '/the-man-behind'
+      preLoaderRoute: typeof TheManBehindRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/thesis': {
@@ -299,6 +339,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ContactRoute: ContactRoute,
+  TheManBehindRoute: TheManBehindRoute,
   ThesisRoute: ThesisRoute,
   NotesThe15MinuteRuleRoute: NotesThe15MinuteRuleRoute,
   NotesTheCuriousCaseOfBuildingRoute: NotesTheCuriousCaseOfBuildingRoute,

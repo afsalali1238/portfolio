@@ -2,12 +2,7 @@ import { useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Container } from "../layout/Container";
-import {
-  projectCount,
-  liveCount,
-  forPeopleCount,
-  sourceCount,
-} from "../../data/projects";
+import { projectCount, liveCount, forPeopleCount, sourceCount } from "../../data/projects";
 import { RevealWord } from "./hero-helpers";
 import { HeroPrism, type HeroPrismControl, type HeroSourceMode } from "./HeroPrism";
 import type { ProjectFilter } from "../../data/filters";
@@ -142,6 +137,48 @@ export function Hero() {
               </span>
             </h1>
 
+            {/* Mobile centerpiece stage: framed interactive refraction playground */}
+            <div
+              data-hero-stage
+              className="lg:hidden relative w-full h-[220px] sm:h-[260px] my-4 rounded-lg border rule-hair bg-paper/[0.04] backdrop-blur-[1.5px] shadow-xs flex flex-col justify-between p-3 select-none touch-none overflow-hidden"
+              aria-label="Interactive prism refraction artwork"
+            >
+              {/* Subtle top indicator */}
+              <div className="flex items-center justify-between w-full pointer-events-none">
+                <span className="font-mono text-[10px] tracking-wider uppercase text-ink-mute/70">
+                  Refraction of Thought
+                </span>
+                <span className="font-mono text-[10px] text-ink-mute/60">
+                  {sourceMode === "rest" ? "Resting ray" : "Pinned light"}
+                </span>
+              </div>
+
+              {/* Bottom interactive controls */}
+              <div className="flex items-center justify-between w-full pt-2 pointer-events-auto">
+                <span className="text-[11px] text-ink-mute/80 select-none">
+                  {hasInteracted ? "Drag to steer · Tap to place" : "Touch & drag to refract"}
+                </span>
+                <button
+                  type="button"
+                  data-hero-control="cycle-light-mobile"
+                  aria-label={controlCopy.aria}
+                  onClick={() => {
+                    setHasInteracted(true);
+                    prismControlRef.current?.cyclePreset();
+                  }}
+                  className="inline-flex min-h-7 items-center gap-1.5 rounded-md border rule-hair bg-paper/90 px-2.5 py-1 text-[11px] font-medium text-ink shadow-xs backdrop-blur-xs transition-colors hover:bg-paper-deep active:scale-95"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`inline-block h-1.5 w-1.5 rounded-full transition-colors ${
+                      sourceMode === "rest" ? "bg-ink-mute/60" : "bg-accent-ink"
+                    }`}
+                  />
+                  <span>{controlCopy.label}</span>
+                </button>
+              </div>
+            </div>
+
             {/* max-w-md keeps the paragraph while clearing the glass's band. */}
             <p className="max-w-md text-base leading-relaxed text-ink-soft md:text-lg">
               Documenting what happens when the wall between having an idea and building it
@@ -213,7 +250,7 @@ export function Hero() {
               prismControlRef.current?.reset();
             }
           }}
-          className="motion-reduce:hidden absolute right-6 md:right-10 -bottom-7 sm:-bottom-8 inline-flex min-h-6 items-center gap-1.5 rounded px-1.5 py-0.5 text-[11px] font-medium tracking-wide text-ink-mute transition-colors duration-150 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+          className="motion-reduce:hidden hidden lg:inline-flex absolute right-6 md:right-10 -bottom-7 sm:-bottom-8 min-h-6 items-center gap-1.5 rounded px-1.5 py-0.5 text-[11px] font-medium tracking-wide text-ink-mute transition-colors duration-150 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
         >
           <span
             aria-hidden="true"

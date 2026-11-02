@@ -7,6 +7,7 @@ import { LogoTile, Wordmark } from "./LogoMark";
 const NAV_LINKS = [
   { label: "Work", to: "/works" },
   { label: "Notes", to: "/notes" },
+  { label: "The Man Behind", to: "/the-man-behind" },
 ] as const;
 
 const iconButton =
@@ -115,12 +116,6 @@ export function SiteHeader() {
                 <span className="absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-ink transition-transform duration-150 ease-out group-hover:scale-x-100 group-data-[status=active]:scale-x-100" />
               </Link>
             ))}
-            <a
-              href="#contact"
-              className="px-3 py-2.5 text-sm font-medium text-ink-soft transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-md"
-            >
-              Contact
-            </a>
             <button
               type="button"
               onClick={toggleTheme}
@@ -201,13 +196,6 @@ export function SiteHeader() {
             {l.label}
           </Link>
         ))}
-        <a
-          href="#contact"
-          onClick={handleClose}
-          className="font-serif text-3xl leading-loose text-ink-soft transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-md"
-        >
-          Contact
-        </a>
       </nav>
     </>
   );
