@@ -202,8 +202,24 @@ export function measureHero(hero: HTMLElement): LayoutSnapshot {
 
   const containerEl = hero.querySelector<HTMLElement>("[data-hero-container]");
   const containerRect = containerEl?.getBoundingClientRect();
+  /**
+   * The Container is `mx-auto max-w-6xl px-6 md:px-10`, so its border box includes the page
+   * gutter. The drafting plate's 12 rules have to land on the *content* grid — the one the
+   * grid columns and the copy are laid out on — or the plate reads as rules drawn beside the
+   * text instead of under it. Reading the computed padding is exact and costs no extra layout,
+   * because the box has already been measured.
+   */
+  const containerPadding = (() => {
+    if (!containerEl) return { left: 0, right: 0 };
+    const style = window.getComputedStyle(containerEl);
+    const px = (value: string) => Number.parseFloat(value) || 0;
+    return { left: px(style.paddingLeft), right: px(style.paddingRight) };
+  })();
   const container = containerRect
-    ? { left: containerRect.left - ox, right: containerRect.right - ox }
+    ? {
+        left: containerRect.left - ox + containerPadding.left,
+        right: containerRect.right - ox - containerPadding.right,
+      }
     : fallback.container;
 
   const copyEl = hero.querySelector<HTMLElement>("[data-hero-copy]");

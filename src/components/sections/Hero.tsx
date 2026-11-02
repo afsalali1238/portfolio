@@ -83,12 +83,12 @@ export function Hero() {
               settles. Widening any of them pushes the whole picture back to the right. */}
           <div className="lg:col-span-7 space-y-6" data-hero-copy>
             <h1 id="hero-heading" className="font-serif tracking-tight">
-              <span className="block text-[12vw] leading-[0.88] text-ink sm:text-[4.5rem] md:text-[5.5rem] lg:text-[6rem] xl:text-[6.8rem]">
+              <span className="block text-[11.5vw] leading-[0.88] text-ink sm:text-[4.6rem] md:text-[5.5rem] lg:text-[6rem] xl:text-[6.8rem]">
                 <RevealWord delay={0.05}>For the tech.</RevealWord>
               </span>
               <span
                 data-hero-thesis
-                className="mt-2 block text-[7.5vw] italic leading-[1.02] text-ink-mute sm:text-[2.6rem] md:text-[3.2rem] lg:text-[3.3rem] xl:text-[3.4rem]"
+                className="mt-2 block text-[7.5vw] italic leading-[1.02] text-ink-mute sm:text-[3rem] md:text-[3.2rem] lg:text-[3.3rem] xl:text-[3.4rem]"
               >
                 <RevealWord delay={0.18} italic>
                   Not because anyone asked.
