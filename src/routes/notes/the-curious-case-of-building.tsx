@@ -143,7 +143,7 @@ function CuriousCasePage() {
             <h2 className="pt-6 font-serif text-3xl text-ink md:text-4xl">The Filter in Dubai</h2>
 
             <p>
-              Around a demanding operations job and family life in Dubai, my time is finite. I
+              Working a demanding operations job in Dubai, my time is finite. I
               don&rsquo;t have twenty hours a week to scroll through demo videos.
             </p>
 

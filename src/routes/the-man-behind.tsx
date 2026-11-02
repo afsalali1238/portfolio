@@ -80,8 +80,8 @@ function TheManBehindPage() {
                   The Man Behind.
                 </h1>
                 <p className="mt-3 max-w-2xl text-base text-ink-soft md:text-lg">
-                  Afsal Ali — builder, family man, and tech operator based in Dubai. Keeping an open
-                  ledger for the tech, facing the machine, and shipping quiet software.
+                  Afsal Ali — builder and tech operator based in Dubai. Keeping an open
+                  ledger for the tech and shipping quiet software.
                 </p>
               </div>
 
@@ -113,9 +113,8 @@ function TheManBehindPage() {
                 <div>
                   <h2 className="font-serif text-3xl text-ink">Let&rsquo;s talk tech.</h2>
                   <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                    Whether you have an idea, want to talk about frontier AI agents, need an honest
-                    perspective on workflow automation, or just want to swap paperhand stories from
-                    the NFT bull run — drop a line.
+                    Whether you have an idea, want to talk about software workflows, or want to
+                    discuss building focused tools — feel free to reach out.
                   </p>
                 </div>
 
@@ -155,11 +154,10 @@ function TheManBehindPage() {
 
               {/* Philosophy Note */}
               <div className="rounded-xl border rule-hair bg-paper-deep/30 p-6 space-y-3">
-                <h3 className="font-serif text-xl text-ink">Why the backside silhouette?</h3>
+                <h3 className="font-serif text-xl text-ink">Why the silhouette?</h3>
                 <p className="text-sm leading-relaxed text-ink-soft">
-                  I believe the spotlight belongs on the tools and the people using them, not on
-                  personal vanity decks. The builder sits facing the code, hunched over the keyboard
-                  late at night, letting the software do the talking.
+                  I prefer letting the work speak for itself rather than making it personal.
+                  The focus stays on the tools and the craft.
                 </p>
               </div>
             </SectionReveal>

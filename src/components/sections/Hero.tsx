@@ -1,15 +1,11 @@
-import { lazy, Suspense, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Container } from "../layout/Container";
 import { projectCount, liveCount, forPeopleCount, sourceCount } from "../../data/projects";
 import { RevealWord } from "./hero-helpers";
-import type { HeroPrismControl, HeroSourceMode } from "./HeroPrism";
+import { HeroPrism, type HeroPrismControl, type HeroSourceMode } from "./HeroPrism";
 import type { ProjectFilter } from "../../data/filters";
-
-const HeroPrism = lazy(() =>
-  import("./HeroPrism").then((m) => ({ default: m.HeroPrism }))
-);
 
 /**
  * An interactive stat tile that opens the works catalogue pre-filtered.
@@ -109,13 +105,11 @@ export function Hero() {
       <div aria-hidden="true" className="hero-wash pointer-events-none absolute inset-0 z-0" />
 
       {/* Background: one ray, one prism, one restrained dispersion fan (full-bleed) */}
-      <Suspense fallback={null}>
-        <HeroPrism
-          className="absolute inset-0 z-0 h-full w-full"
-          controlRef={prismControlRef}
-          onSourceModeChange={handleSourceModeChange}
-        />
-      </Suspense>
+      <HeroPrism
+        className="absolute inset-0 z-0 h-full w-full"
+        controlRef={prismControlRef}
+        onSourceModeChange={handleSourceModeChange}
+      />
 
       {/* No veils. The field stays bright under the words and the engine thins it there — the
           dissolve in hero-ray.ts replaces what used to be two gradient divs. A veil hides the
