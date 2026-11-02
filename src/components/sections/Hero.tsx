@@ -197,7 +197,7 @@ export function Hero() {
           type="button"
           data-hero-control="cycle-light"
           aria-label={controlCopy.aria}
-          title="Click anywhere in the hero to place a light source, or press to cycle facets"
+          title="Tap anywhere in the hero to aim the light; activate to cycle facets; double-tap the light or press Escape to reset"
           onClick={() => {
             setHasInteracted(true);
             prismControlRef.current?.cyclePreset();
@@ -208,7 +208,7 @@ export function Hero() {
               prismControlRef.current?.reset();
             }
           }}
-          className="motion-reduce:hidden absolute right-6 md:right-10 -bottom-7 sm:-bottom-8 inline-flex min-h-6 items-center gap-1.5 rounded px-1.5 py-0.5 text-[11px] font-medium tracking-wide text-ink-mute transition-colors duration-150 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+          className="motion-reduce:hidden absolute right-3 md:right-10 bottom-1 sm:-bottom-8 inline-flex min-h-11 items-center gap-2 rounded-md border rule-hair bg-paper/90 px-3 py-2 text-xs font-medium tracking-wide text-ink-mute shadow-xs backdrop-blur-sm transition-colors duration-150 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink sm:min-h-6 sm:border-0 sm:bg-transparent sm:px-1.5 sm:py-0.5 sm:text-[11px] sm:shadow-none sm:backdrop-blur-none"
         >
           <span
             aria-hidden="true"
