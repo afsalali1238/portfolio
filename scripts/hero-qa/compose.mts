@@ -76,7 +76,7 @@ const theme = (dark: boolean) => ({
 
 /** Type sizes per breakpoint, read off the Tailwind classes in Hero.tsx. */
 const displayScale = (heroW: number) => {
-  if (heroW >= 1280) return { h1: 108.8, thesis: 60.8 };
+  if (heroW >= 1280) return { h1: 108.8, thesis: 54.4 };
   if (heroW >= 1024) return { h1: 96, thesis: 52.8 };
   if (heroW >= 768) return { h1: 88, thesis: 51.2 };
   return { h1: heroW * 0.12, thesis: heroW * 0.075 };

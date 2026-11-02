@@ -23,11 +23,11 @@ Because the prism's position is solved from the landing, the beam and the glass 
 apart, and because the origin is the first _traced far-facet contact_, the fan cannot drift from the glass
 either. Moving one number moves the whole picture coherently.
 
-| viewport | prism centre                                        | beam source               | landing on the left facet | dispersion origin |
-| -------- | --------------------------------------------------- | ------------------------- | ------------------------- | ----------------- |
-| 1440     | (929, 359) · 68 % of the column, 64.5 % of the hero | left frame edge, (0, 65)  | (899, 278)                | (973, 303)        |
-| 1024     | (710, 351) · 69 %                                   | left frame edge, (0, 108) | (680, 269)                | (755, 295)        |
-| 390      | (337, 64) · corner                                  | lower left, (0, 135)      | (365, 57)                 | right facet       |
+| viewport | prism centre                                      | beam source               | landing on the left facet | dispersion origin |
+| -------- | ------------------------------------------------- | ------------------------- | ------------------------- | ----------------- |
+| 1440     | (823, 359) · 57 % of the hero, 59 % of the column | left frame edge, (0, 90)  | (793, 278)                | (868, 303)        |
+| 1024     | (667, 351) · 65 %                                 | left frame edge, (0, 118) | (637, 269)                | (712, 295)        |
+| 390      | (337, 64) · corner                                | lower left, (0, 135)      | right facet               | right facet       |
 
 ### The glass aims at the _column's middle_, not at a right-hand anchor
 
@@ -40,14 +40,6 @@ the column's centre line; the copy is the only thing allowed to hold it back:
 centreX = clamp(band + halfW + 24, column.left + 0.5·column, frame − halfW − 2 %)
 ```
 
-On this composition the display type reaches roughly the middle of the page, so in practice the
-copy's clearance is what decides and the glass settles just past the last glyph — 64.5 % of the
-hero at 1440 rather than 70 %. That is the intended reading: **the glass is held back by the
-words, never by a chosen offset.** The footprint is also what keeps a dead-centre placement off
-the table: the italic line ends within a few pixels of the 50 % line, so a glass centred there
-would put its body behind "asked." and the right edge of the lede (see
-`phase8-prism-alignment.png`). Moving it further left needs a narrower copy, not a smaller margin.
-
 - **band** is the copy that actually shares the glass's vertical band — the display type, and at
   rest also the top of the CTA row, whose box reaches up into that band. Everything below the
   band (the rest of the lede and the buttons) sits under the glass and cannot push it.
@@ -59,6 +51,29 @@ would put its body behind "asked." and the right edge of the lede (see
 - **The source is allowed to sit exactly on the frame boundary.** On a very wide window the run
   reaches the top edge before the left edge; the ripple's envelope is zero there, so the light
   fades in from the edge rather than starting in mid-air.
+
+The glass used to be pinned to the column's three-quarter mark, which parked the section's
+centrepiece out on the right shoulder with a wide empty margin beside it. It now settles where the
+copy lets it: **57 % of the hero at 1440** (823 px), so the triangle's base straddles the 50 %
+line and the fan fills the right half instead of the right third.
+
+Getting there is a pair of changes, because the copy's own footprint is the wall:
+
+- **The copy column is a little narrower.** The closing italic drops from 3.8 rem to 3.4 rem at
+  `xl`, and the lede from `max-w-xl` (576 px) to `max-w-md` (448 px) — still three lines at every
+  width in the sweep, so the hero's height is unchanged.
+- **The CTA row no longer stands in for its buttons.** The row is a flex container, so its box is
+  as wide as the column while the buttons inside it ended 250 px earlier; `sm:w-fit` makes the
+  measured rect the buttons' own extent. Without it, an invisible 250 px of empty row was what
+  held the glass out on the right.
+
+A **dead-centre** glass (50 %, the bottom panel of `phase8-prism-alignment.png`) stays out: the
+last column of the lede reaches within a few pixels of the triangle's left edge, so the 24 px
+clearance is what stops it. Anything further left has to come out of the copy, not the geometry.
+
+The captured layouts in `scripts/hero-qa/data` were updated for the new type scale — the
+horizontal extents of the thesis, lede and CTA rects, plus the derived quiet zones. Vertical
+positions are from the original capture.
 
 A width sweep from 640 to 2560 px keeps all of it true: no clipped vertex, the column-relative
 position between 55 % and 88 %, an incident span above 240 px, and a source on the frame edge

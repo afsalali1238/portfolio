@@ -71,7 +71,11 @@ export function Hero() {
           and the graphic; a dissolve keeps them on one plane. */}
       <Container className="relative z-10" data-hero-container>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 items-center">
-          {/* Left column: headline + thesis + CTAs */}
+          {/* Left column: headline + thesis + CTAs.
+              These widths are load-bearing for the composition behind them: hero-ray.ts places
+              the prism as close to the column's centre line as this copy allows, so the right
+              edge of the italic, the lede and the CTA row is what decides where the glass
+              settles. Widening any of them pushes the whole picture back to the right. */}
           <div className="lg:col-span-7 space-y-6" data-hero-copy>
             <h1 id="hero-heading" className="font-serif tracking-tight">
               <span className="block text-[12vw] leading-[0.88] text-ink sm:text-[4.5rem] md:text-[5.5rem] lg:text-[6rem] xl:text-[6.8rem]">
@@ -79,7 +83,7 @@ export function Hero() {
               </span>
               <span
                 data-hero-thesis
-                className="mt-2 block text-[7.5vw] italic leading-[1.02] text-ink-mute sm:text-[2.6rem] md:text-[3.2rem] lg:text-[3.3rem] xl:text-[3.8rem]"
+                className="mt-2 block text-[7.5vw] italic leading-[1.02] text-ink-mute sm:text-[2.6rem] md:text-[3.2rem] lg:text-[3.3rem] xl:text-[3.4rem]"
               >
                 <RevealWord delay={0.18} italic>
                   Not because anyone asked.
@@ -87,13 +91,15 @@ export function Hero() {
               </span>
             </h1>
 
-            <p className="max-w-xl text-base leading-relaxed text-ink-soft md:text-lg">
+            {/* max-w-md keeps the paragraph at three lines while clearing the glass's band. */}
+            <p className="max-w-md text-base leading-relaxed text-ink-soft md:text-lg">
               Documenting what happens when the wall between having an idea and building it
               disappears. {numberWord(projectCount)} quiet tools, public code, and honest field
               notes.
             </p>
 
-            <div className="flex flex-col gap-3 pt-2 text-sm sm:flex-row sm:flex-wrap sm:items-center">
+            {/* `sm:w-fit`: the row's box is measured, so it must not be wider than its buttons. */}
+            <div className="flex flex-col gap-3 pt-2 text-sm sm:w-fit sm:flex-row sm:flex-wrap sm:items-center">
               <Link
                 to="/works"
                 className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-ink px-6 text-paper transition-all duration-150 hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-paper"

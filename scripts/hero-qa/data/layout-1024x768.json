@@ -8,7 +8,7 @@
  "layout": {
   "heroW": 1024,
   "heroH": 720,
-  "copyRight": 570.65625,
+  "copyRight": 558,
   "thesisLine": {
    "left": 40,
    "right": 528.015625,
@@ -78,13 +78,13 @@
    {
     "left": 40,
     "top": 279.28125,
-    "right": 570.65625,
+    "right": 488,
     "bottom": 367.03125
    },
    {
     "left": 40,
     "top": 391.03125,
-    "right": 570.65625,
+    "right": 392,
     "bottom": 443.03125
    }
   ],
@@ -99,13 +99,13 @@
     {
      "left": 30,
      "top": 269.28125,
-     "right": 580.65625,
+     "right": 498,
      "bottom": 377.03125
     },
     {
      "left": 30,
      "top": 381.03125,
-     "right": 580.65625,
+     "right": 402,
      "bottom": 453.03125
     }
    ],
