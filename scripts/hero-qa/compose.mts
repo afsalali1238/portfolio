@@ -28,14 +28,17 @@ import type { LayoutSnapshot } from "../../src/components/sections/hero-layout.t
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, "../..");
-const PHASE = process.env.HERO_PHASE ?? "8";
+const PHASE = process.env.HERO_PHASE ?? "10";
 const outDir = join(repo, `design/hero-phase${PHASE}`);
 mkdirSync(outDir, { recursive: true });
 
 /* ------------------------------------------------------------------ fonts */
 const FONT_FILES = [
   ["@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff", "Instrument Serif"],
-  ["@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff", "Instrument Serif Italic"],
+  [
+    "@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff",
+    "Instrument Serif Italic",
+  ],
   ["@fontsource/inter/files/inter-latin-400-normal.woff", "Inter"],
   ["@fontsource/inter/files/inter-latin-500-normal.woff", "Inter Medium"],
   ["@fontsource/inter/files/inter-latin-600-normal.woff", "Inter SemiBold"],
@@ -181,7 +184,12 @@ const drawType = (ctx: SKRSContext2D, layout: LayoutSnapshot, dark: boolean) => 
     ctx.lineWidth = 1;
     ctx.stroke();
     const values = ["12", "9", "3", "7"];
-    const labels = ["Total shipped", "Live on the internet", "Open source", "For wife, friends, me"];
+    const labels = [
+      "Total shipped",
+      "Live on the internet",
+      "Open source",
+      "For wife, friends, me",
+    ];
     layout.tiles.forEach((tile, i) => {
       ctx.font = `${mobile ? 30 : 36}px "Instrument Serif"`;
       ctx.fillStyle = t.ink;
@@ -195,19 +203,14 @@ const drawType = (ctx: SKRSContext2D, layout: LayoutSnapshot, dark: boolean) => 
 
 /* ------------------------------------------------------------------- main */
 const [, , only, modeArg = "still", outArg] = process.argv;
-const layouts = only ? [{ name: only }] : [
-  { name: "1440x780" },
-  { name: "1440x780-dark" },
-  { name: "1024x768" },
-  { name: "390x820" },
-];
+const layouts = only
+  ? [{ name: only }]
+  : [{ name: "1440x780" }, { name: "1440x780-dark" }, { name: "1024x768" }, { name: "390x820" }];
 
 for (const entry of layouts) {
   const capture = JSON.parse(readFileSync(join(here, "data", `layout-${entry.name}.json`), "utf8"));
   const layout: LayoutSnapshot = capture.layout;
-  const dark = process.env.REVIEW_DARK
-    ? process.env.REVIEW_DARK === "1"
-    : Boolean(capture.dark);
+  const dark = process.env.REVIEW_DARK ? process.env.REVIEW_DARK === "1" : Boolean(capture.dark);
   const W = Math.round(layout.heroW);
   const H = Math.round(layout.heroH);
 
@@ -221,12 +224,12 @@ for (const entry of layouts) {
   if (modeArg === "live") {
     // Park the pointer just inside the entry facet: the optical response at its most visible.
     const g = ray.geometry();
-    ray.setPointer(
-      (g.topV.x + g.leftV.x) / 2 + 40,
-      (g.topV.y + g.leftV.y) / 2 + 60,
-      true,
-    );
+    ray.setPointer((g.topV.x + g.leftV.x) / 2 + 40, (g.topV.y + g.leftV.y) / 2 + 60, true);
     for (let i = 0; i < 150; i++) ray.paint(layerCtx, 16);
+  } else if (modeArg === "scroll") {
+    ray.setScroll(1);
+    ray.setTime(3.0);
+    for (let i = 0; i < 100; i++) ray.paint(layerCtx, 16);
   } else {
     ray.paintStill(layerCtx);
   }
@@ -239,8 +242,7 @@ for (const entry of layouts) {
   drawType(ctx, layout, dark);
 
   const suffix = modeArg === "still" ? "" : `-${modeArg}`;
-  const outPath =
-    outArg ?? join(outDir, `phase${PHASE}-page-${entry.name}${suffix}.png`);
+  const outPath = outArg ?? join(outDir, `phase${PHASE}-page-${entry.name}${suffix}.png`);
   writeFileSync(outPath, out.toBuffer("image/png"));
   console.log(`wrote ${outPath}`);
 }

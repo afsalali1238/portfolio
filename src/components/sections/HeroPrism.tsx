@@ -33,6 +33,10 @@ const HALF_RATE_MIN_STEP_MS = 1000 / 30 - 2;
  * immediately and holds for the same window, so the two never fight.
  */
 const AUTONOMOUS_RESUME_MS = 6_000;
+/** How long a scroll gesture keeps the loop at full 60 fps before dropping back to 30 fps idle. */
+const SCROLL_WAKE_MS = 400;
+
+const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
 /** Debug hook shape exposed at ?heroDebug=1 so the headless harness can read real rects. */
 type HeroDebugWindow = {
@@ -102,10 +106,14 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     let cssH = 0;
     let rectLeft = 0;
     let rectTop = 0;
+    let heroDocTop = 0;
     let lastPaintTs = 0;
     // Start "warm": the entrance (the prime line growing out of the dot) is the one moment the
     // hero should run at full rate, so the half-rate path only opens once it has had its 2.5 s.
     let lastPointerTs = performance.now();
+    let lastScrollTs = 0;
+    let scrollProgress = 0;
+    let wasDrifting = false;
     let lastRealPointerAt = 0;
     let lastClientX = 0;
     let lastClientY = 0;
@@ -185,8 +193,10 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       const rect = hero.getBoundingClientRect();
       rectLeft = rect.left;
       rectTop = rect.top;
+      heroDocTop = rect.top + window.scrollY;
       cssW = Math.max(1, rect.width);
       cssH = Math.max(1, rect.height);
+      scrollProgress = clamp01((heroDocTop - rectTop) / Math.max(1, cssH));
 
       ray.setTheme(document.documentElement.classList.contains("dark"));
       const tMeasure = performance.now();
@@ -222,6 +232,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
           else commitCanvas();
         }, RESIZE_COMMIT_DELAY_MS);
       }
+      if (!prefersReduced) ray.setScroll(scrollProgress);
       if (debug) console.log(`[hero] resize ${(performance.now() - resizeStarted).toFixed(2)}`);
     };
 
@@ -244,25 +255,31 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       rafId = requestAnimationFrame(frame);
 
       const elapsed = lastPaintTs === 0 ? 16 : ts - lastPaintTs;
-      const idleFor = performance.now() - lastPointerTs;
+      const now = performance.now();
+      const pointerIdle = now - lastPointerTs > IDLE_HALF_RATE_AFTER_MS;
+      const scrollIdle = now - lastScrollTs > SCROLL_WAKE_MS;
       // Idle: paint every other callback. Skipping here (rather than inside the engine) keeps
       // the ripple's phase honest, because dt is measured between paints, not between frames.
-      if (idleFor > IDLE_HALF_RATE_AFTER_MS && elapsed < HALF_RATE_MIN_STEP_MS) return;
+      if (pointerIdle && scrollIdle && elapsed < HALF_RATE_MIN_STEP_MS) return;
       lastPaintTs = ts;
 
-      const drifting = autonomous && performance.now() - lastRealPointerAt > AUTONOMOUS_RESUME_MS;
+      const scrollOwnsField = scrollProgress > 0.02 || now - lastScrollTs <= AUTONOMOUS_RESUME_MS;
+      const drifting =
+        autonomous && !scrollOwnsField && now - lastRealPointerAt > AUTONOMOUS_RESUME_MS;
       if (drifting && anchor && anchor.size > 0) {
         // A lissajous well inside the triangle's inradius (0.16·size < r/2), so the synthetic
         // point never crosses the body's edge and the refraction never pops.
+        wasDrifting = true;
         const t = ts / 1000;
         ray.setPointer(
           anchor.x + Math.sin(t * 0.37) * anchor.size * 0.16,
           anchor.y + Math.sin(t * 0.53 + 1.1) * anchor.size * 0.16,
           true,
         );
-      } else if (idleFor > POINTER_IDLE_RELEASE_MS) {
-        // The current stays attached while the cursor rests inside the hero: only a pointer
-        // that has genuinely gone (left the section, or the window lost focus) is released.
+      } else if (wasDrifting || now - lastPointerTs > POINTER_IDLE_RELEASE_MS) {
+        // Release the synthetic drift as soon as scroll takes over, or release a real pointer
+        // once it has genuinely gone idle beyond the hold window.
+        wasDrifting = false;
         ray.setPointer(0, 0, false);
       }
 
@@ -334,13 +351,25 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       // from under a still cursor. Re-project the last client position instead of letting
       // the current keep reaching for a stale point.
       if (pointerInside) {
-        ray.setPointer(lastClientX - rectLeft, lastClientY - rectTop, true);
+        const x = lastClientX - rectLeft;
+        const y = lastClientY - rectTop;
+        const inside = x >= 0 && x <= cssW && y >= -40 && y <= cssH + 40;
+        pointerInside = inside;
+        ray.setPointer(x, y, inside);
       }
+      // Progress over the hero's own scroll travel: 0 at the page's resting top, 1 when the
+      // section has scrolled past. Always update scrollProgress (even around the inView edge)
+      // so fast upward scrolls back to top never drop the final p = 0 update.
+      if (prefersReduced) return;
+      scrollProgress = clamp01((heroDocTop - rectTop) / Math.max(1, cssH));
+      ray.setScroll(scrollProgress);
+      if (inView) lastScrollTs = performance.now();
     };
 
     const onVisibility = () => syncLoop();
     const onMotionChange = (e: MediaQueryListEvent) => {
       prefersReduced = e.matches;
+      if (!prefersReduced) ray.setScroll(scrollProgress);
       syncLoop();
     };
 
@@ -399,6 +428,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     return () => {
       running = false;
       cancelAnimationFrame(rafId);
+      ray.setScroll(0);
       // The hero may remount (route change): leave the CSS stand-in armed for the next engine.
       delete hero.dataset.heroPainted;
       if (commitTimer !== undefined) clearTimeout(commitTimer);

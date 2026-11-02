@@ -30,16 +30,18 @@ const ctx = canvas.getContext("2d") as never;
 
 const FRAMES = Number(process.env.HERO_FRAMES ?? 300);
 
-for (const mode of ["still", "live"] as const) {
+for (const mode of ["still", "live", "scroll"] as const) {
   const ray = createHeroRay();
   ray.setTheme(Boolean(capture.dark));
   ray.setLayout(layout);
   if (mode === "live") ray.setPointer(layout.heroW * 0.45, layout.heroH * 0.62, true);
+  if (mode === "scroll") ray.setScroll(0.55);
   // Warm up: the first frames build the plate and the caches.
-  for (let i = 0; i < 30; i++) (mode === "still" ? ray.paintStill(ctx) : ray.paint(ctx, 16));
+  for (let i = 0; i < 30; i++) mode === "still" ? ray.paintStill(ctx) : ray.paint(ctx, 16);
 
   const samples: number[] = [];
   for (let i = 0; i < FRAMES; i++) {
+    if (mode === "scroll") ray.setScroll(0.5 + 0.45 * Math.sin(i * 0.04));
     const started = performance.now();
     if (mode === "still") ray.paintStill(ctx);
     else ray.paint(ctx, 16);
