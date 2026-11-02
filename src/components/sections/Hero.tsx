@@ -60,7 +60,7 @@ export function Hero() {
     <section
       aria-labelledby="hero-heading"
       data-hero
-      className="relative overflow-hidden pt-12 pb-12 sm:pt-16 md:pt-24 md:pb-16"
+      className="relative overflow-hidden pt-6 pb-10 sm:pt-8 sm:pb-12 md:pt-12 md:pb-14"
     >
       {/* First paint: the field is drawn by the engine, which cannot run until hydration, so
           the section starts with the ambient wash in CSS and retires it on the engine's first
