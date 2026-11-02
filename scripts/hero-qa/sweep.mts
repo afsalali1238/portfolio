@@ -37,8 +37,9 @@ import type { LayoutSnapshot } from "../../src/components/sections/hero-layout.t
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, "../..");
 const PHASE = process.env.HERO_PHASE ?? "10";
+const NO_WRITE = process.env.HERO_NO_WRITE === "1" || process.argv.includes("--no-write");
 const outDir = join(repo, `design/hero-phase${PHASE}`);
-mkdirSync(outDir, { recursive: true });
+if (!NO_WRITE) mkdirSync(outDir, { recursive: true });
 
 /* ------------------------------------------------------------------ fonts */
 const FONT_FILES = [
@@ -406,7 +407,8 @@ const VIEWPORTS: { name: string; w: number; dark?: boolean }[] = [
   { name: "1440x780", w: 1440, dark: true },
 ];
 
-const [, , only] = process.argv;
+const positionalArgs = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
+const only = positionalArgs[0];
 const selected = only ? VIEWPORTS.filter((v) => v.name.startsWith(only)) : VIEWPORTS;
 
 /* Calibration: the model against the real captures. */
@@ -447,6 +449,64 @@ const overlaps = (a: Rect, b: Rect, pad = 0) =>
   a.right > b.left - pad &&
   a.top < b.bottom + pad &&
   a.bottom > b.top - pad;
+
+type Pt = { x: number; y: number };
+
+const pointInTri = (a: Pt, b: Pt, c: Pt, x: number, y: number) => {
+  const d1 = (x - b.x) * (a.y - b.y) - (a.x - b.x) * (y - b.y);
+  const d2 = (x - c.x) * (b.y - c.y) - (b.x - c.x) * (y - c.y);
+  const d3 = (x - a.x) * (c.y - a.y) - (c.x - a.x) * (y - a.y);
+  const hasNeg = d1 < 0 || d2 < 0 || d3 < 0;
+  const hasPos = d1 > 0 || d2 > 0 || d3 > 0;
+  return !(hasNeg && hasPos);
+};
+
+const segIntersectsSeg = (a: Pt, b: Pt, c: Pt, d: Pt) => {
+  const cross = (o: Pt, p: Pt, q: Pt) => (p.x - o.x) * (q.y - o.y) - (p.y - o.y) * (q.x - o.x);
+  const d1 = cross(c, d, a);
+  const d2 = cross(c, d, b);
+  const d3 = cross(a, b, c);
+  const d4 = cross(a, b, d);
+  return ((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0));
+};
+
+/** Exact overlap check between triangle `(a, b, c)` and rectangle `r` expanded by `pad` px. */
+const triOverlapsRect = (a: Pt, b: Pt, c: Pt, r: Rect, pad = 0) => {
+  const pr: Rect = {
+    left: r.left - pad,
+    right: r.right + pad,
+    top: r.top - pad,
+    bottom: r.bottom + pad,
+  };
+  const inRect = (p: Pt) => p.x >= pr.left && p.x <= pr.right && p.y >= pr.top && p.y <= pr.bottom;
+  if (inRect(a) || inRect(b) || inRect(c)) return true;
+  const corners: Pt[] = [
+    { x: pr.left, y: pr.top },
+    { x: pr.right, y: pr.top },
+    { x: pr.right, y: pr.bottom },
+    { x: pr.left, y: pr.bottom },
+  ];
+  for (const corner of corners) {
+    if (pointInTri(a, b, c, corner.x, corner.y)) return true;
+  }
+  const triEdges: [Pt, Pt][] = [
+    [a, b],
+    [b, c],
+    [c, a],
+  ];
+  const rectEdges: [Pt, Pt][] = [
+    [corners[0], corners[1]],
+    [corners[1], corners[2]],
+    [corners[2], corners[3]],
+    [corners[3], corners[0]],
+  ];
+  for (const [e0, e1] of triEdges) {
+    for (const [r0, r1] of rectEdges) {
+      if (segIntersectsSeg(e0, e1, r0, r1)) return true;
+    }
+  }
+  return false;
+};
 
 const SCROLL_POINTS = [0, 0.5, 1] as const;
 const TRIPTYCH_VIEWPORTS = new Set([
@@ -504,7 +564,7 @@ for (const vp of selected) {
     const g = ray.geometry();
     const label = `${name}@p=${p}`;
 
-    const shouldWrite = p === 1 || writeAllFrames || TRIPTYCH_VIEWPORTS.has(name);
+    const shouldWrite = !NO_WRITE && (p === 1 || writeAllFrames || TRIPTYCH_VIEWPORTS.has(name));
     if (shouldWrite) {
       const out = createCanvas(W, H);
       const ctx = out.getContext("2d") as unknown as SKRSContext2D;
@@ -539,13 +599,19 @@ for (const vp of selected) {
     const shared = layout.textRects.filter(
       (r) => r.bottom > glassBox.top && r.top < glassBox.bottom,
     );
-    const crowded = shared.filter((r) => overlaps(glassBox, r, 2));
+    const crowded = shared.filter((r) => triOverlapsRect(g.topV, g.leftV, g.rightV, r, 4));
     if (crowded.length) {
       fail(label, `glass sits on ${crowded.length} type box(es) it shares a band with`);
     }
 
     const tileCrowded = layout.tiles.filter((t) =>
-      overlaps(glassBox, { left: t.x, right: t.x + t.width, top: t.top, bottom: t.bottom }, 2),
+      triOverlapsRect(
+        g.topV,
+        g.leftV,
+        g.rightV,
+        { left: t.x, right: t.x + t.width, top: t.top, bottom: t.bottom },
+        4,
+      ),
     );
     if (tileCrowded.length) {
       fail(label, `glass sits on ${tileCrowded.length} stat tile(s)`);

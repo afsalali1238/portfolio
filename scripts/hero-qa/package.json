@@ -5,15 +5,18 @@
   "description": "Headless stills + invariant checks for the hero dispersion field (design tooling, not shipped).",
   "scripts": {
     "check": "tsx check.mts",
+    "check:source": "tsx source-placement.mts",
+    "check:dom": "tsx dom-interaction.mts",
     "compose": "tsx compose.mts",
     "bench": "tsx bench.mts",
     "sweep": "tsx sweep.mts",
-    "check:source": "tsx source-placement.mts"
+    "test": "tsx check.mts --no-write && tsx source-placement.mts && tsx dom-interaction.mts && tsx sweep.mts --no-write"
   },
   "dependencies": {
     "@napi-rs/canvas": "^1.1.0"
   },
   "devDependencies": {
+    "happy-dom": "^21.0.4",
     "tsx": "^4.23.15"
   }
 }

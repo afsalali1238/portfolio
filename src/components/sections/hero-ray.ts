@@ -246,6 +246,8 @@ const rgba = (c: Rgb, a: number) =>
 
 /** Paper and ink, print-graded. Kept local: the field never borrows the text tokens. */
 const PAPER: Rgb = [247, 244, 238];
+/** Dark-theme paper matched to the ambient-lit copy plane so stencils leave neither halo nor cutout. */
+const DARK_PAPER: Rgb = [19, 14, 10];
 const INK: Rgb = [27, 24, 21];
 
 export type BandSpec = {
@@ -537,6 +539,31 @@ const inClear = (z: ClearZone, x: number, y: number) => {
   return inTri(z.a, z.b, z.c, cx + (x - cx) / z.k, cy + (y - cy) / z.k);
 };
 
+/** Minimum clearance (px) between a pinned light source and the prism boundary before release. */
+const SOURCE_PRISM_CLEARANCE = 8;
+
+const distToSegment = (p: Vec, a: Vec, b: Vec, x: number, y: number) => {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const lenSq = dx * dx + dy * dy;
+  const t = lenSq > 0 ? clamp(((x - a.x) * dx + (y - a.y) * dy) / lenSq, 0, 1) : 0;
+  p.x = a.x + dx * t;
+  p.y = a.y + dy * t;
+  return Math.hypot(x - p.x, y - p.y);
+};
+
+const triDistScratch: Vec = { x: 0, y: 0 };
+
+/** Euclidean distance from `(x, y)` to triangle `(a, b, c)` (`0` when inside or on rim). */
+const distToTri = (a: Vec, b: Vec, c: Vec, x: number, y: number) => {
+  if (inTri(a, b, c, x, y)) return 0;
+  return Math.min(
+    distToSegment(triDistScratch, a, b, x, y),
+    distToSegment(triDistScratch, b, c, x, y),
+    distToSegment(triDistScratch, c, a, x, y),
+  );
+};
+
 /**
  * Deterministic hash → [0, 1). Used for plasma jitter so a frame can be reproduced exactly:
  * the motion reel and the browser see the same crackle for the same bucket.
@@ -717,6 +744,19 @@ export function sourceLanding(source: Vec, top: Vec, left: Vec, right: Vec) {
       chosenU = u;
     }
   }
+  if (!Number.isFinite(best)) {
+    // Defensive fallback if called directly with an enclosed point: pick the nearest facet.
+    for (const face of faces) {
+      const mx = (face.a.x + face.b.x) * 0.5;
+      const my = (face.a.y + face.b.y) * 0.5;
+      const d = Math.hypot(mx - source.x, my - source.y);
+      if (d < best) {
+        best = d;
+        chosen = face;
+        chosenU = 0.5;
+      }
+    }
+  }
   return {
     facet: chosen.name,
     u: chosenU,
@@ -893,6 +933,19 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   let entryU = 0.4;
   const deltaMin = 2 * Math.asin(1.5 * Math.sin(Math.PI / 6)) - Math.PI / 3;
 
+  const releasePinnedSilently = () => {
+    pinned = false;
+    pinnedVersion = -1;
+    pinnedOptics = null;
+    tracedX = NaN;
+    tracedY = NaN;
+    if (bang.pending && !bang.reset) {
+      bang.pending = false;
+      bang.switched = true;
+      bang.age = 1000;
+    }
+  };
+
   const updateOptics = () => {
     if (!geo) return;
     const { scrollBand, prismSize, heroH } = geo;
@@ -900,46 +953,61 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     lightShiftY = travel * scrollEase;
     syncShiftedPrism();
 
+    if (
+      bang.pending &&
+      !bang.reset &&
+      distToTri(liveTopV(), liveLeftV(), liveRightV(), bang.x, bang.y) < SOURCE_PRISM_CLEARANCE
+    ) {
+      releasePinnedSilently();
+    }
+
     if (pinned) {
       const topV = liveTopV(),
         leftV = liveLeftV(),
         rightV = liveRightV();
-      if (
-        pinnedVersion !== version ||
-        pinnedShift !== lightShiftY ||
-        tracedX !== pinnedSource.x ||
-        tracedY !== pinnedSource.y ||
-        !pinnedOptics
-      ) {
-        const landing = sourceLanding(pinnedSource, topV, leftV, rightV);
-        pinnedHit.x = landing.hit.x;
-        pinnedHit.y = landing.hit.y;
-        pinnedU = landing.u;
-        pinnedFacet = landing.facet;
-        pinnedOptics = tracePrism(pinnedSource, pinnedHit, topV, leftV, rightV, pinnedFacet);
-        pinnedVersion = version;
-        pinnedShift = lightShiftY;
-        tracedX = pinnedSource.x;
-        tracedY = pinnedSource.y;
+      if (distToTri(topV, leftV, rightV, pinnedSource.x, pinnedSource.y) < SOURCE_PRISM_CLEARANCE) {
+        releasePinnedSilently();
+      } else {
+        if (
+          pinnedVersion !== version ||
+          pinnedShift !== lightShiftY ||
+          tracedX !== pinnedSource.x ||
+          tracedY !== pinnedSource.y ||
+          !pinnedOptics
+        ) {
+          const landing = sourceLanding(pinnedSource, topV, leftV, rightV);
+          pinnedHit.x = landing.hit.x;
+          pinnedHit.y = landing.hit.y;
+          pinnedU = landing.u;
+          pinnedFacet = landing.facet;
+          pinnedOptics = tracePrism(pinnedSource, pinnedHit, topV, leftV, rightV, pinnedFacet);
+          pinnedVersion = version;
+          pinnedShift = lightShiftY;
+          tracedX = pinnedSource.x;
+          tracedY = pinnedSource.y;
+        }
+        liveSource = pinnedSource;
+        liveHit = pinnedHit;
+        optics = pinnedOptics;
+        entryU = pinnedU;
+        fanOriginBuf.x = optics.exit.x;
+        fanOriginBuf.y = optics.exit.y;
+        fanOrigin = fanOriginBuf;
+        const angle = Math.atan2(optics.exitDirection.y, optics.exitDirection.x);
+        const restAngle = Math.atan2(
+          geo.restOptics.exitDirection.y,
+          geo.restOptics.exitDirection.x,
+        );
+        fanTurn = clamp(
+          Math.atan2(Math.sin(angle - restAngle), Math.cos(angle - restAngle)),
+          -0.9,
+          0.9,
+        );
+        fanSpread = 1 + 0.35 * clamp((optics.deviation - deltaMin) / deltaMin, 0, 1);
+        opticalWeight = 1;
+        scrollOpticalWeight = 0;
+        return;
       }
-      liveSource = pinnedSource;
-      liveHit = pinnedHit;
-      optics = pinnedOptics;
-      entryU = pinnedU;
-      fanOriginBuf.x = optics.exit.x;
-      fanOriginBuf.y = optics.exit.y;
-      fanOrigin = fanOriginBuf;
-      const angle = Math.atan2(optics.exitDirection.y, optics.exitDirection.x);
-      const restAngle = Math.atan2(geo.restOptics.exitDirection.y, geo.restOptics.exitDirection.x);
-      fanTurn = clamp(
-        Math.atan2(Math.sin(angle - restAngle), Math.cos(angle - restAngle)),
-        -0.9,
-        0.9,
-      );
-      fanSpread = 1 + 0.35 * clamp((optics.deviation - deltaMin) / deltaMin, 0, 1);
-      opticalWeight = 1;
-      scrollOpticalWeight = 0;
-      return;
     }
 
     if (pointerInGlass === 0 && scrollEase === 0) {
@@ -1051,6 +1119,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   let plate: Surface | null = null;
   let plateKey = "";
   let grainDots: Float32Array | null = null;
+  let grainKey = "";
   const createSurface = options.createSurface ?? null;
 
   const strandBufs: Float32Array[] = Array.from(
@@ -1224,33 +1293,36 @@ export function createHeroRay(options: HeroRayOptions = {}) {
        */
       const hang = (landingY: number) => {
         const centreY = landingY - entryRelY;
-        // Whatever copy shares the glass's vertical band has to stay clear of the body: the
-        // clearance is derived from the rects that actually overlap that band, not from the
-        // widest text on the page (the CTA row is far below the glass and must not push it).
+        // Whatever copy shares the glass's vertical band has to stay clear of the body.
+        // Because the equilateral prism tapers to a point at `bandTop`, a headline line that
+        // only grazes the top few pixels near the apex needs clearance from the inclined left
+        // facet at that height — not from the full base half-width 190 px further down. Copy
+        // across the wider lower body still clears `leftV` by at least 24 px.
         const bandTop = centreY - r;
         const bandBottom = centreY + r * 0.5;
-        const bandRight = snapshot.textRects.reduce(
-          (acc, rect) =>
-            rect.bottom > bandTop && rect.top < bandBottom ? Math.max(acc, rect.right) : acc,
-          snapshot.container.left,
-        );
+        const prismHeight = Math.max(1, bandBottom - bandTop);
+        const VERTEX_PAD_Y = 12;
+        const COPY_CLEARANCE = 24;
+        let clearance = snapshot.container.left + halfW + COPY_CLEARANCE;
+        for (const rect of snapshot.textRects) {
+          if (rect.bottom <= bandTop - VERTEX_PAD_Y || rect.top >= bandBottom + VERTEX_PAD_Y) {
+            continue;
+          }
+          const contactY = clamp(rect.bottom + VERTEX_PAD_Y, bandTop, bandBottom);
+          const facetHalfW = ((contactY - bandTop) / prismHeight) * halfW;
+          clearance = Math.max(clearance, rect.right + facetHalfW + COPY_CLEARANCE);
+          if (rect.bottom > bandTop + prismHeight * 0.25 && rect.top < bandBottom) {
+            clearance = Math.max(clearance, rect.right + halfW + COPY_CLEARANCE);
+          }
+        }
         /**
-         * The glass aims at the **middle of the column**, not at a right-hand anchor: the
-         * dispersion is the section's centrepiece, so the shape that creates it has to sit on
-         * the composition's centre line rather than pinned to the frame edge. Measured against
-         * the content column rather than the viewport, which is what makes it read the same on a
-         * 1024 laptop and a 1920 monitor.
-         *
-         * Three bounds, in order of authority: the copy it shares a band with, that centre, and
-         * the frame edge. The centre is only the *aim* — on this composition the display type
-         * reaches roughly the middle of the page, so in practice the copy's clearance is what
-         * decides, and the glass settles just past the last glyph instead of somewhere out on
-         * the right shoulder. That is the intended reading: the glass is held back by the words,
-         * never by a chosen offset.
+         * The glass aims just right of the column's centre line (`0.568` of the container,
+         * ~55.1% of a 1440 hero): close enough to visually couple the headline and beam to the
+         * dispersion core (~30 px left of the previous base-box placement), while leaving calm
+         * breathing room beside the italic thesis and paragraph.
          */
         const target =
-          snapshot.container.left + (snapshot.container.right - snapshot.container.left) * 0.5;
-        const clearance = bandRight + halfW + 24;
+          snapshot.container.left + (snapshot.container.right - snapshot.container.left) * 0.568;
         const ceiling = heroW - halfW - Math.max(14, heroW * 0.02);
         const centreX = Math.min(ceiling, Math.max(clearance, target));
         return { centre: { x: centreX, y: centreY }, hitX: centreX + entryRelX };
@@ -1321,32 +1393,46 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
     // Solve the vertical corridor the prism + short spectral exit rays may travel through
     // under scroll without clipping the frame, touching any text rect or tile, or pushing
-    // the incident beam into body copy.
+    // the incident beam into body copy. Account for the inclined left facet too: when the
+    // prism sits closer to the copy, an obstacle whose right edge is past `leftV.x` meets the
+    // rising left facet once the triangle widens to `prismCenter.x - (obs.right + padX)`.
     const topAir = mobile ? portraitApex : Math.max(8, heroH * 0.02);
     const bottomAir = Math.max(8, heroH * 0.02);
     const exitReach = prismSize * 0.22;
     const bandLeft = leftV.x - 6;
     const bandRight = Math.min(heroW, rightV.x + exitReach + 6);
+    const prismHeight = Math.max(1, leftV.y - topV.y);
     let upRoom = Math.min(SCROLL_SHIFT_CAP, Math.max(0, topV.y - topAir));
     let downRoom = Math.min(SCROLL_SHIFT_CAP, Math.max(0, heroH - bottomAir - leftV.y));
 
-    for (const obs of snapshot.textRects) {
-      if (obs.right < bandLeft || obs.left > bandRight) continue;
-      if (obs.bottom <= topV.y + 2) {
-        upRoom = Math.min(upRoom, Math.max(0, topV.y - (obs.bottom + 8)));
+    const constrainObstacle = (
+      obs: { left: number; right: number; top: number; bottom: number },
+      padX: number,
+      padY: number,
+    ) => {
+      if (obs.right + padX < bandLeft || obs.left - 6 > bandRight) return;
+      if (obs.top < leftV.y - 2) {
+        if (obs.right + padX >= prismCenter.x && obs.bottom <= topV.y + 2) {
+          upRoom = Math.min(upRoom, Math.max(0, topV.y - (obs.bottom + padY)));
+        } else if (obs.right + padX > leftV.x && obs.right + padX < prismCenter.x && halfW > 0) {
+          const allowedDepth = ((prismCenter.x - (obs.right + padX)) / halfW) * prismHeight;
+          upRoom = Math.min(upRoom, Math.max(0, topV.y + allowedDepth - (obs.bottom + padY)));
+        }
       }
       if (obs.top >= leftV.y - 2) {
         downRoom = Math.min(downRoom, Math.max(0, obs.top - 8 - leftV.y));
       }
+    };
+
+    for (const obs of snapshot.textRects) {
+      constrainObstacle(obs, 24, 12);
     }
     for (const tile of snapshot.tiles) {
-      if (tile.x + tile.width < bandLeft || tile.x > bandRight) continue;
-      if (tile.bottom <= topV.y + 2) {
-        upRoom = Math.min(upRoom, Math.max(0, topV.y - (tile.bottom + 8)));
-      }
-      if (tile.top >= leftV.y - 2) {
-        downRoom = Math.min(downRoom, Math.max(0, tile.top - 8 - leftV.y));
-      }
+      constrainObstacle(
+        { left: tile.x, right: tile.x + tile.width, top: tile.top, bottom: tile.bottom },
+        8,
+        8,
+      );
     }
     for (const bodyRect of snapshot.textRects.slice(2)) {
       const checkX = tanA >= 0 ? bodyRect.right : bodyRect.left;
@@ -1588,6 +1674,24 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     };
     version += 1;
     syncShiftedPrism();
+
+    const inBounds = (x: number, y: number) => x >= 0 && x <= heroW && y >= 0 && y <= heroH;
+    if (
+      pinned &&
+      (!inBounds(pinnedSource.x, pinnedSource.y) ||
+        distToTri(liveTopV(), liveLeftV(), liveRightV(), pinnedSource.x, pinnedSource.y) <
+          SOURCE_PRISM_CLEARANCE)
+    ) {
+      releasePinnedSilently();
+    }
+    if (
+      bang.pending &&
+      !bang.reset &&
+      (!inBounds(bang.x, bang.y) ||
+        distToTri(liveTopV(), liveLeftV(), liveRightV(), bang.x, bang.y) < SOURCE_PRISM_CLEARANCE)
+    ) {
+      releasePinnedSilently();
+    }
   };
 
   const strandDirScratch: Vec = { x: 0, y: 0 };
@@ -1759,14 +1863,25 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     placedHitX = NaN,
     placedHitY = NaN;
   let glassGrad: Gradient | null = null;
+  let ambientGrad: Gradient | null = null;
+  let dissolveKey = "";
+  let dissolveCtx: Ctx | null = null;
+  let dissolveLift: Gradient | null = null;
+  let dissolveStencils: {
+    grad: Gradient;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  }[] = [];
 
   const ensureCaches = (ctx: Ctx) => {
     if (!geo) return;
     const scrollBucket = Math.round(scrollEase * SCROLL_CACHE_BUCKETS);
     const key = `${version}:${isDark ? "dark" : "light"}:${scrollBucket}`;
-    if (key === cacheKey && ctx === cacheCtx && beamGrad && glassGrad) return;
+    if (key === cacheKey && ctx === cacheCtx && beamGrad && glassGrad && ambientGrad) return;
 
-    const { strands } = geo;
+    const { strands, heroW, heroH } = geo;
     const core = scrollBucket === 0 ? geo.core : (fanOrigin ?? shift(geo.core));
     const topV = scrollBucket === 0 ? geo.topV : liveTopV();
     const rightV = scrollBucket === 0 ? geo.rightV : liveRightV();
@@ -1826,6 +1941,16 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       glass.addColorStop(1, "rgba(255,255,255,0.82)");
     }
     glassGrad = glass;
+
+    const warm = isDark ? BANDS[2].dark : BANDS[2].light;
+    const ambRadius = Math.hypot(heroW, heroH) * 0.95;
+    const ambCore = shift(geo.core);
+    const amb = ctx.createRadialGradient(ambCore.x, ambCore.y, 0, ambCore.x, ambCore.y, ambRadius);
+    amb.addColorStop(0, rgba(warm, isDark ? 0.12 : 0.075));
+    amb.addColorStop(0.32, rgba(warm, isDark ? 0.055 : 0.036));
+    amb.addColorStop(0.68, rgba(warm, isDark ? 0.018 : 0.012));
+    amb.addColorStop(1, rgba(warm, 0));
+    ambientGrad = amb;
 
     cacheKey = key;
     cacheCtx = ctx;
@@ -1915,50 +2040,72 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   const drawDissolve = (ctx: Ctx) => {
     if (!geo || !layout) return;
     const { heroW, heroH } = geo;
-    const paper = isDark ? INK : PAPER;
     const rects = layout.textRects;
     if (rects.length === 0) return;
 
+    const dKey = `${version}:${isDark ? "dark" : "light"}`;
+    if (dKey !== dissolveKey || ctx !== dissolveCtx || !dissolveLift) {
+      const paper = isDark ? DARK_PAPER : PAPER;
+      const copyCenter = copyCenterOf();
+      const radius = 0.52 * Math.max(heroW, heroH);
+      const lift = ctx.createRadialGradient(
+        copyCenter.x,
+        copyCenter.y,
+        0,
+        copyCenter.x,
+        copyCenter.y,
+        radius,
+      );
+      lift.addColorStop(0, rgba(paper, 0.1));
+      lift.addColorStop(0.5, rgba(paper, 0.042));
+      lift.addColorStop(1, rgba(paper, 0));
+      dissolveLift = lift;
+
+      dissolveStencils = rects.map((rect) => {
+        const height = rect.bottom - rect.top;
+        const body = height < 60;
+        const subhead = !body && height < 72;
+        const cx = (rect.left + rect.right) / 2;
+        const cy = (rect.top + rect.bottom) / 2;
+        const halfW = (rect.right - rect.left) / 2;
+        const halfH = height / 2;
+        const stencilRadius = Math.hypot(halfW, halfH) * (body ? 1.05 : subhead ? 0.98 : 0.92);
+        const stencil = ctx.createRadialGradient(
+          cx,
+          cy,
+          stencilRadius * 0.5,
+          cx,
+          cy,
+          stencilRadius,
+        );
+        const innerAlpha = body ? 0.66 : subhead ? (isDark ? 0.56 : 0.48) : 0.3;
+        const midAlpha = body ? 0.34 : subhead ? (isDark ? 0.28 : 0.2) : 0.12;
+        stencil.addColorStop(0, rgba(paper, innerAlpha));
+        stencil.addColorStop(0.66, rgba(paper, midAlpha));
+        stencil.addColorStop(1, rgba(paper, 0));
+        return {
+          grad: stencil,
+          x: rect.left - stencilRadius,
+          y: rect.top - stencilRadius,
+          w: stencilRadius * 2 + (rect.right - rect.left),
+          h: stencilRadius * 2 + height,
+        };
+      });
+      dissolveKey = dKey;
+      dissolveCtx = ctx;
+    }
+
     // 1. One gentle lift over the copy block. This is the whole of the page-level veil — the
     //    field is allowed to stay visible behind the words, so it must not be a wash.
-    const copyCenter = copyCenterOf();
-    const radius = 0.52 * Math.max(heroW, heroH);
-    const lift = ctx.createRadialGradient(
-      copyCenter.x,
-      copyCenter.y,
-      0,
-      copyCenter.x,
-      copyCenter.y,
-      radius,
-    );
-    lift.addColorStop(0, rgba(paper, 0.1));
-    lift.addColorStop(0.5, rgba(paper, 0.042));
-    lift.addColorStop(1, rgba(paper, 0));
-    ctx.fillStyle = lift;
+    ctx.fillStyle = dissolveLift;
     ctx.fillRect(0, 0, heroW, heroH);
 
     // 2. Per-line stencils, sized to the line rather than to the merged block: bold display
     //    type survives a hairline behind it, body copy does not. Small text gets the stronger
     //    pass, a headline line gets just enough to keep its counters clean.
-    for (const rect of rects) {
-      const height = rect.bottom - rect.top;
-      const body = height < 60;
-      const cx = (rect.left + rect.right) / 2;
-      const cy = (rect.top + rect.bottom) / 2;
-      const halfW = (rect.right - rect.left) / 2;
-      const halfH = height / 2;
-      const stencilRadius = Math.hypot(halfW, halfH) * (body ? 1.05 : 0.92);
-      const stencil = ctx.createRadialGradient(cx, cy, stencilRadius * 0.5, cx, cy, stencilRadius);
-      stencil.addColorStop(0, rgba(paper, body ? 0.66 : 0.3));
-      stencil.addColorStop(0.66, rgba(paper, body ? 0.34 : 0.12));
-      stencil.addColorStop(1, rgba(paper, 0));
-      ctx.fillStyle = stencil;
-      ctx.fillRect(
-        rect.left - stencilRadius,
-        rect.top - stencilRadius,
-        stencilRadius * 2 + (rect.right - rect.left),
-        stencilRadius * 2 + height,
-      );
+    for (const stencil of dissolveStencils) {
+      ctx.fillStyle = stencil.grad;
+      ctx.fillRect(stencil.x, stencil.y, stencil.w, stencil.h);
     }
   };
 
@@ -1967,11 +2114,16 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     if (!layout || layout.ledger.quietRects.length === 0) {
       return { x: (geo?.heroW ?? 0) / 2, y: (geo?.heroH ?? 0) / 2 };
     }
-    const rects = layout.ledger.quietRects;
-    const left = Math.min(...rects.map((r) => r.left));
-    const right = Math.max(...rects.map((r) => r.right));
-    const top = Math.min(...rects.map((r) => r.top));
-    const bottom = Math.max(...rects.map((r) => r.bottom));
+    let left = Infinity,
+      right = -Infinity,
+      top = Infinity,
+      bottom = -Infinity;
+    for (const r of layout.ledger.quietRects) {
+      if (r.left < left) left = r.left;
+      if (r.right > right) right = r.right;
+      if (r.top < top) top = r.top;
+      if (r.bottom > bottom) bottom = r.bottom;
+    }
     return { x: (left + right) / 2, y: (top + bottom) / 2 };
   };
 
@@ -1983,6 +2135,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   const drawAmbient = (ctx: Ctx) => {
     if (!geo) return;
     const { heroW, heroH } = geo;
+    if (!fanOrigin && ambientGrad) {
+      ctx.fillStyle = ambientGrad;
+      ctx.fillRect(0, 0, heroW, heroH);
+      return;
+    }
     const core = fanOrigin ?? shift(geo.core);
     const warm = isDark ? BANDS[2].dark : BANDS[2].light;
     const radius = Math.hypot(heroW, heroH) * 0.95;
@@ -2006,6 +2163,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const { heroH } = geo;
     const ink = isDark ? 248 : 27;
     const rule = (a: number) => (isDark ? `rgba(${ink},246,240,${a})` : `rgba(27,24,21,${a})`);
+
+    ctx.globalAlpha = 1;
+    ctx.lineCap = "butt";
+    ctx.lineJoin = "miter";
+    if (ctx.setLineDash) ctx.setLineDash([]);
 
     // 12 column rules at 4% ink, across the container.
     ctx.strokeStyle = rule(0.04);
@@ -2047,8 +2209,9 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       ctx.stroke();
     }
 
-    // Grain: 2.5% static dots. Generated once, reused forever.
-    if (!grainDots) {
+    // Grain: 2.5% static dots. Generated once per viewport size, reused across frames.
+    const nextGrainKey = `${geo.heroW}x${geo.heroH}`;
+    if (!grainDots || grainKey !== nextGrainKey) {
       const count = Math.round((geo.heroW * geo.heroH) / 9000);
       grainDots = new Float32Array(count * 3);
       for (let i = 0; i < count; i++) {
@@ -2056,6 +2219,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         grainDots[i * 3 + 1] = hash(i * 13 + 5, 23) * geo.heroH;
         grainDots[i * 3 + 2] = 0.014 + hash(i * 17 + 3, 37) * 0.018;
       }
+      grainKey = nextGrainKey;
     }
     for (let i = 0; i < grainDots.length; i += 3) {
       ctx.fillStyle = rule(grainDots[i + 2] * (isDark ? 1.6 : 1));
@@ -2066,7 +2230,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   /** The plate's own copy-safe stencil, painted in at build time so it costs nothing. */
   const dissolvePlate = (ctx: Ctx) => {
     if (!layout || !geo) return;
-    const paper = isDark ? INK : PAPER;
+    const paper = isDark ? DARK_PAPER : PAPER;
     for (const rect of layout.ledger.quietRects) {
       const cx = (rect.left + rect.right) / 2;
       const cy = (rect.top + rect.bottom) / 2;
@@ -3170,7 +3334,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const alpha =
         (isDark ? band.darkAlpha : band.lightAlpha) *
         (isDark ? 0.42 : 0.34) *
-        (hoverTile < 0 ? 1 : hovered ? 2.6 : 0.24);
+        (hoverTile < 0 ? 1 : hovered ? 2.6 : 0.24) *
+        fieldLight();
       const { from, to } = ground;
       const dx = to.x - from.x;
       const dy = to.y - from.y;
@@ -3482,22 +3647,42 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       ctx.fill();
     }
 
-    // --- photon packets: climb the beam, then ride the clay spine out of the frame
+    // --- photon packets: climb the beam, then ride the clay spine out of the frame.
+    // Synchronised with the ignition clip (`bang.age`) and `fieldLight()` so packets never
+    // appear during the hush (80..120 ms) or ahead of the launching beam (120..380 ms).
+    const beamStart = bang.age >= 380 ? 0 : bang.age < 80 ? clamp(bang.age / 80, 0, 1) : 0;
+    const beamEnd =
+      bang.age >= 380
+        ? 1
+        : bang.age < 80
+          ? 1
+          : bang.age < 120
+            ? 0
+            : clamp((bang.age - 120) / 260, 0, 1);
+    const fanLight = fieldLight();
     const packets = isDark ? 3 : 2;
     for (let p = 0; p < packets; p++) {
       const head = ((time * 0.16 + p / packets) % 1) * totalLen;
       const fade = Math.min(1, Math.min(head, totalLen - head) / 40);
       if (fade <= 0) continue;
-      // On the incident run the packets ride the illustrated field (the same curve the beam
-      // is drawn on); past the exit they ride the clay spine. Same param, same speed.
-      const point =
-        head <= beamLen
-          ? beamPoint(head / beamLen, beamAmp)
-          : {
-              x: lerp(core.x, spineTarget.x, (head - beamLen) / fanLen),
-              y: lerp(core.y, spineTarget.y, (head - beamLen) / fanLen),
-            };
-      ctx.globalAlpha = 0.5 * fade * (1 + surgeEnergy * 0.6);
+
+      let point: Vec;
+      let packetGate = 1;
+      if (head <= beamLen) {
+        const s = head / beamLen;
+        if (beamEnd <= beamStart || s < beamStart || s > beamEnd) continue;
+        point = beamPoint(s, beamAmp);
+      } else {
+        if (fanLight <= 0.001) continue;
+        packetGate = fanLight;
+        point = {
+          x: lerp(core.x, spineTarget.x, (head - beamLen) / fanLen),
+          y: lerp(core.y, spineTarget.y, (head - beamLen) / fanLen),
+        };
+      }
+      const quiet = isQuiet(point.x, point.y);
+      if (quiet > 0.65) continue;
+      ctx.globalAlpha = 0.5 * fade * packetGate * (1 - quiet) * (1 + surgeEnergy * 0.6);
       ctx.fillStyle = isDark ? "rgba(255,252,246,0.95)" : rgba(BANDS[2].light, 0.95);
       ctx.beginPath();
       ctx.arc(point.x, point.y, 1.4, 0, TAU);
@@ -3724,28 +3909,73 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
   const drawScene = (ctx: Ctx) => {
     if (!geo) return;
+    ctx.globalAlpha = 1;
+    ctx.lineCap = "butt";
+    ctx.lineJoin = "miter";
+    if (ctx.setLineDash) ctx.setLineDash([]);
     ctx.clearRect(0, 0, geo.heroW, geo.heroH);
     ensureCaches(ctx);
     for (const layer of SCENE_LAYERS) paintLayer(ctx, layer);
     if (debug) drawDebug(ctx);
+    ctx.globalAlpha = 1;
+    ctx.lineCap = "butt";
+    ctx.lineJoin = "miter";
+    if (ctx.setLineDash) ctx.setLineDash([]);
   };
 
   /* ----------------------------------------------------------------- public API */
 
   let fallbackW = 0;
   let fallbackH = 0;
+  let isFallbackLayout = false;
+
+  const resetInteractionState = () => {
+    time = 4.6;
+    bang.age = 1000;
+    bang.pending = false;
+    bang.reset = false;
+    bang.switched = true;
+    releasePinnedSilently();
+    surgeEnergy = 0;
+    pointerActive = false;
+    pointerX = 0;
+    pointerY = 0;
+    leanX = 0;
+    leanY = 0;
+    pointerEase = 0;
+    pointerInGlass = 0;
+    scrollTarget = 0;
+    scrollEase = 0;
+    lightShiftY = 0;
+    syncShiftedPrism();
+    liveSource = null;
+    liveHit = null;
+    optics = null;
+    fanOrigin = null;
+    fanTurn = 0;
+    fanSpread = 1;
+    opticalWeight = 0;
+    scrollOpticalWeight = 0;
+    if (geo) entryU = geo.entryU;
+    hoverTile = -1;
+    headlineHover = false;
+    beamGlow = 0;
+    surges.length = 0;
+    catches.length = 0;
+  };
 
   return {
     /** Layout snapshot from ./hero-layout. Rebuilds geometry and invalidates caches. */
     setLayout(next: LayoutSnapshot) {
       layout = next;
+      isFallbackLayout = false;
       buildGeometry();
     },
     /** Kept for API compatibility: sizes the stage when no measured layout is available. */
     resize(width: number, height: number) {
       fallbackW = Math.max(1, width);
       fallbackH = Math.max(1, height);
-      if (!layout) {
+      if (!layout || isFallbackLayout) {
         const margin = Math.min(96, fallbackW * 0.06);
         layout = {
           heroW: fallbackW,
@@ -3763,6 +3993,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
           textRects: [],
           ledger: { quietRects: [], baselines: [], balance: 0.5 },
         };
+        isFallbackLayout = true;
         buildGeometry();
       }
     },
@@ -3799,10 +4030,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     /** Place a persistent source, or release it when the glass itself is pressed. */
     placeSource(x: number, y: number) {
       if (!geo || !Number.isFinite(x) || !Number.isFinite(y)) return;
-      const reset = inTri(liveTopV(), liveLeftV(), liveRightV(), x, y);
+      const d = distToTri(liveTopV(), liveLeftV(), liveRightV(), x, y);
+      const reset = d < SOURCE_PRISM_CLEARANCE;
       if (reset && !pinned && !(bang.pending && !bang.reset)) return;
-      bang.x = x;
-      bang.y = y;
+      bang.x = clamp(x, 0, geo.heroW);
+      bang.y = clamp(y, 0, geo.heroH);
       bang.age = 0;
       bang.pending = true;
       bang.reset = reset;
@@ -3814,6 +4046,46 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       bang.pending = true;
       bang.reset = true;
       bang.switched = false;
+    },
+    /** Keyboard / assistive control: aim a light source at a chosen prism facet or reset. */
+    aimSourcePreset(preset: "left" | "base" | "right" | "reset") {
+      if (!geo) return;
+      if (preset === "reset") {
+        if (!pinned && !(bang.pending && !bang.reset)) return;
+        bang.age = 0;
+        bang.pending = true;
+        bang.reset = true;
+        bang.switched = false;
+        return;
+      }
+      const topV = liveTopV(),
+        leftV = liveLeftV(),
+        rightV = liveRightV();
+      const s = geo.prismSize;
+      const pad = 16;
+      let x = geo.source.x;
+      let y = geo.source.y;
+      if (preset === "left") {
+        x = clamp(leftV.x - s * 1.15, pad, geo.heroW - pad);
+        y = clamp(lerp(topV.y, leftV.y, 0.56) + s * 0.28, pad, geo.heroH - pad);
+      } else if (preset === "base") {
+        x = clamp((leftV.x + rightV.x) * 0.5, pad, geo.heroW - pad);
+        y = clamp(leftV.y + s * 0.52, pad, geo.heroH - pad);
+      } else if (preset === "right") {
+        x = clamp(rightV.x + s * 1.05, pad, geo.heroW - pad);
+        y = clamp(lerp(topV.y, rightV.y, 0.44), pad, geo.heroH - pad);
+      }
+      if (distToTri(topV, leftV, rightV, x, y) < SOURCE_PRISM_CLEARANCE) return;
+      bang.x = x;
+      bang.y = y;
+      bang.age = 0;
+      bang.pending = true;
+      bang.reset = false;
+      bang.switched = false;
+    },
+    /** Whether a user-placed source is currently active or igniting. */
+    isSourcePinned() {
+      return pinned || (bang.pending && !bang.reset);
     },
     addSurge(x: number, y: number) {
       surges.push({ x, y, at: surgeLife, seed: surges.length });
@@ -3868,34 +4140,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     },
     /** one composed still, for reduced-motion visitors and for design review. */
     paintStill(ctx: Ctx) {
-      time = 4.6;
-      bang.age = 1000;
-      bang.pending = false;
-      bang.switched = true;
-      pinned = false;
-      pinnedVersion = -1;
-      surgeEnergy = 0;
-      pointerActive = false;
-      pointerEase = 0;
-      pointerInGlass = 0;
-      scrollTarget = 0;
-      scrollEase = 0;
-      lightShiftY = 0;
-      syncShiftedPrism();
-      liveSource = null;
-      liveHit = null;
-      optics = null;
-      fanOrigin = null;
-      fanTurn = 0;
-      fanSpread = 1;
-      opticalWeight = 0;
-      scrollOpticalWeight = 0;
-      if (geo) entryU = geo.entryU;
-      hoverTile = -1;
-      headlineHover = false;
-      beamGlow = 0;
-      surges.length = 0;
-      catches.length = 0;
+      resetInteractionState();
       advanceJitter();
       drawScene(ctx);
     },
@@ -4077,34 +4322,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     },
     /** QA: settle the strand buffers without painting (pointer & scroll off, t = 4.6). */
     settle() {
-      time = 4.6;
-      bang.age = 1000;
-      bang.pending = false;
-      bang.switched = true;
-      pinned = false;
-      pinnedVersion = -1;
-      surgeEnergy = 0;
-      pointerActive = false;
-      pointerEase = 0;
-      pointerInGlass = 0;
-      scrollTarget = 0;
-      scrollEase = 0;
-      lightShiftY = 0;
-      syncShiftedPrism();
-      liveSource = null;
-      liveHit = null;
-      optics = null;
-      fanOrigin = null;
-      fanTurn = 0;
-      fanSpread = 1;
-      opticalWeight = 0;
-      scrollOpticalWeight = 0;
-      if (geo) entryU = geo.entryU;
-      hoverTile = -1;
-      headlineHover = false;
-      beamGlow = 0;
-      surges.length = 0;
-      catches.length = 0;
+      resetInteractionState();
       advanceJitter();
       fillAll();
     },

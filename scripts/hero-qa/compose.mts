@@ -73,6 +73,7 @@ const theme = (dark: boolean) => ({
   paperDeep: dark ? oklch(0.18, 0.012, 60) : oklch(0.945, 0.012, 88),
   ink: dark ? oklch(0.97, 0.008, 90) : oklch(0.18, 0.012, 60),
   inkSoft: dark ? oklch(0.8, 0.01, 80) : oklch(0.32, 0.012, 60),
+  inkThesis: dark ? oklch(0.71, 0.01, 75) : oklch(0.52, 0.012, 60),
   inkMute: dark ? oklch(0.6, 0.01, 70) : oklch(0.52, 0.012, 60),
   rule: dark ? oklch(0.25, 0.01, 60) : oklch(0.82, 0.008, 88),
 });
@@ -110,7 +111,7 @@ const drawType = (ctx: SKRSContext2D, layout: LayoutSnapshot, dark: boolean) => 
 
   const thesisFont = `italic ${scale.thesis}px "Instrument Serif Italic"`;
   ctx.font = thesisFont;
-  ctx.fillStyle = t.inkMute;
+  ctx.fillStyle = t.inkThesis;
   ctx.fillText("Not because anyone asked.", thesis.left, layout.thesisLine.baselineY);
 
   if (lede) {

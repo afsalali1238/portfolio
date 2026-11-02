@@ -21,8 +21,9 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const outDir = join(repo, `design/hero-phase${process.env.HERO_PHASE ?? "6"}`);
-mkdirSync(outDir, { recursive: true });
+const NO_WRITE = process.env.HERO_NO_WRITE === "1" || process.argv.includes("--no-write");
+const outDir = join(repo, `design/hero-phase${process.env.HERO_PHASE ?? "10"}`);
+if (!NO_WRITE) mkdirSync(outDir, { recursive: true });
 const URL_BASE = process.env.HERO_URL ?? "http://127.0.0.1:4212/";
 
 const results = [];
@@ -88,8 +89,8 @@ const browser = await chromium.launch(
 
   const heroStops = stops.filter((s) => s.inHero);
   check(
-    "every hero control is reachable by Tab",
-    heroStops.length === 6,
+    "every hero control is reachable by Tab (2 CTAs + 4 stat tiles + light control)",
+    heroStops.length === 7,
     `${heroStops.length} hero stops: ${heroStops.map((s) => s.tag).join(", ")}`,
   );
   check(

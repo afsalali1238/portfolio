@@ -1,6 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type MutableRefObject } from "react";
 import { createHeroRay, type Ctx } from "./hero-ray";
-import { measureHero, type LayoutSnapshot } from "./hero-layout";
+import { measureHero, shouldIgnoreHeroPointerTarget, type LayoutSnapshot } from "./hero-layout";
+
+export type HeroSourceMode = "rest" | "left" | "base" | "right" | "custom";
+
+export type HeroPrismControl = {
+  cyclePreset: () => HeroSourceMode;
+  reset: () => void;
+};
 
 const MAX_DELTA_MS = 64;
 /**
@@ -58,8 +65,26 @@ type HeroDebugWindow = {
  * The container element it measures is the hero <section> itself (`data-hero`), not a
  * wrapper: geometry has to come from the section the copy actually sits in.
  */
-export function HeroPrism({ className = "" }: { className?: string }) {
+/** Minimum drag distance (px) before a touch gesture is treated as scroll/pan instead of tap. */
+const TOUCH_TAP_SLOP_PX = 10;
+/** Maximum interval (ms) and distance (px) for a double-tap reset on touch devices. */
+const DOUBLE_TAP_MS = 320;
+const DOUBLE_TAP_DIST_PX = 28;
+
+const PRESET_ORDER = ["left", "base", "right"] as const;
+
+export function HeroPrism({
+  className = "",
+  controlRef,
+  onSourceModeChange,
+}: {
+  className?: string;
+  controlRef?: MutableRefObject<HeroPrismControl | null>;
+  onSourceModeChange?: (mode: HeroSourceMode) => void;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const modeCallbackRef = useRef(onSourceModeChange);
+  modeCallbackRef.current = onSourceModeChange;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -121,6 +146,16 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     let lastClientX = 0;
     let lastClientY = 0;
     let pointerInside = false;
+    let activeTouch: { id: number; startX: number; startY: number; moved: boolean } | null = null;
+    let lastTapAt = 0;
+    let lastTapX = 0;
+    let lastTapY = 0;
+    let sourceMode: HeroSourceMode = "rest";
+    const setMode = (next: HeroSourceMode) => {
+      if (sourceMode === next) return;
+      sourceMode = next;
+      modeCallbackRef.current?.(next);
+    };
     /** Cached per resize: the anchor the autonomous drift orbits and how wide to make it. */
     let anchor: { x: number; y: number; size: number } | null = null;
     let painted = false;
@@ -295,6 +330,9 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       const started = performance.now();
       ray.setDebug(debugVisible());
       ray.paint(drawCtx, Math.min(MAX_DELTA_MS, elapsed));
+      if (sourceMode !== "rest" && !ray.isSourcePinned()) {
+        setMode("rest");
+      }
       markPainted();
       lastPaintCost = performance.now() - started;
       // ?heroDebug=1 logs one frame in twenty; data-perf (QA only) logs every frame.
@@ -328,6 +366,14 @@ export function HeroPrism({ className = "" }: { className?: string }) {
      * refreshed on scroll and resize, both of which already run.
      */
     const onPointerMove = (e: PointerEvent) => {
+      if (activeTouch && e.pointerId === activeTouch.id) {
+        if (
+          Math.hypot(e.clientX - activeTouch.startX, e.clientY - activeTouch.startY) >
+          TOUCH_TAP_SLOP_PX
+        ) {
+          activeTouch.moved = true;
+        }
+      }
       lastClientX = e.clientX;
       lastClientY = e.clientY;
       lastRealPointerAt = performance.now();
@@ -340,31 +386,67 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     };
 
     const onPointerDown = (e: PointerEvent) => {
-      if (
-        prefersReduced ||
-        e.button !== 0 ||
-        (e.target instanceof Element && e.target.closest("a, button, [role='button']"))
-      )
-        return;
+      if (prefersReduced || shouldIgnoreHeroPointerTarget(e.target, hero)) return;
       const x = e.clientX - rectLeft;
       const y = e.clientY - rectTop;
       if (x < 0 || x > cssW || y < 0 || y > cssH) return;
+
+      if (e.pointerType === "touch") {
+        if (e.isPrimary === false) return;
+        activeTouch = { id: e.pointerId, startX: e.clientX, startY: e.clientY, moved: false };
+        lastRealPointerAt = performance.now();
+        return;
+      }
+
+      if (e.button !== 0 || e.ctrlKey) return;
       lastRealPointerAt = performance.now();
       lastClickTs = lastRealPointerAt;
       ray.placeSource(x, y);
+      setMode(ray.isSourcePinned() ? "custom" : "rest");
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      if (!activeTouch || e.pointerId !== activeTouch.id) return;
+      const touch = activeTouch;
+      activeTouch = null;
+      if (touch.moved || prefersReduced || shouldIgnoreHeroPointerTarget(e.target, hero)) return;
+      const x = e.clientX - rectLeft;
+      const y = e.clientY - rectTop;
+      if (x < 0 || x > cssW || y < 0 || y > cssH) return;
+
+      const now = performance.now();
+      lastRealPointerAt = now;
+      lastClickTs = now;
+      if (
+        now - lastTapAt <= DOUBLE_TAP_MS &&
+        Math.hypot(e.clientX - lastTapX, e.clientY - lastTapY) <= DOUBLE_TAP_DIST_PX
+      ) {
+        lastTapAt = 0;
+        ray.resetSource();
+        setMode("rest");
+        return;
+      }
+      lastTapAt = now;
+      lastTapX = e.clientX;
+      lastTapY = e.clientY;
+      ray.placeSource(x, y);
+      setMode(ray.isSourcePinned() ? "custom" : "rest");
+    };
+
+    const onPointerCancel = (e: PointerEvent) => {
+      if (activeTouch && e.pointerId === activeTouch.id) {
+        activeTouch = null;
+      }
     };
 
     const onDoubleClick = (e: MouseEvent) => {
-      if (
-        prefersReduced ||
-        (e.target instanceof Element && e.target.closest("a, button, [role='button']"))
-      )
-        return;
+      if (prefersReduced || shouldIgnoreHeroPointerTarget(e.target, hero)) return;
       const x = e.clientX - rectLeft,
         y = e.clientY - rectTop;
       if (x < 0 || x > cssW || y < 0 || y > cssH) return;
       lastClickTs = performance.now();
       ray.resetSource();
+      setMode("rest");
     };
 
     const onPointerLeave = () => {
@@ -398,9 +480,44 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     const onVisibility = () => syncLoop();
     const onMotionChange = (e: MediaQueryListEvent) => {
       prefersReduced = e.matches;
-      if (!prefersReduced) ray.setScroll(scrollProgress);
+      if (prefersReduced) {
+        setMode("rest");
+      } else {
+        ray.setScroll(scrollProgress);
+      }
       syncLoop();
     };
+
+    if (controlRef) {
+      controlRef.current = {
+        cyclePreset: () => {
+          if (prefersReduced) return "rest";
+          lastClickTs = performance.now();
+          if (sourceMode === "custom") {
+            ray.resetSource();
+            setMode("rest");
+            return "rest";
+          }
+          const currentIndex = PRESET_ORDER.indexOf(sourceMode as (typeof PRESET_ORDER)[number]);
+          if (currentIndex === PRESET_ORDER.length - 1) {
+            ray.aimSourcePreset("reset");
+            setMode("rest");
+            return "rest";
+          }
+          const nextPreset = PRESET_ORDER[currentIndex + 1];
+          ray.aimSourcePreset(nextPreset);
+          const nextMode = ray.isSourcePinned() ? nextPreset : "rest";
+          setMode(nextMode);
+          return nextMode;
+        },
+        reset: () => {
+          if (prefersReduced) return;
+          lastClickTs = performance.now();
+          ray.resetSource();
+          setMode("rest");
+        },
+      };
+    }
 
     const resizeObs = new ResizeObserver(queueResize);
     resizeObs.observe(hero);
@@ -435,14 +552,18 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       ray.setHeadlineHover(Boolean(target?.closest?.("#hero-heading")));
     };
 
-    hero.addEventListener("pointerover", onHeroPointerOver, { passive: true });
-    hero.addEventListener("pointerleave", () => {
+    const onHeroPointerLeave = () => {
       ray.setTileHover(-1);
       ray.setHeadlineHover(false);
-    });
+    };
+
+    hero.addEventListener("pointerover", onHeroPointerOver, { passive: true });
+    hero.addEventListener("pointerleave", onHeroPointerLeave);
 
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("pointerdown", onPointerDown, { passive: true });
+    window.addEventListener("pointerup", onPointerUp, { passive: true });
+    window.addEventListener("pointercancel", onPointerCancel, { passive: true });
     window.addEventListener("dblclick", onDoubleClick, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("blur", onPointerLeave);
@@ -458,6 +579,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
     return () => {
       running = false;
       cancelAnimationFrame(rafId);
+      if (controlRef) controlRef.current = null;
       ray.setScroll(0);
       // The hero may remount (route change): leave the CSS stand-in armed for the next engine.
       delete hero.dataset.heroPainted;
@@ -466,8 +588,11 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       visObs.disconnect();
       themeObs.disconnect();
       hero.removeEventListener("pointerover", onHeroPointerOver);
+      hero.removeEventListener("pointerleave", onHeroPointerLeave);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerCancel);
       window.removeEventListener("dblclick", onDoubleClick);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("blur", onPointerLeave);
@@ -476,7 +601,7 @@ export function HeroPrism({ className = "" }: { className?: string }) {
       motionQuery.removeEventListener("change", onMotionChange);
       hoverQuery.removeEventListener("change", onHoverChange);
     };
-  }, []);
+  }, [controlRef]);
 
   return (
     <canvas
