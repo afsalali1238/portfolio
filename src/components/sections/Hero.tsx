@@ -239,7 +239,7 @@ export function Hero() {
           type="button"
           data-hero-control="cycle-light"
           aria-label={controlCopy.aria}
-          title="Click anywhere in the hero to place a light source, or press to cycle facets"
+          title="Tap anywhere in the hero to aim the light; activate to cycle facets; double-tap the light or press Escape to reset"
           onClick={() => {
             setHasInteracted(true);
             prismControlRef.current?.cyclePreset();

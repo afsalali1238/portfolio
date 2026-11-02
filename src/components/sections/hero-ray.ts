@@ -598,8 +598,9 @@ export function tracePrism(
   left: Vec,
   right: Vec,
   entryFacet: "left" | "base" | "right" = "left",
+  refractiveIndex = 1.5,
 ) {
-  const n = 1.5;
+  const n = refractiveIndex;
   const critical = Math.asin(1 / n);
   const normalize = (v: Vec): Vec => {
     const length = Math.hypot(v.x, v.y) || 1;
@@ -615,7 +616,7 @@ export function tracePrism(
   const cosIn = clamp(dot(incident, inward), 0, 1);
   const sinIn = clamp(dot(incident, tangent), -1, 1);
   const theta1 = Math.atan2(Math.abs(sinIn), cosIn);
-  const theta2 = Math.asin(sinIn / n);
+  const theta2 = Math.asin(clamp(sinIn / n, -1, 1));
   let direction = {
     x: inward.x * Math.cos(theta2) + tangent.x * Math.sin(theta2),
     y: inward.y * Math.cos(theta2) + tangent.y * Math.sin(theta2),
@@ -642,6 +643,7 @@ export function tracePrism(
   for (let bounce = 0; bounce < 8; bounce++) {
     let best = Infinity;
     let face: (typeof facets)[number] | undefined;
+    let hitU = 0;
     for (const f of facets) {
       if (f.name === last) continue;
       const edge = { x: f.b.x - f.a.x, y: f.b.y - f.a.y };
@@ -653,10 +655,21 @@ export function tracePrism(
       if (distance > 1e-6 && u >= -1e-8 && u <= 1 + 1e-8 && distance < best) {
         best = distance;
         face = f;
+        hitU = u;
       }
     }
     if (!face) break;
-    const end = { x: point.x + direction.x * best, y: point.y + direction.y * best };
+    // A vertex has no unique surface normal. Regularise the contact onto the winning
+    // facet before reflecting/refracting: at the apex this gives the vertical base ray
+    // a real TIR leg instead of a zero-distance stall on the adjacent facet.
+    const safeU = clamp(hitU, 1e-4, 1 - 1e-4);
+    const end =
+      safeU === hitU
+        ? { x: point.x + direction.x * best, y: point.y + direction.y * best }
+        : {
+            x: face.a.x + (face.b.x - face.a.x) * safeU,
+            y: face.a.y + (face.b.y - face.a.y) * safeU,
+          };
     const edge = normalize({ x: face.b.x - face.a.x, y: face.b.y - face.a.y });
     let normal = { x: -edge.y, y: edge.x };
     if (dot(direction, normal) < 0) normal = { x: -normal.x, y: -normal.y };
@@ -701,7 +714,7 @@ export function tracePrism(
   };
 }
 
-/** Choose a visible facet and a comfortable landing away from its vertices. */
+/** Choose a visible facet, then aim through the optical belly or the Dove TIR window. */
 export function sourceLanding(source: Vec, top: Vec, left: Vec, right: Vec) {
   const faces = [
     { name: "left" as const, a: top, b: left },
@@ -709,43 +722,77 @@ export function sourceLanding(source: Vec, top: Vec, left: Vec, right: Vec) {
     { name: "right" as const, a: right, b: top },
   ];
   const cross = (ax: number, ay: number, bx: number, by: number) => ax * by - ay * bx;
-  let best = Infinity;
-  let chosen = faces[0];
-  let chosenU = 0.5;
-  for (const face of faces) {
-    const dx = face.b.x - face.a.x,
-      dy = face.b.y - face.a.y;
-    // The right-hand normal of each directed edge points into the triangle.
-    if (cross(dx, dy, source.x - face.a.x, source.y - face.a.y) <= 0) continue;
-    const u = clamp(
-      ((source.x - face.a.x) * dx + (source.y - face.a.y) * dy) / (dx * dx + dy * dy || 1),
-      0.22,
-      0.78,
-    );
-    const x = face.a.x + dx * u,
-      y = face.a.y + dy * u;
-    // A source outside two planes can see only part of each face. Reject a landing
-    // if the segment would cross another facet before reaching it.
-    let visible = true;
+  const centroid = {
+    x: (top.x + left.x + right.x) / 3,
+    y: (top.y + left.y + right.y) / 3,
+  };
+  const aimX = centroid.x - source.x;
+  const aimY = centroid.y - source.y;
+
+  // Strict outward-plane visibility: an exterior source can never see the back of a
+  // facet. Convexity then guarantees the incident segment does not enter glass early.
+  const visibleFaces = faces.filter((face) => {
+    const dx = face.b.x - face.a.x;
+    const dy = face.b.y - face.a.y;
+    return cross(dx, dy, source.x - face.a.x, source.y - face.a.y) > 0;
+  });
+  const segmentIsVisible = (face: (typeof faces)[number], x: number, y: number) => {
     for (const other of faces) {
       if (other === face) continue;
-      const ex = other.b.x - other.a.x,
-        ey = other.b.y - other.a.y;
+      const ex = other.b.x - other.a.x;
+      const ey = other.b.y - other.a.y;
       const den = cross(x - source.x, y - source.y, ex, ey);
       if (Math.abs(den) < 1e-9) continue;
       const t = cross(other.a.x - source.x, other.a.y - source.y, ex, ey) / den;
       const v = cross(other.a.x - source.x, other.a.y - source.y, x - source.x, y - source.y) / den;
-      if (t > 1e-8 && t < 1 - 1e-8 && v >= 0 && v <= 1) visible = false;
+      if (t > 1e-8 && t < 1 - 1e-8 && v >= 0 && v <= 1) return false;
     }
-    const distance = Math.hypot(x - source.x, y - source.y);
-    if (visible && distance < best) {
-      best = distance;
-      chosen = face;
-      chosenU = u;
+    return true;
+  };
+
+  // First choice is the actual source→centroid crossing, not the nearest point on a
+  // facet (which piles every right-hand click onto a base vertex). At a grazing corner,
+  // fall back to the closest visible facet with a comfortable projected landing.
+  let chosen: (typeof faces)[number] | undefined;
+  let chosenU = 0.5;
+  let best = Infinity;
+  for (const face of visibleFaces) {
+    const ex = face.b.x - face.a.x;
+    const ey = face.b.y - face.a.y;
+    const den = cross(aimX, aimY, ex, ey);
+    if (Math.abs(den) > 1e-9) {
+      const t = cross(face.a.x - source.x, face.a.y - source.y, ex, ey) / den;
+      const u = cross(face.a.x - source.x, face.a.y - source.y, aimX, aimY) / den;
+      const distance = Math.hypot(aimX * t, aimY * t);
+      if (t > 0 && t < 1 && u >= 0 && u <= 1 && distance < best) {
+        chosen = face;
+        chosenU = u;
+        best = distance;
+      }
     }
   }
-  if (!Number.isFinite(best)) {
-    // Defensive fallback if called directly with an enclosed point: pick the nearest facet.
+  if (!chosen) {
+    for (const face of visibleFaces) {
+      const dx = face.b.x - face.a.x;
+      const dy = face.b.y - face.a.y;
+      const u = clamp(
+        ((source.x - face.a.x) * dx + (source.y - face.a.y) * dy) / (dx * dx + dy * dy || 1),
+        0.22,
+        0.78,
+      );
+      const x = face.a.x + dx * u;
+      const y = face.a.y + dy * u;
+      const distance = Math.hypot(x - source.x, y - source.y);
+      if (segmentIsVisible(face, x, y) && distance < best) {
+        chosen = face;
+        chosenU = u;
+        best = distance;
+      }
+    }
+  }
+  if (!chosen) {
+    // Defensive fallback for direct callers with an enclosed point. The interaction
+    // shell releases these sources before tracing; keep the return value finite here.
     for (const face of faces) {
       const mx = (face.a.x + face.b.x) * 0.5;
       const my = (face.a.y + face.b.y) * 0.5;
@@ -757,11 +804,50 @@ export function sourceLanding(source: Vec, top: Vec, left: Vec, right: Vec) {
       }
     }
   }
-  return {
-    facet: chosen.name,
-    u: chosenU,
-    hit: { x: lerp(chosen.a.x, chosen.b.x, chosenU), y: lerp(chosen.a.y, chosen.b.y, chosenU) },
-  };
+  const face = chosen ?? faces[0];
+  const pointAt = (u: number) => ({
+    x: lerp(face.a.x, face.b.x, u),
+    y: lerp(face.a.y, face.b.y, u),
+  });
+
+  if (face.name !== "base") {
+    const opposite = face.name === "left" ? "right" : "left";
+    const bellyU = clamp(chosenU, 0.28, 0.72);
+    const belly = pointAt(bellyU);
+    if (tracePrism(source, belly, top, left, right, face.name).exitFacet === opposite) {
+      chosenU = bellyU;
+    } else {
+      // Lower Dove window: base TIR followed by a near-normal opposite-facet exit.
+      const doveU = face.name === "right" ? 0.28 : 0.72;
+      const dove = pointAt(doveU);
+      if (tracePrism(source, dove, top, left, right, face.name).exitFacet === opposite) {
+        chosenU = doveU;
+      } else {
+        // The fixed belly/Dove points cover the common clicks. Near the regime boundary
+        // (or on a custom layout) scan the same safe facet span for a genuinely outward
+        // opposite exit rather than leaving the fan on the incident side.
+        let bestU = bellyU;
+        let bestScore = -Infinity;
+        for (let u = 0.24; u <= 0.7601; u += 0.02) {
+          const candidate = pointAt(u);
+          const traced = tracePrism(source, candidate, top, left, right, face.name);
+          if (traced.exitFacet !== opposite) continue;
+          const outwardX = traced.exitDirection.x * (opposite === "left" ? -1 : 1);
+          if (outwardX < 0.5) continue;
+          // Prefer the optical belly; use the Dove window as the next-best family.
+          const score = outwardX - Math.abs(u - bellyU) * 0.2 - Math.abs(u - doveU) * 0.1;
+          if (score > bestScore) {
+            bestScore = score;
+            bestU = u;
+          }
+        }
+        chosenU = bestU;
+      }
+    }
+  } else {
+    chosenU = clamp(chosenU, 0.22, 0.78);
+  }
+  return { facet: face.name, u: chosenU, hit: pointAt(chosenU) };
 }
 
 /* ------------------------------------------------------------------------- context */
@@ -928,6 +1014,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   let fanOrigin: Vec | null = null;
   let fanTurn = 0;
   let fanSpread = 1;
+  let fanChirality: 1 | -1 = 1;
   let opticalWeight = 0;
   let scrollOpticalWeight = 0;
   let entryU = 0.4;
@@ -993,17 +1080,24 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         fanOriginBuf.x = optics.exit.x;
         fanOriginBuf.y = optics.exit.y;
         fanOrigin = fanOriginBuf;
+        // The authored fan faces right on desktop and down on portrait. The resting
+        // TIR record is not its angular reference; using it wrapped left exits backward.
+        const fanRestAngle = geo.mobile ? Math.PI / 2 : 0;
         const angle = Math.atan2(optics.exitDirection.y, optics.exitDirection.x);
-        const restAngle = Math.atan2(
-          geo.restOptics.exitDirection.y,
-          geo.restOptics.exitDirection.x,
-        );
-        fanTurn = clamp(
-          Math.atan2(Math.sin(angle - restAngle), Math.cos(angle - restAngle)),
-          -0.9,
-          0.9,
-        );
-        fanSpread = 1 + 0.35 * clamp((optics.deviation - deltaMin) / deltaMin, 0, 1);
+        fanTurn = Math.atan2(Math.sin(angle - fanRestAngle), Math.cos(angle - fanRestAngle));
+        const incLen = Math.hypot(pinnedHit.x - pinnedSource.x, pinnedHit.y - pinnedSource.y) || 1;
+        const incX = (pinnedHit.x - pinnedSource.x) / incLen;
+        const incY = (pinnedHit.y - pinnedSource.y) / incLen;
+        const devCross = incX * optics.exitDirection.y - incY * optics.exitDirection.x;
+        const tirBounces = optics.legs.reduce((count, leg) => count + (leg.tir ? 1 : 0), 0);
+        const parity = tirBounces % 2 === 0 ? 1 : -1;
+        fanChirality =
+          Math.abs(devCross) > 1e-4
+            ? ((parity * Math.sign(devCross)) as 1 | -1)
+            : optics.exitDirection.x < 0
+              ? -1
+              : 1;
+        fanSpread = optics.tir ? 0.92 : 1;
         opticalWeight = 1;
         scrollOpticalWeight = 0;
         return;
@@ -1017,6 +1111,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       fanOrigin = null;
       fanTurn = 0;
       fanSpread = 1;
+      fanChirality = 1;
       opticalWeight = 0;
       scrollOpticalWeight = 0;
       entryU = geo.entryU;
@@ -1062,6 +1157,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
     const target = tracePrism(liveSource, liveHit, topV, leftV, rightV);
     optics = target;
+    fanChirality = 1;
 
     const scrollTurn = clamp(
       (SCROLL_LIFTS_LIGHT ? -1 : 1) * (geo.mobile ? 0.06 : 0.1) * scrollEase,
@@ -1715,6 +1811,46 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
   const strandDirScratch: Vec = { x: 0, y: 0 };
 
+  /**
+   * One live angular frame for every renderer and QA consumer. Reflection reverses the
+   * spectrum's handedness; a plain π rotation would put violet on the wrong side.
+   * The identity branch is exact so resting stills keep their original floating point path.
+   */
+  const liveStrandAngle = (strand: Strand): number => {
+    if (!geo || (fanTurn === 0 && fanSpread === 1 && fanChirality === 1)) return strand.angle;
+    const fanRestAngle = geo.mobile ? Math.PI / 2 : 0;
+    const rel = Math.atan2(
+      Math.sin(strand.angle - fanRestAngle),
+      Math.cos(strand.angle - fanRestAngle),
+    );
+    return fanRestAngle + fanTurn + fanChirality * rel * fanSpread;
+  };
+  const liveStrandDir = (strand: Strand, out: Vec): Vec => {
+    const angle = liveStrandAngle(strand);
+    out.x = Math.cos(angle);
+    out.y = Math.sin(angle);
+    return out;
+  };
+  const liveStrandLength = (strand: Strand, origin: Vec, dir: Vec): number =>
+    fanOrigin !== null || fanTurn !== 0 || fanSpread !== 1 || fanChirality !== 1
+      ? Math.max(120, rayExit(origin, dir, geo?.heroW ?? 0, geo?.heroH ?? 0) * OVERSHOOT)
+      : strand.length;
+
+  /** A live, pinned-only copy corridor. Open lanes keep their full authored voice. */
+  const liveCopyVoice = (origin: Vec, dir: Vec): number => {
+    if (!pinned) return 1;
+    const center = copyCenterOf();
+    const dx = center.x - origin.x;
+    const dy = center.y - origin.y;
+    const length = Math.hypot(dx, dy);
+    if (length < 1e-6) return 0.52;
+    const along = dx * dir.x + dy * dir.y;
+    if (along <= 0) return 1;
+    const angle = Math.acos(clamp(along / length, -1, 1));
+    const smooth = 1 - smoothstep(0, 26 * DEG, angle);
+    return lerp(1, 0.52, smooth);
+  };
+
   /* -------------------------------------------------------------- strand maths */
 
   /**
@@ -1733,19 +1869,10 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     if (!strand) return;
     const buf = strandBufs[index];
     const core = fanOrigin ?? geo.core;
-    const angle =
-      strand.angle +
-      fanTurn +
-      (strand.angle - (geo.mobile ? Math.PI / 2 : 0)) * (fanSpread - 1) * 0.15;
-    strandDirScratch.x = Math.cos(angle);
-    strandDirScratch.y = Math.sin(angle);
-    const dir = strandDirScratch;
+    const dir = liveStrandDir(strand, strandDirScratch);
     const normalX = -dir.y;
     const normalY = dir.x;
-    const length =
-      fanTurn || fanSpread !== 1 || fanOrigin !== null
-        ? Math.max(120, rayExit(core, dir, geo.heroW, geo.heroH) * OVERSHOOT)
-        : strand.length;
+    const length = liveStrandLength(strand, core, dir);
 
     const amp = strand.amplitude * (1 + surgeEnergy * 0.35);
     const omega = time * TAU * strand.hz;
@@ -1852,14 +1979,12 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   const fillAll = () => {
     if (geo) {
       const origin = fanOrigin ?? geo.core;
+      const rx = leanX - origin.x;
+      const ry = leanY - origin.y;
       for (const strand of geo.strands) {
-        const rx = leanX - origin.x;
-        const ry = leanY - origin.y;
-        bowCenters[strand.index] = clamp(
-          (rx * strand.dir.x + ry * strand.dir.y) / strand.length,
-          0.05,
-          0.95,
-        );
+        const dir = liveStrandDir(strand, strandDirScratch);
+        const length = liveStrandLength(strand, origin, dir);
+        bowCenters[strand.index] = clamp((rx * dir.x + ry * dir.y) / length, 0.05, 0.95);
       }
     }
     catches.length = 0;
@@ -1897,11 +2022,16 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   const ensureCaches = (ctx: Ctx) => {
     if (!geo) return;
     const scrollBucket = Math.round(scrollEase * SCROLL_CACHE_BUCKETS);
-    const key = `${version}:${isDark ? "dark" : "light"}:${scrollBucket}`;
+    const poseKey =
+      fanOrigin !== null || fanTurn !== 0 || fanSpread !== 1 || fanChirality !== 1
+        ? `${Math.round((fanOrigin?.x ?? geo.core.x) * 0.5)}:${Math.round((fanOrigin?.y ?? geo.core.y) * 0.5)}:${Math.round(fanTurn * 64)}:${Math.round(fanSpread * 32)}:${fanChirality}`
+        : "rest";
+    const key = `${version}:${isDark ? "dark" : "light"}:${scrollBucket}:${poseKey}`;
     if (key === cacheKey && ctx === cacheCtx && beamGrad && glassGrad && ambientGrad) return;
 
     const { strands, heroW, heroH } = geo;
-    const core = scrollBucket === 0 ? geo.core : (fanOrigin ?? shift(geo.core));
+    const activePose = scrollBucket !== 0 || poseKey !== "rest";
+    const core = !activePose ? geo.core : (fanOrigin ?? shift(geo.core));
     const topV = scrollBucket === 0 ? geo.topV : liveTopV();
     const rightV = scrollBucket === 0 ? geo.rightV : liveRightV();
 
@@ -1912,8 +2042,10 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const body = isDark ? band.dark : band.light;
       const target = geo?.targets[i];
       if (!target) return null;
-      const tx = scrollBucket === 0 ? target.x : core.x + strand.dir.x * strand.length;
-      const ty = scrollBucket === 0 ? target.y : core.y + strand.dir.y * strand.length;
+      const dir = liveStrandDir(strand, strandDirScratch);
+      const length = liveStrandLength(strand, core, dir);
+      const tx = !activePose ? target.x : core.x + dir.x * length;
+      const ty = !activePose ? target.y : core.y + dir.y * length;
       const g = ctx.createLinearGradient(core.x, core.y, tx, ty);
       g.addColorStop(0, rgba(body, 0.34));
       g.addColorStop(0.07, rgba(body, 0.5));
@@ -1927,8 +2059,10 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const band = BANDS[strand.band];
       const body = isDark ? band.dark : band.light;
       const target = geo?.targets[i] ?? { x: core.x + 1, y: core.y + 1 };
-      const tx = scrollBucket === 0 ? target.x : core.x + strand.dir.x * strand.length;
-      const ty = scrollBucket === 0 ? target.y : core.y + strand.dir.y * strand.length;
+      const dir = liveStrandDir(strand, strandDirScratch);
+      const length = liveStrandLength(strand, core, dir);
+      const tx = !activePose ? target.x : core.x + dir.x * length;
+      const ty = !activePose ? target.y : core.y + dir.y * length;
       const alpha = band.ribbonAlpha * (isDark ? 1.2 : 1.6);
       const g = ctx.createLinearGradient(core.x, core.y, tx, ty);
       g.addColorStop(0, rgba(body, 0));
@@ -2129,9 +2263,15 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   };
 
   /** Centre of the copy block, derived from the quiet rects — no extra measurement pass. */
+  const copyCenterBuf: Vec = { x: 0, y: 0 };
+  let copyCenterVersion = -1;
   const copyCenterOf = () => {
+    if (copyCenterVersion === version) return copyCenterBuf;
+    copyCenterVersion = version;
     if (!layout || layout.ledger.quietRects.length === 0) {
-      return { x: (geo?.heroW ?? 0) / 2, y: (geo?.heroH ?? 0) / 2 };
+      copyCenterBuf.x = (geo?.heroW ?? 0) / 2;
+      copyCenterBuf.y = (geo?.heroH ?? 0) / 2;
+      return copyCenterBuf;
     }
     let left = Infinity,
       right = -Infinity,
@@ -2143,7 +2283,9 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       if (r.top < top) top = r.top;
       if (r.bottom > bottom) bottom = r.bottom;
     }
-    return { x: (left + right) / 2, y: (top + bottom) / 2 };
+    copyCenterBuf.x = (left + right) / 2;
+    copyCenterBuf.y = (top + bottom) / 2;
+    return copyCenterBuf;
   };
 
   /**
@@ -2327,7 +2469,9 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const buf = strandBufs[index];
     if (!strand || !buf) return;
     const band = BANDS[strand.band];
-    const voice = bandVoice(strand.band) * strand.alpha;
+    const origin = fanOrigin ?? geo.core;
+    const dir = liveStrandDir(strand, strandDirScratch);
+    const voice = bandVoice(strand.band) * strand.alpha * liveCopyVoice(origin, dir);
     const alpha = (isDark ? band.darkAlpha : band.lightAlpha) * voice * (1 + surgeEnergy * 0.2);
     if (alpha <= 0.004) return;
 
@@ -2418,7 +2562,9 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     // Clay, whatever band the prime lane landed on: this is the accent stroke of the hero.
     const band = BANDS[2];
     const colour = isDark ? band.dark : band.light;
-    const voice = bandVoice(strand.band) * strand.alpha;
+    const origin = fanOrigin ?? shift(geo.core);
+    const dir = liveStrandDir(strand, strandDirScratch);
+    const voice = bandVoice(strand.band) * strand.alpha * liveCopyVoice(origin, dir);
 
     const raw = clamp((time - PRIME_DELAY_S) / PRIME_DRAW_S, 0, 1);
     // Decelerating growth: the head leaves fast and settles into its lane.
@@ -2426,7 +2572,6 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     // A minimum of two samples, so the first frames are a dot rather than nothing.
     const head = Math.max(2, Math.round(grown * STRAND_STEPS));
 
-    const origin = fanOrigin ?? shift(geo.core);
     const gradient = ctx.createLinearGradient(
       origin.x,
       origin.y,
@@ -2537,6 +2682,23 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     gates.length = 0;
     glassInk.length = 0;
     const z = zone();
+    let exitOutward: Vec | null = null;
+    if (pinned && optics?.exitFacet) {
+      const a =
+        optics.exitFacet === "left"
+          ? liveTopV()
+          : optics.exitFacet === "base"
+            ? liveLeftV()
+            : liveRightV();
+      const b =
+        optics.exitFacet === "left"
+          ? liveLeftV()
+          : optics.exitFacet === "base"
+            ? liveRightV()
+            : liveTopV();
+      const length = dist(a, b) || 1;
+      exitOutward = { x: -(b.y - a.y) / length, y: (b.x - a.x) / length };
+    }
     for (let i = 0; i < (geo?.strands.length ?? 0); i++) {
       const strand = geo!.strands[i];
       const buf = strandBufs[i];
@@ -2545,11 +2707,26 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         glassInk.push(0);
         continue;
       }
+      const dir = liveStrandDir(strand, strandDirScratch);
+      if (exitOutward && dir.x * exitOutward.x + dir.y * exitOutward.y < -0.12) {
+        // Backward hemisphere: never reopen this lane on the incident side of the glass.
+        gates.push(STRAND_STEPS);
+        glassInk.push(0);
+        continue;
+      }
       let inside = 0;
       let door = 0;
+      let lastInside = -1;
+      let opened = false;
       for (let k = 0; k <= STRAND_STEPS; k++) {
-        if (inClear(z, buf[k * 2], buf[k * 2 + 1])) inside += 1;
-        else if (door === 0) door = k;
+        const inGlass = inClear(z, buf[k * 2], buf[k * 2 + 1]);
+        if (inGlass) {
+          inside += 1;
+          if (k < STRAND_STEPS * 0.45) lastInside = k;
+        } else if (!opened) {
+          door = exitOutward ? lastInside + 1 : k;
+          opened = true;
+        }
       }
       const liveLen =
         fanOrigin !== null
@@ -2557,7 +2734,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
           : strand.length;
       const ink = (inside / (STRAND_STEPS + 1)) * liveLen;
       glassInk.push(ink);
-      gates.push(ink > GLASS_MAX_INK ? door : 0);
+      gates.push(exitOutward ? door : ink > GLASS_MAX_INK ? door : 0);
     }
   };
 
@@ -2567,9 +2744,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const strand = geo.strands[i];
       if (strand.ribbon <= 0) continue;
       const buf = strandBufs[i];
-      const nx = strand.normal.x;
-      const ny = strand.normal.y;
-      const voice = bandVoice(strand.band) * strand.alpha;
+      const dir = liveStrandDir(strand, strandDirScratch);
+      const nx = -dir.y;
+      const ny = dir.x;
+      const voice =
+        bandVoice(strand.band) * strand.alpha * liveCopyVoice(fanOrigin ?? geo.core, dir);
       const start = Math.max(Math.round(0.14 * STRAND_STEPS), gates[i] ?? 0);
       if (start >= STRAND_STEPS) continue;
 
@@ -2618,8 +2797,10 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const buf = strandBufs[i];
       const gate = gates[i] ?? 0;
       if (gate >= STRAND_STEPS) continue;
-      const lane = strand.length;
-      const nrm = strand.normal;
+      const dir = liveStrandDir(strand, strandDirScratch);
+      const lane = liveStrandLength(strand, fanOrigin ?? geo.core, dir);
+      const nx = -dir.y;
+      const ny = dir.x;
       const colour = isDark ? band.dark : band.light;
       const weight =
         band.plasma * (isDark ? 0.95 : 0.86) * (1 + surgeEnergy * 0.3) * bandVoice(strand.band);
@@ -2637,7 +2818,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         const offset =
           (hash(i * 97 + k * 31 + 7, frame) - 0.5) * 2 * strikeAmp * Math.pow(s, 0.45) * env;
         const jx = (hash(i * 41 + k * 17 + 3, frame) - 0.5) * 1.6;
-        ctx.lineTo(buf[at * 2] + nrm.x * (offset + jx), buf[at * 2 + 1] + nrm.y * (offset + jx));
+        ctx.lineTo(buf[at * 2] + nx * (offset + jx), buf[at * 2 + 1] + ny * (offset + jx));
       }
 
       // ionised haze: wide, faint, coloured
@@ -2669,7 +2850,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         const reach = Math.min(lane * 0.09 * (0.82 + seed * 0.36), STRIKE_REACH_MAX);
         const sway = (hash(i * 61 + b * 23 + 5, frame) - 0.5) * 0.9;
         const side = ((i + b) % 2 === 0 ? 1 : -1) * (0.6 + seed * 0.3);
-        const angle = Math.atan2(nrm.y, nrm.x) + side;
+        const angle = Math.atan2(ny, nx) + side;
         const dx = Math.cos(angle) * reach;
         const dy = Math.sin(angle) * reach;
         const wobAmp = reach * 0.22;
@@ -2963,6 +3144,9 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const hit = liveHit ?? shift(geo.hit);
     const exit = fanOrigin ?? shift(geo.exit);
     const warm = isDark ? BANDS[2].dark : BANDS[2].light;
+    const activeFacet = pinned ? pinnedFacet : "left";
+    const litA = activeFacet === "base" ? leftV : topV;
+    const litB = activeFacet === "left" ? leftV : rightV;
 
     const centroid = {
       x: (topV.x + leftV.x + rightV.x) / 3,
@@ -3007,7 +3191,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     // --- 3. the three faces. A prism seen head-on is one shape; a prism seen as glass is
     //        three faces at three values with one bright edge between them.
     // The near face: the one turned toward the light, from the apex down the incident side.
-    const nearFace = ctx.createLinearGradient(topV.x, topV.y, leftV.x, leftV.y);
+    const nearFace = ctx.createLinearGradient(litA.x, litA.y, litB.x, litB.y);
     nearFace.addColorStop(0, isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.5)");
     nearFace.addColorStop(1, isDark ? "rgba(255,255,255,0.01)" : "rgba(255,255,255,0.12)");
     trace();
@@ -3116,8 +3300,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     ctx.stroke();
 
     // --- 6. specular streak along the incident facet: the highlight that sells the glass
-    const streakFrom = onFacet(topV, leftV, 0.1);
-    const streakTo = onFacet(topV, leftV, 0.44);
+    const streakFrom = onFacet(litA, litB, 0.1);
+    const streakTo = onFacet(litA, litB, 0.44);
     const streak = ctx.createLinearGradient(streakFrom.x, streakFrom.y, streakTo.x, streakTo.y);
     streak.addColorStop(0, "rgba(255,255,255,0)");
     streak.addColorStop(0.5, isDark ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,1)");
@@ -3159,7 +3343,32 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const topV = liveTopV();
     const leftV = liveLeftV();
     const rightV = liveRightV();
-    const last = resting ? record.legs[0] : record.legs[record.legs.length - 1];
+    const length = geo.prismSize * 0.22;
+    if (!resting) {
+      // Trace both surfaces separately for every wavelength. This preserves angular
+      // dispersion on Newton passes and lateral dispersion when Dove TIR cancels it.
+      const source = liveSource ?? geo.source;
+      const entry = liveHit ?? shift(geo.hit);
+      const entryFacet = pinned ? pinnedFacet : "left";
+      return [0.65, 0.61, 0.59, 0.55, 0.5, 0.46, 0.43].flatMap((wavelength, band) => {
+        const index = 1.4868 + 0.004 / wavelength ** 2;
+        const traced = tracePrism(source, entry, topV, leftV, rightV, entryFacet, index);
+        if (!traced.exitFacet) return [];
+        return [
+          {
+            from: traced.exit,
+            to: {
+              x: traced.exit.x + traced.exitDirection.x * length,
+              y: traced.exit.y + traced.exitDirection.y * length,
+            },
+            direction: traced.exitDirection,
+            wavelength,
+            band,
+          },
+        ];
+      });
+    }
+    const last = record.legs[0];
     const facetName = resting ? last.facet : record.exitFacet;
     const facet =
       facetName === "right"
@@ -3182,8 +3391,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     // A real desktop ray reflects here. Only the resting illustration substitutes an
     // angle; never alter tracePrism or silently defeat its total-reflection guard.
     const sinInternal = resting && last.tir ? Math.sign(signedSin) * 0.42 : signedSin;
-    const origin = resting ? (scrollEase > 0 ? last.to : geo.exit) : record.exit;
-    const length = geo.prismSize * 0.22;
+    const origin = scrollEase > 0 ? last.to : geo.exit;
     return [0.65, 0.61, 0.59, 0.55, 0.5, 0.46, 0.43].flatMap((wavelength, band) => {
       const index = 1.4868 + 0.004 / wavelength ** 2;
       const sinOut = index * sinInternal;
@@ -3636,9 +3844,13 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const source = liveSource ?? geo.source;
     const hit = liveHit ?? shift(geo.hit);
     const spine = geo.strands.find((strand) => BANDS[strand.band].flagship && strand.ribbon > 0);
+    const liveFan = fanOrigin !== null || fanTurn !== 0 || fanSpread !== 1 || fanChirality !== 1;
     const spineTarget = spine
-      ? scrollEase > 0 || fanOrigin !== null
-        ? { x: core.x + spine.dir.x * spine.length, y: core.y + spine.dir.y * spine.length }
+      ? liveFan
+        ? {
+            x: strandBufs[spine.index][STRAND_STEPS * 2],
+            y: strandBufs[spine.index][STRAND_STEPS * 2 + 1],
+          }
         : geo.targets[spine.index]
       : { x: heroW + 40, y: heroH * 0.5 };
     const beamLen = dist(source, hit) || 1;
@@ -3756,8 +3968,10 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     ctx.strokeStyle = "rgba(0,160,90,0.5)";
     for (const [i, t] of geo.targets.entries()) {
       const strand = geo.strands[i];
-      const tx = strand && fanOrigin ? dbgExit.x + strand.dir.x * strand.length : t.x;
-      const ty = strand && fanOrigin ? dbgExit.y + strand.dir.y * strand.length : t.y;
+      const dir = strand ? liveStrandDir(strand, strandDirScratch) : t;
+      const length = strand ? liveStrandLength(strand, dbgExit, dir) : 0;
+      const tx = strand && fanOrigin ? dbgExit.x + dir.x * length : t.x;
+      const ty = strand && fanOrigin ? dbgExit.y + dir.y * length : t.y;
       ctx.beginPath();
       ctx.moveTo(dbgExit.x, dbgExit.y);
       ctx.lineTo(tx, ty);
@@ -3973,6 +4187,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     fanOrigin = null;
     fanTurn = 0;
     fanSpread = 1;
+    fanChirality = 1;
     opticalWeight = 0;
     scrollOpticalWeight = 0;
     if (geo) entryU = geo.entryU;
@@ -4254,6 +4469,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
           fanOrigin: fanOrigin ? { ...fanOrigin } : null,
           fanTurn,
           fanSpread,
+          fanChirality,
+          spectralRays: optics && opticalWeight > 0.001 ? spectralRays(optics, false) : [],
           scroll: {
             target: scrollTarget,
             ease: scrollEase,
@@ -4308,9 +4525,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
           Math.sin(TAU * 2.35 * strand.cycles * s + omega * 1.3) * amp * 0.26) *
         env *
         (0.45 + 0.55 * travel);
+      const dir = liveStrandDir(strand, strandDirScratch);
+      const length = liveStrandLength(strand, core, dir);
       return {
-        x: core.x + strand.dir.x * (s * strand.length) + strand.normal.x * off,
-        y: core.y + strand.dir.y * (s * strand.length) + strand.normal.y * off,
+        x: core.x + dir.x * (s * length) - dir.y * off,
+        y: core.y + dir.y * (s * length) + dir.x * off,
       };
     },
     /**
