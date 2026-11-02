@@ -43,8 +43,9 @@ import type { LayoutSnapshot } from "../../src/components/sections/hero-layout.t
 const here = dirname(fileURLToPath(import.meta.url));
 const dataDir = join(here, "data");
 const PHASE = process.env.HERO_PHASE ?? "10";
+const NO_WRITE = process.env.HERO_NO_WRITE === "1" || process.argv.includes("--no-write");
 const shotsDir = join(here, `../../design/hero-phase${PHASE}`);
-mkdirSync(shotsDir, { recursive: true });
+if (!NO_WRITE) mkdirSync(shotsDir, { recursive: true });
 const files = readdirSync(dataDir)
   .filter((f) => f.endsWith(".json"))
   .sort();
@@ -70,7 +71,7 @@ const composite = (
 ) => {
   const out = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
   const ctx = out.getContext("2d");
-  ctx.fillStyle = dark ? "#1b1815" : "#f7f4ee";
+  ctx.fillStyle = dark ? "#0f0a06" : "#f7f4ee";
   ctx.fillRect(0, 0, out.width, out.height);
   ctx.drawImage(layer, 0, 0);
   return out;
@@ -486,10 +487,12 @@ for (const file of files) {
     let opaque = 0;
     for (let i = 3; i < pixels.length; i += 4) if (pixels[i] > 4) opaque += 1;
     assert.ok(opaque > 500, `only ${opaque} non-empty pixels — the field did not draw`);
-    writeFileSync(
-      join(shotsDir, `phase${PHASE}-engine-${capture.name}.png`),
-      composite(canvas, layout, capture.dark).toBuffer("image/png"),
-    );
+    if (!NO_WRITE) {
+      writeFileSync(
+        join(shotsDir, `phase${PHASE}-engine-${capture.name}.png`),
+        composite(canvas, layout, capture.dark).toBuffer("image/png"),
+      );
+    }
   });
 
   check("the glass stays clear: crossings open past the rim, only the hinge enters at rest", () => {
@@ -616,10 +619,12 @@ for (const file of files) {
     assert.ok(live.geometry().interaction.pointerEase > 0.8, "pointer influence never settled in");
 
     // Photograph the caught frame for design review, alongside the idle still.
-    writeFileSync(
-      join(shotsDir, `phase${PHASE}-engine-${capture.name}-catch.png`),
-      composite(canvas, layout, capture.dark).toBuffer("image/png"),
-    );
+    if (!NO_WRITE) {
+      writeFileSync(
+        join(shotsDir, `phase${PHASE}-engine-${capture.name}-catch.png`),
+        composite(canvas, layout, capture.dark).toBuffer("image/png"),
+      );
+    }
   });
 
   check("one light enters: the incident beam outweighs every left lane", () => {
@@ -858,7 +863,7 @@ for (const file of files) {
           );
         }
       }
-      if (p === 1) {
+      if (p === 1 && !NO_WRITE) {
         writeFileSync(
           join(shotsDir, `phase${PHASE}-engine-${capture.name}-scroll.png`),
           composite(canvas, layout, capture.dark).toBuffer("image/png"),
@@ -1035,6 +1040,100 @@ for (const file of files) {
         );
       }
     }
+  });
+
+  if (layout.heroW === 1440) {
+    check("desktop 1440 prism sits in the 54.5–56.2% band (~27–42px left of 57.2%)", () => {
+      const ratio = geo.prismCenter.x / geo.heroW;
+      assert.ok(
+        ratio >= 0.545 && ratio <= 0.562,
+        `1440 prismCenter.x=${geo.prismCenter.x.toFixed(1)} (${(ratio * 100).toFixed(2)}%) outside [54.5%, 56.2%]`,
+      );
+    });
+  }
+
+  check("paintStill() on a reused canvas is byte-identical after full interaction", () => {
+    const W = Math.round(layout.heroW);
+    const H = Math.round(layout.heroH);
+    const fresh = createCanvas(W, H);
+    const freshRay = createHeroRay();
+    freshRay.setTheme(capture.dark);
+    freshRay.setLayout(layout);
+    freshRay.paintStill(fresh.getContext("2d") as never);
+    const expected = fresh.data();
+
+    const reused = createCanvas(W, H);
+    const reusedCtx = reused.getContext("2d") as never;
+    const live = createHeroRay();
+    live.setTheme(capture.dark);
+    live.setLayout(layout);
+    live.setPointer(geo.prismCenter.x, geo.prismCenter.y, true);
+    live.setTileHover(0);
+    live.setHeadlineHover(true);
+    live.placeSource(Math.max(12, W * 0.12), Math.min(H - 12, H * 0.65));
+    live.addSurge(W * 0.5, H * 0.5);
+    live.setScroll(0.75);
+    for (let i = 0; i < 45; i++) live.paint(reusedCtx, 16);
+    live.paintStill(reusedCtx);
+    const actual = reused.data();
+
+    let diffs = 0;
+    for (let i = 0; i < expected.length; i++) {
+      if (expected[i] !== actual[i]) diffs += 1;
+    }
+    assert.equal(diffs, 0, `reused canvas differed in ${diffs} byte(s) after live interaction`);
+  });
+
+  check("muted italic thesis line holds WCAG AA large-text contrast over the beam", () => {
+    const thesis = layout.textRects[1];
+    if (!thesis) return;
+    const W = Math.round(layout.heroW);
+    const H = Math.round(layout.heroH);
+    const layer = createCanvas(W, H);
+    const fresh = createHeroRay();
+    fresh.setTheme(capture.dark);
+    fresh.setLayout(layout);
+    fresh.paintStill(layer.getContext("2d") as never);
+    const page = composite(layer, layout, capture.dark);
+    const data = page.data();
+
+    const srgbToLin = (v: number) => {
+      const s = v / 255;
+      return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    };
+    const lum = (r: number, g: number, b: number) =>
+      0.2126 * srgbToLin(r) + 0.7152 * srgbToLin(g) + 0.0722 * srgbToLin(b);
+    // Token sRGB equivalents of Hero.tsx thesis text (`--ink-mute` light, 55% `--ink-soft` mix dark)
+    const textLum = capture.dark ? lum(168, 163, 157) : lum(112, 105, 99);
+    const ratio = (bgLum: number) =>
+      (Math.max(textLum, bgLum) + 0.05) / (Math.min(textLum, bgLum) + 0.05);
+
+    let minCR = Infinity;
+    let sumCR = 0;
+    let count = 0;
+    const x0 = Math.max(0, Math.ceil(thesis.left));
+    const x1 = Math.min(W - 1, Math.floor(thesis.right));
+    const y0 = Math.max(0, Math.ceil(thesis.top));
+    const y1 = Math.min(H - 1, Math.floor(thesis.bottom));
+    const lumSamples: number[] = [];
+    for (let y = y0; y <= y1; y += 2) {
+      for (let x = x0; x <= x1; x += 2) {
+        const idx = (y * W + x) * 4;
+        const c = ratio(lum(data[idx], data[idx + 1], data[idx + 2]));
+        lumSamples.push(c);
+        if (c < minCR) minCR = c;
+        sumCR += c;
+        count += 1;
+      }
+    }
+    lumSamples.sort((a, b) => a - b);
+    const p02CR = lumSamples[Math.floor(lumSamples.length * 0.02)] ?? minCR;
+    const meanCR = sumCR / Math.max(1, count);
+    assert.ok(meanCR >= 4.5, `thesis mean contrast ${meanCR.toFixed(2)}:1 < 4.5:1`);
+    assert.ok(
+      p02CR >= 3.0,
+      `thesis 2nd-percentile contrast over beam ${p02CR.toFixed(2)}:1 < 3.0:1`,
+    );
   });
 }
 

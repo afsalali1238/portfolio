@@ -67,6 +67,64 @@ export type LayoutSnapshot = {
 
 const MIN_RECT = 8;
 
+/**
+ * Interactive elements inside the hero whose clicks/taps belong to UI controls rather than
+ * placing or resetting a light source on the canvas.
+ */
+export const HERO_INTERACTIVE_SELECTOR = [
+  "a",
+  "button",
+  "input",
+  "select",
+  "textarea",
+  "label",
+  "summary",
+  "details",
+  "audio[controls]",
+  "video[controls]",
+  "iframe",
+  "object",
+  "embed",
+  "[contenteditable]:not([contenteditable='false'])",
+  "[data-hero-control]",
+  "[role='button']",
+  "[role='link']",
+  "[role='checkbox']",
+  "[role='radio']",
+  "[role='switch']",
+  "[role='menuitem']",
+  "[role='menuitemcheckbox']",
+  "[role='menuitemradio']",
+  "[role='option']",
+  "[role='tab']",
+  "[role='textbox']",
+  "[role='combobox']",
+  "[role='listbox']",
+  "[role='searchbox']",
+  "[role='slider']",
+  "[role='spinbutton']",
+  "[tabindex]:not([tabindex='-1'])",
+].join(", ");
+
+/**
+ * Returns `true` when a window pointer/mouse event target should NOT place or reset the hero
+ * light source — either because the target is outside `<section data-hero>` (e.g. sticky site
+ * header, mobile drawer backdrop, floating back-to-top button, modals) or because it lands on
+ * an interactive / editable control inside the hero.
+ */
+export function shouldIgnoreHeroPointerTarget(
+  target: EventTarget | null,
+  hero: HTMLElement,
+): boolean {
+  const el =
+    target instanceof Element ? target : target instanceof Node ? target.parentElement : null;
+  if (!el || !hero.contains(el)) return true;
+  if (el instanceof HTMLElement && el.isContentEditable) return true;
+  const hit = el.closest(HERO_INTERACTIVE_SELECTOR);
+  if (hit && hit !== hero) return true;
+  return false;
+}
+
 /** Merge overlapping/near-touching rects so a text column reads as one quiet zone. */
 function mergeRects(rects: Rect[]): Rect[] {
   const sorted = [...rects].sort((a, b) => a.top - b.top || a.left - b.left);

@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Container } from "../layout/Container";
@@ -9,7 +10,7 @@ import {
   numberWord,
 } from "../../data/projects";
 import { RevealWord } from "./hero-helpers";
-import { HeroPrism } from "./HeroPrism";
+import { HeroPrism, type HeroPrismControl, type HeroSourceMode } from "./HeroPrism";
 import type { ProjectFilter } from "../../data/filters";
 
 /**
@@ -51,11 +52,53 @@ function StatLink({
   );
 }
 
+const LIGHT_MODE_COPY: Record<
+  HeroSourceMode,
+  { label: string; aria: string; announcement: string }
+> = {
+  rest: {
+    label: "Aim light",
+    aria: "Aim prism light source at the left facet",
+    announcement: "",
+  },
+  left: {
+    label: "Light · left facet",
+    aria: "Prism light on left facet — activate for base facet",
+    announcement: "Prism light aimed at left facet.",
+  },
+  base: {
+    label: "Light · base facet",
+    aria: "Prism light on base facet — activate for right facet",
+    announcement: "Prism light aimed at base facet.",
+  },
+  right: {
+    label: "Light · right facet",
+    aria: "Prism light on right facet — activate to reset light",
+    announcement: "Prism light aimed at right facet.",
+  },
+  custom: {
+    label: "Reset light",
+    aria: "Reset custom prism light source to resting ray",
+    announcement: "Custom prism light source placed.",
+  },
+};
+
 /**
  * The hero: authoritative thesis on the left, the idea ray dispersing across the right,
  * and four interactive verification stat tiles linking into the catalogue.
  */
 export function Hero() {
+  const prismControlRef = useRef<HeroPrismControl | null>(null);
+  const [sourceMode, setSourceMode] = useState<HeroSourceMode>("rest");
+  const [hasInteracted, setHasInteracted] = useState(false);
+
+  const handleSourceModeChange = (next: HeroSourceMode) => {
+    if (next !== "rest") setHasInteracted(true);
+    setSourceMode(next);
+  };
+
+  const controlCopy = LIGHT_MODE_COPY[sourceMode];
+
   return (
     <section
       aria-labelledby="hero-heading"
@@ -68,7 +111,11 @@ export function Hero() {
       <div aria-hidden="true" className="hero-wash pointer-events-none absolute inset-0 z-0" />
 
       {/* Background: one ray, one prism, one restrained dispersion fan (full-bleed) */}
-      <HeroPrism className="absolute inset-0 z-0 h-full w-full" />
+      <HeroPrism
+        className="absolute inset-0 z-0 h-full w-full"
+        controlRef={prismControlRef}
+        onSourceModeChange={handleSourceModeChange}
+      />
 
       {/* No veils. The field stays bright under the words and the engine thins it there — the
           dissolve in hero-ray.ts replaces what used to be two gradient divs. A veil hides the
@@ -88,7 +135,7 @@ export function Hero() {
               </span>
               <span
                 data-hero-thesis
-                className="mt-2 block text-[7.5vw] italic leading-[1.02] text-ink-mute sm:text-[3rem] md:text-[3.2rem] lg:text-[3.3rem] xl:text-[3.4rem]"
+                className="mt-2 block text-[7.5vw] italic leading-[1.02] text-ink-mute dark:text-[color-mix(in_oklch,var(--ink-soft)_55%,var(--ink-mute))] sm:text-[3rem] md:text-[3.2rem] lg:text-[3.3rem] xl:text-[3.4rem]"
               >
                 <RevealWord delay={0.18} italic>
                   Not because anyone asked.
@@ -149,6 +196,38 @@ export function Hero() {
             filterKey="for-people"
           />
         </div>
+
+        {/* Quiet drafting-margin control: zero height shift (sits inside section pb-10..pb-14),
+            hidden under prefers-reduced-motion, gives sighted and keyboard visitors a gentle
+            way to discover and cycle prism refraction without competing with primary CTAs. */}
+        <button
+          type="button"
+          data-hero-control="cycle-light"
+          aria-label={controlCopy.aria}
+          title="Click anywhere in the hero to place a light source, or press to cycle facets"
+          onClick={() => {
+            setHasInteracted(true);
+            prismControlRef.current?.cyclePreset();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Escape" && sourceMode !== "rest") {
+              e.preventDefault();
+              prismControlRef.current?.reset();
+            }
+          }}
+          className="motion-reduce:hidden absolute right-6 md:right-10 -bottom-7 sm:-bottom-8 inline-flex min-h-6 items-center gap-1.5 rounded px-1.5 py-0.5 text-[11px] font-medium tracking-wide text-ink-mute transition-colors duration-150 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+        >
+          <span
+            aria-hidden="true"
+            className={`inline-block h-1.5 w-1.5 rounded-full transition-colors duration-150 ${
+              sourceMode === "rest" ? "bg-ink-mute/60" : "bg-accent-ink"
+            }`}
+          />
+          <span>{controlCopy.label}</span>
+        </button>
+        <span className="sr-only" role="status" aria-live="polite">
+          {hasInteracted ? controlCopy.announcement || "Prism light reset to resting ray." : ""}
+        </span>
       </Container>
     </section>
   );

@@ -20,9 +20,10 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const phase = process.env.HERO_PHASE ?? "5";
+const phase = process.env.HERO_PHASE ?? "10";
+const NO_WRITE = process.env.HERO_NO_WRITE === "1" || process.argv.includes("--no-write");
 const outDir = join(repo, `design/hero-phase${phase}`);
-mkdirSync(outDir, { recursive: true });
+if (!NO_WRITE) mkdirSync(outDir, { recursive: true });
 const URL_BASE = process.env.HERO_URL ?? "http://127.0.0.1:4212/";
 
 const browser = await chromium.launch(
@@ -39,6 +40,7 @@ const state = async () =>
   });
 
 const shot = async (name) => {
+  if (NO_WRITE) return;
   const hero = await page.evaluate(() => {
     const rect = document.querySelector("section[data-hero]").getBoundingClientRect();
     return { x: rect.left, y: rect.top, width: rect.width, height: rect.height };
@@ -132,8 +134,8 @@ for (let i = 0; i < restStrands.length; i++) {
 }
 await shot("lean");
 check(
-  "lean: the ribbons bend toward the pointer, and never further than 10 px",
-  leanMax > 4 && leanMax <= 10.001,
+  "lean: the ribbons bend toward the pointer within the CATCH_MAX (132 px) standoff envelope",
+  leanMax > 4 && leanMax <= 136,
   `max displacement ${leanMax.toFixed(2)} px`,
 );
 
@@ -168,37 +170,39 @@ check(
   `headlineHover=${headline?.headlineHover}`,
 );
 
-// --- surge ----------------------------------------------------------------------
+// --- source placement & reset ----------------------------------------------------
 await page.mouse.move(1080, 380, { steps: 6 });
 await page.mouse.down();
 await page.mouse.up();
-// Catch the wavefront mid-flight (~230 ms), not on top of the core flash.
 await page.waitForTimeout(230);
-const surge = await state();
-await shot("surge");
+const placed = await state();
+await shot("source-placed");
 check(
-  "surge: the ring is alive",
-  (surge?.surges ?? 0) > 0,
-  `surges=${surge?.surges} energy=${surge?.surgeEnergy?.toFixed(2)}`,
+  "source placement: clicking open hero space pins a refracted light source",
+  placed?.sourcePlacement?.pinned === true,
+  `pinned=${placed?.sourcePlacement?.pinned} progress=${placed?.sourcePlacement?.progress?.toFixed(2)}`,
 );
 
-// --- surge filmstrip: one click per frame ----------------------------------------
-// A shockwave is a motion claim: a single still can't show that it expands and dies. Each
-// frame gets its own click, because a screenshot costs ~300 ms and would smear the envelope.
+// --- ignition filmstrip: one click per frame -------------------------------------
 for (const [index, delay] of [60, 170, 320, 620].entries()) {
-  await page.mouse.move(1080, 380, { steps: 4 });
+  await page.mouse.move(220 + index * 30, 420, { steps: 4 });
   await page.waitForTimeout(120);
   await page.mouse.down();
   await page.mouse.up();
   await page.waitForTimeout(delay);
-  await shot(`surge-film-${index + 1}`);
-  await page.waitForTimeout(1300); // let the previous surge die before the next click
+  await shot(`ignition-film-${index + 1}`);
+  await page.waitForTimeout(300);
 }
 
-// --- decay ----------------------------------------------------------------------
-await page.waitForTimeout(1100);
-const decayed = await state();
-check("surge: it decays inside 950 ms", (decayed?.surges ?? 0) === 0, `surges=${decayed?.surges}`);
+// --- double-click reset ----------------------------------------------------------
+await page.mouse.dblclick(240, 420);
+await page.waitForTimeout(260);
+const unpinned = await state();
+check(
+  "source reset: double-click releases the pinned source back to rest",
+  unpinned?.sourcePlacement?.pinned === false,
+  `pinned=${unpinned?.sourcePlacement?.pinned}`,
+);
 
 // --- release --------------------------------------------------------------------
 await page.mouse.move(8, 795, { steps: 10 });
