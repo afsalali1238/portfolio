@@ -5,12 +5,13 @@
  *   npm run build && node tools/hero-serve-prod.mjs      # shell 1
  *   node tools/hero-contrast.mjs                         # all breakpoints, both themes
  *
- * Phase 4's checkpoints are "type-contrast check" and "no seam". Both are measurable, so this
- * measures them instead of trusting a screenshot:
+ * Measures two things instead of trusting a screenshot:
  *
  *   1. CONTRAST — hides the hero's text, photographs the field behind it, and computes WCAG
  *      contrast between each text element's real computed colour and the mean luminance of
- *      what is actually behind that element. Large text is judged at 3:1, body at 4.5:1.
+ *      what is actually behind that element. Resting large text is judged at 3:1 and body at
+ *      4.5:1. Desktop layouts are also audited after `aimSourcePreset("right")` settles, with
+ *      a strict 4.5:1 floor on the headline, thesis, lede and stat tiles under the leftward fan.
  *
  *   2. SEAM — samples a row band of pure background across the hero and reports the largest
  *      step between neighbouring columns. A veil edge shows up as a cliff; a dissolve cannot
@@ -40,6 +41,43 @@ const contrast = (a, b) => {
   return (hi + 0.05) / (lo + 0.05);
 };
 
+/** Average the composited page behind each target box from a text-hidden screenshot. */
+const readBackdrops = async (page, targets) => {
+  const shot = await page.screenshot({ type: "png" });
+  return page.evaluate(
+    async ({ b64, boxes }) => {
+      const image = new Image();
+      image.src = `data:image/png;base64,${b64}`;
+      await image.decode();
+      const canvas = document.createElement("canvas");
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(image, 0, 0);
+      return boxes.map(({ rect }) => {
+        const x = Math.max(0, Math.round(rect.left));
+        const y = Math.max(0, Math.round(rect.top));
+        const w = Math.min(canvas.width - x, Math.round(rect.width));
+        const h = Math.min(canvas.height - y, Math.round(rect.height));
+        if (w <= 0 || h <= 0) return null;
+        const { data } = ctx.getImageData(x, y, w, h);
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        let count = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          r += data[i];
+          g += data[i + 1];
+          b += data[i + 2];
+          count += 1;
+        }
+        return { r: r / count, g: g / count, b: b / count };
+      });
+    },
+    { b64: shot.toString("base64"), boxes: targets },
+  );
+};
+
 const browser = await chromium.launch(
   process.env.HERO_CHROMIUM ? { executablePath: process.env.HERO_CHROMIUM } : {},
 );
@@ -59,10 +97,9 @@ for (const vp of VIEWPORTS) {
     if (dark) await page.evaluate(() => document.documentElement.classList.add("dark"));
     await page.waitForTimeout(1200);
 
-    // ---- 1. contrast -------------------------------------------------------------
-    // Hide the text, keep the canvas: what is left is what sits behind the words.
     // Resolve every computed colour to sRGB by painting it: the theme tokens are oklch, and a
-    // regex can't read those (it silently returns near-black, which produced false failures).
+    // regex can't read those. Opaque ancestors inside the hero (filled button, tile panel)
+    // stand in for the drawing as the text's real backdrop.
     const textColours = await page.evaluate(() => {
       const canvas = document.createElement("canvas");
       canvas.width = canvas.height = 1;
@@ -75,11 +112,6 @@ for (const vp of VIEWPORTS) {
         const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
         return [r, g, b];
       };
-      // Opaque ancestors between the text and the field mean the text sits on its own surface
-      // (the buttons, the tile panel) — that surface, not the drawing, is its backdrop.
-      // Stop at the hero itself: the page's paper sits *behind* the canvas, so it is not the
-      // text's backdrop once the field is painted. Only surfaces inside the hero (the filled
-      // button, the tile panel) are allowed to stand in for the drawing.
       const hero = document.querySelector("section[data-hero]");
       const ownSurface = (el) => {
         let node = el;
@@ -114,145 +146,105 @@ for (const vp of VIEWPORTS) {
       }));
     });
 
-    const samples = await page.evaluate(
-      async ({ dark: isDark }) => {
-        const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-        const hero = document.querySelector("section[data-hero]");
-        const targets = [];
-        const push = (el, label, kind) => {
-          if (!el) return;
-          const rect = el.getBoundingClientRect();
-          if (rect.width < 4 || rect.height < 4) return;
-          targets.push({
-            label,
-            kind,
-            rect: {
-              left: rect.left + scrollX,
-              top: rect.top + scrollY,
-              width: rect.width,
-              height: rect.height,
-            },
-            colour: getComputedStyle(el).color,
-            fontSize: parseFloat(getComputedStyle(el).fontSize),
-            fontWeight: getComputedStyle(el).fontWeight,
-          });
-        };
-        push(document.querySelector("#hero-heading"), "headline", "large");
-        const thesis = document.querySelector("[data-hero-thesis]");
-        push(thesis, "thesis", "large");
-        push(document.querySelector("[data-hero-copy] p"), "lede", "body");
-        const ctas = [...document.querySelectorAll("[data-hero-copy] a")];
-        push(ctas[0], "cta (filled)", "body");
-        push(ctas[1], "cta (outline)", "body");
-        const tiles = [...document.querySelectorAll("[data-hero-tile]")];
-        tiles.forEach((tile, i) => {
-          const spans = [...tile.querySelectorAll("span")].filter(
-            (span) => span.getAttribute("aria-hidden") !== "true",
-          );
-          push(spans[0], `tile ${i + 1} value`, "large");
-          push(spans[spans.length - 1], `tile ${i + 1} label`, "body");
+    const targets = await page.evaluate(() => {
+      const out = [];
+      const push = (el, label, kind) => {
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        if (rect.width < 4 || rect.height < 4) return;
+        out.push({
+          label,
+          kind,
+          rect: {
+            left: rect.left + scrollX,
+            top: rect.top + scrollY,
+            width: rect.width,
+            height: rect.height,
+          },
+          fontSize: parseFloat(getComputedStyle(el).fontSize),
         });
+      };
+      push(document.querySelector("#hero-heading"), "headline", "large");
+      push(document.querySelector("[data-hero-thesis]"), "thesis", "large");
+      push(document.querySelector("[data-hero-copy] p"), "lede", "body");
+      const ctas = [...document.querySelectorAll("[data-hero-copy] a")];
+      push(ctas[0], "cta (filled)", "body");
+      push(ctas[1], "cta (outline)", "body");
+      [...document.querySelectorAll("[data-hero-tile]")].forEach((tile, i) => {
+        const spans = [...tile.querySelectorAll("span")].filter(
+          (span) => span.getAttribute("aria-hidden") !== "true",
+        );
+        push(spans[0], `tile ${i + 1} value`, "large");
+        push(spans[spans.length - 1], `tile ${i + 1} label`, "body");
+      });
+      return out;
+    });
 
-        const previous = [];
-        for (const entry of targets) {
-          const el = [...hero.querySelectorAll("*")].find((candidate) => {
-            const r = candidate.getBoundingClientRect();
-            return (
-              Math.abs(r.left + scrollX - entry.rect.left) < 0.6 &&
-              Math.abs(r.top + scrollY - entry.rect.top) < 0.6 &&
-              Math.abs(r.width - entry.rect.width) < 0.6
-            );
-          });
-          if (el) {
-            previous.push({ el, opacity: el.style.opacity });
-            el.style.opacity = "0";
-          }
-        }
-        await wait(80);
-        const canvas = hero.querySelector("canvas");
-        const shot = await new Promise((resolve) => {
-          const source = document.createElement("canvas");
-          source.width = canvas.width;
-          source.height = canvas.height;
-          resolve(source);
-        });
-        void shot;
-
-        // Read the composited page behind each element from a fresh canvas draw of the hero.
-        const crop = [];
-        for (const entry of targets) {
-          const ctx = document.createElement("canvas").getContext("2d");
-          crop.push({ entry, ctx: Boolean(ctx) });
-        }
-        for (const { el, opacity } of previous) el.style.opacity = opacity;
-        return { targets, isDark };
-      },
-      { dark },
-    );
-
-    // Screenshot with the same text hidden, then average each element's box from the image.
+    // Hide the text once; both resting and pinned audits photograph the same boxes.
     await page.addStyleTag({
-      content: `#hero-heading, [data-hero-copy] p, [data-hero-copy] a, [data-hero-tile] span { opacity: 0 !important; }`,
+      content: `#hero-heading, [data-hero-thesis], [data-hero-copy] p, [data-hero-copy] a, [data-hero-tile] span { opacity: 0 !important; }`,
     });
     await page.waitForTimeout(120);
-    const bare = await page.screenshot({ type: "png" });
-    const barePixels = await page.evaluate(
-      async ({ b64, targets }) => {
-        const image = new Image();
-        image.src = `data:image/png;base64,${b64}`;
-        await image.decode();
-        const canvas = document.createElement("canvas");
-        canvas.width = image.width;
-        canvas.height = image.height;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(image, 0, 0);
-        return targets.map(({ rect }) => {
-          const x = Math.max(0, Math.round(rect.left));
-          const y = Math.max(0, Math.round(rect.top));
-          const w = Math.min(canvas.width - x, Math.round(rect.width));
-          const h = Math.min(canvas.height - y, Math.round(rect.height));
-          if (w <= 0 || h <= 0) return null;
-          const { data } = ctx.getImageData(x, y, w, h);
-          let r = 0;
-          let g = 0;
-          let b = 0;
-          let count = 0;
-          for (let i = 0; i < data.length; i += 4) {
-            r += data[i];
-            g += data[i + 1];
-            b += data[i + 2];
-            count += 1;
-          }
-          return { r: r / count, g: g / count, b: b / count };
-        });
-      },
-      { b64: bare.toString("base64"), targets: samples.targets },
-    );
 
-    console.log(`\n${vp.name} ${dark ? "dark" : "light"}`);
-    for (const [index, entry] of samples.targets.entries()) {
-      const behind = barePixels[index];
-      if (!behind) continue;
-      const resolved = textColours[index] ?? { colour: [0, 0, 0], surface: null };
-      const text = resolved.colour;
-      const backdrop = resolved.surface ?? [behind.r, behind.g, behind.b];
-      const onOwnSurface = Boolean(resolved.surface);
-      const ratio = contrast(luminance(...text), luminance(...backdrop));
-      const large = entry.kind === "large" || entry.fontSize >= 24;
-      const required = large ? 3 : 4.5;
-      const ok = ratio >= required;
-      if (!ok) failures += 1;
-      console.log(
-        `  ${ok ? "✓" : "✗"} ${entry.label.padEnd(18)} ${ratio.toFixed(2)}:1 (needs ${required}) · ${
-          onOwnSurface
-            ? "on its own surface"
-            : `behind rgb(${behind.r.toFixed(0)},${behind.g.toFixed(0)},${behind.b.toFixed(0)})`
-        }`,
-      );
+    const report = (label, backdrops, strict) => {
+      console.log(`\n${vp.name} ${dark ? "dark" : "light"} · ${label}`);
+      for (const [index, entry] of targets.entries()) {
+        const behind = backdrops[index];
+        if (!behind) continue;
+        const resolved = textColours[index] ?? { colour: [0, 0, 0], surface: null };
+        const backdrop = resolved.surface ?? [behind.r, behind.g, behind.b];
+        const ratio = contrast(luminance(...resolved.colour), luminance(...backdrop));
+        const large = entry.kind === "large" || entry.fontSize >= 24;
+        const required = strict ? 4.5 : large ? 3 : 4.5;
+        const ok = ratio >= required;
+        if (!ok) failures += 1;
+        console.log(
+          `  ${ok ? "✓" : "✗"} ${entry.label.padEnd(18)} ${ratio.toFixed(2)}:1 (needs ${required}) · ${
+            resolved.surface
+              ? "on its own surface"
+              : `behind rgb(${behind.r.toFixed(0)},${behind.g.toFixed(0)},${behind.b.toFixed(0)})`
+          }`,
+        );
+      }
+    };
+
+    const restingBackdrops = await readBackdrops(page, targets);
+    report("rest", restingBackdrops, false);
+
+    // Opposite-side regression: a right-pinned source throws the fan across the copy column.
+    // Give the full ignition choreography time to reach fieldLight() === 1 before measuring.
+    if (vp.w >= 1024) {
+      await page.evaluate(() => {
+        const ray = window.__heroRay;
+        if (!ray?.aimSourcePreset) throw new Error("debug engine unavailable");
+        ray.aimSourcePreset("right");
+      });
+      await page.waitForTimeout(950);
+      const pinned = await page.evaluate(() => {
+        const state = window.__heroRay.geometry().interaction;
+        return {
+          ok:
+            state.sourcePlacement.pinned &&
+            state.sourcePlacement.facet === "right" &&
+            state.optics?.exitFacet === "left" &&
+            state.sourcePlacement.light === 1,
+          facet: state.sourcePlacement.facet,
+          exit: state.optics?.exitFacet,
+          light: state.sourcePlacement.light,
+        };
+      });
+      if (!pinned.ok) {
+        failures += 1;
+        console.log(`  ✗ right-pinned audit did not settle: ${JSON.stringify(pinned)}`);
+      }
+      const pinnedBackdrops = await readBackdrops(page, targets);
+      report("right-pinned leftward fan", pinnedBackdrops, true);
     }
 
-    // ---- 2. seam -----------------------------------------------------------------
-    // A row band with no type in it, full width. Any veil edge would appear as a step here.
+    // Seam: a row band with no type in it, full width, on the resting page plate.
+    await page.evaluate(() => window.__heroRay?.resetSource?.());
+    await page.waitForTimeout(950);
+    const restingShot = await page.screenshot({ type: "png" });
     const seam = await page.evaluate(
       async ({ b64 }) => {
         const image = new Image();
@@ -275,13 +267,13 @@ for (const vp of VIEWPORTS) {
           }
           columns.push(sum / bandH);
         }
-        // Compare 9-column means, so single-pixel noise can't be mistaken for a seam.
-        const window = 24;
+        // Compare 24-column means so single-pixel noise is not mistaken for a seam.
+        const windowSize = 24;
         const means = [];
-        for (let x = 0; x + window <= columns.length; x++) {
+        for (let x = 0; x + windowSize <= columns.length; x++) {
           let sum = 0;
-          for (let k = 0; k < window; k++) sum += columns[x + k];
-          means.push(sum / window);
+          for (let k = 0; k < windowSize; k++) sum += columns[x + k];
+          means.push(sum / windowSize);
         }
         let worst = 0;
         let at = 0;
@@ -292,11 +284,10 @@ for (const vp of VIEWPORTS) {
             at = i;
           }
         }
-        return { worst, at, width: canvas.width };
+        return { worst, at };
       },
-      { b64: bare.toString("base64") },
+      { b64: restingShot.toString("base64") },
     );
-
     const seamOk = seam.worst <= 4;
     if (!seamOk) failures += 1;
     console.log(
