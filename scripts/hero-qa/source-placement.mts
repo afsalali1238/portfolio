@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
 import { createCanvas } from "@napi-rs/canvas";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { createHeroRay, sourceLanding, tracePrism } from "../../src/components/sections/hero-ray";
 
 const top = { x: 100, y: 0 };
@@ -173,6 +176,171 @@ assert.equal(
   false,
   "source enclosed by resized prism must release",
 );
+
+/* ------------------------------------------- opposite-side dispersion regressions */
+
+const here = dirname(fileURLToPath(import.meta.url));
+const desktopLayout = JSON.parse(readFileSync(join(here, "data/layout-1440x780.json"), "utf8"))
+  .layout as import("../../src/components/sections/hero-layout").LayoutSnapshot;
+
+const makeRay = (dark: boolean, desktop: boolean) => {
+  const ray = createHeroRay();
+  ray.setTheme(dark);
+  if (desktop) ray.setLayout(desktopLayout);
+  else ray.resize(800, 600);
+  return ray;
+};
+
+const exitOutwardFor = (g: ReturnType<ReturnType<typeof createHeroRay>["geometry"]>) => {
+  const facet = g.interaction.optics?.exitFacet;
+  const a = facet === "left" ? g.topV : facet === "base" ? g.leftV : g.rightV;
+  const b = facet === "left" ? g.leftV : facet === "base" ? g.rightV : g.topV;
+  const len = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+  return { x: -(b.y - a.y) / len, y: (b.x - a.x) / len };
+};
+
+for (const desktop of [false, true]) {
+  const w = desktop ? desktopLayout.heroW : 800;
+  const h = desktop ? desktopLayout.heroH : 600;
+  const x = desktop ? 1300 : 740;
+  const elevations = desktop ? [155, 290, 460] : [110, 290, 460];
+  for (const dark of [false, true]) {
+    for (const y of elevations) {
+      const ray = makeRay(dark, desktop);
+      const canvas = createCanvas(w, h);
+      const ctx = canvas.getContext("2d") as never;
+      // Empty plate at the same scene clock as the pinned frame below.
+      ray.paintStill(ctx);
+      ray.paint(ctx, 700);
+      const empty = canvas.getContext("2d").getImageData(0, 0, w, h).data;
+
+      ray.placeSource(x, y);
+      ray.paint(ctx, 700);
+      const g = ray.geometry();
+      const state = g.interaction;
+      const label = `${desktop ? "1440" : "800"} ${dark ? "dark" : "light"} right(${x},${y})`;
+      assert.equal(state.sourcePlacement.pinned, true, `${label}: source did not pin`);
+      assert.equal(state.sourcePlacement.light, 1, `${label}: fan did not re-illuminate`);
+      assert.equal(state.sourcePlacement.facet, "right", `${label}: wrong entry facet`);
+      assert.equal(state.optics?.exitFacet, "left", `${label}: did not exit opposite side`);
+      assert.ok((state.optics?.exitDirection.x ?? 0) < -0.5, `${label}: exit is not leftward`);
+
+      const prime = g.strands[g.prime];
+      assert.ok(prime.tip.x < prime.root.x - 200, `${label}: prime fan still points right`);
+      const outward = exitOutwardFor(g);
+      let closedBackwardLanes = 0;
+      for (const [i, strand] of g.strands.entries()) {
+        const dx = strand.tip.x - strand.root.x;
+        const dy = strand.tip.y - strand.root.y;
+        const len = Math.hypot(dx, dy) || 1;
+        if ((dx * outward.x + dy * outward.y) / len < -0.12) {
+          closedBackwardLanes += 1;
+          assert.equal(g.glass.gates[i], g.steps, `${label}: backward lane ${i} reopened`);
+        }
+      }
+      assert.ok(closedBackwardLanes > 0, `${label}: exterior gate was not exercised`);
+
+      // The left exit corridor must carry real pigment, not a transparent cached gradient.
+      const live = canvas.getContext("2d").getImageData(0, 0, w, h).data;
+      let maxDelta = 0;
+      for (let t = 0.1; t < 1; t += 0.02) {
+        const px = prime.root.x + (prime.tip.x - prime.root.x) * t;
+        const py = prime.root.y + (prime.tip.y - prime.root.y) * t;
+        for (let oy = -12; oy <= 12; oy += 3) {
+          for (let ox = -12; ox <= 12; ox += 3) {
+            const sx = Math.round(px + ox);
+            const sy = Math.round(py + oy);
+            if (sx < 0 || sx >= w || sy < 0 || sy >= h) continue;
+            const at = (sy * w + sx) * 4;
+            for (let c = 0; c < 3; c++)
+              maxDelta = Math.max(maxDelta, Math.abs(empty[at + c] - live[at + c]));
+          }
+        }
+      }
+      assert.ok(maxDelta > 20, `${label}: left corridor is empty (maxDelta=${maxDelta})`);
+    }
+  }
+
+  // The high-right Dove window must not collapse back to a base exit between samples.
+  const ray = makeRay(false, desktop);
+  const g = ray.geometry();
+  for (let y = 80; y <= 300; y += 10) {
+    const source = { x, y };
+    const landing = sourceLanding(source, g.topV, g.leftV, g.rightV);
+    const traced = tracePrism(source, landing.hit, g.topV, g.leftV, g.rightV, landing.facet);
+    assert.equal(landing.facet, "right", `high-right y=${y}: wrong entry`);
+    assert.equal(traced.exitFacet, "left", `high-right y=${y}: lost opposite exit`);
+    assert.ok(traced.exitDirection.x < -0.5, `high-right y=${y}: exit turned backward`);
+  }
+}
+
+// Cauchy order is a physical invariant, not a rotation convention: violet is lower on
+// both horizontal Newton passes. Dove TIR cancels angular spread but keeps lateral spread.
+{
+  const ray = makeRay(false, false);
+  const canvas = createCanvas(800, 600);
+  const ctx = canvas.getContext("2d") as never;
+  for (const [source, entry, exit, chirality] of [
+    [{ x: 60, y: 420 }, "left", "right", 1],
+    [{ x: 740, y: 420 }, "right", "left", -1],
+  ] as const) {
+    ray.placeSource(source.x, source.y);
+    ray.paint(ctx, 700);
+    const state = ray.geometry().interaction;
+    assert.equal(state.sourcePlacement.facet, entry);
+    assert.equal(state.optics?.exitFacet, exit);
+    assert.equal(state.optics?.legs.length, 1, "Newton regression must be a single pass");
+    assert.equal(state.optics?.tir, false);
+    assert.equal(state.fanChirality, chirality);
+    const rays = state.spectralRays;
+    assert.equal(rays.length, 7);
+    const red = rays.find((r) => r.band === 0)!;
+    const violet = rays.find((r) => r.band === 6)!;
+    assert.ok(violet.direction.y > red.direction.y, "violet inverted above red");
+    assert.ok(violet.to.y - violet.from.y > red.to.y - red.from.y, "violet tip is not lower");
+  }
+  for (const [source, exit] of [
+    [{ x: 60, y: 110 }, "right"],
+    [{ x: 740, y: 110 }, "left"],
+  ] as const) {
+    ray.placeSource(source.x, source.y);
+    ray.paint(ctx, 700);
+    const state = ray.geometry().interaction;
+    assert.equal(state.optics?.exitFacet, exit);
+    assert.equal(state.optics?.legs.length, 2);
+    assert.equal(state.optics?.legs[0].tir, true);
+    const rays = state.spectralRays;
+    assert.equal(rays.length, 7);
+    const red = rays.find((r) => r.band === 0)!;
+    const violet = rays.find((r) => r.band === 6)!;
+    const angularSpread = Math.abs(
+      Math.atan2(violet.direction.y, violet.direction.x) -
+        Math.atan2(red.direction.y, red.direction.x),
+    );
+    assert.ok(angularSpread < 1e-6, "Dove TIR should cancel angular dispersion");
+    assert.ok(violet.from.y > red.from.y, "Dove lateral dispersion moved violet away from base");
+  }
+}
+
+// Every assistive preset must produce a real exit and a prime strand aligned with it.
+{
+  const ray = makeRay(false, false);
+  const canvas = createCanvas(800, 600);
+  const ctx = canvas.getContext("2d") as never;
+  for (const preset of ["left", "base", "right"] as const) {
+    ray.aimSourcePreset(preset);
+    ray.paint(ctx, 700);
+    const g = ray.geometry();
+    const optics = g.interaction.optics!;
+    assert.ok(optics.exitFacet, `preset ${preset} stalled inside the glass`);
+    const prime = g.strands[g.prime];
+    const dx = prime.tip.x - prime.root.x;
+    const dy = prime.tip.y - prime.root.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const gap = Math.hypot(dx / len - optics.exitDirection.x, dy / len - optics.exitDirection.y);
+    assert.ok(gap < 0.25, `preset ${preset}: prime is ${gap.toFixed(3)} away from the exit axis`);
+  }
+}
 
 console.log(
   "Source placement, facet tracing, choreography, interruption, overlap release and still-frame checks pass.",

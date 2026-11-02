@@ -2,12 +2,7 @@ import { useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Container } from "../layout/Container";
-import {
-  projectCount,
-  liveCount,
-  forPeopleCount,
-  sourceCount,
-} from "../../data/projects";
+import { projectCount, liveCount, forPeopleCount, sourceCount } from "../../data/projects";
 import { RevealWord } from "./hero-helpers";
 import { HeroPrism, type HeroPrismControl, type HeroSourceMode } from "./HeroPrism";
 import type { ProjectFilter } from "../../data/filters";
