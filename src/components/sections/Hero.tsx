@@ -143,10 +143,10 @@ export function Hero() {
               </span>
             </h1>
 
-            {/* Mobile centerpiece stage: framed interactive refraction playground */}
+            {/* Mobile centerpiece stage: interactive refraction playground */}
             <div
               data-hero-stage
-              className="lg:hidden relative w-full h-[220px] sm:h-[260px] my-4 rounded-lg border rule-hair bg-paper/[0.04] backdrop-blur-[1.5px] shadow-xs flex flex-col justify-between p-3 select-none touch-none overflow-hidden"
+              className="lg:hidden relative w-full h-[240px] sm:h-[280px] my-3 rounded-xl border border-ink/[0.08] dark:border-paper/[0.08] bg-transparent flex flex-col justify-between p-3 select-none touch-none"
               aria-label="Interactive prism refraction artwork"
             >
               {/* Subtle top indicator */}
@@ -172,7 +172,7 @@ export function Hero() {
                     setHasInteracted(true);
                     prismControlRef.current?.cyclePreset();
                   }}
-                  className="inline-flex min-h-7 items-center gap-1.5 rounded-md border rule-hair bg-paper/90 px-2.5 py-1 text-[11px] font-medium text-ink shadow-xs backdrop-blur-xs transition-colors hover:bg-paper-deep active:scale-95"
+                  className="inline-flex min-h-7 items-center gap-1.5 rounded-md border rule-hair bg-paper/90 dark:bg-paper-deep/90 px-2.5 py-1 text-[11px] font-medium text-ink shadow-xs transition-colors hover:bg-paper-deep active:scale-95"
                 >
                   <span
                     aria-hidden="true"
@@ -192,7 +192,7 @@ export function Hero() {
             </p>
 
             {/* `sm:w-fit`: the row's box is measured, so it must not be wider than its buttons. */}
-            <div className="flex flex-col gap-3 pt-2 text-sm sm:w-fit sm:flex-row sm:flex-wrap sm:items-center">
+            <div data-hero-ctas className="flex flex-col gap-3 pt-2 text-sm sm:w-fit sm:flex-row sm:flex-wrap sm:items-center">
               <Link
                 to="/works"
                 className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-ink px-6 text-paper transition-all duration-150 hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-paper"

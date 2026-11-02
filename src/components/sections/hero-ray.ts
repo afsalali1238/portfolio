@@ -1314,7 +1314,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
     const stageW = hasStage && stage ? stage.right - stage.left : 0;
     const stageH = hasStage && stage ? stage.bottom - stage.top : 0;
-    const stageSize = clamp(Math.min(stageW * 0.38, stageH * 0.58), 84, 128);
+    const stageSize = clamp(Math.min(stageW * 0.4, stageH * 0.6), 92, 136);
 
     // The half-width of the triangle is exactly `size / 2` (r·cos30° with r = size/√3), which
     // makes both budgets a single subtraction.
@@ -1371,8 +1371,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     let centre: Vec;
     if (hasStage && stage) {
       centre = {
-        x: stage.left + stageW * 0.5,
-        y: stage.top + stageH * 0.44,
+        x: stage.left + stageW * 0.44,
+        y: stage.top + stageH * 0.46,
       };
     } else if (mobile) {
       /**
@@ -1571,7 +1571,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
      * width there, so "the empty side" means the margin *beside* the words, not the whole page.
      */
     const sweep = hasStage
-      ? { from: -40, to: 95 }
+      ? { from: -42, to: 105 }
       : mobile
         ? { from: 12, to: 178 }
         : { from: -166, to: 164 };
@@ -1588,7 +1588,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
      * brightest thing on a 390 px screen. The desktop factor stays tiny (0.16) because the fan
      * is the section's centrepiece and the copy sits in its own column.
      */
-    const copyDamping = hasStage ? 0.25 : mobile ? 0.55 : 0.16;
+    const copyDamping = hasStage ? 0.08 : mobile ? 0.55 : 0.16;
     const damped = (angle: number) => {
       const dir = { x: Math.cos(angle), y: Math.sin(angle) };
       let hits = 0;
@@ -1616,7 +1616,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
      * untouched — there the fan is meant to reach every edge.
      */
     const containPortrait = (dir: Vec): number => {
-      if (!mobile) return 1;
+      if (!mobile || hasStage) return 1;
       const reach = rayExit(core, dir, heroW, heroH);
       const exitY = core.y + dir.y * reach;
       const from = heroH * 0.22;
@@ -1670,7 +1670,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
             : spec.ghost
               ? 0.008
               : 1) *
-          (mobile ? 0.86 : 1) *
+          (mobile && !hasStage ? 0.86 : 1) *
           damped(spec.angle) *
           containPortrait(dir),
         ghost: spec.ghost,

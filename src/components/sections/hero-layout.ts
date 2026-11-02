@@ -317,12 +317,24 @@ export function measureHero(hero: HTMLElement): LayoutSnapshot {
     bottom: thesisRect.bottom,
   };
 
+  const stageEl = hero.querySelector<HTMLElement>("[data-hero-stage]");
+  const mobileStage = (() => {
+    if (!stageEl || stageEl.offsetParent === null) return null;
+    const r = stageEl.getBoundingClientRect();
+    if (r.width < 10 || r.height < 10) return null;
+    return toLocal(r, ox, oy);
+  })();
+
   const ledeEl = copyEl?.querySelector<HTMLElement>("p") ?? null;
   const ledeRect = ledeEl ? toLocal(ledeEl.getBoundingClientRect(), ox, oy) : null;
 
-  const ctaEl = ledeEl?.parentElement
-    ? (ledeEl.parentElement.querySelector<HTMLElement>(":scope > div") ?? null)
-    : null;
+  const ctaEl =
+    copyEl?.querySelector<HTMLElement>("[data-hero-ctas]") ??
+    (ledeEl?.parentElement
+      ? (Array.from(ledeEl.parentElement.querySelectorAll<HTMLElement>(":scope > div")).find(
+          (el) => !el.hasAttribute("data-hero-stage"),
+        ) ?? null)
+      : null);
   const ctaRect = ctaEl ? toLocal(ctaEl.getBoundingClientRect(), ox, oy) : null;
 
   const copyRight = Math.max(
@@ -346,7 +358,9 @@ export function measureHero(hero: HTMLElement): LayoutSnapshot {
 
   const textRects: Rect[] = [...headlineLines];
   if (ledeRect) textRects.push(ledeRect);
-  if (ctaRect) textRects.push(ctaRect);
+  if (ctaRect && (!mobileStage || Math.abs(ctaRect.top - mobileStage.top) > 20)) {
+    textRects.push(ctaRect);
+  }
   if (textRects.length === 0) textRects.push(...fallback.textRects);
 
   // Quiet zones are the type boxes plus a margin, merged when they touch: the dissolve mask
@@ -388,14 +402,6 @@ export function measureHero(hero: HTMLElement): LayoutSnapshot {
       x1: ledeRect.right,
     });
   }
-
-  const stageEl = hero.querySelector<HTMLElement>("[data-hero-stage]");
-  const mobileStage = (() => {
-    if (!stageEl || stageEl.offsetParent === null) return null;
-    const r = stageEl.getBoundingClientRect();
-    if (r.width < 10 || r.height < 10) return null;
-    return toLocal(r, ox, oy);
-  })();
 
   return {
     heroW,
