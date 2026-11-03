@@ -79,10 +79,6 @@ function TheManBehindPage() {
                 <h1 className="font-serif text-5xl leading-tight text-ink md:text-6xl">
                   The Man Behind.
                 </h1>
-                <p className="mt-3 max-w-2xl text-base text-ink-soft md:text-lg">
-                  Afsal Ali — builder and tech operator based in Dubai. Keeping an open
-                  ledger for the tech and shipping quiet software.
-                </p>
               </div>
 
               {/* Location & Time badge */}
@@ -150,15 +146,6 @@ function TheManBehindPage() {
                 <div className="border-t rule-hair pt-4 text-xs text-ink-mute">
                   Typically replies within 24 hours. No recruiter spam or cold pitch decks, please.
                 </div>
-              </div>
-
-              {/* Philosophy Note */}
-              <div className="rounded-xl border rule-hair bg-paper-deep/30 p-6 space-y-3">
-                <h3 className="font-serif text-xl text-ink">Why the silhouette?</h3>
-                <p className="text-sm leading-relaxed text-ink-soft">
-                  I prefer letting the work speak for itself rather than making it personal.
-                  The focus stays on the tools and the craft.
-                </p>
               </div>
             </SectionReveal>
 
