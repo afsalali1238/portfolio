@@ -2035,6 +2035,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const activePose = scrollBucket !== 0 || poseKey !== "rest";
     const core = !activePose ? geo.core : (fanOrigin ?? shift(geo.core));
     const topV = scrollBucket === 0 ? geo.topV : liveTopV();
+    const leftV = scrollBucket === 0 ? geo.leftV : liveLeftV();
     const rightV = scrollBucket === 0 ? geo.rightV : liveRightV();
 
     // One gradient per strand: the dot → line continuum is carried by the alpha ramp, so a

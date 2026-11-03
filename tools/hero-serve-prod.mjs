@@ -16,7 +16,7 @@ import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { extname, join, resolve } from "node:path";
 import { dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const root = join(repo, ".vercel/output");
@@ -40,7 +40,7 @@ const mime = {
   ".ico": "image/x-icon",
 };
 
-const handler = (await import(join(root, "functions/__server.func/index.mjs"))).default;
+const handler = (await import(pathToFileURL(join(root, "functions/__server.func/index.mjs")).href)).default;
 
 const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", "http://localhost");
