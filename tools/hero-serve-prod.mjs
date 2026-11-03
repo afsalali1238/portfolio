@@ -40,7 +40,8 @@ const mime = {
   ".ico": "image/x-icon",
 };
 
-const handler = (await import(pathToFileURL(join(root, "functions/__server.func/index.mjs")).href)).default;
+const handler = (await import(pathToFileURL(join(root, "functions/__server.func/index.mjs")).href))
+  .default;
 
 const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", "http://localhost");

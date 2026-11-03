@@ -22,7 +22,8 @@ export function Origin({ isPage = false }: { isPage?: boolean }) {
 
             <p>
               I work a full-time operations role in Dubai. I can&rsquo;t follow every launch, so I
-              filter. I watch what ships, study how things work, and build focused tools. That&rsquo;s how I learn.
+              filter. I watch what ships, study how things work, and build focused tools.
+              That&rsquo;s how I learn.
             </p>
 
             <p>

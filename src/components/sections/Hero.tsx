@@ -155,8 +155,16 @@ export function Hero() {
 
               {/* Bottom interactive controls */}
               <div className="flex items-center justify-between w-full pt-2 pointer-events-auto">
-                <span className="text-[11px] text-ink-mute/80 select-none">
-                  {hasInteracted ? "Drag to steer · Tap to place" : "Touch & drag to refract"}
+                <span className="inline-flex items-center gap-1.5 text-[11px] text-ink-mute/80 select-none">
+                  {!hasInteracted && (
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-ink/40 opacity-75" />
+                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent-ink/70" />
+                    </span>
+                  )}
+                  <span>
+                    {hasInteracted ? "Drag to steer · Tap to place" : "Touch & drag to refract"}
+                  </span>
                 </span>
                 <button
                   type="button"
@@ -186,7 +194,10 @@ export function Hero() {
             </p>
 
             {/* `sm:w-fit`: the row's box is measured, so it must not be wider than its buttons. */}
-            <div data-hero-ctas className="flex flex-col gap-3 pt-2 text-sm sm:w-fit sm:flex-row sm:flex-wrap sm:items-center">
+            <div
+              data-hero-ctas
+              className="flex flex-col gap-3 pt-2 text-sm sm:w-fit sm:flex-row sm:flex-wrap sm:items-center"
+            >
               <Link
                 to="/works"
                 className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-ink px-6 text-paper transition-all duration-150 hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
