@@ -197,16 +197,10 @@ function EnergyLedgerPage() {
                 <strong className="text-ink">The Petrodollar</strong> worked because paper bills
                 were tied to barrels of crude oil — literal barrels of dense, combustible work.
               </li>
-              <li>
-                <strong className="text-ink">Bitcoin</strong> made the connection explicit with
-                Proof of Work: converting raw hash-power and electrical current into cryptographic
-                scarcity.
-              </li>
             </ul>
 
             <p>
-              Now we enter the Fourth Era: <strong className="text-ink">The Compute Economy</strong>
-              .
+              Now we enter the Next Era: <strong className="text-ink">The Compute Economy</strong>.
             </p>
 
             <p>

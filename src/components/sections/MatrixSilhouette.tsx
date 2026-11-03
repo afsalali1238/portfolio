@@ -1,14 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 /**
- * MatrixSilhouette renders an interactive digital matrix canvas inspired by
- * the Solana terminal silhouette aesthetic.
+ * MatrixSilhouette renders an interactive digital matrix canvas.
  * Monospace alphanumeric characters form the contours of a person seen from behind,
- * looking forward into the digital matrix grid.
+ * looking forward into the digital code grid.
  */
 export function MatrixSilhouette({ className = "" }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [viewMode, setViewMode] = useState<"matrix" | "reference">("matrix");
   const mouseRef = useRef<{ x: number; y: number; active: boolean }>({
     x: -1,
     y: -1,
@@ -16,8 +14,6 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
   });
 
   useEffect(() => {
-    if (viewMode !== "matrix") return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -260,7 +256,7 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
       canvas.removeEventListener("mouseleave", handleMouseLeave);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [viewMode]);
+  }, []);
 
   return (
     <div
@@ -273,43 +269,20 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
           <span className="text-zinc-200 font-semibold">SILHOUETTE_OPERATOR_BACKVIEW</span>
           <span className="text-zinc-500 hidden sm:inline">:: [DUBAI_NODE]</span>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setViewMode((m) => (m === "matrix" ? "reference" : "matrix"))}
-            className="rounded border border-zinc-700 bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-300 hover:border-zinc-500 hover:text-white transition-colors"
-          >
-            {viewMode === "matrix" ? "View Original Reference" : "View Matrix Terminal"}
-          </button>
-        </div>
+        <div className="text-[11px] font-mono text-zinc-500">SECURE_TERMINAL</div>
       </div>
 
       {/* Main Visual Display */}
       <div className="relative aspect-[4/3] w-full min-h-[360px] md:min-h-[460px] bg-black">
-        {viewMode === "matrix" ? (
-          <>
-            <canvas ref={canvasRef} className="h-full w-full block cursor-crosshair select-none" />
-            {/* Subtle overlay vignette & terminal status */}
-            <div className="pointer-events-none absolute inset-0 bg-radial-gradient from-transparent via-transparent to-black/60" />
-            <div className="pointer-events-none absolute bottom-3 left-3 rounded bg-zinc-900/80 px-2.5 py-1 text-[11px] font-mono text-zinc-400 border border-zinc-800 backdrop-blur">
-              <span className="text-emerald-400">SYS_LOC:</span> 25.2048° N, 55.2708° E · UTC+4
-            </div>
-            <div className="pointer-events-none absolute bottom-3 right-3 text-[11px] font-mono text-zinc-500">
-              Interactive Matrix · Hover to scan
-            </div>
-          </>
-        ) : (
-          <div className="relative h-full w-full flex items-center justify-center p-4">
-            <img
-              src="/the-man-behind-ref.png"
-              alt="Silhouette reference of a person's backside looking into the cryptographic matrix"
-              className="max-h-full max-w-full object-contain rounded"
-            />
-            <div className="absolute bottom-3 right-3 text-[11px] font-mono text-zinc-400 bg-zinc-900/90 px-2 py-1 rounded border border-zinc-800">
-              Solana Matrix Architecture Reference
-            </div>
-          </div>
-        )}
+        <canvas ref={canvasRef} className="h-full w-full block cursor-crosshair select-none" />
+        {/* Subtle overlay vignette & terminal status */}
+        <div className="pointer-events-none absolute inset-0 bg-radial-gradient from-transparent via-transparent to-black/60" />
+        <div className="pointer-events-none absolute bottom-3 left-3 rounded bg-zinc-900/80 px-2.5 py-1 text-[11px] font-mono text-zinc-400 border border-zinc-800 backdrop-blur">
+          <span className="text-emerald-400">SYS_LOC:</span> 25.2048° N, 55.2708° E · UTC+4
+        </div>
+        <div className="pointer-events-none absolute bottom-3 right-3 text-[11px] font-mono text-zinc-500">
+          Interactive Matrix · Hover to scan
+        </div>
       </div>
 
       {/* Terminal Footer info */}

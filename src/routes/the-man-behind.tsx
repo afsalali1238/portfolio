@@ -24,7 +24,7 @@ export const Route = createFileRoute("/the-man-behind")({
       description:
         "Get in touch with Afsal Ali, the builder behind forthe.tech. Dubai, United Arab Emirates (UTC+4).",
       path: "/the-man-behind",
-      image: "/the-man-behind-ref.png",
+      image: "/og/home.png",
     }),
   }),
   component: TheManBehindPage,

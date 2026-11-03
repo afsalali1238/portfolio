@@ -3,7 +3,6 @@ import { PageShell } from "../components/site/PageShell";
 import { Hero } from "../components/sections/Hero";
 import { FeaturedWorks } from "../components/sections/FeaturedWorks";
 import { ThesisTeaser } from "../components/sections/ThesisTeaser";
-import { NFTJourney } from "../components/sections/NFTJourney";
 import { Origin } from "../components/sections/Origin";
 import { seo, DEFAULT_DESCRIPTION } from "../lib/site";
 
@@ -19,12 +18,11 @@ export const Route = createFileRoute("/")({
 });
 
 /**
- * Home presents the whole arc:
+ * Home presents the core arc:
  * 1. Hero (the idea ray: prism dispersion canvas, thesis, stat tiles)
  * 2. Featured builds (selected showcase — kinē, Provia, Doomscholar)
  * 3. Thesis teaser (dispatch standfirst + Energy Ledger thesis)
- * 4. The Journey (Paperhands, Diamond Hands, NFT tuition & hard lessons)
- * 5. Origin (concise About story + static posture drawing)
+ * 4. Origin (concise About story + static posture drawing)
  */
 function Index() {
   return (
@@ -32,7 +30,6 @@ function Index() {
       <Hero />
       <FeaturedWorks />
       <ThesisTeaser />
-      <NFTJourney />
       <Origin />
     </PageShell>
   );
