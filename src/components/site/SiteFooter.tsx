@@ -47,7 +47,7 @@ export function SiteFooter() {
                 LinkedIn ↗<span className="sr-only"> (opens in a new tab)</span>
               </a>
               <a
-                href="https://x.com/afsalali1238"
+                href="https://x.com/afsallali"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"

@@ -78,7 +78,7 @@ function NotesIndexPage() {
                     <ArrowUpRight className="h-3 w-3" />
                   </a>
                   <a
-                    href="https://x.com/afsalali1238"
+                    href="https://x.com/afsallali"
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-1.5 rounded-md border rule-hair bg-paper px-3 py-1.5 font-medium text-ink transition-colors hover:bg-paper-deep"
@@ -148,7 +148,7 @@ function NotesIndexPage() {
                         Medium <ArrowUpRight className="h-3 w-3" />
                       </a>
                       <a
-                        href={d.external?.twitter ?? "https://x.com/afsalali1238"}
+                        href={d.external?.twitter ?? "https://x.com/afsallali"}
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center gap-0.5 text-ink-soft hover:text-ink transition-colors"

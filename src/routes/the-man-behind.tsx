@@ -178,7 +178,7 @@ function TheManBehindPage() {
                   </a>
 
                   <a
-                    href="https://x.com/afsalali1238"
+                    href="https://x.com/afsallali"
                     target="_blank"
                     rel="noreferrer"
                     className="group flex items-center justify-between rounded-lg border rule-hair p-3.5 transition-colors hover:bg-paper-deep"

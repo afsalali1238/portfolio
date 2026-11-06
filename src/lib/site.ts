@@ -50,6 +50,8 @@ export function seo({
       { property: "og:image:height", content: "630" },
       { property: "og:image:alt", content: imageAlt ?? title },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@afsallali" },
+      { name: "twitter:creator", content: "@afsallali" },
       { name: "twitter:title", content: title },
       { name: "twitter:description", content: description },
       { name: "twitter:image", content: img },

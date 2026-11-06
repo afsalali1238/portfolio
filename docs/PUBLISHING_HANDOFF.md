@@ -111,7 +111,7 @@
   ---
 
   _This is Dispatch No. 08 from [forthe.tech](https://www.forthe.tech) — an open field laboratory of applied AI tools and operating systems built in Dubai._
-  _Follow the builds on [LinkedIn](https://www.linkedin.com/in/afsalali1238/) and [X](https://x.com/afsalali1238)._
+  _Follow the builds on [LinkedIn](https://www.linkedin.com/in/afsalali1238/) and [X](https://x.com/afsallali)._
   ```
 
 #### Staging Guide for Piece 2: _The First Hit Is Free_
@@ -220,7 +220,7 @@ Use the lever with lethal precision. Never surrender your judgment.
 
 ### PLATFORM 4: X / Twitter (The Tech Spark & Rapid Dialogue)
 
-- **Handle:** `@afsalali1238`
+- **Handle:** `@afsallali`
 - **Target Audience:** AI researchers, Cursor/vibe coders, Indie hackers, Tech VCs.
 
 #### Single Tweets Queue (Post 1–2 per day):

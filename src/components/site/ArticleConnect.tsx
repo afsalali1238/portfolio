@@ -15,7 +15,7 @@ const DEFAULT_LINKS: Required<PlatformLinks> = {
   substack: "https://substack.com/@afsalali",
   medium: "https://medium.com/@afsalali1238",
   linkedin: "https://www.linkedin.com/in/afsalali1238/",
-  twitter: "https://x.com/afsalali1238",
+  twitter: "https://x.com/afsallali",
 };
 
 /**

@@ -134,6 +134,7 @@ const PERSON_SCHEMA = {
     "https://github.com/afsalali1238",
     "https://www.linkedin.com/in/afsalali1238/",
     "https://medium.com/@afsalali1238",
+    "https://x.com/afsallali",
   ],
 };
 

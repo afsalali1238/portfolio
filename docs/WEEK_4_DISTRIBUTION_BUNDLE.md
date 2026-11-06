@@ -324,5 +324,5 @@ Building used to be the mountain. Today, building is just the ticket to enter th
 ---
 
 _Published as part of the public ledger on [forthe.tech](https://www.forthe.tech). Afsal Ali is an operations builder in Dubai managing physical logistics by day and shipping applied AI tools by night._  
-_Follow the builds on [LinkedIn](https://www.linkedin.com/in/afsalali1238/) and [X / Twitter](https://x.com/afsalali1238)._
+_Follow the builds on [LinkedIn](https://www.linkedin.com/in/afsalali1238/) and [X / Twitter](https://x.com/afsallali)._
 ```
