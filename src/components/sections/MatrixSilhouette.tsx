@@ -6,10 +6,18 @@ import { CHIMP_GRID_W, CHIMP_GRID_H, CHIMP_GRID_DATA } from "./chimpGridData";
  * Monospace alphanumeric characters form the contours of a chimpanzee holding an AK-47,
  * with both a high-contrast tactical silhouette and live animated video matrix feed.
  */
-export function MatrixSilhouette({ className = "" }: { className?: string }) {
+export function MatrixSilhouette({
+  className = "",
+  defaultMode = "silhouette",
+  hideToggle = false,
+}: {
+  className?: string;
+  defaultMode?: "silhouette" | "video";
+  hideToggle?: boolean;
+}) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [mode, setMode] = useState<"silhouette" | "video">("silhouette");
+  const [mode, setMode] = useState<"silhouette" | "video">(defaultMode);
   const modeRef = useRef<"silhouette" | "video">(mode);
   modeRef.current = mode;
 
@@ -261,7 +269,9 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
         </div>
 
         {/* Mode Selector Toggle */}
-        <div className="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-black/60 p-1">
+        <div
+          className={`items-center gap-1.5 rounded-lg border border-zinc-800 bg-black/60 p-1 ${hideToggle ? "hidden" : "flex"}`}
+        >
           <button
             type="button"
             onClick={() => setMode("silhouette")}
