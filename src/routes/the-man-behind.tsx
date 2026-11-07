@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Container } from "../components/layout/Container";
 import { SectionReveal } from "../components/animations/SectionReveal";
 import { PageShell } from "../components/site/PageShell";
-import { MatrixSilhouette } from "../components/sections/MatrixSilhouette";
+import { LivingObject } from "../components/sections/LivingObject";
 import { seo, AUTHOR } from "../lib/site";
 import {
   Mail,
@@ -98,7 +98,7 @@ function TheManBehindPage() {
 
           {/* Silhouette Matrix Visual */}
           <SectionReveal className="mt-10">
-            <MatrixSilhouette />
+            <LivingObject />
           </SectionReveal>
 
           {/* Contact Channels & Direct Reach */}
