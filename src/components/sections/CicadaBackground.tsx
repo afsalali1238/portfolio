@@ -215,7 +215,7 @@ export function CicadaBackground({ className = "" }: { className?: string }) {
     let py = 0;
     let illumActive = false;
     let parallaxX = 0;
-    let lastRealPointerAt = 0;
+    let lastRealPointerAt = performance.now();
     let touch: { id: number; x0: number; y0: number; moved: boolean } | null = null;
     const pulses: { t0: number; x: number; y: number }[] = [];
 
@@ -449,13 +449,13 @@ export function CicadaBackground({ className = "" }: { className?: string }) {
       raf = requestAnimationFrame(frame);
 
       const elapsed = lastPaintTs === 0 ? 16 : ts - lastPaintTs;
-      lastPaintTs = ts;
       const now = performance.now();
       const pointerIdle = now - lastPointerTs > IDLE_HALF_RATE_AFTER_MS;
       const scrollIdle = now - lastScrollTs > SCROLL_WAKE_MS;
       const tapIdle = now - lastTapTs > CLICK_WAKE_MS;
       // Idle: paint every other callback (the ambient motion is slow; 30 fps is enough).
       if (pointerIdle && scrollIdle && tapIdle && elapsed < HALF_RATE_MIN_STEP_MS) return;
+      lastPaintTs = ts;
 
       // Synthetic drift on touch / no-pointer devices after 6s without a real touch.
       const drifting =
