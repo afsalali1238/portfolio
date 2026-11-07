@@ -176,6 +176,24 @@
   opacity: 0;
 }
 
+/* Cicada hero (/the-man-behind): the cicada lives in the canvas behind the intro copy.
+   pan-y lets the browser own vertical scrolling while taps still reach the canvas engine. */
+.cicada-hero {
+  touch-action: pan-y;
+}
+
+/* Legibility wash behind the foreground copy: a theme-aware paper veil (no drop shadows,
+   per project convention) so heading, badge and toggles stay readable over the cicada. */
+.cicada-wash {
+  background: radial-gradient(
+    120% 62% at 50% 2%,
+    color-mix(in oklch, var(--paper) 95%, transparent) 0%,
+    color-mix(in oklch, var(--paper) 84%, transparent) 32%,
+    color-mix(in oklch, var(--paper) 55%, transparent) 64%,
+    transparent 88%
+  );
+}
+
 /* Hero headline: slides up from its own clip box on first paint (no JS needed). */
 @keyframes reveal-up {
   from {

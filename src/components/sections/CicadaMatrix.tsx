@@ -1,14 +1,27 @@
 import { useEffect, useRef } from "react";
 import { CICADA_GRID_W, CICADA_GRID_H, CICADA_GRID_DATA } from "./cicadaGridData";
+import { CicadaBackground } from "./CicadaBackground";
+
+export type CicadaMatrixProps = {
+  className?: string;
+  /** `panel` keeps the legacy boxed terminal presentation; `background` renders the immersive hero engine. */
+  variant?: "panel" | "background";
+};
 
 /**
  * CicadaMatrix — a "living object" character-matrix cicada.
- * Wing veins (intensity ≥8) shimmer, the body breathes (±0.5% scale), background
- * rain bends toward the pointer, and a tap fires a "chirp" brightness pulse.
- * Performance guards mirror HeroPrism: DPR cap, idle half-rate after 2.5s,
- * sleep after 20s of no interaction, visibilitychange pause, reduced-motion static frame.
+ *
+ * `variant="background"` (default for /the-man-behind) renders the cicada as an immersive
+ * living background behind the hero copy; `variant="panel"` keeps the legacy boxed terminal
+ * presentation for embedding contexts.
  */
-export function CicadaMatrix({ className = "" }: { className?: string }) {
+export function CicadaMatrix({ className = "", variant = "panel" }: CicadaMatrixProps) {
+  if (variant === "background") return <CicadaBackground className={className} />;
+  return <CicadaPanel className={className} />;
+}
+
+/** Legacy boxed terminal presentation of the cicada. */
+function CicadaPanel({ className = "" }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
