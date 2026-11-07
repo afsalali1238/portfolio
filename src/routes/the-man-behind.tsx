@@ -66,42 +66,39 @@ function TheManBehindPage() {
 
   return (
     <PageShell>
-      <div className="pb-24 pt-12 md:pt-16">
+      {/* Immersive hero: the cicada lives in the background behind the intro copy. */}
+      <LivingObject>
+        <SectionReveal className="space-y-4">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-mute">
+            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+            Contact &amp; Identity
+          </div>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <h1 className="font-serif text-5xl leading-tight text-ink md:text-6xl">
+                The Man Behind.
+              </h1>
+            </div>
+
+            {/* Location & Time badge */}
+            <div className="flex flex-col gap-2 rounded-lg border rule-hair bg-paper-deep/60 p-4 text-xs">
+              <div className="flex items-center gap-2 text-ink-mute">
+                <MapPin className="h-3.5 w-3.5 text-ink" />
+                <span>Dubai, United Arab Emirates</span>
+              </div>
+              <div className="flex items-center gap-2 text-ink-mute">
+                <Clock className="h-3.5 w-3.5 text-emerald-500" />
+                <span>GST (UTC+4):</span>
+                <DubaiLiveClock />
+              </div>
+            </div>
+          </div>
+        </SectionReveal>
+      </LivingObject>
+
+      {/* Contact Channels & Direct Reach */}
+      <div className="pb-24">
         <Container className="max-w-5xl">
-          {/* Header Title Section */}
-          <SectionReveal className="space-y-4">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-mute">
-              <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
-              Contact &amp; Identity
-            </div>
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <div>
-                <h1 className="font-serif text-5xl leading-tight text-ink md:text-6xl">
-                  The Man Behind.
-                </h1>
-              </div>
-
-              {/* Location & Time badge */}
-              <div className="flex flex-col gap-2 rounded-lg border rule-hair bg-paper-deep/60 p-4 text-xs">
-                <div className="flex items-center gap-2 text-ink-mute">
-                  <MapPin className="h-3.5 w-3.5 text-ink" />
-                  <span>Dubai, United Arab Emirates</span>
-                </div>
-                <div className="flex items-center gap-2 text-ink-mute">
-                  <Clock className="h-3.5 w-3.5 text-emerald-500" />
-                  <span>GST (UTC+4):</span>
-                  <DubaiLiveClock />
-                </div>
-              </div>
-            </div>
-          </SectionReveal>
-
-          {/* Silhouette Matrix Visual */}
-          <SectionReveal className="mt-10">
-            <LivingObject />
-          </SectionReveal>
-
-          {/* Contact Channels & Direct Reach */}
           <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-12">
             {/* Left: Email & Direct Connect */}
             <SectionReveal className="space-y-6 lg:col-span-7">
