@@ -5,6 +5,10 @@ import { CHIMP_GRID_W, CHIMP_GRID_H, CHIMP_GRID_DATA } from "./chimpGridData";
  * MatrixSilhouette renders an interactive digital matrix canvas.
  * Monospace alphanumeric characters form the contours of a chimpanzee holding an AK-47,
  * with both a high-contrast tactical silhouette and live animated video matrix feed.
+ *
+ * The panel is now sized to fit the available viewport: it caps its height, lets the
+ * artwork use contain-style sizing with a safe margin, adapts character density to the
+ * panel dimensions, reduces chrome on small screens, and pauses when the tab is hidden.
  */
 export function MatrixSilhouette({
   className = "",
@@ -16,7 +20,6 @@ export function MatrixSilhouette({
   hideToggle?: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const [mode, setMode] = useState<"silhouette" | "video">(defaultMode);
   const modeRef = useRef<"silhouette" | "video">(mode);
   modeRef.current = mode;
@@ -26,6 +29,8 @@ export function MatrixSilhouette({
     y: -1,
     active: false,
   });
+
+  const visibilityRef = useRef(true);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -69,17 +74,31 @@ export function MatrixSilhouette({
       maskCanvas.height = Math.floor(height);
     };
 
-    resize();
-    window.addEventListener("resize", resize);
+    // Grid sizing: adapts cell size to panel dimensions while bounding render cost.
+    const MIN_CELL_SIZE = 10;
+    const MAX_CELL_SIZE = 16;
+    const MAX_COLS = 80;
+    const MAX_ROWS = 50;
 
-    // Grid sizing
-    const cellSize = 12;
+    const getCellSize = (w: number, h: number) => {
+      // Larger panels afford smaller cells (more detail); small screens get larger,
+      // more readable cells. Then bound by max cell count for performance.
+      const densityScale = Math.min(w, h) / 400;
+      let cellSize = Math.round(14 / densityScale);
+      cellSize = Math.max(MIN_CELL_SIZE, Math.min(MAX_CELL_SIZE, cellSize));
+      const sizeByCols = Math.ceil(w / MAX_COLS);
+      const sizeByRows = Math.ceil(h / MAX_ROWS);
+      return Math.max(cellSize, sizeByCols, sizeByRows);
+    };
+
+    let cellSize = getCellSize(width, height);
     let tick = 0;
 
     const render = () => {
       tick++;
       if (width <= 0 || height <= 0) {
         resize();
+        cellSize = getCellSize(width, height);
       }
 
       ctx.clearRect(0, 0, width, height);
@@ -102,6 +121,7 @@ export function MatrixSilhouette({
         let drawX = 0;
         let drawY = 0;
 
+        // Contain-style: fit video within canvas, preserving aspect ratio.
         if (canvasAspect > videoAspect) {
           drawH = width / videoAspect;
           drawY = (height - drawH) / 2;
@@ -120,10 +140,18 @@ export function MatrixSilhouette({
 
       const mouse = mouseRef.current;
 
-      // Scaling for embedded chimp grid in silhouette mode
+      // Scaling for embedded chimp grid in silhouette mode — contain-style with a
+      // small safe margin so the artwork never touches the panel edges.
       const chimpAspect = CHIMP_GRID_W / CHIMP_GRID_H;
-      const targetH = height * 0.94;
-      const targetW = targetH * chimpAspect;
+      const margin = 0.06; // 6% safe margin on each side
+      const availW = width * (1 - margin * 2);
+      const availH = height * (1 - margin * 2);
+      let targetH = availH;
+      let targetW = targetH * chimpAspect;
+      if (targetW > availW) {
+        targetW = availW;
+        targetH = targetW / chimpAspect;
+      }
       const offsetX = (width - targetW) / 2;
       const offsetY = (height - targetH) / 2;
 
@@ -225,7 +253,29 @@ export function MatrixSilhouette({
       animationFrameId = requestAnimationFrame(render);
     };
 
-    animationFrameId = requestAnimationFrame(render);
+    const start = () => {
+      if (!visibilityRef.current) return;
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    const stop = () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+
+    const handleVisibilityChange = () => {
+      visibilityRef.current = !document.hidden;
+      if (visibilityRef.current) {
+        start();
+      } else {
+        stop();
+        video.pause();
+      }
+    };
+
+    resize();
+    start();
+    window.addEventListener("resize", resize);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
@@ -245,6 +295,7 @@ export function MatrixSilhouette({
 
     return () => {
       window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseleave", handleMouseLeave);
       cancelAnimationFrame(animationFrameId);
@@ -253,16 +304,23 @@ export function MatrixSilhouette({
     };
   }, []);
 
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
+
   return (
     <div
-      ref={containerRef}
       className={`relative overflow-hidden rounded-xl border rule-hair bg-zinc-950 shadow-2xl ${className}`}
     >
-      {/* Header Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 bg-zinc-900/90 px-4 py-2.5 text-xs font-mono text-zinc-400">
+      {/* Header Bar — compact on mobile */}
+      <div
+        className={`flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 bg-zinc-900/90 px-4 py-2.5 ${
+          isMobile ? "px-3 py-2" : "px-4 py-2.5"
+        } text-xs font-mono text-zinc-400`}
+      >
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-zinc-200 font-semibold tracking-wider">
+          <span
+            className={`text-zinc-200 font-semibold tracking-wider ${isMobile ? "text-xs" : ""}`}
+          >
             CHIMP_AK47_TACTICAL_OPERATOR
           </span>
           <span className="text-zinc-500 hidden sm:inline">:: [DUBAI_NODE]</span>
@@ -270,7 +328,9 @@ export function MatrixSilhouette({
 
         {/* Mode Selector Toggle */}
         <div
-          className={`items-center gap-1.5 rounded-lg border border-zinc-800 bg-black/60 p-1 ${hideToggle ? "hidden" : "flex"}`}
+          className={`items-center gap-1.5 rounded-lg border border-zinc-800 bg-black/60 p-1 ${
+            hideToggle ? "hidden" : "flex"
+          }`}
         >
           <button
             type="button"
@@ -297,8 +357,8 @@ export function MatrixSilhouette({
         </div>
       </div>
 
-      {/* Main Visual Display */}
-      <div className="relative aspect-[4/3] w-full min-h-[360px] md:min-h-[480px] bg-black">
+      {/* Main Visual Display — height-limited, artwork contained with safe margin */}
+      <div className="relative w-full max-h-[65vh] min-h-[320px] md:min-h-[420px] bg-black">
         <canvas ref={canvasRef} className="h-full w-full block cursor-crosshair select-none" />
         {/* Subtle overlay vignette & terminal status */}
         <div className="pointer-events-none absolute inset-0 bg-radial-gradient from-transparent via-transparent to-black/60" />
@@ -310,14 +370,18 @@ export function MatrixSilhouette({
         </div>
       </div>
 
-      {/* Terminal Footer info */}
-      <div className="flex flex-wrap items-center justify-between border-t border-zinc-800 bg-zinc-900/60 px-4 py-2 text-[11px] font-mono text-zinc-400">
+      {/* Terminal Footer info — compact on mobile */}
+      <div
+        className={`flex flex-wrap items-center justify-between border-t border-zinc-800 bg-zinc-900/60 px-4 py-2 ${
+          isMobile ? "px-3 py-1.5 text-[10px]" : "px-4 py-2 text-[11px]"
+        } font-mono text-zinc-400`}
+      >
         <div className="flex items-center gap-3">
           <span>PORT: 0x443</span>
           <span className="text-zinc-600">|</span>
-          <span>IDENTITY: CHIMP_WITH_AK47</span>
-          <span className="text-zinc-600">|</span>
-          <span>CALIBER: 7.62×39MM</span>
+          <span className={`hidden ${isMobile ? "" : "sm:inline"}`}>IDENTITY: CHIMP_WITH_AK47</span>
+          <span className="text-zinc-600 hidden sm:inline">|</span>
+          <span className={`hidden ${isMobile ? "" : "sm:inline"}`}>CALIBER: 7.62×39MM</span>
         </div>
         <div className="text-emerald-400/90 font-mono">STATUS: ARMED &amp; COMPILED</div>
       </div>
