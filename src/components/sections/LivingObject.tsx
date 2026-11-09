@@ -3,11 +3,10 @@ import { Container } from "../layout/Container";
 import { CicadaMatrix } from "./CicadaMatrix";
 import { MatrixSilhouette } from "./MatrixSilhouette";
 
-type Mode = "cicada" | "ape-video" | "ape-silhouette";
+type Mode = "cicada" | "ape-video";
 const MODES: { id: Mode; label: string }[] = [
   { id: "cicada", label: "Cicada (natural)" },
   { id: "ape-video", label: "Ape AK-47 (video)" },
-  { id: "ape-silhouette", label: "Ape (silhouette)" },
 ];
 
 /**
@@ -16,7 +15,8 @@ const MODES: { id: Mode; label: string }[] = [
  * The cicada lives in the page background behind the intro copy (canvas spans the hero,
  * painted with the page background so it melts into the section), while the mode toggle and
  * the emergence line float above it on a legibility wash. Ape modes keep their boxed terminal
- * presentation as easter eggs; switching to them unmounts the cicada engine cleanly.
+ * The ape video mode keeps its boxed terminal presentation as an easter egg;
+ * switching to it unmounts the cicada engine cleanly.
  */
 export function LivingObject({
   className = "",
@@ -43,7 +43,7 @@ export function LivingObject({
           <Container className="max-w-5xl">
             <MatrixSilhouette
               key={mode}
-              defaultMode={mode === "ape-video" ? "video" : "silhouette"}
+              defaultMode="video"
               hideToggle
             />
           </Container>
