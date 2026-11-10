@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Container } from "../layout/Container";
 import { CicadaMatrix } from "./CicadaMatrix";
-import { MatrixSilhouette } from "./MatrixSilhouette";
+import { ApeVideoBackground } from "./ApeVideoBackground";
 
 type Mode = "cicada" | "ape-video";
 const MODES: { id: Mode; label: string }[] = [
@@ -12,11 +12,13 @@ const MODES: { id: Mode; label: string }[] = [
 /**
  * LivingObject — the immersive hero of /the-man-behind.
  *
- * The cicada lives in the page background behind the intro copy (canvas spans the hero,
- * painted with the page background so it melts into the section), while the mode toggle and
- * the emergence line float above it on a legibility wash. Ape modes keep their boxed terminal
- * The ape video mode keeps its boxed terminal presentation as an easter egg;
- * switching to it unmounts the cicada engine cleanly.
+ * Both the natural cicada and the AK-47 chimpanzee video live in the page background
+ * behind the intro copy (canvas/video spans the hero, painted with the page background
+ * and legibility wash so they melt into the section).
+ *
+ * Modes:
+ * - "cicada": reactive living character-matrix insect engine.
+ * - "ape-video": full-bleed, fit-to-screen video matrix background with falling glyph rain.
  */
 export function LivingObject({
   className = "",
@@ -26,31 +28,22 @@ export function LivingObject({
   children?: ReactNode;
 }) {
   const [mode, setMode] = useState<Mode>("cicada");
-  const immersive = mode === "cicada";
 
   return (
     <section
       data-cicada-hero
-      className={`cicada-hero relative overflow-hidden flex flex-col ${
-        immersive ? "min-h-[560px] md:min-h-[86vh]" : ""
-      } ${className}`}
+      className={`cicada-hero relative overflow-hidden flex flex-col min-h-[560px] md:min-h-[86vh] ${className}`}
     >
-      {immersive && <CicadaMatrix variant="background" />}
+      {mode === "cicada" ? <CicadaMatrix variant="background" /> : <ApeVideoBackground />}
       <div aria-hidden="true" className="cicada-wash pointer-events-none absolute inset-0 z-[1]" />
-      <div className="relative z-10 flex flex-1 flex-col">
+      <div className="relative z-10 flex flex-1 flex-col justify-between">
         <Container className="max-w-5xl pt-12 md:pt-16">{children}</Container>
-        {!immersive && (
-          <Container className="max-w-5xl">
-            <MatrixSilhouette
-              key={mode}
-              defaultMode="video"
-              hideToggle
-            />
-          </Container>
-        )}
-        <Container className="max-w-5xl pb-10">
-          <p className="font-serif text-lg italic text-ink-soft">
-            Seventeen years underground. Then it emerges — wings first.
+
+        <Container className="max-w-5xl pb-10 mt-auto">
+          <p className="font-serif text-lg italic text-ink-soft transition-opacity duration-300">
+            {mode === "cicada"
+              ? "Seventeen years underground. Then it emerges — wings first."
+              : "Giving an operator modern tools is like handing a chimpanzee an AK-47: zero committees, lethal execution speed."}
           </p>
           <div
             role="tablist"
@@ -75,7 +68,9 @@ export function LivingObject({
             ))}
           </div>
           <p className="mt-3 text-[11px] font-mono tracking-wide text-ink-mute">
-            Move to stir the wings · Tap to chirp
+            {mode === "cicada"
+              ? "Move to stir the wings · Tap to chirp"
+              : "Move cursor to illuminate matrix rain · Fit-to-screen live feed"}
           </p>
         </Container>
       </div>
