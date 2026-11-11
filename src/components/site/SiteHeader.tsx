@@ -6,6 +6,7 @@ import { LogoTile, Wordmark } from "./LogoMark";
 
 const NAV_LINKS = [
   { label: "Work", to: "/works" },
+  { label: "Manifesto", to: "/thesis" },
   { label: "Notes", to: "/notes" },
   { label: "The Man Behind", to: "/the-man-behind" },
 ] as const;

@@ -20,6 +20,7 @@ function generateSitemap() {
 
   const staticRoutes = [
     { path: "/", priority: 1.0, changefreq: "weekly" },
+    { path: "/thesis", priority: 0.95, changefreq: "monthly" },
     { path: "/works", priority: 0.9, changefreq: "weekly" },
     { path: "/notes", priority: 0.85, changefreq: "weekly" },
     { path: "/the-man-behind", priority: 0.9, changefreq: "weekly" },

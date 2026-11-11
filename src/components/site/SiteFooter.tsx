@@ -96,6 +96,9 @@ export function SiteFooter() {
               <Link to="/works" className="inline-flex min-h-11 items-center hover:text-ink">
                 Work
               </Link>
+              <Link to="/thesis" className="inline-flex min-h-11 items-center hover:text-ink">
+                Manifesto
+              </Link>
               <Link to="/notes" className="inline-flex min-h-11 items-center hover:text-ink">
                 Notes
               </Link>

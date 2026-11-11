@@ -97,7 +97,7 @@ function NotesIndexPage() {
               <SectionReveal key={d.number}>
                 <div className="group block rounded-lg border rule-hair bg-paper p-6 transition-all hover:border-ink hover:bg-paper-deep/60 md:p-8">
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-ink-mute">
-                    <span className="font-mono">
+                    <span className="tabular-nums font-medium">
                       No. {d.number} · {d.date}
                     </span>
                     <div className="flex items-center gap-3">

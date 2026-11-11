@@ -38,7 +38,7 @@ export function ArticlePlatformBar({
   return (
     <div className="my-6 flex flex-wrap items-center justify-between gap-3 border-y rule-hair py-3 text-xs text-ink-mute">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono uppercase tracking-wider text-ink font-medium">Read on:</span>
+        <span className="uppercase tracking-wider text-ink font-medium">Read on:</span>
         <span className="rounded bg-paper-deep px-2 py-0.5 font-medium text-ink">
           forthe.tech (canonical)
         </span>
@@ -115,7 +115,7 @@ export function RelatedBuildsSection({ projectIds }: { projectIds?: string[] }) 
           >
             <div className="flex items-center justify-between text-xs text-ink-mute">
               <span className="font-medium text-ink">{p.for}</span>
-              <span className="font-mono">{p.year}</span>
+              <span className="tabular-nums">{p.year}</span>
             </div>
             <h3 className="mt-1.5 font-serif text-xl text-ink transition-colors group-hover:text-ink">
               {p.name}

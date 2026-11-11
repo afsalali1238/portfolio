@@ -281,7 +281,7 @@ function ProjectCaseStudy() {
                       className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-md border rule-hair bg-paper-deep/40 p-4 transition-colors hover:border-ink hover:bg-paper-deep"
                     >
                       <div className="space-y-1">
-                        <div className="text-xs text-ink-mute font-mono">
+                        <div className="text-xs text-ink-mute tabular-nums">
                           No. {note.number} · {note.date}
                         </div>
                         <div className="font-serif text-xl text-ink group-hover:text-ink">

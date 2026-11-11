@@ -20,6 +20,33 @@ export type Dispatch = {
 
 export const DISPATCHES: Dispatch[] = [
   {
+    number: "09",
+    date: "12 November 2026",
+    title: "The Refraction of Thought.",
+    subtitle:
+      "A manifesto of light, friction, effort, and becoming: why ideas prove nothing until they collide with the dense glass of honest craft.",
+    path: "/thesis",
+    readTime: "6 min read",
+    words: "~1,100 words",
+    external: {
+      substack: "https://substack.com/@afsalali",
+      medium: "https://medium.com/@afsalali1238",
+      linkedin: "https://www.linkedin.com/in/afsalali1238/",
+      twitter: "https://x.com/afsallali",
+    },
+    relatedWorks: [
+      "provia",
+      "pharmarab",
+      "physioarab",
+      "kine",
+      "nxtdoorchef",
+      "kasper",
+      "doomscholar",
+      "novibe",
+    ],
+    tags: ["Manifesto", "Light & Prism", "Craft", "Philosophy", "Becoming"],
+  },
+  {
     number: "08",
     date: "31 October 2026",
     title: "The curious case of building.",

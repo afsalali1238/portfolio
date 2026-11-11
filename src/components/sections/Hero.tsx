@@ -145,17 +145,17 @@ export function Hero() {
             >
               {/* Subtle top indicator */}
               <div className="flex items-center justify-between w-full pointer-events-none">
-                <span className="font-mono text-[10px] tracking-wider uppercase text-ink-mute/70">
+                <span className="text-xs tracking-wider uppercase text-ink-mute/70 font-medium">
                   Refraction of Thought
                 </span>
-                <span className="font-mono text-[10px] text-ink-mute/60">
+                <span className="text-xs text-ink-mute/60">
                   {sourceMode === "rest" ? "Resting ray" : "Pinned light"}
                 </span>
               </div>
 
               {/* Bottom interactive controls */}
               <div className="flex items-center justify-between w-full pt-2 pointer-events-auto">
-                <span className="inline-flex items-center gap-1.5 text-[11px] text-ink-mute/80 select-none">
+                <span className="inline-flex items-center gap-1.5 text-xs text-ink-mute/80 select-none">
                   {!hasInteracted && (
                     <span className="relative flex h-1.5 w-1.5">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-ink/40 opacity-75" />
@@ -174,7 +174,7 @@ export function Hero() {
                     setHasInteracted(true);
                     prismControlRef.current?.cyclePreset();
                   }}
-                  className="inline-flex min-h-7 items-center gap-1.5 rounded-md border rule-hair bg-paper/90 dark:bg-paper-deep/90 px-2.5 py-1 text-[11px] font-medium text-ink shadow-xs transition-colors hover:bg-paper-deep active:scale-95"
+                  className="inline-flex min-h-7 items-center gap-1.5 rounded-md border rule-hair bg-paper/90 dark:bg-paper-deep/90 px-2.5 py-1 text-xs font-medium text-ink shadow-xs transition-colors hover:bg-paper-deep active:scale-95"
                 >
                   <span
                     aria-hidden="true"
@@ -261,7 +261,7 @@ export function Hero() {
               prismControlRef.current?.reset();
             }
           }}
-          className="motion-reduce:hidden hidden lg:inline-flex absolute right-6 md:right-10 -bottom-7 sm:-bottom-8 min-h-6 items-center gap-1.5 rounded px-1.5 py-0.5 text-[11px] font-medium tracking-wide text-ink-mute transition-colors duration-150 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+          className="motion-reduce:hidden hidden lg:inline-flex absolute right-6 md:right-10 -bottom-7 sm:-bottom-8 min-h-6 items-center gap-1.5 rounded px-1.5 py-0.5 text-xs font-medium tracking-wide text-ink-mute transition-colors duration-150 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
         >
           <span
             aria-hidden="true"

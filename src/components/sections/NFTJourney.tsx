@@ -43,7 +43,7 @@ export function NFTJourney() {
                   <TrendingDown className="h-3 w-3 text-red-500" />
                   Estimated Tuition
                 </div>
-                <div className="font-mono text-sm font-semibold text-ink">
+                <div className="tabular-nums text-sm font-semibold text-ink">
                   {NFT_JOURNEY_STATS.totalBurnedEstimate}
                 </div>
               </div>
@@ -52,7 +52,7 @@ export function NFTJourney() {
                   <Flame className="h-3 w-3 text-amber-500" />
                   Gas Burned
                 </div>
-                <div className="font-mono text-sm font-semibold text-ink">
+                <div className="tabular-nums text-sm font-semibold text-ink">
                   {NFT_JOURNEY_STATS.ethBurned}
                 </div>
               </div>
@@ -61,14 +61,14 @@ export function NFTJourney() {
                   <DollarSign className="h-3 w-3 text-emerald-500" />
                   Max Paperhand Miss
                 </div>
-                <div className="font-mono text-sm font-semibold text-ink">~$35k+</div>
+                <div className="tabular-nums text-sm font-semibold text-ink">~$35k+</div>
               </div>
               <div className="space-y-0.5">
                 <div className="text-ink-mute flex items-center gap-1">
                   <Award className="h-3 w-3 text-blue-500" />
                   Held to $0 Rate
                 </div>
-                <div className="font-mono text-sm font-semibold text-ink">
+                <div className="tabular-nums text-sm font-semibold text-ink">
                   {NFT_JOURNEY_STATS.zeroHoldRate}
                 </div>
               </div>

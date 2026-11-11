@@ -21,6 +21,7 @@ import { Route as NotesTheEnergyLedgerRouteImport } from './routes/notes/the-ene
 import { Route as NotesTheFirstHitIsFreeRouteImport } from './routes/notes/the-first-hit-is-free'
 import { Route as NotesTheMoatMovedRouteImport } from './routes/notes/the-moat-moved'
 import { Route as NotesTheRealityTestRouteImport } from './routes/notes/the-reality-test'
+import { Route as NotesTheRefractionOfThoughtRouteImport } from './routes/notes/the-refraction-of-thought'
 import { Route as NotesTheWhatsappOperatingSystemRouteImport } from './routes/notes/the-whatsapp-operating-system'
 import { Route as WorksIndexRouteImport } from './routes/works/index'
 import { Route as WorksIdRouteImport } from './routes/works/$id'
@@ -86,6 +87,12 @@ const NotesTheRealityTestRoute = NotesTheRealityTestRouteImport.update({
   path: '/notes/the-reality-test',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NotesTheRefractionOfThoughtRoute =
+  NotesTheRefractionOfThoughtRouteImport.update({
+    id: '/notes/the-refraction-of-thought',
+    path: '/notes/the-refraction-of-thought',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const NotesTheWhatsappOperatingSystemRoute =
   NotesTheWhatsappOperatingSystemRouteImport.update({
     id: '/notes/the-whatsapp-operating-system',
@@ -115,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/notes/the-first-hit-is-free': typeof NotesTheFirstHitIsFreeRoute
   '/notes/the-moat-moved': typeof NotesTheMoatMovedRoute
   '/notes/the-reality-test': typeof NotesTheRealityTestRoute
+  '/notes/the-refraction-of-thought': typeof NotesTheRefractionOfThoughtRoute
   '/notes/the-whatsapp-operating-system': typeof NotesTheWhatsappOperatingSystemRoute
   '/works/$id': typeof WorksIdRoute
   '/notes/': typeof NotesIndexRoute
@@ -132,6 +140,7 @@ export interface FileRoutesByTo {
   '/notes/the-first-hit-is-free': typeof NotesTheFirstHitIsFreeRoute
   '/notes/the-moat-moved': typeof NotesTheMoatMovedRoute
   '/notes/the-reality-test': typeof NotesTheRealityTestRoute
+  '/notes/the-refraction-of-thought': typeof NotesTheRefractionOfThoughtRoute
   '/notes/the-whatsapp-operating-system': typeof NotesTheWhatsappOperatingSystemRoute
   '/works/$id': typeof WorksIdRoute
   '/notes': typeof NotesIndexRoute
@@ -150,6 +159,7 @@ export interface FileRoutesById {
   '/notes/the-first-hit-is-free': typeof NotesTheFirstHitIsFreeRoute
   '/notes/the-moat-moved': typeof NotesTheMoatMovedRoute
   '/notes/the-reality-test': typeof NotesTheRealityTestRoute
+  '/notes/the-refraction-of-thought': typeof NotesTheRefractionOfThoughtRoute
   '/notes/the-whatsapp-operating-system': typeof NotesTheWhatsappOperatingSystemRoute
   '/works/$id': typeof WorksIdRoute
   '/notes/': typeof NotesIndexRoute
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/notes/the-first-hit-is-free'
     | '/notes/the-moat-moved'
     | '/notes/the-reality-test'
+    | '/notes/the-refraction-of-thought'
     | '/notes/the-whatsapp-operating-system'
     | '/works/$id'
     | '/notes/'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/notes/the-first-hit-is-free'
     | '/notes/the-moat-moved'
     | '/notes/the-reality-test'
+    | '/notes/the-refraction-of-thought'
     | '/notes/the-whatsapp-operating-system'
     | '/works/$id'
     | '/notes'
@@ -203,6 +215,7 @@ export interface FileRouteTypes {
     | '/notes/the-first-hit-is-free'
     | '/notes/the-moat-moved'
     | '/notes/the-reality-test'
+    | '/notes/the-refraction-of-thought'
     | '/notes/the-whatsapp-operating-system'
     | '/works/$id'
     | '/notes/'
@@ -221,6 +234,7 @@ export interface RootRouteChildren {
   NotesTheFirstHitIsFreeRoute: typeof NotesTheFirstHitIsFreeRoute
   NotesTheMoatMovedRoute: typeof NotesTheMoatMovedRoute
   NotesTheRealityTestRoute: typeof NotesTheRealityTestRoute
+  NotesTheRefractionOfThoughtRoute: typeof NotesTheRefractionOfThoughtRoute
   NotesTheWhatsappOperatingSystemRoute: typeof NotesTheWhatsappOperatingSystemRoute
   WorksIdRoute: typeof WorksIdRoute
   NotesIndexRoute: typeof NotesIndexRoute
@@ -313,6 +327,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NotesTheRealityTestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/notes/the-refraction-of-thought': {
+      id: '/notes/the-refraction-of-thought'
+      path: '/notes/the-refraction-of-thought'
+      fullPath: '/notes/the-refraction-of-thought'
+      preLoaderRoute: typeof NotesTheRefractionOfThoughtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/notes/the-whatsapp-operating-system': {
       id: '/notes/the-whatsapp-operating-system'
       path: '/notes/the-whatsapp-operating-system'
@@ -349,6 +370,7 @@ const rootRouteChildren: RootRouteChildren = {
   NotesTheFirstHitIsFreeRoute: NotesTheFirstHitIsFreeRoute,
   NotesTheMoatMovedRoute: NotesTheMoatMovedRoute,
   NotesTheRealityTestRoute: NotesTheRealityTestRoute,
+  NotesTheRefractionOfThoughtRoute: NotesTheRefractionOfThoughtRoute,
   NotesTheWhatsappOperatingSystemRoute: NotesTheWhatsappOperatingSystemRoute,
   WorksIdRoute: WorksIdRoute,
   NotesIndexRoute: NotesIndexRoute,

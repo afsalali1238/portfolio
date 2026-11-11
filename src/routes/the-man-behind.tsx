@@ -51,7 +51,7 @@ function DubaiLiveClock() {
     return () => clearInterval(interval);
   }, []);
 
-  return <span className="font-mono text-ink font-semibold">{timeStr || "Loading GST..."}</span>;
+  return <span className="tabular-nums text-ink font-semibold">{timeStr || "Loading GST..."}</span>;
 }
 
 function TheManBehindPage() {
