@@ -1016,155 +1016,178 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
   return (
     <div
       ref={containerRef}
-      className={`transition-all duration-300 ${
+      className={`transition-all duration-300 w-full relative overflow-hidden bg-black select-none ${
         isFullscreen
-          ? "fixed inset-0 z-50 flex flex-col bg-black h-screen w-screen"
-          : `relative overflow-hidden rounded-xl border rule-hair bg-zinc-950 shadow-2xl ${className}`
+          ? "fixed inset-0 z-50 flex flex-col h-screen w-screen"
+          : `min-h-[560px] sm:min-h-[660px] md:min-h-[740px] lg:min-h-[800px] h-[78vh] max-h-[880px] ${className}`
       }`}
     >
-      {/* 1. Primary Terminal Navigation Header Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 bg-zinc-900/95 px-4 py-3 text-xs font-mono text-zinc-400">
-        <div className="flex items-center gap-2">
-          <span
-            className={`h-2 w-2 rounded-full animate-pulse ${
-              colorTheme === "amber"
-                ? "bg-amber-500"
-                : colorTheme === "cyan"
-                  ? "bg-cyan-500"
-                  : "bg-emerald-500"
-            }`}
-          />
-          <span className="text-zinc-200 font-semibold tracking-wider">
-            {currentMeta.badge}
-          </span>
-          <span className="text-zinc-500 hidden sm:inline">:: [DUBAI_NODE]</span>
-        </div>
+      {/* 1. Main Canvas Display (Borderless Full-Bleed) */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 h-full w-full block cursor-crosshair touch-none"
+      />
 
-        {/* 3 Artwork Tab Selectors */}
-        <div
-          role="tablist"
-          aria-label="Matrix Artworks"
-          className="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-black/60 p-1"
-        >
-          {ARTWORKS.map((artwork) => (
-            <button
-              key={artwork.id}
-              role="tab"
-              aria-selected={activeArtwork === artwork.id}
-              type="button"
-              onClick={() => setActiveArtwork(artwork.id)}
-              className={`rounded-md px-3 py-1 text-[11px] font-mono transition-all ${
-                activeArtwork === artwork.id
-                  ? colorTheme === "amber"
-                    ? "bg-amber-500/20 text-amber-400 font-semibold border border-amber-500/40"
-                    : colorTheme === "cyan"
-                      ? "bg-cyan-500/20 text-cyan-400 font-semibold border border-cyan-500/40"
-                      : "bg-emerald-500/20 text-emerald-400 font-semibold border border-emerald-500/40"
-                  : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
-              }`}
-            >
-              {artwork.label}
-            </button>
-          ))}
-        </div>
+      {/* 2. CRT Scanline Grid Texture */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-20 bg-[linear-gradient(to_bottom,transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px]"
+      />
 
-        {/* Global Controls: Color CRT Theme + Sound + Fullscreen */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center rounded-lg border border-zinc-800 bg-black/60 p-0.5">
-            <button
-              type="button"
-              onClick={() => setColorTheme("emerald")}
-              title="Matrix Emerald Phosphor"
-              className={`h-5 w-5 rounded text-[10px] font-bold transition-all ${
-                colorTheme === "emerald" ? "bg-emerald-500 text-black" : "text-emerald-500 hover:bg-zinc-800"
+      {/* 3. Soft Atmospheric Dissolves (No harsh box edges!) */}
+      {/* Top soft fade into page header */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black via-black/60 to-transparent z-10"
+      />
+      {/* Bottom deep fade into page content */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black via-black/80 to-transparent z-10"
+      />
+      {/* Side edge vignettes */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-black via-black/50 to-transparent z-10"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-black via-black/50 to-transparent z-10"
+      />
+
+      {/* 4. Top Floating Cyber HUD Pill */}
+      <div className="absolute top-4 inset-x-0 z-20 flex justify-center px-3 pointer-events-none">
+        <div className="pointer-events-auto flex flex-wrap items-center justify-center gap-2 rounded-full border border-zinc-800/90 bg-zinc-950/75 px-3 py-1.5 backdrop-blur-md shadow-2xl shadow-emerald-950/20">
+          {/* Status Indicator */}
+          <div className="flex items-center gap-1.5 pl-1.5 pr-2.5 border-r border-zinc-800">
+            <span
+              className={`h-2 w-2 rounded-full animate-pulse ${
+                colorTheme === "amber"
+                  ? "bg-amber-400"
+                  : colorTheme === "cyan"
+                    ? "bg-cyan-400"
+                    : "bg-emerald-400"
               }`}
-            >
-              M
-            </button>
-            <button
-              type="button"
-              onClick={() => setColorTheme("amber")}
-              title="Retro Amber CRT"
-              className={`h-5 w-5 rounded text-[10px] font-bold transition-all ${
-                colorTheme === "amber" ? "bg-amber-500 text-black" : "text-amber-500 hover:bg-zinc-800"
-              }`}
-            >
-              A
-            </button>
-            <button
-              type="button"
-              onClick={() => setColorTheme("cyan")}
-              title="Cyber Cyan Phosphor"
-              className={`h-5 w-5 rounded text-[10px] font-bold transition-all ${
-                colorTheme === "cyan" ? "bg-cyan-500 text-black" : "text-cyan-400 hover:bg-zinc-800"
-              }`}
-            >
-              C
-            </button>
+            />
+            <span className="font-mono text-[10px] tracking-wider text-zinc-300 font-semibold uppercase hidden sm:inline">
+              {currentMeta.badge}
+            </span>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`rounded-lg border px-2 py-1 text-[11px] font-mono transition-colors ${
-              soundEnabled
-                ? "border-emerald-500/50 bg-emerald-500/20 text-emerald-300"
-                : "border-zinc-800 bg-black/60 text-zinc-400 hover:text-zinc-200"
-            }`}
-            title={soundEnabled ? "Synthesizer SFX: ON" : "Synthesizer SFX: MUTED (Click to enable)"}
-          >
-            {soundEnabled ? "SFX: ON" : "SFX: OFF"}
-          </button>
+          {/* 3 Artwork Switcher Tabs */}
+          <div role="tablist" aria-label="Matrix Artworks" className="flex items-center gap-1">
+            {ARTWORKS.map((artwork) => (
+              <button
+                key={artwork.id}
+                role="tab"
+                aria-selected={activeArtwork === artwork.id}
+                type="button"
+                onClick={() => setActiveArtwork(artwork.id)}
+                className={`rounded-full px-2.5 sm:px-3 py-1 text-xs font-mono transition-all whitespace-nowrap ${
+                  activeArtwork === artwork.id
+                    ? colorTheme === "amber"
+                      ? "bg-amber-500/25 text-amber-300 font-semibold border border-amber-500/40 shadow-sm"
+                      : colorTheme === "cyan"
+                        ? "bg-cyan-500/25 text-cyan-300 font-semibold border border-cyan-500/40 shadow-sm"
+                        : "bg-emerald-500/25 text-emerald-300 font-semibold border border-emerald-500/40 shadow-sm"
+                    : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5"
+                }`}
+              >
+                {artwork.id === "man-behind" ? (
+                  <>
+                    <span className="sm:hidden">Man Behind</span>
+                    <span className="hidden sm:inline">The Man Behind</span>
+                  </>
+                ) : (
+                  artwork.label
+                )}
+              </button>
+            ))}
+          </div>
 
-          <button
-            type="button"
-            onClick={() => setIsFullscreen(!isFullscreen)}
-            className="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-black/60 px-2.5 py-1 text-[11px] font-mono text-zinc-300 hover:border-emerald-500/50 hover:text-emerald-400 transition-colors"
-            title={isFullscreen ? "Exit Fullscreen (ESC)" : "Fit to Screen / Fullscreen"}
-          >
-            <svg
-              className="h-3.5 w-3.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
+          {/* Controls: Phosphor Theme + Sound + Fullscreen */}
+          <div className="flex items-center gap-1.5 pl-2 border-l border-zinc-800">
+            {/* Color CRT Theme Switcher */}
+            <div className="flex items-center rounded-full border border-zinc-800 bg-black/60 p-0.5">
+              <button
+                type="button"
+                onClick={() => setColorTheme("emerald")}
+                title="Matrix Emerald Phosphor"
+                className={`h-5 w-5 rounded-full text-[10px] font-bold transition-all ${
+                  colorTheme === "emerald"
+                    ? "bg-emerald-500 text-black shadow-sm"
+                    : "text-emerald-500 hover:bg-zinc-800"
+                }`}
+              >
+                M
+              </button>
+              <button
+                type="button"
+                onClick={() => setColorTheme("amber")}
+                title="Retro Amber CRT"
+                className={`h-5 w-5 rounded-full text-[10px] font-bold transition-all ${
+                  colorTheme === "amber"
+                    ? "bg-amber-500 text-black shadow-sm"
+                    : "text-amber-500 hover:bg-zinc-800"
+                }`}
+              >
+                A
+              </button>
+              <button
+                type="button"
+                onClick={() => setColorTheme("cyan")}
+                title="Cyber Cyan Phosphor"
+                className={`h-5 w-5 rounded-full text-[10px] font-bold transition-all ${
+                  colorTheme === "cyan"
+                    ? "bg-cyan-500 text-black shadow-sm"
+                    : "text-cyan-400 hover:bg-zinc-800"
+                }`}
+              >
+                C
+              </button>
+            </div>
+
+            {/* Sound Toggle */}
+            <button
+              type="button"
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className={`rounded-full border px-2.5 py-0.5 text-[11px] font-mono transition-colors ${
+                soundEnabled
+                  ? "border-emerald-500/50 bg-emerald-500/20 text-emerald-300"
+                  : "border-zinc-800 bg-black/60 text-zinc-400 hover:text-zinc-200"
+              }`}
+              title={soundEnabled ? "Synthesizer SFX: ON" : "Synthesizer SFX: MUTED (Click to enable)"}
             >
-              {isFullscreen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M10 4H4m0 0v6m0-6l7 7m10-7h-6m0 0v6m0-6l7 7"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-                />
-              )}
-            </svg>
-            <span>{isFullscreen ? "Exit Fullscreen" : "Fit to Screen"}</span>
-          </button>
+              {soundEnabled ? "SFX: ON" : "SFX: OFF"}
+            </button>
+
+            {/* Fit to Screen / Fullscreen */}
+            <button
+              type="button"
+              onClick={() => setIsFullscreen(!isFullscreen)}
+              className="flex items-center gap-1 rounded-full border border-zinc-800 bg-black/60 px-2.5 py-0.5 text-[11px] font-mono text-zinc-300 hover:border-emerald-500/50 hover:text-emerald-400 transition-colors"
+              title={isFullscreen ? "Exit Fullscreen (ESC)" : "Expand Stage"}
+            >
+              <span>{isFullscreen ? "✕" : "⛶"}</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* 2. Interactive Action Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800/80 bg-zinc-950/90 px-4 py-2 text-xs font-mono text-zinc-300 backdrop-blur">
-        <div className="flex items-center gap-2">
-          <span className="text-zinc-500 text-[11px]">INTERACTION:</span>
-
-          {/* Man Behind Actions: Walking into Darkness Gait controls */}
+      {/* 5. Bottom Floating Tactical Action Dock */}
+      <div className="absolute bottom-6 inset-x-0 z-20 flex justify-center px-3 pointer-events-none">
+        <div className="pointer-events-auto flex flex-wrap items-center justify-center gap-2 rounded-full border border-zinc-800/80 bg-zinc-950/85 px-3.5 py-1.5 backdrop-blur-md shadow-2xl max-w-[96vw]">
+          {/* Man Behind Actions */}
           {activeArtwork === "man-behind" && (
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center rounded border border-zinc-800 bg-black/60 p-0.5">
+            <>
+              {/* Walking Cadence Selector */}
+              <div className="flex items-center rounded-full border border-zinc-800 bg-black/60 p-0.5">
                 <button
                   type="button"
                   onClick={() => setWalkGait("striding")}
-                  className={`rounded px-2 py-0.5 text-[11px] font-medium transition-all ${
+                  className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-all ${
                     walkGait === "striding"
-                      ? "bg-emerald-500/25 text-emerald-300 font-semibold"
+                      ? "bg-emerald-500/30 text-emerald-300 font-semibold"
                       : "text-zinc-400 hover:text-zinc-200"
                   }`}
                   title="Walking cadence into the darkness"
@@ -1174,9 +1197,9 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
                 <button
                   type="button"
                   onClick={() => setWalkGait("sprinting")}
-                  className={`rounded px-2 py-0.5 text-[11px] font-medium transition-all ${
+                  className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-all ${
                     walkGait === "sprinting"
-                      ? "bg-emerald-500/25 text-emerald-300 font-semibold"
+                      ? "bg-emerald-500/30 text-emerald-300 font-semibold"
                       : "text-zinc-400 hover:text-zinc-200"
                   }`}
                   title="Accelerate pace into darkness"
@@ -1186,9 +1209,9 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
                 <button
                   type="button"
                   onClick={() => setWalkGait("vigil")}
-                  className={`rounded px-2 py-0.5 text-[11px] font-medium transition-all ${
+                  className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-all ${
                     walkGait === "vigil"
-                      ? "bg-emerald-500/25 text-emerald-300 font-semibold"
+                      ? "bg-emerald-500/30 text-emerald-300 font-semibold"
                       : "text-zinc-400 hover:text-zinc-200"
                   }`}
                   title="Stationary silhouette vigil"
@@ -1197,37 +1220,39 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
                 </button>
               </div>
 
+              {/* Sonar Decryptor */}
               <button
                 type="button"
                 onClick={triggerSonarSweep}
-                className="flex items-center gap-1.5 rounded bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 px-2.5 py-1 text-[11px] text-emerald-300 font-medium transition-all"
+                className="flex items-center gap-1.5 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 px-3 py-1 text-[11px] text-emerald-300 font-medium transition-all"
               >
                 <span>◈</span>
                 <span>Sonar Decryptor</span>
               </button>
 
+              {/* Neural Core */}
               <button
                 type="button"
                 onClick={() => setNeuralCoreActive(!neuralCoreActive)}
-                className={`flex items-center gap-1.5 rounded border px-2.5 py-1 text-[11px] font-medium transition-all ${
+                className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-medium transition-all ${
                   neuralCoreActive
                     ? "bg-emerald-500/30 border-emerald-400 text-emerald-200"
                     : "border-zinc-800 bg-black/50 text-zinc-400 hover:text-zinc-200"
                 }`}
               >
                 <span>☵</span>
-                <span>Neural Core</span>
+                <span>Neural Core: {neuralCoreActive ? "ON" : "OFF"}</span>
               </button>
-            </div>
+            </>
           )}
 
           {/* Ape AK-47 Actions */}
           {activeArtwork === "ape-ak47" && (
-            <div className="flex items-center gap-2">
+            <>
               <button
                 type="button"
                 onClick={() => triggerBurstFire()}
-                className="flex items-center gap-1.5 rounded bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 px-3 py-1 text-[11px] text-red-300 font-semibold tracking-wide transition-all shadow-sm"
+                className="flex items-center gap-1.5 rounded-full bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 px-3.5 py-1 text-[11px] text-red-300 font-semibold tracking-wide transition-all shadow-sm"
               >
                 <span>🔥</span>
                 <span>FIRE BURST</span>
@@ -1235,7 +1260,7 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
               <button
                 type="button"
                 onClick={() => setBulletTimeActive(!bulletTimeActive)}
-                className={`flex items-center gap-1.5 rounded border px-2.5 py-1 text-[11px] font-medium transition-all ${
+                className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-medium transition-all ${
                   bulletTimeActive
                     ? "bg-amber-500/25 border-amber-400 text-amber-300"
                     : "border-zinc-800 bg-black/50 text-zinc-400 hover:text-zinc-200"
@@ -1244,7 +1269,7 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
                 <span>⏱</span>
                 <span>Bullet Time: {bulletTimeActive ? "0.35x" : "1.0x"}</span>
               </button>
-              <div className="hidden sm:flex items-center gap-1 rounded border border-zinc-800 bg-black/50 px-2.5 py-1 text-[11px] text-zinc-400">
+              <div className="hidden sm:flex items-center gap-1.5 rounded-full border border-zinc-800 bg-black/60 px-3 py-1 text-[11px] text-zinc-400 font-mono">
                 <span>MAG:</span>
                 <span className={ammoCount < 9 ? "text-red-400 font-bold" : "text-emerald-400 font-bold"}>
                   {ammoCount}/30
@@ -1252,16 +1277,16 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
                 <span className="text-zinc-600">|</span>
                 <span>7.62×39</span>
               </div>
-            </div>
+            </>
           )}
 
           {/* Cicada Actions */}
           {activeArtwork === "cicada" && (
-            <div className="flex items-center gap-2">
+            <>
               <button
                 type="button"
                 onClick={triggerChirpPulse}
-                className="flex items-center gap-1.5 rounded bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 px-2.5 py-1 text-[11px] text-emerald-300 font-medium transition-all"
+                className="flex items-center gap-1.5 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 px-3 py-1 text-[11px] text-emerald-300 font-medium transition-all"
               >
                 <span>♫</span>
                 <span>Chirp Pulse</span>
@@ -1269,7 +1294,7 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
               <button
                 type="button"
                 onClick={() => setCicadaEmerged(!cicadaEmerged)}
-                className={`flex items-center gap-1.5 rounded border px-2.5 py-1 text-[11px] font-medium transition-all ${
+                className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-medium transition-all ${
                   cicadaEmerged
                     ? "bg-emerald-500/25 border-emerald-400 text-emerald-300"
                     : "border-zinc-800 bg-black/50 text-zinc-400 hover:text-zinc-200"
@@ -1278,72 +1303,17 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
                 <span>⏳</span>
                 <span>Phase: {cicadaEmerged ? "Emerged Adult" : "Nymph"}</span>
               </button>
-            </div>
+            </>
           )}
         </div>
-
-        <div className="text-[11px] text-zinc-500 hidden sm:block">
-          Click canvas to interact · Hover to scan
-        </div>
       </div>
 
-      {/* 3. Main Visual Display */}
-      <div
-        className={`relative w-full bg-black ${
-          isFullscreen
-            ? "flex-1 h-full min-h-0"
-            : "aspect-[16/9] min-h-[440px] md:min-h-[560px] lg:min-h-[640px]"
-        }`}
-      >
-        <canvas
-          ref={canvasRef}
-          className="h-full w-full block cursor-crosshair select-none touch-none"
-        />
-
-        {/* CRT Scanline Grid Texture */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-25 bg-[linear-gradient(to_bottom,transparent_50%,rgba(0,0,0,0.4)_50%)] bg-[length:100%_4px]"
-        />
-
-        {/* Live telemetry badges */}
-        <div className="pointer-events-none absolute bottom-3 left-3 rounded bg-zinc-900/80 px-2.5 py-1 text-[11px] font-mono text-zinc-400 border border-zinc-800 backdrop-blur">
-          <span
-            className={
-              colorTheme === "amber"
-                ? "text-amber-400"
-                : colorTheme === "cyan"
-                  ? "text-cyan-400"
-                  : "text-emerald-400"
-            }
-          >
-            SYS_LOC:
-          </span>{" "}
-          25.2048° N, 55.2708° E · UTC+4
-        </div>
-        <div className="pointer-events-none absolute bottom-3 right-3 text-[11px] font-mono text-zinc-400 hidden sm:block bg-zinc-900/80 px-2.5 py-1 rounded border border-zinc-800">
-          {currentMeta.hint}
-        </div>
+      {/* 6. Subtle Floating Ambient Telemetry */}
+      <div className="pointer-events-none absolute bottom-3 left-6 hidden md:block text-[10px] font-mono text-zinc-500/70 z-20">
+        SYS_LOC: 25.2048° N, 55.2708° E · DUBAI_NODE · PORT: 0x443
       </div>
-
-      {/* 4. Terminal Footer Telemetry */}
-      <div className="flex flex-wrap items-center justify-between border-t border-zinc-800 bg-zinc-900/70 px-4 py-2.5 text-[11px] font-mono text-zinc-400">
-        <div className="flex items-center gap-3">
-          <span>PORT: 0x443</span>
-          <span className="text-zinc-600">|</span>
-          <span>{currentMeta.telemetry}</span>
-        </div>
-        <div
-          className={`font-mono font-medium ${
-            colorTheme === "amber"
-              ? "text-amber-400/90"
-              : colorTheme === "cyan"
-                ? "text-cyan-400/90"
-                : "text-emerald-400/90"
-          }`}
-        >
-          STATUS: COMPILED &amp; STRIDING
-        </div>
+      <div className="pointer-events-none absolute bottom-3 right-6 hidden md:block text-[10px] font-mono text-zinc-500/70 z-20">
+        Click canvas to interact · Hover to scan
       </div>
     </div>
   );

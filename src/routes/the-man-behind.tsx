@@ -66,12 +66,12 @@ function TheManBehindPage() {
 
   return (
     <PageShell>
-      <div className="pb-24 pt-12 md:pt-16">
+      <div className="pb-24 pt-10 md:pt-14">
+        {/* 1. Header Title & Location Section */}
         <Container className="max-w-5xl">
-          {/* Header Title Section */}
           <SectionReveal className="space-y-4">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-mute">
-              <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+              <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               Contact &amp; Identity
             </div>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -85,7 +85,7 @@ function TheManBehindPage() {
               </div>
 
               {/* Location & Time badge */}
-              <div className="flex flex-col gap-2 rounded-lg border rule-hair bg-paper-deep/60 p-4 text-xs">
+              <div className="flex flex-col gap-2 rounded-lg border rule-hair bg-paper-deep/60 p-4 text-xs backdrop-blur-sm">
                 <div className="flex items-center gap-2 text-ink-mute">
                   <MapPin className="h-3.5 w-3.5 text-ink" />
                   <span>Dubai, United Arab Emirates</span>
@@ -98,15 +98,18 @@ function TheManBehindPage() {
               </div>
             </div>
           </SectionReveal>
+        </Container>
 
-          {/* Fit-to-Screen Live Video Matrix Centerpiece */}
-          <SectionReveal className="mt-8">
-            <MatrixSilhouette />
-          </SectionReveal>
+        {/* 2. Full-Bleed Borderless Matrix Experience (No box, edge-to-edge immersion) */}
+        <div className="mt-8 relative w-full overflow-hidden bg-black">
+          <MatrixSilhouette />
+        </div>
 
+        {/* 3. Post-Matrix Content & Direct Reach */}
+        <Container className="max-w-5xl mt-12">
           {/* Builder Manifesto Quote */}
-          <SectionReveal className="mt-6">
-            <p className="font-serif text-lg italic text-ink-soft border-l-2 border-emerald-500/60 pl-4 py-1">
+          <SectionReveal>
+            <p className="font-serif text-xl italic text-ink-soft border-l-2 border-emerald-500/60 pl-5 py-2 leading-relaxed">
               &ldquo;Giving an operations guy modern AI tools is like handing a chimpanzee an
               AK-47: zero committees, lethal execution speed, and software built purely out of
               curiosity.&rdquo;
