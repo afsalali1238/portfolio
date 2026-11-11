@@ -3,6 +3,7 @@ import { CICADA_GRID_W, CICADA_GRID_H, CICADA_GRID_DATA } from "./cicadaGridData
 
 export type MatrixArtworkId = "man-behind" | "ape-ak47" | "cicada";
 export type ColorTheme = "emerald" | "amber" | "cyan";
+export type WalkGait = "striding" | "sprinting" | "vigil";
 
 interface ArtworkMeta {
   id: MatrixArtworkId;
@@ -16,9 +17,9 @@ const ARTWORKS: ArtworkMeta[] = [
   {
     id: "man-behind",
     label: "The Man Behind",
-    badge: "OPERATOR_BACKVIEW",
-    telemetry: "IDENTITY: THE_MAN_BEHIND | MODEL: OPERATOR_CONTOUR",
-    hint: "Click to fire Sonar Decryptor · Hover to scan contours",
+    badge: "OPERATOR_WALKING_INTO_DARKNESS",
+    telemetry: "IDENTITY: THE_MAN_BEHIND | CADENCE: WALKING_INTO_VOID",
+    hint: "Dark void silhouette striding into digital matrix rain · Click to scan",
   },
   {
     id: "ape-ak47",
@@ -36,7 +37,6 @@ const ARTWORKS: ArtworkMeta[] = [
   },
 ];
 
-// Ejected brass shell casing particle
 interface CasingParticle {
   x: number;
   y: number;
@@ -48,7 +48,6 @@ interface CasingParticle {
   life: number;
 }
 
-// Spore / pollen particle for cicada
 interface SporeParticle {
   x: number;
   y: number;
@@ -76,11 +75,16 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
 
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Artwork-specific interactive states
+  // Man Behind Walk Controls
+  const [walkGait, setWalkGait] = useState<WalkGait>("striding");
+  const walkGaitRef = useRef<WalkGait>(walkGait);
+  walkGaitRef.current = walkGait;
+
   const [neuralCoreActive, setNeuralCoreActive] = useState(false);
   const neuralCoreRef = useRef(neuralCoreActive);
   neuralCoreRef.current = neuralCoreActive;
 
+  // Ape AK-47 Controls
   const [bulletTimeActive, setBulletTimeActive] = useState(false);
   const bulletTimeRef = useRef(bulletTimeActive);
   bulletTimeRef.current = bulletTimeActive;
@@ -89,6 +93,7 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
   const ammoRef = useRef(ammoCount);
   ammoRef.current = ammoCount;
 
+  // Cicada Controls
   const [cicadaEmerged, setCicadaEmerged] = useState(true);
   const cicadaEmergedRef = useRef(cicadaEmerged);
   cicadaEmergedRef.current = cicadaEmerged;
@@ -107,7 +112,6 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
       if (actx.state === "suspended") actx.resume();
 
       if (type === "gunshot") {
-        // Noise + low punch burst
         const bufferSize = actx.sampleRate * 0.18;
         const buffer = actx.createBuffer(1, bufferSize, actx.sampleRate);
         const data = buffer.getChannelData(0);
@@ -152,7 +156,6 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
     }
   };
 
-  // Shared animation and particle refs
   const mouseRef = useRef<{ x: number; y: number; active: boolean; lastMove: number }>({
     x: -9999,
     y: -9999,
@@ -175,7 +178,6 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
 
   // Trigger Fire Burst (Ape AK-47)
   const triggerBurstFire = (originX?: number, originY?: number) => {
-    // Ammo decrement & reload
     setAmmoCount((prev) => {
       const next = prev - 3;
       if (next <= 0) {
@@ -185,7 +187,6 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
       return next;
     });
 
-    // Muzzle flash & recoil shake
     flashAlphaRef.current = 0.85;
     shakeRef.current = {
       x: (Math.random() - 0.5) * 14,
@@ -195,7 +196,6 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
 
     playSynthesizedSound("gunshot");
 
-    // Spawn 3 ejected brass casings
     const canvas = canvasRef.current;
     const baseW = canvas ? canvas.width / (window.devicePixelRatio || 1) : 800;
     const baseH = canvas ? canvas.height / (window.devicePixelRatio || 1) : 450;
@@ -221,7 +221,6 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
     pulsesRef.current.push({ t0: performance.now() });
     playSynthesizedSound("chirp");
 
-    // Scatter pollen/spore particles
     const canvas = canvasRef.current;
     const baseW = canvas ? canvas.width / (window.devicePixelRatio || 1) : 800;
     const baseH = canvas ? canvas.height / (window.devicePixelRatio || 1) : 450;
@@ -250,14 +249,13 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
     let isVisible = true;
     let isRunning = true;
 
-    const CHARS = "0123456789ABCDEFVUGX#$@&*%";
-
-    // Decryption telemetry phrases for Man Behind laser sweep
+    // Authentic Katakana & Matrix Alphanumeric Character Set
+    const CHARS = "0123456789ABCDEF$#@%&*+-/=<>~VUGX日ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ";
     const DECRYPT_WORDS = ["OP:AFSAL", "SYS:BUILDER", "NODE:DUBAI", "PORT:0x443", "LAT:25.2048", "LON:55.2708", "STATUS:ARMED", "VERIFIED"];
 
     // 1. Offscreen mask for human silhouette
     const humanMaskCanvas = document.createElement("canvas");
-    const humanMaskCtx = humanMaskCanvas.getContext("2d");
+    const humanMaskCtx = humanMaskCanvas.getContext("2d", { willReadFrequently: true });
 
     // 2. Offscreen mask for live AK-47 video
     const videoMaskCanvas = document.createElement("canvas");
@@ -272,87 +270,132 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
     video.autoplay = true;
     video.crossOrigin = "anonymous";
 
-    const drawHumanSilhouette = (mCtx: CanvasRenderingContext2D, w: number, h: number) => {
+    /**
+     * Draws the dynamic walking human silhouette onto the offscreen mask
+     */
+    const drawWalkingHumanSilhouette = (
+      mCtx: CanvasRenderingContext2D,
+      w: number,
+      h: number,
+      swayX: number,
+      bobY: number,
+      shoulderTilt: number,
+      armSwing: number,
+    ) => {
       mCtx.clearRect(0, 0, w, h);
+      mCtx.save();
+
+      const centerX = w * 0.5 + swayX;
+      const centerY = h * 0.28 + bobY;
+      const headRadius = Math.min(w, h) * 0.165;
+
+      mCtx.translate(centerX, centerY);
+      mCtx.rotate(shoulderTilt);
       mCtx.fillStyle = "#ffffff";
 
-      const centerX = w * 0.5;
-      const headY = h * 0.28;
-      const headRadius = Math.min(w, h) * 0.16;
-
-      // Head
+      // Head (silhouette seen from back, with ears)
       mCtx.beginPath();
-      mCtx.ellipse(centerX, headY, headRadius * 0.82, headRadius * 1.05, 0.04, 0, Math.PI * 2);
+      mCtx.ellipse(0, 0, headRadius * 0.84, headRadius * 1.06, 0.02, 0, Math.PI * 2);
+      mCtx.fill();
+
+      // Ears (silhouette edge bumps)
+      mCtx.beginPath();
+      mCtx.ellipse(-headRadius * 0.83, headRadius * 0.1, headRadius * 0.12, headRadius * 0.22, -0.1, 0, Math.PI * 2);
+      mCtx.ellipse(headRadius * 0.83, headRadius * 0.1, headRadius * 0.12, headRadius * 0.22, 0.1, 0, Math.PI * 2);
+      mCtx.fill();
+
+      // Hair crown contour
+      mCtx.beginPath();
+      mCtx.ellipse(-headRadius * 0.08, -headRadius * 0.76, headRadius * 0.65, headRadius * 0.44, -0.05, 0, Math.PI * 2);
       mCtx.fill();
 
       // Neck
       const neckWidth = headRadius * 0.54;
-      const neckTop = headY + headRadius * 0.7;
-      const neckBottom = headY + headRadius * 1.34;
+      const neckTop = headRadius * 0.68;
+      const neckBottom = headRadius * 1.35;
       mCtx.beginPath();
-      mCtx.moveTo(centerX - neckWidth, neckTop);
-      mCtx.lineTo(centerX + neckWidth, neckTop);
-      mCtx.lineTo(centerX + neckWidth * 1.25, neckBottom);
-      mCtx.lineTo(centerX - neckWidth * 1.25, neckBottom);
+      mCtx.moveTo(-neckWidth, neckTop);
+      mCtx.lineTo(neckWidth, neckTop);
+      mCtx.lineTo(neckWidth * 1.25, neckBottom);
+      mCtx.lineTo(-neckWidth * 1.25, neckBottom);
       mCtx.closePath();
       mCtx.fill();
 
-      // Trapezius and shoulders
+      // Broad shoulders & back sloping downward into darkness
       const shoulderY = neckBottom;
-      const shoulderSpan = Math.min(w * 0.44, 280);
-      const waistY = h * 0.99;
-      const waistSpan = shoulderSpan * 0.75;
+      const shoulderSpan = Math.min(w * 0.46, 310);
+      const waistY = h * 0.98 - centerY;
+      const waistSpan = shoulderSpan * 0.82;
 
       mCtx.beginPath();
-      mCtx.moveTo(centerX - neckWidth * 1.1, neckTop + 5);
+      mCtx.moveTo(-neckWidth * 1.1, neckTop + 5);
+      // Left shoulder curve (arm swing motion)
       mCtx.bezierCurveTo(
-        centerX - neckWidth * 1.8,
-        shoulderY - 5,
-        centerX - shoulderSpan * 0.75,
-        shoulderY + 15,
-        centerX - shoulderSpan,
-        shoulderY + 45,
+        -neckWidth * 1.8,
+        shoulderY - 5 + armSwing * 0.35,
+        -shoulderSpan * 0.75,
+        shoulderY + 16 + armSwing * 0.45,
+        -shoulderSpan,
+        shoulderY + 48 + armSwing * 0.55,
       );
+      // Left torso down to base
       mCtx.bezierCurveTo(
-        centerX - shoulderSpan * 0.95,
-        shoulderY + 120,
-        centerX - waistSpan * 1.05,
-        waistY - 50,
-        centerX - waistSpan,
-        waistY,
+        -shoulderSpan * 0.95,
+        shoulderY + 130,
+        -waistSpan * 1.05,
+        waistY - 40,
+        -waistSpan,
+        waistY + 180,
       );
-      mCtx.lineTo(centerX + waistSpan, waistY);
+      // Base across bottom
+      mCtx.lineTo(waistSpan, waistY + 180);
+      // Right torso up
       mCtx.bezierCurveTo(
-        centerX + waistSpan * 1.05,
-        waistY - 50,
-        centerX + shoulderSpan * 0.95,
-        shoulderY + 120,
-        centerX + shoulderSpan,
-        shoulderY + 45,
+        waistSpan * 1.05,
+        waistY - 40,
+        shoulderSpan * 0.95,
+        shoulderY + 130,
+        shoulderSpan,
+        shoulderY + 48 - armSwing * 0.55,
       );
+      // Right shoulder curve (opposite arm swing)
       mCtx.bezierCurveTo(
-        centerX + shoulderSpan * 0.75,
-        shoulderY + 15,
-        centerX + neckWidth * 1.8,
-        shoulderY - 5,
-        centerX + neckWidth * 1.1,
+        shoulderSpan * 0.75,
+        shoulderY + 16 - armSwing * 0.45,
+        neckWidth * 1.8,
+        shoulderY - 5 - armSwing * 0.35,
+        neckWidth * 1.1,
         neckTop + 5,
       );
       mCtx.closePath();
       mCtx.fill();
 
-      // Hair silhouette
-      mCtx.beginPath();
-      mCtx.ellipse(
-        centerX - headRadius * 0.08,
-        headY - headRadius * 0.75,
-        headRadius * 0.65,
-        headRadius * 0.45,
-        -0.08,
-        0,
-        Math.PI * 2,
-      );
-      mCtx.fill();
+      mCtx.restore();
+    };
+
+    // Columns state for dense matrix digital rain simulation
+    let rainDrops: {
+      y: number;
+      speed: number;
+      length: number;
+      chars: string[];
+    }[] = [];
+
+    const initRainColumns = (colsCount: number, h: number) => {
+      rainDrops = new Array(colsCount);
+      for (let i = 0; i < colsCount; i++) {
+        const len = 12 + Math.floor(Math.random() * 22);
+        const chars: string[] = [];
+        for (let j = 0; j < len; j++) {
+          chars.push(CHARS[Math.floor(Math.random() * CHARS.length)]);
+        }
+        rainDrops[i] = {
+          y: Math.random() * -h * 1.5,
+          speed: 1.4 + Math.random() * 2.8,
+          length: len,
+          chars,
+        };
+      }
     };
 
     const resize = () => {
@@ -366,14 +409,16 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
 
-      humanMaskCanvas.width = width;
-      humanMaskCanvas.height = height;
-      if (humanMaskCtx) {
-        drawHumanSilhouette(humanMaskCtx, width, height);
-      }
+      // Downscaled offscreen mask for fast 60fps walking silhouette sampling
+      humanMaskCanvas.width = Math.max(10, Math.floor(width / 2));
+      humanMaskCanvas.height = Math.max(10, Math.floor(height / 2));
 
+      // Video mask resize
       videoMaskCanvas.width = Math.max(10, Math.floor(width / 2));
       videoMaskCanvas.height = Math.max(10, Math.floor(height / 2));
+
+      const cellSize = getCellSize(width);
+      initRainColumns(Math.floor(width / cellSize) + 2, height);
     };
 
     resize();
@@ -401,7 +446,7 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
         resize();
       }
 
-      // Handle recoil shake offset
+      // Recoil shake offset
       const shake = shakeRef.current;
       let offsetX = 0;
       let offsetY = 0;
@@ -417,12 +462,14 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
 
       ctx.clearRect(-20, -20, width + 40, height + 40);
 
-      // Deep CRT terminal background
-      ctx.fillStyle = "#070a08";
+      // Pitch Black Matrix Terminal Horizon
+      ctx.fillStyle = "#000000";
       ctx.fillRect(-20, -20, width + 40, height + 40);
 
       const mode = activeArtworkRef.current;
       const theme = colorThemeRef.current;
+      const gait = walkGaitRef.current;
+
       const cellSize = getCellSize(width);
       const cols = Math.floor(width / cellSize);
       const rows = Math.floor(height / cellSize);
@@ -435,7 +482,7 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
       const pulses = pulsesRef.current;
       const sonar = sonarBeamRef.current;
 
-      // Handle video play/pause & bullet-time speed
+      // Handle video play/pause
       if (mode === "ape-ak47") {
         video.playbackRate = bulletTimeRef.current ? 0.35 : 1.0;
         if (video.paused) video.play().catch(() => {});
@@ -451,33 +498,73 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
         }
       }
 
-      // Palette color generators
-      const getThemeColor = (type: "bright" | "mid" | "dim" | "subtle", alpha = 1.0) => {
+      // CRT Phosphor Color Palette (High-vibrancy Matrix green, Amber, Cyan)
+      const getThemeColor = (type: "head" | "bright" | "mid" | "dim" | "void", alpha = 1.0) => {
         if (theme === "amber") {
-          if (type === "bright") return `rgba(254, 243, 199, ${alpha})`;
+          if (type === "head") return `rgba(254, 243, 199, ${alpha})`;
+          if (type === "bright") return `rgba(251, 191, 36, ${alpha})`;
           if (type === "mid") return `rgba(245, 158, 11, ${alpha})`;
           if (type === "dim") return `rgba(180, 83, 9, ${alpha})`;
-          return `rgba(245, 158, 11, ${alpha * 0.18})`;
+          return `rgba(20, 10, 0, ${alpha * 0.25})`;
         }
         if (theme === "cyan") {
-          if (type === "bright") return `rgba(236, 254, 255, ${alpha})`;
+          if (type === "head") return `rgba(236, 254, 255, ${alpha})`;
+          if (type === "bright") return `rgba(103, 232, 249, ${alpha})`;
           if (type === "mid") return `rgba(34, 211, 238, ${alpha})`;
           if (type === "dim") return `rgba(14, 116, 144, ${alpha})`;
-          return `rgba(34, 211, 238, ${alpha * 0.18})`;
+          return `rgba(0, 15, 25, ${alpha * 0.25})`;
         }
-        // Emerald (Default)
-        if (type === "bright") return `rgba(240, 253, 244, ${alpha})`;
-        if (type === "mid") return `rgba(52, 211, 153, ${alpha})`;
-        if (type === "dim") return `rgba(16, 185, 129, ${alpha})`;
-        return `rgba(34, 197, 94, ${alpha * 0.16})`;
+        // Iconic Matrix Neon Green (matching user uploaded reference image)
+        if (type === "head") return `rgba(240, 253, 244, ${alpha})`; // Crisp white-mint lead
+        if (type === "bright") return `rgba(0, 255, 102, ${alpha})`; // Vibrant laser matrix green
+        if (type === "mid") return `rgba(34, 197, 94, ${alpha})`; // Core phosphor green
+        if (type === "dim") return `rgba(21, 128, 61, ${alpha})`; // Deeper shadow rain
+        return `rgba(0, 30, 12, ${alpha * 0.18})`; // Faint void trace
       };
 
+      // Advance rain drops simulation
+      for (let i = 0; i < rainDrops.length; i++) {
+        const drop = rainDrops[i];
+        if (!drop) continue;
+        drop.y += drop.speed;
+        if (drop.y > height + 100) {
+          drop.y = -drop.length * cellSize - Math.random() * 80;
+          drop.speed = 1.4 + Math.random() * 2.8;
+        }
+        // Occasional character flicker
+        if (tick % 5 === 0 && Math.random() < 0.2) {
+          const idx = Math.floor(Math.random() * drop.length);
+          drop.chars[idx] = CHARS[Math.floor(Math.random() * CHARS.length)];
+        }
+      }
+
       // ==========================================
-      // ARTWORK 1: The Man Behind (Human Silhouette)
+      // ARTWORK 1: The Man Behind (Walking into the Darkness)
+      // Matches the exact uploaded reference: Dense Green Matrix Rain outside,
+      // and a Negative Void Silhouette walking into the darkness!
       // ==========================================
       if (mode === "man-behind") {
-        const maskData = humanMaskCtx?.getImageData(0, 0, width, height);
-        const centerX = width * 0.5;
+        // Calculate dynamic walking cycle kinematics
+        const walkSpeedMultiplier = gait === "sprinting" ? 1.8 : gait === "vigil" ? 0 : 1.0;
+        const walkCycle = (now * 0.0034 * walkSpeedMultiplier);
+
+        const swayX = gait === "vigil" ? 0 : Math.sin(walkCycle) * 7.5;
+        const bobY = gait === "vigil" ? 0 : Math.abs(Math.sin(walkCycle * 2)) * 5.5;
+        const shoulderTilt = gait === "vigil" ? 0 : Math.sin(walkCycle) * 0.024;
+        const armSwing = gait === "vigil" ? 0 : Math.sin(walkCycle) * 12;
+
+        const maskW = humanMaskCanvas.width;
+        const maskH = humanMaskCanvas.height;
+
+        // Draw walking silhouette on offscreen mask
+        if (humanMaskCtx && maskW > 0 && maskH > 0) {
+          const scaledSway = (swayX / width) * maskW;
+          const scaledBob = (bobY / height) * maskH;
+          drawWalkingHumanSilhouette(humanMaskCtx, maskW, maskH, scaledSway, scaledBob, shoulderTilt, armSwing);
+        }
+
+        const maskData = humanMaskCtx?.getImageData(0, 0, maskW, maskH);
+        const centerX = width * 0.5 + swayX;
 
         for (let r = 0; r < rows; r++) {
           for (let c = 0; c < cols; c++) {
@@ -488,20 +575,18 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
             let isEdge = false;
 
             if (maskData) {
-              const px = Math.min(Math.floor(x), width - 1);
-              const py = Math.min(Math.floor(y), height - 1);
-              const idx = (py * width + px) * 4;
+              const mx = Math.min(Math.floor((x / width) * maskW), maskW - 1);
+              const my = Math.min(Math.floor((y / height) * maskH), maskH - 1);
+              const idx = (my * maskW + mx) * 4;
               isInside = maskData.data[idx] > 128;
 
+              // Check boundary for razor-sharp silhouette edge contour
               if (isInside) {
-                const checkLeft = Math.max(0, px - 6);
-                const checkRight = Math.min(width - 1, px + 6);
-                const checkUp = Math.max(0, py - 6);
-                const checkDown = Math.min(height - 1, py + 6);
-                const leftIdx = (py * width + checkLeft) * 4;
-                const rightIdx = (py * width + checkRight) * 4;
-                const upIdx = (checkUp * width + px) * 4;
-                const downIdx = (checkDown * width + px) * 4;
+                const checkDist = 2;
+                const leftIdx = (my * maskW + Math.max(0, mx - checkDist)) * 4;
+                const rightIdx = (my * maskW + Math.min(maskW - 1, mx + checkDist)) * 4;
+                const upIdx = (Math.max(0, my - checkDist) * maskW + mx) * 4;
+                const downIdx = (Math.min(maskH - 1, my + checkDist) * maskW + mx) * 4;
 
                 if (
                   maskData.data[leftIdx] < 128 ||
@@ -514,11 +599,16 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
               }
             }
 
-            let char = CHARS[(r * 1337 + c * 31 + Math.floor(tick / 16)) % CHARS.length];
+            // Character from falling rain drop column
+            const drop = rainDrops[c % rainDrops.length];
+            const dropRowHead = drop ? Math.floor((drop.y / height) * rows) : 0;
+            const distFromHead = r - dropRowHead;
+            const charSeed = (r * 1337 + c * 31 + Math.floor(tick / 16)) % CHARS.length;
+            let char = CHARS[charSeed];
 
-            // Sonar laser beam decryption effect
+            // Sonar laser beam decryption
             let sonarHit = false;
-            if (sonar.active && Math.abs(y - sonar.y) < 32) {
+            if (sonar.active && Math.abs(y - sonar.y) < 30) {
               sonarHit = true;
               if (isInside && c % 4 === 0) {
                 char = DECRYPT_WORDS[(r + c) % DECRYPT_WORDS.length][c % 4] || char;
@@ -526,37 +616,60 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
             }
 
             // Neural core spine illumination
-            const isSpine = neuralCoreRef.current && Math.abs(x - centerX) < 14 && y > height * 0.28 && y < height * 0.9;
+            const isSpine =
+              neuralCoreRef.current &&
+              Math.abs(x - centerX) < 14 &&
+              y > height * 0.28 + bobY &&
+              y < height * 0.92;
 
             let mouseDist = 999;
             if (mouse.active) {
               mouseDist = Math.hypot(x - mouse.x, y - mouse.y);
             }
 
+            // --- COLOR DETERMINATION ---
             if (sonarHit) {
-              // Laser beam sweep: white-hot phosphor illumination
-              ctx.fillStyle = getThemeColor("bright", 1.0);
+              // Laser sweep illumination
+              ctx.fillStyle = getThemeColor("head", 1.0);
             } else if (isSpine) {
-              // Pulsing neural spine
-              const spinePulse = 0.7 + 0.3 * Math.sin(now * 0.008 - y * 0.04);
-              ctx.fillStyle = getThemeColor("bright", spinePulse);
+              // Glowing neural data packets
+              const spinePulse = 0.75 + 0.25 * Math.sin(now * 0.009 - y * 0.04);
+              ctx.fillStyle = getThemeColor("head", spinePulse);
             } else if (isInside) {
+              // INSIDE SILHOUETTE: EXACTLY LIKE REFERENCE IMAGE!
+              // Negative space dark void walking into darkness!
               if (isEdge) {
-                ctx.fillStyle = mouseDist < 80 ? getThemeColor("mid", 1.0) : getThemeColor("bright", 0.95);
+                // Razor-sharp illuminated green contour tracing the head & shoulders
+                ctx.fillStyle = mouseDist < 85 ? getThemeColor("head", 1.0) : getThemeColor("bright", 0.95);
               } else {
-                const depth = ((r + c) % 4) * 0.08;
+                // Pitch black interior with faint, subtle subterranean green dots/void
                 if (mouseDist < 95) {
-                  ctx.fillStyle = getThemeColor("mid", Math.max(0.6, 0.9 - mouseDist / 130));
+                  // Cursor hover reveals subtle inner matrix
+                  const glow = 1 - mouseDist / 95;
+                  ctx.fillStyle = getThemeColor("mid", glow * 0.45);
                 } else {
-                  ctx.fillStyle = `rgba(212, 212, 216, ${0.45 + depth})`;
+                  // Void characters (very dark/subtle negative space)
+                  const subtleDot = (r * 7 + c * 11) % 6 === 0;
+                  ctx.fillStyle = subtleDot ? getThemeColor("void", 0.35) : "rgba(0, 0, 0, 0)";
                 }
               }
             } else {
+              // OUTSIDE SILHOUETTE: DENSE VIBRANT GREEN MATRIX RAIN!
+              // Rain streams cascading downwards
               if (mouseDist < 85) {
-                ctx.fillStyle = getThemeColor("mid", 0.55 - mouseDist / 120);
+                // Bright proximity glow near cursor
+                ctx.fillStyle = getThemeColor("head", 0.95 - mouseDist / 120);
+              } else if (distFromHead === 0) {
+                // White-mint head of the falling drop
+                ctx.fillStyle = getThemeColor("head", 0.95);
+              } else if (distFromHead > 0 && distFromHead < (drop?.length || 15)) {
+                // Glowing green rain tail
+                const alpha = Math.max(0.18, 1 - distFromHead / (drop?.length || 15));
+                ctx.fillStyle = getThemeColor(alpha > 0.65 ? "bright" : "mid", alpha);
               } else {
-                const subtleAlpha = (r * 7 + c * 11) % 5 === 0 ? 0.16 : 0.04;
-                ctx.fillStyle = getThemeColor("subtle", subtleAlpha);
+                // Ambient green code background (just like reference image)
+                const ambientAlpha = ((r * 3 + c * 7) % 5 === 0) ? 0.45 : 0.22;
+                ctx.fillStyle = getThemeColor("mid", ambientAlpha);
               }
             }
 
@@ -564,23 +677,37 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
           }
         }
 
-        // Draw laser scanline visual bar
+        // Draw laser sweep bar
         if (sonar.active) {
-          ctx.strokeStyle = getThemeColor("bright", 0.75);
+          ctx.strokeStyle = getThemeColor("head", 0.85);
           ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.moveTo(0, sonar.y);
           ctx.lineTo(width, sonar.y);
           ctx.stroke();
 
-          // Laser glow halo
-          const grad = ctx.createLinearGradient(0, sonar.y - 12, 0, sonar.y + 12);
+          const grad = ctx.createLinearGradient(0, sonar.y - 14, 0, sonar.y + 14);
           grad.addColorStop(0, "transparent");
-          grad.addColorStop(0.5, getThemeColor("mid", 0.35));
+          grad.addColorStop(0.5, getThemeColor("bright", 0.4));
           grad.addColorStop(1, "transparent");
           ctx.fillStyle = grad;
-          ctx.fillRect(0, sonar.y - 12, width, 24);
+          ctx.fillRect(0, sonar.y - 14, width, 28);
         }
+
+        // Walking tunnel depth gradient (man walking deeper into the darkness)
+        const tunnelGrad = ctx.createRadialGradient(
+          centerX,
+          height * 0.42 + bobY,
+          20,
+          centerX,
+          height * 0.42 + bobY,
+          Math.max(width, height) * 0.65,
+        );
+        tunnelGrad.addColorStop(0, "rgba(0, 0, 0, 0.45)");
+        tunnelGrad.addColorStop(0.5, "transparent");
+        tunnelGrad.addColorStop(1, "rgba(0, 0, 0, 0.7)");
+        ctx.fillStyle = tunnelGrad;
+        ctx.fillRect(0, 0, width, height);
       }
 
       // ==========================================
@@ -640,20 +767,20 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
               const intensity = 1 - mouseDist / 85;
               ctx.fillStyle =
                 mouseDist < 28
-                  ? getThemeColor("bright", 0.94 + intensity * 0.06)
-                  : getThemeColor("mid", 0.72 + intensity * 0.28);
+                  ? getThemeColor("head", 0.94 + intensity * 0.06)
+                  : getThemeColor("bright", 0.72 + intensity * 0.28);
             } else {
               if (lum > 170) {
-                ctx.fillStyle = getThemeColor("bright", 0.92 + (tick % 3) * 0.04);
+                ctx.fillStyle = getThemeColor("head", 0.92 + (tick % 3) * 0.04);
               } else if (lum > 115) {
-                ctx.fillStyle = getThemeColor("mid", 0.82 + ((r + c) % 3) * 0.06);
+                ctx.fillStyle = getThemeColor("bright", 0.82 + ((r + c) % 3) * 0.06);
               } else if (lum > 60) {
-                ctx.fillStyle = getThemeColor("dim", 0.68 + ((r * 2 + c) % 4) * 0.06);
+                ctx.fillStyle = getThemeColor("mid", 0.68 + ((r * 2 + c) % 4) * 0.06);
               } else if (lum > 24) {
                 ctx.fillStyle = getThemeColor("dim", 0.38 + ((r + c) % 3) * 0.05);
               } else {
                 const ambientAlpha = (r * 7 + c * 11) % 6 === 0 ? 0.14 : 0.05;
-                ctx.fillStyle = getThemeColor("subtle", ambientAlpha);
+                ctx.fillStyle = getThemeColor("void", ambientAlpha);
               }
             }
 
@@ -661,13 +788,13 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
           }
         }
 
-        // Draw and update ejected brass casing physics
+        // Update and draw brass shell casings
         const casings = casingsRef.current;
         for (let i = casings.length - 1; i >= 0; i--) {
           const p = casings[i];
           p.x += p.vx;
           p.y += p.vy;
-          p.vy += 0.38; // gravity
+          p.vy += 0.38;
           p.rot += p.vRot;
           p.life++;
           p.alpha -= 0.018;
@@ -681,16 +808,15 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
           ctx.translate(p.x, p.y);
           ctx.rotate(p.rot);
           ctx.fillStyle = theme === "amber" ? `rgba(251, 191, 36, ${p.alpha})` : `rgba(234, 179, 8, ${p.alpha})`;
-          // Draw metallic cartridge rectangle
           ctx.fillRect(-5, -2, 10, 4);
           ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha * 0.8})`;
-          ctx.fillRect(-6, -1.5, 2, 3); // cartridge rim
+          ctx.fillRect(-6, -1.5, 2, 3);
           ctx.restore();
         }
 
-        // Draw muzzle flash screen flare
+        // Muzzle flash screen flare
         if (flashAlphaRef.current > 0.02) {
-          ctx.fillStyle = getThemeColor("bright", flashAlphaRef.current * 0.4);
+          ctx.fillStyle = getThemeColor("head", flashAlphaRef.current * 0.4);
           ctx.fillRect(-20, -20, width + 40, height + 40);
           flashAlphaRef.current *= 0.72;
         }
@@ -698,7 +824,7 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
         // Bullet-time supersonic tracer streaks
         if (bulletTimeRef.current && (tick % 6 === 0 || tick % 7 === 0)) {
           const streakY = height * 0.35 + (Math.random() - 0.5) * 60;
-          ctx.strokeStyle = getThemeColor("bright", 0.75);
+          ctx.strokeStyle = getThemeColor("head", 0.75);
           ctx.lineWidth = 1.5;
           ctx.beginPath();
           ctx.moveTo(width * 0.56, streakY);
@@ -720,7 +846,6 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
         const oy = (height - targetH) / 2;
         const tSec = now / 1000;
 
-        // Interactive rain that bends toward pointer
         for (let c = 0; c < cols; c++) {
           const speed = 0.6 + ((c * 7) % 5) * 0.18;
           const head = ((tick * speed + c * 13) % (rows + 8)) - 4;
@@ -734,7 +859,7 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
             if (r < 0 || r >= rows) continue;
             const a = 0.16 - k * 0.03;
             ctx.fillStyle =
-              k === 0 ? getThemeColor("mid", a + 0.1) : getThemeColor("bright", a * 0.5);
+              k === 0 ? getThemeColor("bright", a + 0.1) : getThemeColor("head", a * 0.5);
             ctx.fillText(
               CHARS[(c * 31 + r * 7 + (tick >> 3)) % 16],
               c * cellSize + cellSize / 2 + bend * k * 2,
@@ -743,7 +868,6 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
           }
         }
 
-        // Draw Cicada character matrix
         for (let r = 0; r < rows; r++) {
           for (let c = 0; c < cols; c++) {
             const x = c * cellSize + cellSize / 2;
@@ -775,7 +899,6 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
               if (d < 110) boost += (1 - d / 110) * 0.45;
             }
 
-            // Acoustic Chirp wave rings
             for (const p of pulses) {
               const age = (now - p.t0) / 700;
               if (age > 1) continue;
@@ -788,16 +911,15 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
             const a = Math.min(1, (emerged ? 0.25 : 0.15) + (val / 9) * 0.65 + boost);
             ctx.fillStyle =
               edge || val >= 8
-                ? getThemeColor("mid", a)
+                ? getThemeColor("bright", a)
                 : val >= 5
-                  ? getThemeColor("bright", a * 0.9)
+                  ? getThemeColor("head", a * 0.9)
                   : getThemeColor("dim", a * 0.45);
 
             ctx.fillText(CHARS[(r * 31 + c * 17 + (tick >> 4)) % 16], x, y);
           }
         }
 
-        // Draw and update pollen/spore particles
         const spores = sporesRef.current;
         for (let i = spores.length - 1; i >= 0; i--) {
           const sp = spores[i];
@@ -810,7 +932,7 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
           }
           ctx.beginPath();
           ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
-          ctx.fillStyle = getThemeColor("mid", sp.alpha);
+          ctx.fillStyle = getThemeColor("bright", sp.alpha);
           ctx.fill();
         }
 
@@ -822,7 +944,7 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
       // Pointer tactical reticle HUD
       if (mouse.active && mouse.x > 0 && mouse.y > 0) {
         ctx.save();
-        ctx.strokeStyle = getThemeColor("mid", 0.55);
+        ctx.strokeStyle = getThemeColor("bright", 0.55);
         ctx.lineWidth = 1;
 
         ctx.beginPath();
@@ -841,10 +963,10 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
         ctx.stroke();
 
         ctx.font = `600 10px "SFMono-Regular", Menlo, Monaco, Consolas, monospace`;
-        ctx.fillStyle = getThemeColor("bright", 0.9);
+        ctx.fillStyle = getThemeColor("head", 0.9);
         const subLabel =
           mode === "man-behind"
-            ? (neuralCoreRef.current ? "CORE: ACTIVE" : "SCANNER: READY")
+            ? `GAIT: ${gait.toUpperCase()}`
             : mode === "ape-ak47"
               ? `MAG: ${ammoRef.current}/30 · 7.62MM`
               : (cicadaEmergedRef.current ? "4.4 kHz RES" : "NYMPH PHASE");
@@ -932,7 +1054,6 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
     };
   }, []);
 
-  // Handle ESC key to exit fullscreen
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isFullscreen) {
@@ -1002,7 +1123,6 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
 
         {/* Global Controls: Color CRT Theme + Sound + Fullscreen */}
         <div className="flex items-center gap-2">
-          {/* CRT Palette Toggle */}
           <div className="flex items-center rounded-lg border border-zinc-800 bg-black/60 p-0.5">
             <button
               type="button"
@@ -1036,7 +1156,6 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
             </button>
           </div>
 
-          {/* Sound Synthesizer Toggle */}
           <button
             type="button"
             onClick={() => setSoundEnabled(!soundEnabled)}
@@ -1050,7 +1169,6 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
             {soundEnabled ? "SFX: ON" : "SFX: OFF"}
           </button>
 
-          {/* Fit to Screen / Fullscreen Button */}
           <button
             type="button"
             onClick={() => setIsFullscreen(!isFullscreen)}
@@ -1085,22 +1203,62 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
         </div>
       </div>
 
-      {/* 2. Interactive Action Toolbar (Artwork-specific Tactical Controls) */}
+      {/* 2. Interactive Action Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800/80 bg-zinc-950/90 px-4 py-2 text-xs font-mono text-zinc-300 backdrop-blur">
         <div className="flex items-center gap-2">
-          <span className="text-zinc-500 text-[11px]">TACTICAL ACTION:</span>
+          <span className="text-zinc-500 text-[11px]">INTERACTION:</span>
 
-          {/* Man Behind Actions */}
+          {/* Man Behind Actions: Walking into Darkness Gait controls */}
           {activeArtwork === "man-behind" && (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center rounded border border-zinc-800 bg-black/60 p-0.5">
+                <button
+                  type="button"
+                  onClick={() => setWalkGait("striding")}
+                  className={`rounded px-2 py-0.5 text-[11px] font-medium transition-all ${
+                    walkGait === "striding"
+                      ? "bg-emerald-500/25 text-emerald-300 font-semibold"
+                      : "text-zinc-400 hover:text-zinc-200"
+                  }`}
+                  title="Walking cadence into the darkness"
+                >
+                  🚶 Walk
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setWalkGait("sprinting")}
+                  className={`rounded px-2 py-0.5 text-[11px] font-medium transition-all ${
+                    walkGait === "sprinting"
+                      ? "bg-emerald-500/25 text-emerald-300 font-semibold"
+                      : "text-zinc-400 hover:text-zinc-200"
+                  }`}
+                  title="Accelerate pace into darkness"
+                >
+                  🏃 Sprint
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setWalkGait("vigil")}
+                  className={`rounded px-2 py-0.5 text-[11px] font-medium transition-all ${
+                    walkGait === "vigil"
+                      ? "bg-emerald-500/25 text-emerald-300 font-semibold"
+                      : "text-zinc-400 hover:text-zinc-200"
+                  }`}
+                  title="Stationary silhouette vigil"
+                >
+                  🧍 Vigil
+                </button>
+              </div>
+
               <button
                 type="button"
                 onClick={triggerSonarSweep}
                 className="flex items-center gap-1.5 rounded bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 px-2.5 py-1 text-[11px] text-emerald-300 font-medium transition-all"
               >
                 <span>◈</span>
-                <span>Laser Sonar Sweep</span>
+                <span>Sonar Decryptor</span>
               </button>
+
               <button
                 type="button"
                 onClick={() => setNeuralCoreActive(!neuralCoreActive)}
@@ -1111,7 +1269,7 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
                 }`}
               >
                 <span>☵</span>
-                <span>Neural Core: {neuralCoreActive ? "ON" : "OFF"}</span>
+                <span>Neural Core</span>
               </button>
             </div>
           )}
@@ -1178,11 +1336,11 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
         </div>
 
         <div className="text-[11px] text-zinc-500 hidden sm:block">
-          Canvas is fully clickable · Tap to interact
+          Click canvas to interact · Hover to scan
         </div>
       </div>
 
-      {/* 3. Main Visual Display (Widescreen 16:9 Fit-to-Screen) */}
+      {/* 3. Main Visual Display */}
       <div
         className={`relative w-full bg-black ${
           isFullscreen
@@ -1199,12 +1357,6 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 opacity-25 bg-[linear-gradient(to_bottom,transparent_50%,rgba(0,0,0,0.4)_50%)] bg-[length:100%_4px]"
-        />
-
-        {/* Vignette edge falloff */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-radial-gradient from-transparent via-transparent to-black/60"
         />
 
         {/* Live telemetry badges */}
@@ -1243,7 +1395,7 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
                 : "text-emerald-400/90"
           }`}
         >
-          STATUS: COMPILED &amp; INTERACTIVE
+          STATUS: COMPILED &amp; STRIDING
         </div>
       </div>
     </div>
