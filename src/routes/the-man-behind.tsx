@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Container } from "../components/layout/Container";
 import { SectionReveal } from "../components/animations/SectionReveal";
 import { PageShell } from "../components/site/PageShell";
-import { LivingObject } from "../components/sections/LivingObject";
+import { MatrixSilhouette } from "../components/sections/MatrixSilhouette";
 import { seo, AUTHOR } from "../lib/site";
 import {
   Mail,
@@ -66,39 +66,54 @@ function TheManBehindPage() {
 
   return (
     <PageShell>
-      {/* Immersive hero: the cicada lives in the background behind the intro copy. */}
-      <LivingObject>
-        <SectionReveal className="space-y-4">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-mute">
-            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
-            Contact &amp; Identity
-          </div>
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-              <h1 className="font-serif text-5xl leading-tight text-ink md:text-6xl">
-                The Man Behind.
-              </h1>
-            </div>
-
-            {/* Location & Time badge */}
-            <div className="flex flex-col gap-2 rounded-lg border rule-hair bg-paper-deep/60 p-4 text-xs">
-              <div className="flex items-center gap-2 text-ink-mute">
-                <MapPin className="h-3.5 w-3.5 text-ink" />
-                <span>Dubai, United Arab Emirates</span>
-              </div>
-              <div className="flex items-center gap-2 text-ink-mute">
-                <Clock className="h-3.5 w-3.5 text-emerald-500" />
-                <span>GST (UTC+4):</span>
-                <DubaiLiveClock />
-              </div>
-            </div>
-          </div>
-        </SectionReveal>
-      </LivingObject>
-
-      {/* Contact Channels & Direct Reach */}
-      <div className="pb-24">
+      <div className="pb-24 pt-12 md:pt-16">
         <Container className="max-w-5xl">
+          {/* Header Title Section */}
+          <SectionReveal className="space-y-4">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-mute">
+              <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+              Contact &amp; Identity
+            </div>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div>
+                <h1 className="font-serif text-5xl leading-tight text-ink md:text-6xl">
+                  The Man Behind.
+                </h1>
+                <p className="mt-2 text-base text-ink-soft">
+                  Builder, operator, and experimenter based in Dubai.
+                </p>
+              </div>
+
+              {/* Location & Time badge */}
+              <div className="flex flex-col gap-2 rounded-lg border rule-hair bg-paper-deep/60 p-4 text-xs">
+                <div className="flex items-center gap-2 text-ink-mute">
+                  <MapPin className="h-3.5 w-3.5 text-ink" />
+                  <span>Dubai, United Arab Emirates</span>
+                </div>
+                <div className="flex items-center gap-2 text-ink-mute">
+                  <Clock className="h-3.5 w-3.5 text-emerald-500" />
+                  <span>GST (UTC+4):</span>
+                  <DubaiLiveClock />
+                </div>
+              </div>
+            </div>
+          </SectionReveal>
+
+          {/* Fit-to-Screen Live Video Matrix Centerpiece */}
+          <SectionReveal className="mt-8">
+            <MatrixSilhouette />
+          </SectionReveal>
+
+          {/* Builder Manifesto Quote */}
+          <SectionReveal className="mt-6">
+            <p className="font-serif text-lg italic text-ink-soft border-l-2 border-emerald-500/60 pl-4 py-1">
+              &ldquo;Giving an operations guy modern AI tools is like handing a chimpanzee an
+              AK-47: zero committees, lethal execution speed, and software built purely out of
+              curiosity.&rdquo;
+            </p>
+          </SectionReveal>
+
+          {/* Contact Channels & Direct Reach */}
           <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-12">
             {/* Left: Email & Direct Connect */}
             <SectionReveal className="space-y-6 lg:col-span-7">
@@ -128,8 +143,8 @@ function TheManBehindPage() {
                   >
                     {copied ? (
                       <>
-                        <Check className="h-4 w-4 text-emerald-600" />
-                        <span className="text-emerald-600 font-medium">Copied to Clipboard</span>
+                        <Check className="h-4 w-4 text-emerald-500" />
+                        <span className="text-emerald-500">Email Copied!</span>
                       </>
                     ) : (
                       <>
@@ -140,29 +155,27 @@ function TheManBehindPage() {
                   </button>
                 </div>
 
-                <div className="border-t rule-hair pt-4 text-xs text-ink-mute">
-                  Typically replies within 24 hours. No recruiter spam or cold pitch decks, please.
+                <div className="border-t rule-hair pt-4 text-xs text-ink-mute flex items-center gap-2">
+                  <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Available for collaborations &amp; architecture advisory.</span>
                 </div>
               </div>
             </SectionReveal>
 
-            {/* Right: Network & Platforms */}
+            {/* Right: Direct Reach Channels */}
             <SectionReveal className="space-y-4 lg:col-span-5">
               <div className="rounded-xl border rule-hair bg-paper p-6 space-y-4">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-                  Direct Network &amp; Profiles
-                </h3>
-
+                <h3 className="font-serif text-xl text-ink">Find me on</h3>
                 <div className="space-y-2">
                   <a
-                    href="https://www.linkedin.com/in/afsalali1238/"
+                    href="https://linkedin.com/in/afsalali"
                     target="_blank"
                     rel="noreferrer"
                     className="group flex items-center justify-between rounded-lg border rule-hair p-3.5 transition-colors hover:bg-paper-deep"
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex h-9 w-9 items-center justify-center rounded-md bg-paper-deep text-ink">
-                        <MessageSquare className="h-4 w-4" />
+                        <span className="font-serif font-bold text-xs">in</span>
                       </div>
                       <div>
                         <div className="text-sm font-medium text-ink">LinkedIn</div>
