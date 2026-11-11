@@ -257,6 +257,14 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
     const humanMaskCanvas = document.createElement("canvas");
     const humanMaskCtx = humanMaskCanvas.getContext("2d", { willReadFrequently: true });
 
+    // Authentic mask image extracted from the reference photo
+    const maskImg = new Image();
+    maskImg.src = "/man-behind-mask.png";
+    let maskLoaded = false;
+    maskImg.onload = () => {
+      maskLoaded = true;
+    };
+
     // 2. Offscreen mask for live AK-47 video
     const videoMaskCanvas = document.createElement("canvas");
     const videoMaskCtx = videoMaskCanvas.getContext("2d", { willReadFrequently: true });
@@ -271,7 +279,9 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
     video.crossOrigin = "anonymous";
 
     /**
-     * Draws the dynamic walking human silhouette onto the offscreen mask
+     * Draws the dynamic walking human silhouette onto the offscreen mask.
+     * Uses the authentic mask extracted directly from the reference photo,
+     * maintaining proportional centering across all screen aspect ratios.
      */
     const drawWalkingHumanSilhouette = (
       mCtx: CanvasRenderingContext2D,
@@ -280,95 +290,36 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
       swayX: number,
       bobY: number,
       shoulderTilt: number,
-      armSwing: number,
     ) => {
       mCtx.clearRect(0, 0, w, h);
       mCtx.save();
 
+      // Reference aspect ratio of the bust silhouette (553 / 574 ≈ 0.963)
+      const targetH = Math.min(h * 0.94, w * 0.92);
+      const targetW = targetH * 0.963;
+      const headCenterY = h * 0.44 + bobY;
       const centerX = w * 0.5 + swayX;
-      const centerY = h * 0.28 + bobY;
-      const headRadius = Math.min(w, h) * 0.165;
 
-      mCtx.translate(centerX, centerY);
+      mCtx.translate(centerX, headCenterY);
       mCtx.rotate(shoulderTilt);
-      mCtx.fillStyle = "#ffffff";
 
-      // Head (silhouette seen from back, with ears)
-      mCtx.beginPath();
-      mCtx.ellipse(0, 0, headRadius * 0.84, headRadius * 1.06, 0.02, 0, Math.PI * 2);
-      mCtx.fill();
-
-      // Ears (silhouette edge bumps)
-      mCtx.beginPath();
-      mCtx.ellipse(-headRadius * 0.83, headRadius * 0.1, headRadius * 0.12, headRadius * 0.22, -0.1, 0, Math.PI * 2);
-      mCtx.ellipse(headRadius * 0.83, headRadius * 0.1, headRadius * 0.12, headRadius * 0.22, 0.1, 0, Math.PI * 2);
-      mCtx.fill();
-
-      // Hair crown contour
-      mCtx.beginPath();
-      mCtx.ellipse(-headRadius * 0.08, -headRadius * 0.76, headRadius * 0.65, headRadius * 0.44, -0.05, 0, Math.PI * 2);
-      mCtx.fill();
-
-      // Neck
-      const neckWidth = headRadius * 0.54;
-      const neckTop = headRadius * 0.68;
-      const neckBottom = headRadius * 1.35;
-      mCtx.beginPath();
-      mCtx.moveTo(-neckWidth, neckTop);
-      mCtx.lineTo(neckWidth, neckTop);
-      mCtx.lineTo(neckWidth * 1.25, neckBottom);
-      mCtx.lineTo(-neckWidth * 1.25, neckBottom);
-      mCtx.closePath();
-      mCtx.fill();
-
-      // Broad shoulders & back sloping downward into darkness
-      const shoulderY = neckBottom;
-      const shoulderSpan = Math.min(w * 0.46, 310);
-      const waistY = h * 0.98 - centerY;
-      const waistSpan = shoulderSpan * 0.82;
-
-      mCtx.beginPath();
-      mCtx.moveTo(-neckWidth * 1.1, neckTop + 5);
-      // Left shoulder curve (arm swing motion)
-      mCtx.bezierCurveTo(
-        -neckWidth * 1.8,
-        shoulderY - 5 + armSwing * 0.35,
-        -shoulderSpan * 0.75,
-        shoulderY + 16 + armSwing * 0.45,
-        -shoulderSpan,
-        shoulderY + 48 + armSwing * 0.55,
-      );
-      // Left torso down to base
-      mCtx.bezierCurveTo(
-        -shoulderSpan * 0.95,
-        shoulderY + 130,
-        -waistSpan * 1.05,
-        waistY - 40,
-        -waistSpan,
-        waistY + 180,
-      );
-      // Base across bottom
-      mCtx.lineTo(waistSpan, waistY + 180);
-      // Right torso up
-      mCtx.bezierCurveTo(
-        waistSpan * 1.05,
-        waistY - 40,
-        shoulderSpan * 0.95,
-        shoulderY + 130,
-        shoulderSpan,
-        shoulderY + 48 - armSwing * 0.55,
-      );
-      // Right shoulder curve (opposite arm swing)
-      mCtx.bezierCurveTo(
-        shoulderSpan * 0.75,
-        shoulderY + 16 - armSwing * 0.45,
-        neckWidth * 1.8,
-        shoulderY - 5 - armSwing * 0.35,
-        neckWidth * 1.1,
-        neckTop + 5,
-      );
-      mCtx.closePath();
-      mCtx.fill();
+      if (maskLoaded) {
+        mCtx.drawImage(maskImg, -targetW / 2, -targetH * 0.44, targetW, targetH);
+      } else {
+        // Fallback while mask image loads
+        const headR = targetH * 0.16;
+        mCtx.fillStyle = "#ffffff";
+        mCtx.beginPath();
+        mCtx.ellipse(0, -headR * 1.1, headR * 0.85, headR * 1.1, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        mCtx.beginPath();
+        mCtx.moveTo(-targetW * 0.45, targetH * 0.5);
+        mCtx.lineTo(-headR * 0.6, -headR * 0.1);
+        mCtx.lineTo(headR * 0.6, -headR * 0.1);
+        mCtx.lineTo(targetW * 0.45, targetH * 0.5);
+        mCtx.closePath();
+        mCtx.fill();
+      }
 
       mCtx.restore();
     };
@@ -398,6 +349,13 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
       }
     };
 
+    const getCellSize = (w: number) => {
+      if (w < 480) return 9;
+      if (w < 768) return 10;
+      if (w < 1280) return 11;
+      return 12;
+    };
+
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -424,13 +382,6 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
     resize();
     const resizeObs = new ResizeObserver(resize);
     resizeObs.observe(canvas);
-
-    const getCellSize = (w: number) => {
-      if (w < 480) return 9;
-      if (w < 768) return 10;
-      if (w < 1280) return 11;
-      return 12;
-    };
 
     // Main render loop
     const render = (now: number) => {
@@ -546,12 +497,13 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
       if (mode === "man-behind") {
         // Calculate dynamic walking cycle kinematics
         const walkSpeedMultiplier = gait === "sprinting" ? 1.8 : gait === "vigil" ? 0 : 1.0;
-        const walkCycle = (now * 0.0034 * walkSpeedMultiplier);
+        const walkCycle = now * 0.0028 * walkSpeedMultiplier;
 
-        const swayX = gait === "vigil" ? 0 : Math.sin(walkCycle) * 7.5;
-        const bobY = gait === "vigil" ? 0 : Math.abs(Math.sin(walkCycle * 2)) * 5.5;
-        const shoulderTilt = gait === "vigil" ? 0 : Math.sin(walkCycle) * 0.024;
-        const armSwing = gait === "vigil" ? 0 : Math.sin(walkCycle) * 12;
+        const figureScale = Math.min(height * 0.92, width * 0.72);
+        const swayX = gait === "vigil" ? 0 : Math.sin(walkCycle) * (figureScale * 0.018);
+        const bobY = gait === "vigil" ? 0 : Math.abs(Math.sin(walkCycle * 2)) * (figureScale * 0.014);
+        const shoulderTilt = gait === "vigil" ? 0 : Math.sin(walkCycle) * 0.016;
+        const armSwing = gait === "vigil" ? 0 : Math.sin(walkCycle) * (figureScale * 0.026);
 
         const maskW = humanMaskCanvas.width;
         const maskH = humanMaskCanvas.height;
@@ -560,7 +512,7 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
         if (humanMaskCtx && maskW > 0 && maskH > 0) {
           const scaledSway = (swayX / width) * maskW;
           const scaledBob = (bobY / height) * maskH;
-          drawWalkingHumanSilhouette(humanMaskCtx, maskW, maskH, scaledSway, scaledBob, shoulderTilt, armSwing);
+          drawWalkingHumanSilhouette(humanMaskCtx, maskW, maskH, scaledSway, scaledBob, shoulderTilt);
         }
 
         const maskData = humanMaskCtx?.getImageData(0, 0, maskW, maskH);
@@ -578,21 +530,21 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
               const mx = Math.min(Math.floor((x / width) * maskW), maskW - 1);
               const my = Math.min(Math.floor((y / height) * maskH), maskH - 1);
               const idx = (my * maskW + mx) * 4;
-              isInside = maskData.data[idx] > 128;
+              isInside = maskData.data[idx] > 90;
 
               // Check boundary for razor-sharp silhouette edge contour
               if (isInside) {
-                const checkDist = 2;
+                const checkDist = 3;
                 const leftIdx = (my * maskW + Math.max(0, mx - checkDist)) * 4;
                 const rightIdx = (my * maskW + Math.min(maskW - 1, mx + checkDist)) * 4;
                 const upIdx = (Math.max(0, my - checkDist) * maskW + mx) * 4;
                 const downIdx = (Math.min(maskH - 1, my + checkDist) * maskW + mx) * 4;
 
                 if (
-                  maskData.data[leftIdx] < 128 ||
-                  maskData.data[rightIdx] < 128 ||
-                  maskData.data[upIdx] < 128 ||
-                  maskData.data[downIdx] < 128
+                  maskData.data[leftIdx] < 90 ||
+                  maskData.data[rightIdx] < 90 ||
+                  maskData.data[upIdx] < 90 ||
+                  maskData.data[downIdx] < 90
                 ) {
                   isEdge = true;
                 }
@@ -637,38 +589,40 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
               ctx.fillStyle = getThemeColor("head", spinePulse);
             } else if (isInside) {
               // INSIDE SILHOUETTE: EXACTLY LIKE REFERENCE IMAGE!
-              // Negative space dark void walking into darkness!
+              // In the reference image, the matrix characters are still present inside the bust,
+              // but very dim/dark phosphor green (~0.30 - 0.40 alpha)!
               if (isEdge) {
                 // Razor-sharp illuminated green contour tracing the head & shoulders
                 ctx.fillStyle = mouseDist < 85 ? getThemeColor("head", 1.0) : getThemeColor("bright", 0.95);
               } else {
-                // Pitch black interior with faint, subtle subterranean green dots/void
                 if (mouseDist < 95) {
-                  // Cursor hover reveals subtle inner matrix
+                  // Cursor hover acts like a decryption scanner
                   const glow = 1 - mouseDist / 95;
-                  ctx.fillStyle = getThemeColor("mid", glow * 0.45);
+                  ctx.fillStyle = getThemeColor("bright", glow * 0.85);
                 } else {
-                  // Void characters (very dark/subtle negative space)
-                  const subtleDot = (r * 7 + c * 11) % 6 === 0;
-                  ctx.fillStyle = subtleDot ? getThemeColor("void", 0.35) : "rgba(0, 0, 0, 0)";
+                  // Authentic subterranean dark green characters (matches reference photo!)
+                  ctx.fillStyle = getThemeColor("dim", 0.32);
                 }
               }
             } else {
               // OUTSIDE SILHOUETTE: DENSE VIBRANT GREEN MATRIX RAIN!
-              // Rain streams cascading downwards
               if (mouseDist < 85) {
-                // Bright proximity glow near cursor
-                ctx.fillStyle = getThemeColor("head", 0.95 - mouseDist / 120);
+                // Proximity cursor glow
+                ctx.fillStyle = getThemeColor("head", 1.0);
               } else if (distFromHead === 0) {
                 // White-mint head of the falling drop
-                ctx.fillStyle = getThemeColor("head", 0.95);
-              } else if (distFromHead > 0 && distFromHead < (drop?.length || 15)) {
-                // Glowing green rain tail
-                const alpha = Math.max(0.18, 1 - distFromHead / (drop?.length || 15));
-                ctx.fillStyle = getThemeColor(alpha > 0.65 ? "bright" : "mid", alpha);
+                ctx.fillStyle = getThemeColor("head", 1.0);
+              } else if (distFromHead > 0 && distFromHead < (drop?.length || 20)) {
+                // Vivid phosphor green rain trail
+                if (distFromHead < 4) {
+                  ctx.fillStyle = getThemeColor("bright", 0.98);
+                } else {
+                  const trailAlpha = Math.max(0.40, 1 - distFromHead / (drop?.length || 20));
+                  ctx.fillStyle = getThemeColor("mid", trailAlpha);
+                }
               } else {
-                // Ambient green code background (just like reference image)
-                const ambientAlpha = ((r * 3 + c * 7) % 5 === 0) ? 0.45 : 0.22;
+                // Dense cascading ambient matrix rain
+                const ambientAlpha = ((r * 7 + c * 13) % 4 === 0) ? 0.70 : 0.46;
                 ctx.fillStyle = getThemeColor("mid", ambientAlpha);
               }
             }
@@ -694,20 +648,13 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
           ctx.fillRect(0, sonar.y - 14, width, 28);
         }
 
-        // Walking tunnel depth gradient (man walking deeper into the darkness)
-        const tunnelGrad = ctx.createRadialGradient(
-          centerX,
-          height * 0.42 + bobY,
-          20,
-          centerX,
-          height * 0.42 + bobY,
-          Math.max(width, height) * 0.65,
-        );
-        tunnelGrad.addColorStop(0, "rgba(0, 0, 0, 0.45)");
-        tunnelGrad.addColorStop(0.5, "transparent");
-        tunnelGrad.addColorStop(1, "rgba(0, 0, 0, 0.7)");
-        ctx.fillStyle = tunnelGrad;
-        ctx.fillRect(0, 0, width, height);
+        // Deep darkness fade at bottom: walking into the digital abyss
+        const bottomDarkness = ctx.createLinearGradient(0, height * 0.65, 0, height);
+        bottomDarkness.addColorStop(0, "rgba(0, 0, 0, 0)");
+        bottomDarkness.addColorStop(0.65, "rgba(0, 0, 0, 0.75)");
+        bottomDarkness.addColorStop(1, "rgba(0, 0, 0, 0.98)");
+        ctx.fillStyle = bottomDarkness;
+        ctx.fillRect(0, height * 0.65, width, height * 0.35);
       }
 
       // ==========================================
