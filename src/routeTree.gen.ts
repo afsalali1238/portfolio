@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as TheManBehindRouteImport } from './routes/the-man-behind'
 import { Route as ThesisRouteImport } from './routes/thesis'
+import { Route as LabRefractionRouteImport } from './routes/lab/refraction'
 import { Route as NotesIndexRouteImport } from './routes/notes/index'
 import { Route as NotesThe15MinuteRuleRouteImport } from './routes/notes/the-15-minute-rule'
 import { Route as NotesTheCuriousCaseOfBuildingRouteImport } from './routes/notes/the-curious-case-of-building'
@@ -44,6 +45,11 @@ const TheManBehindRoute = TheManBehindRouteImport.update({
 const ThesisRoute = ThesisRouteImport.update({
   id: '/thesis',
   path: '/thesis',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LabRefractionRoute = LabRefractionRouteImport.update({
+  id: '/lab/refraction',
+  path: '/lab/refraction',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotesIndexRoute = NotesIndexRouteImport.update({
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/the-man-behind': typeof TheManBehindRoute
   '/thesis': typeof ThesisRoute
+  '/lab/refraction': typeof LabRefractionRoute
   '/notes/the-15-minute-rule': typeof NotesThe15MinuteRuleRoute
   '/notes/the-curious-case-of-building': typeof NotesTheCuriousCaseOfBuildingRoute
   '/notes/the-empathy-moat': typeof NotesTheEmpathyMoatRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/the-man-behind': typeof TheManBehindRoute
   '/thesis': typeof ThesisRoute
+  '/lab/refraction': typeof LabRefractionRoute
   '/notes/the-15-minute-rule': typeof NotesThe15MinuteRuleRoute
   '/notes/the-curious-case-of-building': typeof NotesTheCuriousCaseOfBuildingRoute
   '/notes/the-empathy-moat': typeof NotesTheEmpathyMoatRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/the-man-behind': typeof TheManBehindRoute
   '/thesis': typeof ThesisRoute
+  '/lab/refraction': typeof LabRefractionRoute
   '/notes/the-15-minute-rule': typeof NotesThe15MinuteRuleRoute
   '/notes/the-curious-case-of-building': typeof NotesTheCuriousCaseOfBuildingRoute
   '/notes/the-empathy-moat': typeof NotesTheEmpathyMoatRoute
@@ -172,6 +181,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/the-man-behind'
     | '/thesis'
+    | '/lab/refraction'
     | '/notes/the-15-minute-rule'
     | '/notes/the-curious-case-of-building'
     | '/notes/the-empathy-moat'
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/the-man-behind'
     | '/thesis'
+    | '/lab/refraction'
     | '/notes/the-15-minute-rule'
     | '/notes/the-curious-case-of-building'
     | '/notes/the-empathy-moat'
@@ -208,6 +219,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/the-man-behind'
     | '/thesis'
+    | '/lab/refraction'
     | '/notes/the-15-minute-rule'
     | '/notes/the-curious-case-of-building'
     | '/notes/the-empathy-moat'
@@ -227,6 +239,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   TheManBehindRoute: typeof TheManBehindRoute
   ThesisRoute: typeof ThesisRoute
+  LabRefractionRoute: typeof LabRefractionRoute
   NotesThe15MinuteRuleRoute: typeof NotesThe15MinuteRuleRoute
   NotesTheCuriousCaseOfBuildingRoute: typeof NotesTheCuriousCaseOfBuildingRoute
   NotesTheEmpathyMoatRoute: typeof NotesTheEmpathyMoatRoute
@@ -269,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: '/thesis'
       fullPath: '/thesis'
       preLoaderRoute: typeof ThesisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lab/refraction': {
+      id: '/lab/refraction'
+      path: '/lab/refraction'
+      fullPath: '/lab/refraction'
+      preLoaderRoute: typeof LabRefractionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/notes/': {
@@ -363,6 +383,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   TheManBehindRoute: TheManBehindRoute,
   ThesisRoute: ThesisRoute,
+  LabRefractionRoute: LabRefractionRoute,
   NotesThe15MinuteRuleRoute: NotesThe15MinuteRuleRoute,
   NotesTheCuriousCaseOfBuildingRoute: NotesTheCuriousCaseOfBuildingRoute,
   NotesTheEmpathyMoatRoute: NotesTheEmpathyMoatRoute,

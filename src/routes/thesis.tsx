@@ -3,6 +3,7 @@ import { ArrowLeft, Sparkles, Compass, Shield, Feather, Layers } from "lucide-re
 import { PageShell } from "../components/site/PageShell";
 import { Container } from "../components/layout/Container";
 import { SectionReveal } from "../components/animations/SectionReveal";
+import { RefractionEngine } from "../components/refraction/RefractionEngine";
 import { seo, SITE_URL, SITE_NAME, AUTHOR } from "../lib/site";
 import {
   ArticlePlatformBar,
@@ -84,6 +85,14 @@ export function ManifestoPage() {
                 words={dispatch.words}
               />
             )}
+          </SectionReveal>
+
+          <SectionReveal className="mt-10 md:mt-14">
+            <RefractionEngine />
+            <p className="mt-3 font-mono text-[11px] leading-relaxed text-ink-mute">
+              Field note: use the density slider or drag the source line. The instrument is a
+              physical companion to the argument below, not a metaphor in place of one.
+            </p>
           </SectionReveal>
 
           {/* Core Essay Article */}
