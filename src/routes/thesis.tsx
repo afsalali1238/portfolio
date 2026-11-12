@@ -166,7 +166,7 @@ export function ManifestoPage() {
                   <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
                     These are the black holes of life. You pour in weeks of sleepless effort,
                     emotional energy, and deep care, and the medium simply swallows it without a
-                    sound. No reflection, no bending into colour—just exhaustion and burnout.
+                    sound. No reflection, no bending into colour. Just exhaustion and burnout.
                   </p>
                 </li>
                 <li className="rounded-lg border rule-hair bg-paper-deep/60 p-5">
@@ -216,7 +216,7 @@ export function ManifestoPage() {
                 </li>
               </ul>
               <p>
-                Getting a real result is never an accident of effortless genius. It is a wrestling match
+                Getting a real result is never an accident of genius. It is a wrestling match
                 with materials, syntax, human habits, and hard reality. You enter the glass with a raw,
                 unverified thought. You only get to pull the spectrum out on the other side if you are
                 willing to pay the price of admission:{" "}
@@ -236,7 +236,7 @@ export function ManifestoPage() {
                 Look closely at the prism. It sits in silence.
               </p>
               <p>
-                Every day, hundreds of stray lights cross its surface—distracted beams, hurried beams,
+                Every day, hundreds of stray lights cross its surface. Distracted beams, hurried beams,
                 cynical beams looking for a shortcut. Most glance off or produce only dull, muddy
                 shadows.
               </p>
@@ -244,15 +244,15 @@ export function ManifestoPage() {
                 Magic only happens when the right light enters the right medium.
               </blockquote>
               <p>
-                When your specific, lived frequency—your strange curiosities, your scars, the books you
-                digested, the specific problems that genuinely bother you—collides with a problem or a
+                When your specific, lived frequency (your strange curiosities, your scars, the books you
+                digested, the specific problems that genuinely bother you) collides with a problem or a
                 person tuned to receive it, the reaction is instantaneous.
               </p>
               <p>
                 The resistance stops feeling like punishment; it turns into harmony. You find a problem
                 that others dismissed as tedious, but to you, it feels like an obsession. You meet someone
                 who felt unseen, and suddenly you speak the same dialect. The friction of the work stops
-                draining you—it electrifies you.
+                draining you. It electrifies you.
               </p>
             </SectionReveal>
 
@@ -282,7 +282,7 @@ export function ManifestoPage() {
               </p>
               <p>
                 Yet technology is not an idol. We do not worship the silicon, the model weights, or the
-                hype cycle. Tech is merely <strong className="text-ink">a modern piece of glass</strong>—a
+                hype cycle. Tech is merely <strong className="text-ink">a modern piece of glass</strong>, a
                 rapid, malleable medium through which we test our thoughts and build things that take
                 friction away from living human beings.
               </p>
@@ -414,7 +414,7 @@ export function ManifestoPage() {
               </p>
               <p>
                 We often gaze at the spectrum shooting out of the prism and praise the finished
-                artifact—the app that launched, the published book, the visual work.
+                artifact (the app that launched, the published book, the visual work).
               </p>
               <p>
                 <strong className="text-ink">
@@ -428,7 +428,7 @@ export function ManifestoPage() {
               <p>
                 When you refuse to skim through life; when you let hard problems break your shallow
                 certainties; when you put in the daily effort and take the violent reflections on the chin
-                without turning bitter—<strong className="text-ink">you are the one who is refracted.</strong>
+                without turning bitter, <strong className="text-ink">you are the one who is refracted.</strong>
               </p>
               <p className="font-serif text-xl italic text-ink md:text-2xl">
                 You started as a single, narrow beam of untested thought.
