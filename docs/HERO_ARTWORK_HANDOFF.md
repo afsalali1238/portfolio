@@ -12,7 +12,7 @@
 | :--------------------------------------------------------- | :------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------- |
 | _"polymath, thinker, and maker"_                           | Sounds like Twitter-bio aggrandizement. Real operators don't self-identify as polymaths; they just ship. | **"Operator with an edge"** or simply letting the variety of shipped tools speak for itself.                   |
 | _"brings concepts from the unseen world into living form"_ | Too mystical, pseudo-spiritual. Sounds like a fantasy novel.                                             | **"Forcing raw ideas to collide with physical friction and syntax."** Physics, not sorcery.                    |
-| _"pedestal of effortless inspiration"_                     | Cliche writing trope.                                                                                    | Replaced with direct operational realities: WhatsApp chaos, Arabic dialect edge-cases, cold APIs, server heat. |
+| _"pedestal of inspiration without work"_                   | Cliche writing trope.                                                                                    | Replaced with direct operational realities: WhatsApp chaos, Arabic dialect edge-cases, cold APIs, server heat. |
 
 ---
 
@@ -53,17 +53,17 @@ Use this when the visitor clicks _"Read the Mechanics"_ or scrolls past the canv
 
 A single line of light enters from beyond the frame.
 
-It travels silently, strikes the face of a heavy glass prism, and breaks into living color—a restless field of electric paths that branch, shiver, and reach far past the canvas.
+It travels silently, strikes the face of a heavy glass prism, and breaks into living colour, a restless field of electric paths that branch, shiver, and reach far past the canvas.
 
 The artwork unifies three physical archetypes:
 
-1. **The Hipgnosis Prism** (_The Dark Side of the Moon_) — Proof that what appears singular already carries a layered spectrum inside it.
-2. **High-Frequency Discharge** (_Tesla’s Filaments_) — Energy is not theoretical; it is physical, tactile, and responsive to contact.
-3. **Emergence** — Vast, durable architectures unfurl from small, disciplined seeds.
+1. **The Hipgnosis Prism** (_The Dark Side of the Moon_), revealing the layered spectrum already present within what appears singular.
+2. **High-Frequency Discharge** (_Tesla’s Filaments_), where energy is physical, tactile, and responsive to contact.
+3. **Emergence:** Vast, durable architectures unfurl from small, disciplined seeds.
 
 This is not a showcase of design spectacle, and it is not an exercise in idle daydreaming.
 
-It is a reminder of an engineering law: **an unmanifested thought has zero density. To find out what it is worth, you have to drive it into the friction of genuine making—where syntax, materials, and human reality test whether it holds together.**
+It is a reminder of an engineering law: **an unmanifested thought has zero density. To find out what it is worth, you have to drive it into the friction of genuine making, where syntax, materials, and human reality test whether it holds together.**
 
 ---
 ```
@@ -96,17 +96,17 @@ Every real tool begins before there is an audience, a client invoice, or a ticke
 The incoming line is singular. It arrives from outside the margins because genuine curiosity does not wait for a corporate brief. It is self-igniting.
 
 ### 2. The Prism: The Dense Medium of Reality
-In optics, light only refracts when it moves from vacuum into a **denser medium**. In empty space, light travels straight, unchecked, and unrevealed. Only when it hits the density of glass—slowing down and navigating resistance—does its internal structure split open.
+In optics, light bends at a boundary between media with different refractive indices. Entering a **denser medium** slows it, and leaving one can bend it again. In empty space, light travels straight, unchecked, and unrevealed. At the boundary with glass, its speed changes and its internal structure can be revealed.
 
 In software and engineering, that dense medium is **the craft of making**:
 * Wrestling with messy APIs, obscure bugs, and edge cases until the system bends to your will.
 * Listening to the pharmacist, the driver, or the clinic coordinator tell you why your interface fails them on a chaotic Tuesday.
 * Rewriting the entire flow when reality proves your assumptions wrong.
 
-The prism is not an altar of effortless inspiration. It is the crucible of deliberate work. You enter the glass with an unverified thought; you exit with a tested artifact.
+The prism is not an altar to inspiration without work. It is the crucible of deliberate work. You enter the glass with an unverified thought; you exit with a tested artifact.
 
 ### 3. The Spectrum: Stacked Understanding
-When white light enters the glass, each wavelength bends at a different angle. What looked like a single beam turns out to be an entire architecture of color.
+At the glass boundary, each wavelength refracts by a different amount because the refractive index varies with wavelength. What looked like a single beam reveals an entire architecture of colour.
 
 This is what happens when you commit to deep, stacked execution:
 * **Domain Operations + Modern LLMs** turns hours of spreadsheet reconciliation into a 2-second background task.
@@ -121,7 +121,7 @@ Beyond the glass, the paths do not settle into a sterile, corporate line chart. 
 Once you put working code into the real world, it develops momentum:
 * A tiny side-script built to scratch your own itch becomes the backbone for an entire workflow.
 * Solving one operational bottleneck uncovers three higher-order problems worth attacking next.
-* The discipline earned building one tool becomes the effortless launchpad for a completely different domain tomorrow.
+* The discipline earned building one tool becomes a launchpad for a completely different domain tomorrow.
 
 ### 5. Beyond the Frame: The Open Horizon
 The lines in the artwork do not terminate neatly inside the screen margins. They bleed off the edges.
@@ -145,7 +145,7 @@ To ensure this feels like high-end engineering rather than a static JPEG, here i
   - **Amber / Flame (`#F59E0B`):** Healthcare & Clinical Tools (`Provia`, `PharmaRab`, `kinē`).
   - **Emerald (`#10B981`):** Hyperlocal Networks (`NxtDoorChef`, `CraftersUnited`).
   - **Violet / Electric Indigo (`#818CF8`):** Thinking Tools & Agents (`Doomscholar`, `Bodhi`, `Incubator`).
-- **Tesla Filament Behavior:** Tiny micro-arcs (perlin noise discharge) flickering along the colored paths, gently attracted toward the visitor’s mouse cursor when hovering within 120px.
+- **Tesla Filament Behaviour:** Tiny micro-arcs (perlin noise discharge) flickering along the coloured paths, gently attracted toward the visitor’s mouse cursor when hovering within 120px.
 
 ### Interaction States
 
@@ -161,4 +161,4 @@ To ensure this feels like high-end engineering rather than a static JPEG, here i
 ## 4. Key Takeaways for Deployment
 
 1. **Keep the Hero Lean:** Don't dump the whole 800-word explainer directly above the fold. Show the dynamic visual, the H1, the 2-sentence hook, and the 3-line triptych. Let the deep explainer sit in a toggle drawer (`[ Anatomy of the Piece ]`) or directly precede the project grid.
-2. **Tie Art Directly to the Grid:** When someone hovers over a project card in your grid below (e.g., `PharmaRab`), give that card a subtle border in the corresponding refracted ray's color (Amber). This visually proves that the artwork isn't just decoration—it is the index system of your work.
+2. **Tie Art Directly to the Grid:** When someone hovers over a project card in your grid below (e.g., `PharmaRab`), give that card a subtle border in the corresponding refracted ray's colour (Amber). This visually proves that the artwork is not just decoration. It is the index system of your work.

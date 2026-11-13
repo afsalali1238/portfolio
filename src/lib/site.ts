@@ -55,6 +55,7 @@ export function seo({
       { name: "twitter:title", content: title },
       { name: "twitter:description", content: description },
       { name: "twitter:image", content: img },
+      { name: "twitter:image:alt", content: imageAlt ?? title },
     ],
     links: [{ rel: "canonical", href: url }],
   };

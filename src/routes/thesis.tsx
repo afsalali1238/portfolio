@@ -3,6 +3,7 @@ import { ScrollyPageShell } from "../components/scrollytelling/ScrollyPageShell"
 import { ScrollyStage } from "../components/scrollytelling/ScrollyStage";
 import { DiscussionFooter } from "../components/DiscussionFooter";
 import { seo, SITE_URL, SITE_NAME, AUTHOR } from "../lib/site";
+import { THESIS_PUBLISHED_AT } from "../components/scrollytelling/story";
 import "../styles/app.css";
 import "../styles/compact.css";
 import "../styles/accessibility.css";
@@ -25,7 +26,12 @@ const MANIFESTO_SCHEMA = {
     name: SITE_NAME,
     url: SITE_URL,
   },
-  datePublished: "2026-11-12",
+  image: [`${SITE_URL}/og/thesis.png`],
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": `${SITE_URL}${PATH}`,
+  },
+  datePublished: THESIS_PUBLISHED_AT,
   inLanguage: "en-GB",
 };
 
@@ -36,7 +42,8 @@ export const Route = createFileRoute("/thesis")({
       description:
         "Curiosity enters. Craft bends it. Reality catches the colour. An interactive manifesto on ideas, the work, and finding the right medium.",
       path: PATH,
-      image: "/og/home.png",
+      image: "/og/thesis.png",
+      imageAlt: "A cream-coloured forthe.tech card introducing The Refraction of Thought.",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(MANIFESTO_SCHEMA) }],

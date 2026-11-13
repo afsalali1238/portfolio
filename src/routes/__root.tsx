@@ -10,6 +10,8 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import instrumentSerif from "@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff2?url";
+import instrumentSerifItalic from "@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff2?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 import { PageShell } from "../components/site/PageShell";
@@ -102,6 +104,20 @@ export const Route = createRootRoute({
       { name: "theme-color", content: "#0F0A06", media: "(prefers-color-scheme: dark)" },
     ],
     links: [
+      {
+        rel: "preload",
+        href: instrumentSerif,
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "preload",
+        href: instrumentSerifItalic,
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous",
+      },
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
       { rel: "icon", href: "/favicon.ico", sizes: "any" },
@@ -140,7 +156,7 @@ const PERSON_SCHEMA = {
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en-GB">
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <HeadContent />

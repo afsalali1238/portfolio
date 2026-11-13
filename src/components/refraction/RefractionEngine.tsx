@@ -160,7 +160,7 @@ export function RefractionEngine({ className = "", standalone = false }: Refract
           <p>
             {standalone
               ? "Five discrete wavelength bands are traced through the triangle. The density slider is the red-reference refractive index; Cauchy dispersion offsets shorter wavelengths."
-              : "A thought becomes measurable only after it enters a denser medium: velocity falls from c to c/n, then wavelength-dependent indices make the separation observable."}
+              : "At a boundary between media with different refractive indices, a ray may bend. Entering a denser medium lowers its speed from c to c/n, while wavelength-dependent indices make the separation observable. The ray can bend again on exit."}
           </p>
         </div>
       </div>

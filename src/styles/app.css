@@ -1,5 +1,5 @@
 :root {
-  font-family: 'DM Sans Variable', 'DM Sans', sans-serif;
+  font-family: "DM Sans Variable", "DM Sans", sans-serif;
   color: #eeeae1;
   background: #0b0c0e;
   font-synthesis: none;
@@ -9,10 +9,10 @@
   --ink: #0b0c0e;
   --paper: #eeeae1;
   --muted: #a6a7a7;
-  --faint: #6d7178;
+  --faint: #8a8e95;
   --hairline: rgba(205, 211, 221, 0.14);
-  --mono: 'IBM Plex Mono', monospace;
-  --serif: 'Instrument Serif', Georgia, serif;
+  --mono: "IBM Plex Mono", monospace;
+  --serif: "Instrument Serif", Georgia, serif;
   color-scheme: dark;
 }
 * {
@@ -60,8 +60,8 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 1px solid var(--paper);
-  outline-offset: 6px;
+  outline: 2px solid var(--paper);
+  outline-offset: 4px;
 }
 button:focus:not(:focus-visible) {
   outline: none;
@@ -162,6 +162,7 @@ button svg {
   gap: 12px;
   align-items: center;
   white-space: nowrap;
+  color: var(--paper);
 }
 .brand > svg {
   width: 29px;
@@ -190,7 +191,7 @@ button svg {
   align-items: center;
   gap: 10px;
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 1.2px;
   white-space: nowrap;
 }
@@ -229,7 +230,7 @@ button svg {
   padding: 11px 15px;
   color: #bec0c2;
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 12px;
   letter-spacing: 1px;
   transition:
     border-color 0.25s,
@@ -258,7 +259,7 @@ button svg {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 1.25px;
   color: #777c85;
   z-index: 3;
@@ -279,7 +280,7 @@ button svg {
   top: 48%;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
-  font: 7px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 1.75px;
   color: #4d525b;
   z-index: 3;
@@ -322,7 +323,7 @@ button svg {
   display: flex;
   align-items: center;
   gap: 11px;
-  font: 8px var(--mono) !important;
+  font: 12px var(--mono) !important;
   letter-spacing: 1.65px;
   color: #a9acb1 !important;
   margin: 0 !important;
@@ -345,18 +346,44 @@ button svg {
   font-size: 17px;
   line-height: 1.65;
   color: #a6a8ab;
-  margin: 26px 0 0;
+  margin: 20px 0 0;
   letter-spacing: -0.15px;
+}
+.prologue-byline,
+.reading-byline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font: clamp(12px, 0.85vw, 14px)/1.4 var(--mono);
+  letter-spacing: 0.1px;
+  color: #929aa6;
+}
+.prologue-byline {
+  margin: 12px 0 0;
+}
+.prologue-byline > span:first-child,
+.prologue-byline time {
+  color: var(--paper);
+}
+.reading-byline {
+  color: #596050;
+  margin-top: 18px;
+}
+.reading-byline > span:first-child,
+.reading-byline time {
+  color: #292a2c;
 }
 .begin-button {
   display: inline-flex;
   align-items: center;
   gap: 15px;
   text-align: left;
-  margin-top: 31px;
+  margin-top: 24px;
   font-size: 12px;
   font-weight: 450;
   letter-spacing: 0.1px;
+  color: var(--paper);
 }
 .circle-arrow {
   display: grid;
@@ -384,7 +411,7 @@ button svg {
 }
 .button-subline {
   display: block;
-  font: 7px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 1.1px;
   color: #656b75;
   margin-top: 7px;
@@ -393,10 +420,10 @@ button svg {
   display: flex;
   align-items: center;
   gap: 13px;
-  font: 6.5px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 1.2px;
   color: #5e636c;
-  margin-top: 41px;
+  margin-top: 26px;
   white-space: nowrap;
 }
 .colophon-dash {
@@ -404,7 +431,7 @@ button svg {
   border-top: 1px solid #3b4048;
 }
 .beat-eyebrow {
-  font: 9px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 1.3px;
   text-transform: uppercase;
   display: flex;
@@ -414,7 +441,7 @@ button svg {
   color: #b9bcc2;
 }
 .chapter-number {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--paper);
   min-width: 13px;
 }
@@ -462,7 +489,7 @@ button svg {
   display: flex;
   align-items: center;
   gap: 14px;
-  font: 6.5px/1.5 var(--mono);
+  font: 12px/1.5 var(--mono);
   color: #696f79;
   letter-spacing: 1px;
   margin-top: 34px;
@@ -471,14 +498,14 @@ button svg {
   border: 1px solid #383e47;
   padding: 4px 5px;
   color: #a2a6ad;
-  font-size: 7px;
+  font-size: 12px;
   line-height: 1;
 }
 .beat-surfaces h2 {
   font-size: clamp(43px, 4.1vw, 64px);
 }
 .beat-surfaces > p {
-  font-size: 15px;
+  font-size: 16px;
 }
 .surface-tabs {
   display: flex;
@@ -491,28 +518,28 @@ button svg {
 .surface-tab {
   display: flex;
   gap: 7px;
-  font-size: 10px;
+  font-size: 12px;
   color: #747983;
   transition: color 0.2s;
   align-items: center;
 }
 .surface-tab > span {
-  font: 7px var(--mono);
+  font: 12px var(--mono);
   color: #535a66;
 }
 .surface-tab:hover {
   color: var(--paper);
 }
-.surfaces[data-surface='0'] .surface-tab-0,
-.surfaces[data-surface='1'] .surface-tab-1,
-.surfaces[data-surface='2'] .surface-tab-2,
-.surfaces[data-surface='3'] .surface-tab-3 {
+.surfaces[data-surface="0"] .surface-tab-0,
+.surfaces[data-surface="1"] .surface-tab-1,
+.surfaces[data-surface="2"] .surface-tab-2,
+.surfaces[data-surface="3"] .surface-tab-3 {
   color: var(--paper);
 }
-.surfaces[data-surface='0'] .surface-tab-0 > span,
-.surfaces[data-surface='1'] .surface-tab-1 > span,
-.surfaces[data-surface='2'] .surface-tab-2 > span,
-.surfaces[data-surface='3'] .surface-tab-3 > span {
+.surfaces[data-surface="0"] .surface-tab-0 > span,
+.surfaces[data-surface="1"] .surface-tab-1 > span,
+.surfaces[data-surface="2"] .surface-tab-2 > span,
+.surfaces[data-surface="3"] .surface-tab-3 > span {
   color: #bfc3cb;
 }
 .surface-panels {
@@ -534,7 +561,7 @@ button svg {
   margin: 0 0 12px;
 }
 .surface-panel p {
-  font-size: 15px;
+  font-size: 16px;
   max-width: 380px;
 }
 .surface-panel p.italic-copy {
@@ -550,7 +577,7 @@ button svg {
   margin-bottom: 22px;
 }
 .beat-density p {
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.65;
   margin-bottom: 17px;
   max-width: 415px;
@@ -561,7 +588,7 @@ button svg {
 }
 .beat-density .beat-footnote {
   margin-top: 27px;
-  font-size: 6px;
+  font-size: 12px;
   letter-spacing: 0.7px;
 }
 .beat-colours h2 {
@@ -581,7 +608,7 @@ button svg {
   font-size: clamp(40px, 3.8vw, 60px);
 }
 .beat-becoming p {
-  font-size: 15px;
+  font-size: 16px;
   max-width: 440px;
 }
 .beat-becoming p.closing-thought {
@@ -597,7 +624,7 @@ button svg {
   display: inline-flex;
   align-items: center;
   gap: 20px;
-  font-size: 11px;
+  font-size: 12px;
   color: #b3b6bc;
   transition: color 0.2s;
 }
@@ -629,7 +656,7 @@ button svg {
 .rail-caption,
 .rail-end {
   position: absolute;
-  font: 6px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 1.4px;
   color: #5c626d;
   left: -2px;
@@ -664,7 +691,7 @@ button svg {
   display: flex;
   align-items: center;
   width: 42px;
-  font: 9px var(--mono);
+  font: 12px var(--mono);
   color: #656c78;
   text-align: left;
 }
@@ -685,15 +712,15 @@ button svg {
   line-height: 1;
 }
 .rail-origin .rail-numeral {
-  font-size: 7px;
+  font-size: 12px;
 }
-.rail-stop[data-active='true'] .rail-dot {
+.rail-stop[data-active="true"] .rail-dot {
   background: #f1ede5;
   box-shadow:
     0 0 0 3px #0b0c0e,
     0 0 0 3.6px #727780;
 }
-.rail-stop[data-active='true'] .rail-numeral {
+.rail-stop[data-active="true"] .rail-numeral {
   color: var(--paper);
 }
 .rail-stop:hover {
@@ -701,7 +728,7 @@ button svg {
 }
 .rail-label {
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 1px;
   position: absolute;
@@ -733,7 +760,7 @@ button svg {
   display: flex;
   align-items: center;
   gap: 8px;
-  font: 7px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 1px;
   color: #959ba6;
   border-bottom: 1px solid #2d323a;
@@ -747,7 +774,7 @@ button svg {
 .telemetry-live {
   margin-left: auto;
   color: #555d69;
-  font-size: 6px;
+  font-size: 12px;
   letter-spacing: 1.5px;
 }
 .telemetry-values {
@@ -758,7 +785,7 @@ button svg {
 }
 .telemetry-key {
   display: block;
-  font: 5.8px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 1px;
   color: #707783;
   white-space: nowrap;
@@ -778,7 +805,7 @@ button svg {
   letter-spacing: 0;
 }
 .telemetry-status-value {
-  font: 6px/1.6 var(--mono);
+  font: 12px/1.6 var(--mono);
   color: #a5acb7;
   letter-spacing: 0.55px;
   display: block;
@@ -798,7 +825,7 @@ button svg {
   display: flex;
   align-items: center;
   gap: 6px;
-  font: 7px var(--mono);
+  font: 12px var(--mono);
   color: #a3a9b4;
 }
 .spectral-legend i {
@@ -808,7 +835,7 @@ button svg {
   box-shadow: 0 0 5px currentColor;
 }
 .spectral-legend small {
-  font-size: 5px;
+  font-size: 12px;
   color: #666f7e;
 }
 .stage-footer {
@@ -824,7 +851,7 @@ button svg {
   z-index: 5;
 }
 .footer-chapter {
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 0.65px;
   color: #a3a9b2;
   display: flex;
@@ -841,7 +868,7 @@ button svg {
   align-items: center;
   gap: 14px;
   justify-self: center;
-  font: 7px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 1.2px;
   color: #9ca3ae;
   white-space: nowrap;
@@ -865,12 +892,12 @@ button svg {
   white-space: nowrap;
 }
 .progress-label {
-  font: 6px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 0.8px;
   color: #6b7380;
 }
 .progress-readout {
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   color: #d1d4d9;
   letter-spacing: 0.6px;
 }
@@ -898,13 +925,13 @@ button svg {
   position: absolute;
   right: 4.5%;
   top: 100px;
-  font-size: 11px;
+  font-size: 12px;
   background: #252931;
   padding: 10px 15px;
   z-index: 20;
 }
 .eyebrow {
-  font: 8px/1.6 var(--mono);
+  font: 12px/1.6 var(--mono);
   letter-spacing: 1.3px;
   color: #8a929d;
   font-weight: 400;
@@ -917,6 +944,10 @@ button svg {
   scroll-margin-top: 0;
   outline: none;
 }
+.discussion-footer:focus {
+  outline: 2px solid var(--paper);
+  outline-offset: -8px;
+}
 .discussion-topline {
   display: flex;
   justify-content: space-between;
@@ -926,7 +957,7 @@ button svg {
   border-bottom: 1px solid #292f37;
 }
 .discussion-topline .eyebrow {
-  font-size: 7px;
+  font-size: 12px;
   color: #727b88;
 }
 .discussion-grid {
@@ -940,7 +971,7 @@ button svg {
   gap: 10px;
   align-items: center;
   color: #949ca7;
-  font-size: 7px;
+  font-size: 12px;
 }
 .discussion-intro h2 {
   font: 400 clamp(50px, 5.3vw, 81px)/0.99 var(--serif);
@@ -952,12 +983,12 @@ button svg {
   font-weight: 400;
 }
 .discussion-intro > p:not(.eyebrow) {
-  font-size: 13px;
+  font-size: 16px;
   color: #8a929e;
   line-height: 1.8;
 }
 .discussion-coordinate {
-  font: 6px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 1.2px;
   color: #535e6c;
   display: block;
@@ -966,16 +997,21 @@ button svg {
 .thought-form {
   padding-top: 8px;
 }
+.thought-form-title {
+  font: 400 clamp(30px, 3vw, 42px)/1.1 var(--serif);
+  color: var(--paper);
+  margin: 0 0 28px;
+}
 .thought-form label {
   display: flex;
   justify-content: space-between;
-  font: 7px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 1px;
   color: #b5bbc5;
   align-items: center;
 }
 .thought-form label > span {
-  font-size: 6px;
+  font-size: 12px;
   color: #626d7e;
 }
 .thought-form input,
@@ -990,7 +1026,7 @@ button svg {
   background: transparent;
   color: var(--paper);
   font:
-    14px/1.6 'DM Sans Variable',
+    16px/1.6 "DM Sans Variable",
     sans-serif;
   transition: border-color 0.2s;
   resize: vertical;
@@ -1019,7 +1055,7 @@ button svg {
   margin-top: 25px;
 }
 .form-actions > p {
-  font-size: 9px;
+  font-size: 16px;
   color: #6c7788;
   line-height: 1.7;
   margin: 0;
@@ -1031,7 +1067,7 @@ button svg {
   background: #e6e2d9;
   color: #15181d;
   padding: 15px 18px;
-  font-size: 10px;
+  font-size: 12px;
   white-space: nowrap;
   transition: background 0.2s;
 }
@@ -1040,7 +1076,7 @@ button svg {
 }
 .form-notice {
   min-height: 25px;
-  font-size: 11px;
+  font-size: 16px;
   line-height: 1.6;
   color: #b9c4d2;
   margin-top: 17px;
@@ -1051,13 +1087,29 @@ button svg {
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
-.saved-thoughts > h3 {
+.saved-thoughts-heading {
   grid-column: 1/-1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
   margin-bottom: 15px;
 }
-.saved-thoughts > h3 > span {
+.saved-thoughts-heading h3 {
+  margin: 0;
+}
+.saved-thoughts-heading > h3 > span {
   color: #525f73;
   margin-left: 15px;
+}
+.clear-thoughts {
+  border-bottom: 1px solid #586273;
+  color: #a9b2bf;
+  font: 12px var(--mono);
+  padding: 8px 0;
+}
+.clear-thoughts:hover {
+  color: var(--paper);
 }
 .saved-thought {
   padding: 25px;
@@ -1076,14 +1128,14 @@ button svg {
   justify-content: space-between;
   align-items: center;
   gap: 15px;
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   color: #8694a8;
 }
 .saved-thought button {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 8px;
+  font-size: 12px;
   color: #718198;
 }
 .saved-thought button:hover {
@@ -1105,12 +1157,12 @@ button svg {
   height: 24px;
 }
 .site-footer > span {
-  font: 6px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 1px;
   color: #677386;
 }
 .site-footer > .text-link {
-  font-size: 10px;
+  font-size: 12px;
   gap: 18px;
   color: #919cae;
 }
@@ -1134,6 +1186,22 @@ button svg {
 .reading-paper {
   padding: 30px 70px 50px;
 }
+.reduced-motion-view {
+  display: none;
+  min-height: 100svh;
+  background: #e9e5dc;
+  color: #292a2c;
+}
+.reduced-motion-view .reading-paper {
+  width: min(900px, 100%);
+  margin: 0 auto;
+}
+.reading-home-link {
+  color: #424e3b;
+  font: 12px var(--mono);
+  border-bottom: 1px solid #9aa28f;
+  padding: 8px 0;
+}
 .reading-header {
   display: flex;
   align-items: center;
@@ -1143,7 +1211,7 @@ button svg {
   gap: 16px;
 }
 .reading-header > .eyebrow {
-  font-size: 7px;
+  font-size: 12px;
   color: #767770;
 }
 .icon-button {
@@ -1160,7 +1228,7 @@ button svg {
 }
 .reading-intro > .eyebrow {
   color: #74766e;
-  font-size: 7px;
+  font-size: 12px;
 }
 .reading-intro h2 {
   font: 400 82px/0.99 var(--serif);
@@ -1184,7 +1252,7 @@ button svg {
   gap: 19px;
   align-items: center;
   width: 100%;
-  font: 9px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 1px;
   text-transform: uppercase;
   color: #666a61;
@@ -1197,6 +1265,12 @@ button svg {
 .reading-chapter-link > svg {
   margin-left: auto;
 }
+.reading-movement-heading {
+  max-width: 680px;
+  font: italic 400 clamp(30px, 3.4vw, 42px)/1.12 var(--serif);
+  color: #2b3129;
+  margin: 0 0 26px;
+}
 .reading-chapter p {
   font-size: 17px;
   line-height: 1.8;
@@ -1204,10 +1278,58 @@ button svg {
   max-width: 620px;
   margin: 0 0 19px;
 }
-.reading-chapter .reading-last {
-  font: italic 27px/1.3 var(--serif);
+.reading-chapter .reading-lead {
+  font-size: 20px;
+  color: #353c31;
+}
+.reading-chapter .reading-italic,
+.reading-chapter .reading-emphasis {
+  font: italic 25px/1.35 var(--serif);
+  color: #2b3129;
+}
+.reading-chapter .reading-closing {
+  font: 400 27px/1.3 var(--serif);
   color: #2b3129;
   margin-top: 23px;
+}
+.reading-chapter .reading-signature {
+  font: italic 25px/1.3 var(--serif);
+  color: #2b3129;
+}
+.reading-surfaces {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin: 24px 0 12px;
+}
+.reading-surface {
+  border-top: 1px solid #c6c4be;
+  padding-top: 12px;
+}
+.reading-surface h4 {
+  color: #596050;
+  font: 12px var(--mono);
+  letter-spacing: 1px;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+}
+.reading-surface p.reading-surface-lead {
+  font: italic 25px/1.2 var(--serif);
+  color: #2b3129;
+  margin-bottom: 8px;
+}
+.reading-surface p {
+  margin-bottom: 0;
+}
+.reading-chapter p.reading-footnote {
+  max-width: 620px;
+  margin: 26px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid #c6c4be;
+  color: #596050;
+  font: 12px/1.65 var(--mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 .reading-note {
   border-top: 1px solid #b9bdb0;
@@ -1216,10 +1338,10 @@ button svg {
 }
 .reading-note .eyebrow {
   color: #6d7565;
-  font-size: 7px;
+  font-size: 12px;
 }
 .reading-note p {
-  font-size: 11px;
+  font-size: 16px;
   line-height: 1.9;
   color: #747c6c;
   margin: 17px 0 26px;
@@ -1291,7 +1413,7 @@ button svg {
     font-size: 29px;
   }
   .prologue-eyebrow {
-    font-size: 9px !important;
+    font-size: 12px !important;
   }
   .beat .prologue-deck {
     font-size: 19px;
@@ -1300,13 +1422,13 @@ button svg {
     bottom: 125px;
   }
   .telemetry-key {
-    font-size: 6.5px;
+    font-size: 12px;
   }
   .telemetry-top {
-    font-size: 8px;
+    font-size: 12px;
   }
   .telemetry-status-value {
-    font-size: 7px;
+    font-size: 12px;
   }
   .stage-footer {
     height: 86px;
@@ -1325,7 +1447,7 @@ button svg {
     font-size: 48px;
   }
   .beat p {
-    font-size: 15px;
+    font-size: 16px;
     max-width: 360px;
   }
   .beat-density h2 {
@@ -1345,18 +1467,18 @@ button svg {
     gap: 8px;
   }
   .telemetry-key {
-    font-size: 5px;
+    font-size: 12px;
     letter-spacing: 0.5px;
   }
   .telemetry-status-value {
-    font-size: 5px;
+    font-size: 12px;
   }
   .prologue-colophon {
-    font-size: 5.7px;
+    font-size: 12px;
     letter-spacing: 0.6px;
   }
   .instrument-meta {
-    font-size: 7px;
+    font-size: 12px;
   }
   .header-nav {
     gap: 24px;
@@ -1365,7 +1487,7 @@ button svg {
     display: none;
   }
   .telemetry-top {
-    font-size: 6px;
+    font-size: 12px;
   }
 }
 @media (max-height: 760px) and (min-width: 1024px) {
@@ -1376,16 +1498,22 @@ button svg {
     top: 98px;
   }
   .editorial {
-    height: 395px;
-    top: 50%;
-    transform: translateY(-43%);
+    top: 132px;
+    right: 52%;
+    bottom: 92px;
+    height: auto;
+    transform: none;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #414957 transparent;
+    padding-right: 8px;
   }
   .beat h1 {
     font-size: min(6.3vw, 89px);
     margin-top: 25px;
   }
   .beat .prologue-deck {
-    font-size: 15px;
+    font-size: 16px;
     margin-top: 20px;
   }
   .begin-button {
@@ -1402,7 +1530,7 @@ button svg {
     margin-bottom: 20px;
   }
   .beat p {
-    font-size: 14px;
+    font-size: 16px;
     margin-bottom: 13px;
   }
   .beat p.editorial-emphasis {
@@ -1476,13 +1604,13 @@ button svg {
     margin-right: 26px;
   }
   .current-page {
-    font-size: 7px;
+    font-size: 12px;
   }
   .read-button {
-    font-size: 11px;
+    font-size: 12px;
   }
   .sound-button {
-    font-size: 7px;
+    font-size: 12px;
     padding: 10px 12px;
   }
   .brand > span {
@@ -1496,10 +1624,10 @@ button svg {
     left: 5%;
     right: 5%;
     top: 108px;
-    font-size: 7px;
+    font-size: 12px;
   }
   .instrument-meta-right {
-    font-size: 6px;
+    font-size: 12px;
     gap: 14px;
   }
   .margin-note {
@@ -1525,7 +1653,7 @@ button svg {
     height: 470px;
     transform: translateY(-42%);
   }
-  .pinned-stage[data-chapter='0'] .editorial {
+  .pinned-stage[data-chapter="0"] .editorial {
     top: 52%;
     height: 400px;
     transform: translateY(-30%);
@@ -1566,7 +1694,7 @@ button svg {
   .telemetry-top {
     border: 0;
     padding-bottom: 0;
-    font-size: 6px;
+    font-size: 12px;
   }
   .telemetry-values {
     display: flex;
@@ -1577,7 +1705,7 @@ button svg {
     display: none;
   }
   .telemetry-value {
-    font-size: 11px;
+    font-size: 12px;
     gap: 7px;
     margin: 0;
   }
@@ -1605,14 +1733,14 @@ button svg {
   }
   .rail-stop {
     height: 36px;
-    font-size: 8px;
+    font-size: 12px;
   }
   .rail-numeral {
     margin-left: 12px;
   }
   .rail-caption,
   .rail-end {
-    font-size: 5px;
+    font-size: 12px;
   }
   .field-trigger {
     left: 24%;
@@ -1626,18 +1754,18 @@ button svg {
     height: 74px;
   }
   .footer-chapter {
-    font-size: 7px;
+    font-size: 12px;
     gap: 12px;
   }
   .scroll-prompt {
-    font-size: 6px;
+    font-size: 12px;
     letter-spacing: 0.6px;
   }
   .progress-label {
     display: none;
   }
   .progress-readout {
-    font-size: 7px;
+    font-size: 12px;
   }
   .discussion-grid {
     gap: 7%;
@@ -1647,7 +1775,7 @@ button svg {
     font-size: 62px;
   }
   .thought-form label {
-    font-size: 6px;
+    font-size: 12px;
   }
   .form-actions {
     align-items: flex-start;
@@ -1658,17 +1786,17 @@ button svg {
     padding: 13px 17px;
   }
   .discussion-topline .eyebrow {
-    font-size: 6px;
+    font-size: 12px;
     letter-spacing: 0.7px;
   }
   .site-footer > span {
     display: none;
   }
   .discussion-coordinate {
-    font-size: 5px;
+    font-size: 12px;
   }
   .discussion-intro > p:not(.eyebrow) {
-    font-size: 12px;
+    font-size: 16px;
   }
   .sound-notice {
     top: 90px;
@@ -1700,7 +1828,7 @@ button svg {
     display: none;
   }
   .read-button {
-    font-size: 10px;
+    font-size: 12px;
     gap: 7px;
   }
   .read-button > svg {
@@ -1725,7 +1853,7 @@ button svg {
     left: 24px;
     right: 24px;
     top: 98px;
-    font-size: 6px;
+    font-size: 12px;
     letter-spacing: 1px;
   }
   .instrument-meta-right {
@@ -1743,7 +1871,7 @@ button svg {
     height: 445px;
     transform: translateY(-43%);
   }
-  .pinned-stage[data-chapter='0'] .editorial {
+  .pinned-stage[data-chapter="0"] .editorial {
     top: 53%;
     height: 360px;
     transform: translateY(-30%);
@@ -1754,18 +1882,22 @@ button svg {
     margin-top: 27px;
   }
   .beat .prologue-deck {
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.65;
     margin-top: 24px;
   }
   .prologue-eyebrow {
-    font-size: 6px !important;
+    font-size: 12px !important;
     letter-spacing: 1.3px;
     gap: 9px;
   }
+  .prologue-colophon,
+  .button-subline {
+    display: none;
+  }
   .begin-button {
-    font-size: 11px;
-    margin-top: 29px;
+    font-size: 12px;
+    margin-top: 22px;
     gap: 13px;
   }
   .circle-arrow {
@@ -1773,11 +1905,11 @@ button svg {
     height: 39px;
   }
   .button-subline {
-    font-size: 6px;
+    font-size: 12px;
     letter-spacing: 1px;
   }
   .prologue-colophon {
-    font-size: 5px;
+    font-size: 12px;
     gap: 8px;
     letter-spacing: 0.75px;
     margin-top: 31px;
@@ -1786,13 +1918,13 @@ button svg {
     width: 12px;
   }
   .beat-eyebrow {
-    font-size: 7px;
+    font-size: 12px;
     gap: 11px;
     margin-bottom: 25px;
     letter-spacing: 1.2px;
   }
   .chapter-number {
-    font-size: 8px;
+    font-size: 12px;
   }
   .eyebrow-line {
     width: 23px;
@@ -1803,7 +1935,7 @@ button svg {
     margin-bottom: 22px;
   }
   .beat p {
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.65;
     margin-bottom: 15px;
     max-width: 340px;
@@ -1822,21 +1954,21 @@ button svg {
     margin-top: 17px;
   }
   .beat-footnote {
-    font-size: 5.3px;
+    font-size: 12px;
     letter-spacing: 0.65px;
     gap: 10px;
     margin-top: 26px;
     max-width: 295px;
   }
   .beat-footnote > span {
-    font-size: 6px;
+    font-size: 12px;
     padding: 4px;
   }
   .beat-surfaces h2 {
     font-size: clamp(38px, 10.3vw, 56px);
   }
   .beat-surfaces > p {
-    font-size: 13px;
+    font-size: 16px;
   }
   .surface-tabs {
     gap: 8px;
@@ -1844,11 +1976,11 @@ button svg {
     padding-top: 12px;
   }
   .surface-tab {
-    font-size: 9px;
+    font-size: 12px;
     gap: 5px;
   }
   .surface-tab > span {
-    font-size: 6px;
+    font-size: 12px;
   }
   .surface-panels {
     margin-top: 22px;
@@ -1859,7 +1991,7 @@ button svg {
     margin-bottom: 12px;
   }
   .surface-panel p {
-    font-size: 13px;
+    font-size: 16px;
   }
   .surface-panel p.italic-copy {
     font-size: 21px;
@@ -1873,7 +2005,7 @@ button svg {
     margin-bottom: 20px;
   }
   .beat-density p {
-    font-size: 13px;
+    font-size: 16px;
     margin-bottom: 15px;
   }
   .beat-density p.italic-copy {
@@ -1882,7 +2014,7 @@ button svg {
     margin-top: 18px;
   }
   .beat-density .beat-footnote {
-    font-size: 5px;
+    font-size: 12px;
     margin-top: 24px;
     letter-spacing: 0.6px;
   }
@@ -1890,7 +2022,7 @@ button svg {
     font-size: clamp(39px, 10.5vw, 55px);
   }
   .beat-colours p {
-    font-size: 13px;
+    font-size: 16px;
   }
   .beat p.closing-thought {
     font-size: 23px;
@@ -1901,7 +2033,7 @@ button svg {
     font-size: clamp(36px, 9.6vw, 52px);
   }
   .beat-becoming p {
-    font-size: 13px;
+    font-size: 16px;
   }
   .beat-becoming p.closing-thought {
     font-size: 24px;
@@ -1911,7 +2043,7 @@ button svg {
     margin: 24px 0;
   }
   .closing-link {
-    font-size: 10px;
+    font-size: 12px;
     padding-bottom: 9px;
   }
   .chapter-rail {
@@ -1922,7 +2054,7 @@ button svg {
   }
   .rail-stop {
     height: 32px;
-    font-size: 7px;
+    font-size: 12px;
     width: 25px;
   }
   .rail-dot {
@@ -1936,25 +2068,23 @@ button svg {
     margin-left: 9px;
   }
   .rail-origin .rail-numeral {
-    font-size: 6px;
+    font-size: 12px;
   }
   .rail-caption,
   .rail-end,
   .rail-label {
     display: none;
   }
-  .rail-stop[data-active='true'] .rail-dot {
+  .rail-stop[data-active="true"] .rail-dot {
     box-shadow:
       0 0 0 2px #0b0c0e,
       0 0 0 2.6px #727780;
   }
   .telemetry {
-    left: 27px;
-    right: 51px;
-    bottom: 91px;
+    display: none;
   }
   .telemetry-top {
-    font-size: 5.6px;
+    font-size: 12px;
     letter-spacing: 0.75px;
   }
   .telemetry-values {
@@ -1962,7 +2092,7 @@ button svg {
     padding-top: 8px;
   }
   .telemetry-value {
-    font-size: 10px;
+    font-size: 12px;
   }
   .telemetry-value > i {
     font-size: 12px;
@@ -1972,11 +2102,11 @@ button svg {
     gap: 16px;
   }
   .spectral-legend > div {
-    font-size: 5.5px;
+    font-size: 12px;
     gap: 5px;
   }
   .spectral-legend small {
-    font-size: 4.5px;
+    font-size: 12px;
   }
   .spectral-legend i {
     width: 2.5px;
@@ -1989,7 +2119,7 @@ button svg {
     grid-template-columns: 1fr 1fr;
   }
   .footer-chapter {
-    font-size: 6.5px;
+    font-size: 12px;
     gap: 10px;
     letter-spacing: 0.5px;
   }
@@ -2003,7 +2133,7 @@ button svg {
     gap: 0;
   }
   .progress-readout {
-    font-size: 6.5px;
+    font-size: 12px;
     letter-spacing: 0.25px;
   }
   .discussion-footer {
@@ -2016,7 +2146,7 @@ button svg {
     display: none;
   }
   .discussion-topline .eyebrow {
-    font-size: 6px;
+    font-size: 12px;
     letter-spacing: 1px;
   }
   .discussion-grid {
@@ -2025,7 +2155,7 @@ button svg {
     padding: 55px 0 25px;
   }
   .discussion-intro > .eyebrow {
-    font-size: 6px;
+    font-size: 12px;
   }
   .discussion-intro h2 {
     font-size: 59px;
@@ -2033,41 +2163,41 @@ button svg {
     margin: 25px 0 22px;
   }
   .discussion-intro > p:not(.eyebrow) {
-    font-size: 12px;
+    font-size: 16px;
   }
   .discussion-coordinate {
     margin-top: 25px;
-    font-size: 5px;
+    font-size: 12px;
   }
   .thought-form {
     padding: 0;
   }
   .thought-form label {
-    font-size: 6px;
+    font-size: 12px;
   }
   .thought-form input {
     margin-bottom: 27px;
   }
   .thought-form input,
   .thought-form textarea {
-    font-size: 13px;
+    font-size: 16px;
   }
   .form-actions {
-    flex-direction: row;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
   }
   .form-actions > p {
-    font-size: 7px;
+    font-size: 16px;
     line-height: 1.6;
   }
   .submit-thought {
-    font-size: 9px;
+    font-size: 12px;
     gap: 16px;
     padding: 13px 14px;
   }
   .form-notice {
-    font-size: 10px;
+    font-size: 16px;
   }
   .saved-thoughts {
     grid-template-columns: 1fr;
@@ -2091,7 +2221,7 @@ button svg {
     height: 21px;
   }
   .site-footer > .text-link {
-    font-size: 8px;
+    font-size: 12px;
     gap: 9px;
     max-width: 140px;
     text-align: right;
@@ -2110,7 +2240,7 @@ button svg {
     padding-bottom: 18px;
   }
   .reading-header > .eyebrow {
-    font-size: 5.5px;
+    font-size: 12px;
     letter-spacing: 0.5px;
   }
   .reading-intro {
@@ -2122,20 +2252,27 @@ button svg {
     margin: 24px 0;
   }
   .reading-intro > .eyebrow {
-    font-size: 6px;
+    font-size: 12px;
   }
   .reading-deck {
-    font-size: 14px;
+    font-size: 16px;
   }
   .reading-chapter {
     padding: 28px 0 16px;
   }
+  .reading-movement-heading {
+    font-size: 32px;
+  }
+  .reading-surfaces {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
   .reading-chapter-link {
-    font-size: 7px;
+    font-size: 12px;
     margin-bottom: 22px;
   }
   .reading-chapter p {
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.8;
     margin-bottom: 16px;
   }
@@ -2143,10 +2280,10 @@ button svg {
     font-size: 25px;
   }
   .reading-note p {
-    font-size: 10px;
+    font-size: 16px;
   }
   .sound-notice {
-    font-size: 9px;
+    font-size: 12px;
     max-width: 220px;
   }
 }
@@ -2156,7 +2293,7 @@ button svg {
     top: 49%;
     transform: translateY(-43%);
   }
-  .pinned-stage[data-chapter='0'] .editorial {
+  .pinned-stage[data-chapter="0"] .editorial {
     top: 51%;
     height: 330px;
     transform: translateY(-33%);
@@ -2169,7 +2306,7 @@ button svg {
     margin-bottom: 18px;
   }
   .beat p {
-    font-size: 12px;
+    font-size: 16px;
     line-height: 1.6;
     margin-bottom: 13px;
   }
@@ -2186,7 +2323,7 @@ button svg {
   }
   .beat-footnote {
     margin-top: 21px;
-    font-size: 4.8px;
+    font-size: 12px;
   }
   .beat-density .beat-footnote {
     margin-top: 18px;
@@ -2206,7 +2343,7 @@ button svg {
     font-size: 25px;
   }
   .surface-panel p {
-    font-size: 12px;
+    font-size: 16px;
   }
   .beat-becoming h2 {
     font-size: 34px;
@@ -2216,7 +2353,7 @@ button svg {
     margin: 18px 0;
   }
   .beat .prologue-deck {
-    font-size: 14px;
+    font-size: 16px;
     margin-top: 20px;
   }
   .begin-button {
@@ -2242,7 +2379,38 @@ button svg {
     margin-top: 25px;
   }
 }
+@media (max-height: 760px) and (max-width: 600px) {
+  .editorial,
+  .pinned-stage[data-chapter="0"] .editorial {
+    top: 123px;
+    bottom: 156px;
+    height: auto;
+    transform: none;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #414957 transparent;
+    padding-right: 8px;
+  }
+  .pinned-stage[data-chapter="0"] .editorial {
+    top: 132px;
+    bottom: 164px;
+  }
+  .editorial .beat {
+    position: relative;
+  }
+  .editorial .beat[aria-hidden="true"] {
+    display: none;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
+  .scroll-track,
+  .reading-dialog,
+  .no-script-reader {
+    display: none !important;
+  }
+  .reduced-motion-view {
+    display: block;
+  }
   *,
   *::before,
   *::after {

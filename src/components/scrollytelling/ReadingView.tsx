@@ -1,58 +1,215 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react'
-import { CHAPTERS, FULL_TEXT } from './story'
-import { Icon } from '../Icons'
-import { lockDocumentScroll } from './scrollLock'
+import { Fragment, forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from "react";
+import { AUTHOR } from "../../lib/site";
+import { Icon } from "../Icons";
+import { lockDocumentScroll } from "./scrollLock";
+import {
+  CHAPTERS,
+  MOVEMENTS,
+  PHYSICS_NOTE,
+  PROLOGUE,
+  SURFACES,
+  THESIS_PUBLISHED_AT,
+  THESIS_READ_TIME_MINUTES,
+  publishedDateLabel,
+  type Movement,
+  type StorySegment,
+} from "./story";
 
 export interface ReadingHandle {
-  open: () => void
-  close: () => void
-  isOpen: () => boolean
+  open: () => void;
+  close: () => void;
+  isOpen: () => boolean;
+}
+
+function renderSegments(segments: readonly StorySegment[]) {
+  return segments.map((segment, index) => (
+    <Fragment key={`${segment.text}-${index}`}>
+      {segment.breakBefore && <br />}
+      {segment.emphasis ? (
+        <em>{segment.breakBefore ? segment.text.trimStart() : segment.text}</em>
+      ) : segment.breakBefore ? (
+        segment.text.trimStart()
+      ) : (
+        segment.text
+      )}
+    </Fragment>
+  ));
+}
+
+function paragraphClass(kind: string) {
+  if (kind === "body") return undefined;
+  if (kind === "lead") return "reading-lead";
+  if (kind === "emphasis") return "reading-emphasis";
+  if (kind === "signature") return "reading-signature";
+  return `reading-${kind}`;
+}
+
+function StoryPaper({
+  onChapter,
+  onClose,
+  titleId,
+}: {
+  onChapter?: (index: number) => void;
+  onClose?: () => void;
+  titleId: string;
+}) {
+  return (
+    <div className="reading-paper">
+      <header className="reading-header">
+        <span className="eyebrow">FOR THE TECH. / THE MANIFESTO</span>
+        {onClose ? (
+          <button
+            className="icon-button"
+            aria-label="Close reading view"
+            onClick={onClose}
+            autoFocus
+          >
+            <Icon name="close" />
+          </button>
+        ) : (
+          <a className="reading-home-link" href="/">
+            For the tech.
+          </a>
+        )}
+      </header>
+      <div className="reading-intro">
+        <p className="eyebrow">THE WORDS, WITHOUT THE MOTION.</p>
+        <h2 id={titleId}>{renderSegments(PROLOGUE.heading)}</h2>
+        <p className="reading-deck">
+          {PROLOGUE.deck[0]}
+          <br />
+          {PROLOGUE.deck[1]}
+        </p>
+        <p className="reading-byline">
+          <span>{AUTHOR}</span>
+          <span aria-hidden="true">·</span>
+          <time dateTime={THESIS_PUBLISHED_AT}>{publishedDateLabel()}</time>
+          <span aria-hidden="true">·</span>
+          <span>{THESIS_READ_TIME_MINUTES} min read</span>
+        </p>
+      </div>
+      {MOVEMENTS.map((movement, index) => (
+        <ReadableMovement
+          key={movement.numeral}
+          movement={movement}
+          index={index}
+          onChapter={onChapter}
+        />
+      ))}
+      <footer className="reading-note">
+        <span className="eyebrow">A NOTE ON THE EXPERIMENT</span>
+        <p>{PHYSICS_NOTE}</p>
+        {onClose && (
+          <button className="text-link" onClick={onClose}>
+            Back to the light <Icon name="arrow" size={14} />
+          </button>
+        )}
+      </footer>
+    </div>
+  );
+}
+
+function ReadableMovement({
+  movement,
+  index,
+  onChapter,
+}: {
+  movement: Movement;
+  index: number;
+  onChapter?: (index: number) => void;
+}) {
+  const chapterIndex = index + 1;
+  return (
+    <section className="reading-chapter" aria-labelledby={`reading-movement-${movement.numeral}`}>
+      {onChapter ? (
+        <button className="reading-chapter-link" onClick={() => onChapter(chapterIndex)}>
+          <span>{CHAPTERS[chapterIndex].numeral}</span>
+          <span>{CHAPTERS[chapterIndex].title}</span>
+          <Icon name="arrow" size={14} />
+        </button>
+      ) : (
+        <div className="reading-chapter-link">
+          <span>{CHAPTERS[chapterIndex].numeral}</span>
+          <span>{CHAPTERS[chapterIndex].title}</span>
+        </div>
+      )}
+      <h3 className="reading-movement-heading" id={`reading-movement-${movement.numeral}`}>
+        {renderSegments(movement.heading)}
+      </h3>
+      {movement.blocks.map((block, blockIndex) =>
+        block.type === "surfaces" ? (
+          <div className="reading-surfaces" key={`surfaces-${blockIndex}`}>
+            {SURFACES.map((surface) => (
+              <div className="reading-surface" key={surface.label}>
+                <h4>{surface.label}</h4>
+                <p className="reading-surface-lead">{surface.lead}</p>
+                <p>{surface.detail}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className={paragraphClass(block.kind)} key={`paragraph-${blockIndex}`}>
+            {renderSegments(block.segments)}
+          </p>
+        ),
+      )}
+      {movement.footnote && <p className="reading-footnote">{movement.footnote}</p>}
+    </section>
+  );
+}
+
+export function ReducedMotionReading() {
+  return (
+    <article className="reduced-motion-view" aria-labelledby="reduced-reading-title">
+      <StoryPaper titleId="reduced-reading-title" />
+    </article>
+  );
 }
 
 export const ReadingView = forwardRef<
   ReadingHandle,
   { onOpenChange: (open: boolean) => void; onChapter: (index: number) => void }
 >(function ReadingView({ onOpenChange, onChapter }, ref) {
-  const dialog = useRef<HTMLDialogElement>(null)
-  const restoreScroll = useRef<(() => void) | null>(null)
+  const dialog = useRef<HTMLDialogElement>(null);
+  const restoreScroll = useRef<(() => void) | null>(null);
   const release = useCallback(() => {
-    if (!restoreScroll.current) return
-    const restore = restoreScroll.current
-    restoreScroll.current = null
-    restore()
-    onOpenChange(false)
-  }, [onOpenChange])
+    if (!restoreScroll.current) return;
+    const restore = restoreScroll.current;
+    restoreScroll.current = null;
+    restore();
+    onOpenChange(false);
+  }, [onOpenChange]);
   const close = useCallback(() => {
-    if (dialog.current?.open) dialog.current.close()
-    release()
-  }, [release])
+    if (dialog.current?.open) dialog.current.close();
+    release();
+  }, [release]);
   useEffect(
     () => () => {
-      restoreScroll.current?.()
-      restoreScroll.current = null
+      restoreScroll.current?.();
+      restoreScroll.current = null;
     },
     [],
-  )
+  );
   useImperativeHandle(
     ref,
     () => ({
       open() {
-        if (!dialog.current || dialog.current.open) return
+        if (!dialog.current || dialog.current.open) return;
         try {
-          dialog.current.showModal()
+          dialog.current.showModal();
         } catch {
-          return
+          return;
         }
-        restoreScroll.current = lockDocumentScroll(document)
-        onOpenChange(true)
+        restoreScroll.current = lockDocumentScroll(document);
+        onOpenChange(true);
       },
       close,
       isOpen() {
-        return !!dialog.current?.open
+        return !!dialog.current?.open;
       },
     }),
     [onOpenChange, close],
-  )
+  );
 
   return (
     <dialog
@@ -60,95 +217,48 @@ export const ReadingView = forwardRef<
       ref={dialog}
       aria-labelledby="reading-title"
       onKeyDown={(event) => {
-        if (event.key !== 'Tab' || event.altKey || event.ctrlKey || event.metaKey) return
+        if (event.key !== "Tab" || event.altKey || event.ctrlKey || event.metaKey) return;
         const controls = [
           ...event.currentTarget.querySelectorAll<HTMLElement>(
             'button:not([disabled]),a[href],input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])',
           ),
-        ].filter((element) => element.getClientRects().length > 0 && !element.closest('[inert]'))
+        ].filter((element) => element.getClientRects().length > 0 && !element.closest("[inert]"));
         const first = controls[0],
-          last = controls[controls.length - 1]
-        if (!first) return
+          last = controls[controls.length - 1];
+        if (!first) return;
         if (
           event.shiftKey &&
           (document.activeElement === first || document.activeElement === event.currentTarget)
         ) {
-          event.preventDefault()
-          last.focus()
+          event.preventDefault();
+          last.focus();
         } else if (
           !event.shiftKey &&
           (document.activeElement === last || document.activeElement === event.currentTarget)
         ) {
-          event.preventDefault()
-          first.focus()
+          event.preventDefault();
+          first.focus();
         }
       }}
       onCancel={(event) => {
-        event.preventDefault()
-        close()
+        event.preventDefault();
+        close();
       }}
       onClose={() => {
-        if (!dialog.current?.open) release()
+        if (!dialog.current?.open) release();
       }}
       onClick={(event) => {
-        if (event.target === dialog.current) close()
+        if (event.target === dialog.current) close();
       }}
     >
-      <div className="reading-paper">
-        <header className="reading-header">
-          <span className="eyebrow">FOR THE TECH. / THE MANIFESTO</span>
-          <button className="icon-button" aria-label="Close reading view" onClick={close} autoFocus>
-            <Icon name="close" />
-          </button>
-        </header>
-        <div className="reading-intro">
-          <p className="eyebrow">THE WORDS, WITHOUT THE MOTION.</p>
-          <h2 id="reading-title">
-            The Refraction
-            <br />
-            of <em>Thought.</em>
-          </h2>
-          <p className="reading-deck">
-            Curiosity enters. Craft bends it.
-            <br />
-            Reality catches the colour.
-          </p>
-        </div>
-        {FULL_TEXT.map((chapter, index) => (
-          <section className="reading-chapter" key={chapter.title}>
-            <button
-              className="reading-chapter-link"
-              onClick={() => {
-                close()
-                onChapter(index + 1)
-              }}
-            >
-              <span>{CHAPTERS[index + 1].numeral}</span>
-              <span>{chapter.title}</span>
-              <Icon name="arrow" size={14} />
-            </button>
-            {chapter.paragraphs.map((paragraph, pIndex) => (
-              <p
-                key={paragraph}
-                className={pIndex === chapter.paragraphs.length - 1 ? 'reading-last' : ''}
-              >
-                {paragraph}
-              </p>
-            ))}
-          </section>
-        ))}
-        <footer className="reading-note">
-          <span className="eyebrow">A NOTE ON THE EXPERIMENT</span>
-          <p>
-            This is a metaphor, not a physics textbook. The optical engine uses Snell’s law and
-            Cauchy’s equation; spectral separation is exaggerated after emergence. In nature, light
-            can also refract when it leaves a denser medium.
-          </p>
-          <button className="text-link" onClick={close}>
-            Back to the light <Icon name="arrow" size={14} />
-          </button>
-        </footer>
-      </div>
+      <StoryPaper
+        titleId="reading-title"
+        onClose={close}
+        onChapter={(index) => {
+          close();
+          onChapter(index);
+        }}
+      />
     </dialog>
-  )
-})
+  );
+});

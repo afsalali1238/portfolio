@@ -1,8 +1,10 @@
-import { chromium } from "playwright";
+import { chromium } from "playwright-core";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
 
+// Set THESIS_CHROMIUM to an executable path when Edge is not installed; OG_OUTPUT_DIR can
+// redirect generated files for a safe preview without overwriting the checked-in cards.
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.resolve(__dirname, "..");
 
@@ -130,8 +132,8 @@ const renderHtml = ({ kicker, title, sub, url, right, size = 120 }) => `<!doctyp
       <div class="kick">${esc(kicker)}</div>
     </div>
     <div class="mid">
-      <h1 style="font-size: ${size}px;">${esc(title)}</h1>
-      ${sub ? `<p>${esc(sub)}</p>` : ""}
+      <h1 style="font-size: ${size}px;">${esc(title).replace(/\n/g, "<br>")}</h1>
+      ${sub ? `<p>${esc(sub).replace(/\n/g, "<br>")}</p>` : ""}
     </div>
     <div class="foot">
       <span>${esc(url)}</span>
@@ -169,15 +171,6 @@ const items = [
     url: "www.forthe.tech/about",
     right: "Afsal Ali · Dubai",
   },
-  {
-    id: "thesis",
-    kicker: "Notes · Dispatch No. 01",
-    title: "The Energy Ledger.",
-    size: 130,
-    sub: "AI tokens are the new currency. And every token is an IOU on physical energy.",
-    url: "www.forthe.tech/notes/the-energy-ledger",
-    right: "Afsal Ali · Dubai",
-  },
   ...projects.map((p) => ({
     id: p.id,
     kicker: `${builtForLabel(p.for)} · ${p.year}`,
@@ -187,7 +180,7 @@ const items = [
     url: `www.forthe.tech/works/${p.id}`,
     right: p.tags.slice(0, 3).join(" · "),
   })),
-  ...DISPATCHES.map((d) => ({
+  ...DISPATCHES.filter((d) => d.path !== "/thesis").map((d) => ({
     id: path.basename(d.path),
     kicker: `Notes · Dispatch No. ${d.number}`,
     title: d.title,
@@ -196,13 +189,26 @@ const items = [
     url: `www.forthe.tech${d.path}`,
     right: `${d.readTime} · Afsal Ali`,
   })),
+  {
+    id: "thesis",
+    kicker: "A thesis in six movements",
+    title: "The Refraction\nof Thought.",
+    size: 120,
+    sub: "Curiosity enters. Craft bends it.\nReality catches the colour.",
+    url: "www.forthe.tech/thesis",
+    right: "Afsal Ali · Dubai",
+  },
 ];
 
-const out = path.join(repo, "public/og");
+const out = path.resolve(process.env.OG_OUTPUT_DIR ?? path.join(repo, "public/og"));
 fs.mkdirSync(out, { recursive: true });
 
-console.log(`Generating ${items.length} share cards using MS Edge...`);
-const browser = await chromium.launch({ channel: "msedge" });
+console.log(`Generating ${items.length} share cards...`);
+const browser = await chromium.launch(
+  process.env.THESIS_CHROMIUM
+    ? { executablePath: process.env.THESIS_CHROMIUM }
+    : { channel: "msedge" },
+);
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });
 
 for (const it of items) {
