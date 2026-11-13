@@ -1,0 +1,115 @@
+{
+  "url": "http://localhost:3000",
+  "checkedAt": "2026-11-13T07:45:08.720Z",
+  "checks": [
+    {
+      "name": "SSR, route, metadata, local fonts, and the 600vh pinned track",
+      "status": "passed"
+    },
+    {
+      "name": "Ignition CTA and keyboard chapter navigation",
+      "status": "passed"
+    },
+    {
+      "name": "Pointer-controlled incident beam",
+      "status": "passed"
+    },
+    {
+      "name": "All four surface interactions remain story-locked",
+      "status": "passed"
+    },
+    {
+      "name": "Compression, five spectral bands, emergence, and chapter accessibility",
+      "status": "passed"
+    },
+    {
+      "name": "Reader dialog, focus restoration, Escape, and complete original text",
+      "status": "passed"
+    },
+    {
+      "name": "Ambient audio is opt-in and can be muted",
+      "status": "passed"
+    },
+    {
+      "name": "Field notes save locally, survive a reload, and can be removed",
+      "status": "passed"
+    },
+    {
+      "name": "Responsive reading and no horizontal overflow: 390 × 844",
+      "status": "passed"
+    },
+    {
+      "name": "Responsive reading and no horizontal overflow: 375 × 667",
+      "status": "passed"
+    },
+    {
+      "name": "Responsive reading and no horizontal overflow: 320 × 568",
+      "status": "passed"
+    },
+    {
+      "name": "Responsive reading and no horizontal overflow: 768 × 1024",
+      "status": "passed"
+    },
+    {
+      "name": "Responsive reading and no horizontal overflow: 844 × 390",
+      "status": "passed"
+    },
+    {
+      "name": "Standard-motion progress is damped, rather than snapped",
+      "status": "passed"
+    },
+    {
+      "name": "No-JavaScript fallback exposes the entire manifesto",
+      "status": "passed"
+    }
+  ],
+  "accessibility": [
+    {
+      "name": "Prologue and discussion footer",
+      "violations": [],
+      "needsManualReview": 1
+    },
+    {
+      "name": "Chapter 1",
+      "violations": [],
+      "needsManualReview": 1
+    },
+    {
+      "name": "Chapter 2",
+      "violations": [],
+      "needsManualReview": 1
+    },
+    {
+      "name": "Chapter 3",
+      "violations": [],
+      "needsManualReview": 1
+    },
+    {
+      "name": "Chapter 4",
+      "violations": [],
+      "needsManualReview": 1
+    },
+    {
+      "name": "Chapter 5",
+      "violations": [],
+      "needsManualReview": 1
+    },
+    {
+      "name": "Chapter 6",
+      "violations": [],
+      "needsManualReview": 1
+    },
+    {
+      "name": "Reading view",
+      "violations": [],
+      "needsManualReview": 0
+    },
+    {
+      "name": "Mobile closing chapter",
+      "violations": [],
+      "needsManualReview": 1
+    }
+  ],
+  "browserErrors": [],
+  "status": "passed"
+}

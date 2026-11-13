@@ -1,0 +1,6 @@
+src/routeTree.gen.ts
+pnpm-lock.yaml
+.output/
+node_modules/
+qa/screenshots/
+qa/results.json

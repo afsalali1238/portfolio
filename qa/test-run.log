@@ -1,0 +1,421 @@
+
+> your-creative-showcase@ test:all /home/user/your-creative-showcase
+> pnpm test && pnpm test:browser && pnpm test:hardening
+
+
+> your-creative-showcase@ test /home/user/your-creative-showcase
+> tsx --test src/components/*.test.ts src/components/scrollytelling/*.test.ts
+
+TAP version 13
+# Subtest: Bounded, untrusted browser storage
+    # Subtest: accepts only an array of valid notes
+    ok 1 - accepts only an array of valid notes
+      ---
+      duration_ms: 1.110972
+      type: 'test'
+      ...
+    # Subtest: trims and bounds stored user text
+    ok 2 - trims and bounds stored user text
+      ---
+      duration_ms: 0.154977
+      type: 'test'
+      ...
+    # Subtest: rejects corrupt dates and empty notes
+    ok 3 - rejects corrupt dates and empty notes
+      ---
+      duration_ms: 0.131998
+      type: 'test'
+      ...
+    # Subtest: de-duplicates IDs and caps the retained list
+    ok 4 - de-duplicates IDs and caps the retained list
+      ---
+      duration_ms: 0.306384
+      type: 'test'
+      ...
+    # Subtest: does not parse oversized storage payloads
+    ok 5 - does not parse oversized storage payloads
+      ---
+      duration_ms: 0.16479
+      type: 'test'
+      ...
+    # Subtest: can be imported and queried safely during SSR
+    ok 6 - can be imported and queried safely during SSR
+      ---
+      duration_ms: 0.089899
+      type: 'test'
+      ...
+    1..6
+ok 1 - Bounded, untrusted browser storage
+  ---
+  duration_ms: 2.637727
+  type: 'suite'
+  ...
+# Subtest: Compatibility-safe local note identifiers
+    # Subtest: creates distinct identifiers
+    ok 1 - creates distinct identifiers
+      ---
+      duration_ms: 0.264231
+      type: 'test'
+      ...
+    # Subtest: works when randomUUID is missing
+    ok 2 - works when randomUUID is missing
+      ---
+      duration_ms: 0.66871
+      type: 'test'
+      ...
+    # Subtest: still works without the Web Crypto API
+    ok 3 - still works without the Web Crypto API
+      ---
+      duration_ms: 0.170735
+      type: 'test'
+      ...
+    1..3
+ok 2 - Compatibility-safe local note identifiers
+  ---
+  duration_ms: 1.42728
+  type: 'suite'
+  ...
+# Subtest: Snell’s law
+    # Subtest: preserves normal incidence
+    ok 1 - preserves normal incidence
+      ---
+      duration_ms: 0.607611
+      type: 'test'
+      ...
+    # Subtest: bends toward the normal in glass
+    ok 2 - bends toward the normal in glass
+      ---
+      duration_ms: 0.113956
+      type: 'test'
+      ...
+    # Subtest: detects total internal reflection
+    ok 3 - detects total internal reflection
+      ---
+      duration_ms: 0.14506
+      type: 'test'
+      ...
+    # Subtest: reflects a mirror ray by 180°
+    ok 4 - reflects a mirror ray by 180°
+      ---
+      duration_ms: 0.517825
+      type: 'test'
+      ...
+    1..4
+ok 3 - Snell’s law
+  ---
+  duration_ms: 1.971894
+  type: 'suite'
+  ...
+# Subtest: Prism geometry and spectral dispersion
+    # Subtest: intersects a segment without accepting intersections behind the ray
+    ok 1 - intersects a segment without accepting intersections behind the ray
+      ---
+      duration_ms: 0.216032
+      type: 'test'
+      ...
+    # Subtest: traces both glass boundaries with a ~32° bend
+    ok 2 - traces both glass boundaries with a ~32° bend
+      ---
+      duration_ms: 0.271162
+      type: 'test'
+      ...
+    # Subtest: calibrates the green index to 1.520 and bends violet more than red
+    ok 3 - calibrates the green index to 1.520 and bends violet more than red
+      ---
+      duration_ms: 0.190962
+      type: 'test'
+      ...
+    # Subtest: normalizes safely
+    ok 4 - normalizes safely
+      ---
+      duration_ms: 0.245089
+      type: 'test'
+      ...
+    1..4
+ok 4 - Prism geometry and spectral dispersion
+  ---
+  duration_ms: 1.172414
+  type: 'suite'
+  ...
+# Subtest: Particle budget and lifecycle
+    # Subtest: has exactly 120 particles and decays velocity and lifetime
+    ok 1 - has exactly 120 particles and decays velocity and lifetime
+      ---
+      duration_ms: 3.378225
+      type: 'test'
+      ...
+    1..1
+ok 5 - Particle budget and lifecycle
+  ---
+  duration_ms: 3.559134
+  type: 'suite'
+  ...
+# Subtest: Story timing
+    # Subtest: keeps the complete progress interval covered
+    ok 1 - keeps the complete progress interval covered
+      ---
+      duration_ms: 0.400473
+      type: 'test'
+      ...
+    # Subtest: synchronizes the surface order
+    ok 2 - synchronizes the surface order
+      ---
+      duration_ms: 0.078779
+      type: 'test'
+      ...
+    1..2
+ok 6 - Story timing
+  ---
+  duration_ms: 0.555644
+  type: 'suite'
+  ...
+# Subtest: Track-local progress and cinematic damping
+    # Subtest: excludes content before and after the track
+    ok 1 - excludes content before and after the track
+      ---
+      duration_ms: 0.558787
+      type: 'test'
+      ...
+    # Subtest: maps chapter navigation into the same document coordinate space
+    ok 2 - maps chapter navigation into the same document coordinate space
+      ---
+      duration_ms: 0.149938
+      type: 'test'
+      ...
+    # Subtest: guards empty/invalid measurement inputs
+    ok 3 - guards empty/invalid measurement inputs
+      ---
+      duration_ms: 0.171402
+      type: 'test'
+      ...
+    # Subtest: is equivalent at 60Hz and 120Hz
+    ok 4 - is equivalent at 60Hz and 120Hz
+      ---
+      duration_ms: 0.186395
+      type: 'test'
+      ...
+    # Subtest: snaps for reduced motion and settles exactly
+    ok 5 - snaps for reduced motion and settles exactly
+      ---
+      duration_ms: 0.072205
+      type: 'test'
+      ...
+    # Subtest: does not jump after a long suspended frame
+    ok 6 - does not jump after a long suspended frame
+      ---
+      duration_ms: 0.058557
+      type: 'test'
+      ...
+    1..6
+ok 7 - Track-local progress and cinematic damping
+  ---
+  duration_ms: 1.883381
+  type: 'suite'
+  ...
+# Subtest: Canvas backing-store safety
+    # Subtest: does not create a zero-sized source canvas in forced colours or hidden containers
+    ok 1 - does not create a zero-sized source canvas in forced colours or hidden containers
+      ---
+      duration_ms: 0.217719
+      type: 'test'
+      ...
+    # Subtest: honours normal DPR and caps very large allocations
+    ok 2 - honours normal DPR and caps very large allocations
+      ---
+      duration_ms: 0.625093
+      type: 'test'
+      ...
+    # Subtest: clamps extreme dimensions and preserves a minimum one-pixel store
+    ok 3 - clamps extreme dimensions and preserves a minimum one-pixel store
+      ---
+      duration_ms: 0.12414
+      type: 'test'
+      ...
+    # Subtest: handles missing or invalid pixel ratio values
+    ok 4 - handles missing or invalid pixel ratio values
+      ---
+      duration_ms: 0.23571
+      type: 'test'
+      ...
+    1..4
+ok 8 - Canvas backing-store safety
+  ---
+  duration_ms: 1.438044
+  type: 'suite'
+  ...
+# Subtest: Owned reading-view scroll locks
+    # Subtest: restores the exact styles that existed before opening
+    ok 1 - restores the exact styles that existed before opening
+      ---
+      duration_ms: 0.174195
+      type: 'test'
+      ...
+    # Subtest: does not release another overlay’s lock
+    ok 2 - does not release another overlay’s lock
+      ---
+      duration_ms: 0.063278
+      type: 'test'
+      ...
+    # Subtest: is safe to release twice and in reverse order
+    ok 3 - is safe to release twice and in reverse order
+      ---
+      duration_ms: 0.055428
+      type: 'test'
+      ...
+    1..3
+ok 9 - Owned reading-view scroll locks
+  ---
+  duration_ms: 0.384455
+  type: 'suite'
+  ...
+# Subtest: Web Audio ownership and races
+    # Subtest: is lazy, including when imported/updated during SSR
+    ok 1 - is lazy, including when imported/updated during SSR
+      ---
+      duration_ms: 0.726712
+      type: 'test'
+      ...
+    # Subtest: applies the current chapter hum when sound is enabled later
+    ok 2 - applies the current chapter hum when sound is enabled later
+      ---
+      duration_ms: 0.596591
+      type: 'test'
+      ...
+    # Subtest: suspends the context after a mute fade instead of leaving silent oscillators running
+    ok 3 - suspends the context after a mute fade instead of leaving silent oscillators running
+      ---
+      duration_ms: 326.236563
+      type: 'test'
+      ...
+    # Subtest: cancels a pending mute suspension when re-enabled
+    ok 4 - cancels a pending mute suspension when re-enabled
+      ---
+      duration_ms: 325.475502
+      type: 'test'
+      ...
+    # Subtest: does not allow a pending resume to play behind an open reader or hidden page
+    ok 5 - does not allow a pending resume to play behind an open reader or hidden page
+      ---
+      duration_ms: 0.669347
+      type: 'test'
+      ...
+    # Subtest: does not resurrect a destroyed context after an asynchronous resume
+    ok 6 - does not resurrect a destroyed context after an asynchronous resume
+      ---
+      duration_ms: 0.283929
+      type: 'test'
+      ...
+    # Subtest: stops and disconnects continuous and scheduled one-shot sources on destroy
+    ok 7 - stops and disconnects continuous and scheduled one-shot sources on destroy
+      ---
+      duration_ms: 0.33012
+      type: 'test'
+      ...
+    # Subtest: bounds a resume that never resolves, then stays muted after a late completion
+    ok 8 - bounds a resume that never resolves, then stays muted after a late completion
+      ---
+      duration_ms: 21.707787
+      type: 'test'
+      ...
+    # Subtest: closes a partially created graph when a browser audio device fails
+    ok 9 - closes a partially created graph when a browser audio device fails
+      ---
+      duration_ms: 0.486177
+      type: 'test'
+      ...
+    # Subtest: fails gracefully without supported audio
+    ok 10 - fails gracefully without supported audio
+      ---
+      duration_ms: 0.250833
+      type: 'test'
+      ...
+    1..10
+ok 10 - Web Audio ownership and races
+  ---
+  duration_ms: 677.912148
+  type: 'suite'
+  ...
+1..10
+# tests 43
+# suites 10
+# pass 43
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1281.29834
+
+> your-creative-showcase@ test:browser /home/user/your-creative-showcase
+> node qa/smoke.mjs
+
+✓ SSR, route, metadata, local fonts, and the 600vh pinned track
+✓ Ignition CTA and keyboard chapter navigation
+✓ Pointer-controlled incident beam
+✓ All four surface interactions remain story-locked
+✓ Compression, five spectral bands, emergence, and chapter accessibility
+✓ Reader dialog, focus restoration, Escape, and complete original text
+✓ Ambient audio is opt-in and can be muted
+✓ Field notes save locally, survive a reload, and can be removed
+✓ Responsive reading and no horizontal overflow: 390 × 844
+✓ Responsive reading and no horizontal overflow: 375 × 667
+✓ Responsive reading and no horizontal overflow: 320 × 568
+✓ Responsive reading and no horizontal overflow: 768 × 1024
+✓ Responsive reading and no horizontal overflow: 844 × 390
+✓ Standard-motion progress is damped, rather than snapped
+✓ No-JavaScript fallback exposes the entire manifesto
+
+15 browser checks passed. No browser errors.
+
+> your-creative-showcase@ test:hardening /home/user/your-creative-showcase
+> node qa/hardening.mjs
+
+✓ server: SSR, security headers, redirects, and a useful 404
+✓ server: Brotli/gzip negotiation, immutable caching, Vary, and conditional requests
+✓ chromium: Reduced motion is event-driven; initial load stays local
+✓ chromium: Idle editorial writes eliminated; damping and live motion preferences preserved
+✓ chromium: Reader focus, owned scroll locks, and chapter return
+✓ chromium: Keyboard respects editable fields, modifiers, rail focus, and hidden chapters
+✓ chromium: Discussion and return-to-origin navigation hand off keyboard focus
+✓ chromium: Resize preserves progress; document-relative navigation excludes surrounding content
+✓ chromium: Forced colours, zero-sized canvas, and context restoration do not crash
+✓ chromium: High-DPI mobile and 4K desktop canvases stay within the 4-megapixel budget
+✓ chromium: Audio/rendering pause for reader, page lifecycle, visibility, and offscreen stage
+✓ chromium: Client-side unmount releases RAF, audio, observers, and reader scroll lock
+✓ chromium: Missing UUID support, escaped user content, whitespace validation, and cross-tab notes
+✓ chromium: Blocked storage and unavailable Web Audio degrade without a broken page
+✓ chromium: A stalled native audio resume releases the busy control with an accessible notice
+✓ chromium: Unavailable Canvas 2D preserves the full interactive editorial
+✓ chromium: No-JavaScript manifesto remains readable and its local-only form cannot submit
+✓ firefox: Reduced motion is event-driven; initial load stays local
+✓ firefox: Idle editorial writes eliminated; damping and live motion preferences preserved
+✓ firefox: Reader focus, owned scroll locks, and chapter return
+✓ firefox: Keyboard respects editable fields, modifiers, rail focus, and hidden chapters
+✓ firefox: Discussion and return-to-origin navigation hand off keyboard focus
+✓ firefox: Resize preserves progress; document-relative navigation excludes surrounding content
+✓ firefox: Forced colours, zero-sized canvas, and context restoration do not crash
+✓ firefox: High-DPI mobile and 4K desktop canvases stay within the 4-megapixel budget
+✓ firefox: Audio/rendering pause for reader, page lifecycle, visibility, and offscreen stage
+✓ firefox: Client-side unmount releases RAF, audio, observers, and reader scroll lock
+✓ firefox: Missing UUID support, escaped user content, whitespace validation, and cross-tab notes
+✓ firefox: Blocked storage and unavailable Web Audio degrade without a broken page
+✓ firefox: A stalled native audio resume releases the busy control with an accessible notice
+✓ firefox: Unavailable Canvas 2D preserves the full interactive editorial
+✓ firefox: No-JavaScript manifesto remains readable and its local-only form cannot submit
+✓ webkit: Reduced motion is event-driven; initial load stays local
+✓ webkit: Idle editorial writes eliminated; damping and live motion preferences preserved
+✓ webkit: Reader focus, owned scroll locks, and chapter return
+✓ webkit: Keyboard respects editable fields, modifiers, rail focus, and hidden chapters
+✓ webkit: Discussion and return-to-origin navigation hand off keyboard focus
+✓ webkit: Resize preserves progress; document-relative navigation excludes surrounding content
+✓ webkit: Forced colours, zero-sized canvas, and context restoration do not crash
+✓ webkit: High-DPI mobile and 4K desktop canvases stay within the 4-megapixel budget
+✓ webkit: Audio/rendering pause for reader, page lifecycle, visibility, and offscreen stage
+✓ webkit: Client-side unmount releases RAF, audio, observers, and reader scroll lock
+✓ webkit: Missing UUID support, escaped user content, whitespace validation, and cross-tab notes
+✓ webkit: Blocked storage and unavailable Web Audio degrade without a broken page
+✓ webkit: A stalled native audio resume releases the busy control with an accessible notice
+✓ webkit: Unavailable Canvas 2D preserves the full interactive editorial
+✓ webkit: No-JavaScript manifesto remains readable and its local-only form cannot submit
+✓ all: No uncaught browser errors or external runtime requests
+
+48/48 hardening checks passed.

@@ -1,0 +1,72 @@
+
+> your-creative-showcase@ build /home/user/your-creative-showcase
+> vite build && tsc --noEmit
+
+vite v8.3.8 building client environment for production...
+transforming...
+✓ 164 modules transformed.
+rendering chunks...
+computing gzip size...
+.output/public/assets/ibm-plex-mono-latin-400-normal-CvHOgSBP.woff       13.14 kB
+.output/public/assets/ibm-plex-mono-latin-400-normal-DMJ8VG8y.woff2      14.70 kB
+.output/public/assets/dm-sans-latin-ext-wght-normal-BOFOeGcA.woff2       18.22 kB
+.output/public/assets/instrument-serif-latin-400-normal-BVbkICAY.woff    18.33 kB
+.output/public/assets/instrument-serif-latin-400-italic-u__WvvIK.woff    19.26 kB
+.output/public/assets/instrument-serif-latin-400-normal-DnYpCC2O.woff2   21.03 kB
+.output/public/assets/instrument-serif-latin-400-italic-DKMiL14s.woff2   22.12 kB
+.output/public/assets/dm-sans-latin-wght-normal-Xz1IZZA0.woff2           36.93 kB
+.output/public/assets/index-DhU6z9Np.css                                 37.97 kB │ gzip:   9.18 kB
+.output/public/assets/thesis-CiVWm5Of.js                                 55.64 kB │ gzip:  18.63 kB
+.output/public/assets/index-Dfhm0NaN.js                                 343.33 kB │ gzip: 111.03 kB
+
+✓ built in 466ms
+vite v8.3.8 building ssr environment for production...
+transforming...
+✓ 141 modules transformed.
+rendering chunks...
+computing gzip size...
+node_modules/.nitro/vite/services/ssr/nitro-service.json                                         0.02 kB │ gzip:  0.04 kB
+node_modules/.nitro/vite/services/ssr/assets/ibm-plex-mono-latin-400-normal-CvHOgSBP.woff       13.14 kB
+node_modules/.nitro/vite/services/ssr/assets/ibm-plex-mono-latin-400-normal-DMJ8VG8y.woff2      14.70 kB
+node_modules/.nitro/vite/services/ssr/assets/dm-sans-latin-ext-wght-normal-BOFOeGcA.woff2       18.22 kB
+node_modules/.nitro/vite/services/ssr/assets/instrument-serif-latin-400-normal-BVbkICAY.woff    18.33 kB
+node_modules/.nitro/vite/services/ssr/assets/instrument-serif-latin-400-italic-u__WvvIK.woff    19.26 kB
+node_modules/.nitro/vite/services/ssr/assets/instrument-serif-latin-400-normal-DnYpCC2O.woff2   21.03 kB
+node_modules/.nitro/vite/services/ssr/assets/instrument-serif-latin-400-italic-DKMiL14s.woff2   22.12 kB
+node_modules/.nitro/vite/services/ssr/assets/dm-sans-latin-wght-normal-Xz1IZZA0.woff2           36.93 kB
+node_modules/.nitro/vite/services/ssr/assets/router-DhU6z9Np.css                                37.97 kB │ gzip:  9.18 kB
+node_modules/.nitro/vite/services/ssr/assets/empty-plugin-adapters-BiGySXWX.js                   0.26 kB │ gzip:  0.17 kB
+node_modules/.nitro/vite/services/ssr/assets/start-CZxz8QQY.js                                   0.26 kB │ gzip:  0.19 kB
+node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-DwRJO-Kb.js              0.55 kB │ gzip:  0.31 kB
+node_modules/.nitro/vite/services/ssr/assets/router-0NIjHihP.js                                  5.14 kB │ gzip:  1.80 kB
+node_modules/.nitro/vite/services/ssr/assets/thesis-WBKGPqeO.js                                 91.36 kB │ gzip: 24.54 kB
+node_modules/.nitro/vite/services/ssr/index.js                                                 262.31 kB │ gzip: 63.68 kB
+
+✓ built in 237ms
+
+[nitro] ◐ Building [Nitro] (preset: node-server, compatibility: 2026-11-13)
+[nitro] ✔ Generated public .output/public
+vite v8.3.8 building nitro environment for production...
+transforming...
+✓ 195 modules transformed.
+rendering chunks...
+computing gzip size...
+.output/server/_ssr/start-CZxz8QQY.mjs                    0.12 kB │ gzip:   0.12 kB
+.output/server/_ssr/empty-plugin-adapters-BiGySXWX.mjs    0.21 kB │ gzip:   0.15 kB
+.output/server/_tanstack-start-manifest_v-DwRJO-Kb.mjs    0.61 kB │ gzip:   0.34 kB
+.output/server/_chunks/ssr-renderer.mjs                   1.21 kB │ gzip:   0.58 kB
+.output/server/_runtime.mjs                               1.55 kB │ gzip:   0.72 kB
+.output/server/_ssr/router-0NIjHihP.mjs                   5.36 kB │ gzip:   1.79 kB
+.output/server/_libs/tanstack__history.mjs               11.66 kB │ gzip:   3.46 kB
+.output/server/_libs/react.mjs                           17.85 kB │ gzip:   4.62 kB
+.output/server/index.mjs                                 21.91 kB │ gzip:   6.48 kB
+.output/server/_libs/@tanstack/react-router+[2...].mjs   37.22 kB │ gzip:   9.48 kB
+.output/server/_libs/h3+rou3+srvx.mjs                    73.86 kB │ gzip:  19.22 kB
+.output/server/_ssr/thesis-WBKGPqeO.mjs                  98.58 kB │ gzip:  24.70 kB
+.output/server/_ssr/ssr.mjs                             255.43 kB │ gzip:  62.76 kB
+.output/server/_libs/@tanstack/react-router+[...].mjs   656.45 kB │ gzip: 137.74 kB
+
+✓ built in 258ms
+ℹ Generated .output/nitro.json
+
+[nitro] ✔ You can preview this build using npx vite preview

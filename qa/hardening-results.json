@@ -1,0 +1,507 @@
+{
+  "url": "http://localhost:3000",
+  "checkedAt": "2026-11-13T07:45:25.125Z",
+  "checks": [
+    {
+      "engine": "server",
+      "name": "SSR, security headers, redirects, and a useful 404",
+      "status": "passed",
+      "ms": 37
+    },
+    {
+      "engine": "server",
+      "name": "Brotli/gzip negotiation, immutable caching, Vary, and conditional requests",
+      "status": "passed",
+      "ms": 23
+    },
+    {
+      "engine": "chromium",
+      "name": "Reduced motion is event-driven; initial load stays local",
+      "status": "passed",
+      "ms": 2560
+    },
+    {
+      "engine": "chromium",
+      "name": "Idle editorial writes eliminated; damping and live motion preferences preserved",
+      "status": "passed",
+      "ms": 2426
+    },
+    {
+      "engine": "chromium",
+      "name": "Reader focus, owned scroll locks, and chapter return",
+      "status": "passed",
+      "ms": 1653
+    },
+    {
+      "engine": "chromium",
+      "name": "Keyboard respects editable fields, modifiers, rail focus, and hidden chapters",
+      "status": "passed",
+      "ms": 926
+    },
+    {
+      "engine": "chromium",
+      "name": "Discussion and return-to-origin navigation hand off keyboard focus",
+      "status": "passed",
+      "ms": 833
+    },
+    {
+      "engine": "chromium",
+      "name": "Resize preserves progress; document-relative navigation excludes surrounding content",
+      "status": "passed",
+      "ms": 1378
+    },
+    {
+      "engine": "chromium",
+      "name": "Forced colours, zero-sized canvas, and context restoration do not crash",
+      "status": "passed",
+      "ms": 2110
+    },
+    {
+      "engine": "chromium",
+      "name": "High-DPI mobile and 4K desktop canvases stay within the 4-megapixel budget",
+      "status": "passed",
+      "ms": 1354
+    },
+    {
+      "engine": "chromium",
+      "name": "Audio/rendering pause for reader, page lifecycle, visibility, and offscreen stage",
+      "status": "passed",
+      "ms": 4003
+    },
+    {
+      "engine": "chromium",
+      "name": "Client-side unmount releases RAF, audio, observers, and reader scroll lock",
+      "status": "passed",
+      "ms": 1634
+    },
+    {
+      "engine": "chromium",
+      "name": "Missing UUID support, escaped user content, whitespace validation, and cross-tab notes",
+      "status": "passed",
+      "ms": 1510
+    },
+    {
+      "engine": "chromium",
+      "name": "Blocked storage and unavailable Web Audio degrade without a broken page",
+      "status": "passed",
+      "ms": 739
+    },
+    {
+      "engine": "chromium",
+      "name": "A stalled native audio resume releases the busy control with an accessible notice",
+      "status": "passed",
+      "ms": 3545
+    },
+    {
+      "engine": "chromium",
+      "name": "Unavailable Canvas 2D preserves the full interactive editorial",
+      "status": "passed",
+      "ms": 763
+    },
+    {
+      "engine": "chromium",
+      "name": "No-JavaScript manifesto remains readable and its local-only form cannot submit",
+      "status": "passed",
+      "ms": 108
+    },
+    {
+      "engine": "firefox",
+      "name": "Reduced motion is event-driven; initial load stays local",
+      "status": "passed",
+      "ms": 3242
+    },
+    {
+      "engine": "firefox",
+      "name": "Idle editorial writes eliminated; damping and live motion preferences preserved",
+      "status": "passed",
+      "ms": 2722
+    },
+    {
+      "engine": "firefox",
+      "name": "Reader focus, owned scroll locks, and chapter return",
+      "status": "passed",
+      "ms": 1988
+    },
+    {
+      "engine": "firefox",
+      "name": "Keyboard respects editable fields, modifiers, rail focus, and hidden chapters",
+      "status": "passed",
+      "ms": 1117
+    },
+    {
+      "engine": "firefox",
+      "name": "Discussion and return-to-origin navigation hand off keyboard focus",
+      "status": "passed",
+      "ms": 893
+    },
+    {
+      "engine": "firefox",
+      "name": "Resize preserves progress; document-relative navigation excludes surrounding content",
+      "status": "passed",
+      "ms": 1861
+    },
+    {
+      "engine": "firefox",
+      "name": "Forced colours, zero-sized canvas, and context restoration do not crash",
+      "status": "passed",
+      "ms": 2195
+    },
+    {
+      "engine": "firefox",
+      "name": "High-DPI mobile and 4K desktop canvases stay within the 4-megapixel budget",
+      "status": "passed",
+      "ms": 1703
+    },
+    {
+      "engine": "firefox",
+      "name": "Audio/rendering pause for reader, page lifecycle, visibility, and offscreen stage",
+      "status": "passed",
+      "ms": 12939
+    },
+    {
+      "engine": "firefox",
+      "name": "Client-side unmount releases RAF, audio, observers, and reader scroll lock",
+      "status": "passed",
+      "ms": 3865
+    },
+    {
+      "engine": "firefox",
+      "name": "Missing UUID support, escaped user content, whitespace validation, and cross-tab notes",
+      "status": "passed",
+      "ms": 2050
+    },
+    {
+      "engine": "firefox",
+      "name": "Blocked storage and unavailable Web Audio degrade without a broken page",
+      "status": "passed",
+      "ms": 1050
+    },
+    {
+      "engine": "firefox",
+      "name": "A stalled native audio resume releases the busy control with an accessible notice",
+      "status": "passed",
+      "ms": 3759
+    },
+    {
+      "engine": "firefox",
+      "name": "Unavailable Canvas 2D preserves the full interactive editorial",
+      "status": "passed",
+      "ms": 946
+    },
+    {
+      "engine": "firefox",
+      "name": "No-JavaScript manifesto remains readable and its local-only form cannot submit",
+      "status": "passed",
+      "ms": 365
+    },
+    {
+      "engine": "webkit",
+      "name": "Reduced motion is event-driven; initial load stays local",
+      "status": "passed",
+      "ms": 3273
+    },
+    {
+      "engine": "webkit",
+      "name": "Idle editorial writes eliminated; damping and live motion preferences preserved",
+      "status": "passed",
+      "ms": 2719
+    },
+    {
+      "engine": "webkit",
+      "name": "Reader focus, owned scroll locks, and chapter return",
+      "status": "passed",
+      "ms": 2778
+    },
+    {
+      "engine": "webkit",
+      "name": "Keyboard respects editable fields, modifiers, rail focus, and hidden chapters",
+      "status": "passed",
+      "ms": 1288
+    },
+    {
+      "engine": "webkit",
+      "name": "Discussion and return-to-origin navigation hand off keyboard focus",
+      "status": "passed",
+      "ms": 1185
+    },
+    {
+      "engine": "webkit",
+      "name": "Resize preserves progress; document-relative navigation excludes surrounding content",
+      "status": "passed",
+      "ms": 1895
+    },
+    {
+      "engine": "webkit",
+      "name": "Forced colours, zero-sized canvas, and context restoration do not crash",
+      "status": "passed",
+      "ms": 2795
+    },
+    {
+      "engine": "webkit",
+      "name": "High-DPI mobile and 4K desktop canvases stay within the 4-megapixel budget",
+      "status": "passed",
+      "ms": 2475
+    },
+    {
+      "engine": "webkit",
+      "name": "Audio/rendering pause for reader, page lifecycle, visibility, and offscreen stage",
+      "status": "passed",
+      "ms": 6605
+    },
+    {
+      "engine": "webkit",
+      "name": "Client-side unmount releases RAF, audio, observers, and reader scroll lock",
+      "status": "passed",
+      "ms": 2234
+    },
+    {
+      "engine": "webkit",
+      "name": "Missing UUID support, escaped user content, whitespace validation, and cross-tab notes",
+      "status": "passed",
+      "ms": 2108
+    },
+    {
+      "engine": "webkit",
+      "name": "Blocked storage and unavailable Web Audio degrade without a broken page",
+      "status": "passed",
+      "ms": 1188
+    },
+    {
+      "engine": "webkit",
+      "name": "A stalled native audio resume releases the busy control with an accessible notice",
+      "status": "passed",
+      "ms": 3799
+    },
+    {
+      "engine": "webkit",
+      "name": "Unavailable Canvas 2D preserves the full interactive editorial",
+      "status": "passed",
+      "ms": 1018
+    },
+    {
+      "engine": "webkit",
+      "name": "No-JavaScript manifesto remains readable and its local-only form cannot submit",
+      "status": "passed",
+      "ms": 429
+    },
+    {
+      "engine": "all",
+      "name": "No uncaught browser errors or external runtime requests",
+      "status": "passed",
+      "ms": 0
+    }
+  ],
+  "engines": {
+    "chromium": "145.0.7632.6",
+    "firefox": "146.0.1",
+    "webkit": "26.0"
+  },
+  "measurements": {
+    "htmlHeaders": {
+      "cache-control": "no-cache",
+      "content-security-policy": "base-uri 'self'; object-src 'none'; form-action 'self'",
+      "content-type": "text/html; charset=utf-8",
+      "permissions-policy": "camera=(), microphone=(), geolocation=()",
+      "referrer-policy": "strict-origin-when-cross-origin",
+      "x-content-type-options": "nosniff",
+      "date": "Fri, 13 Nov 2026 07:45:25 GMT",
+      "connection": "keep-alive",
+      "keep-alive": "timeout=5",
+      "transfer-encoding": "chunked"
+    },
+    "assets": [
+      {
+        "path": "/assets/index-DhU6z9Np.css",
+        "uncompressedBytes": 37971,
+        "brotliBytes": 7927,
+        "gzipBytes": 9109,
+        "brotliReductionPercent": 79.1
+      },
+      {
+        "path": "/assets/index-Dfhm0NaN.js",
+        "uncompressedBytes": 343337,
+        "brotliBytes": 95220,
+        "gzipBytes": 109819,
+        "brotliReductionPercent": 72.3
+      },
+      {
+        "path": "/assets/thesis-CiVWm5Of.js",
+        "uncompressedBytes": 55643,
+        "brotliBytes": 16045,
+        "gzipBytes": 18525,
+        "brotliReductionPercent": 71.2
+      }
+    ],
+    "chromium": {
+      "initialLoad": {
+        "domContentLoadedMs": 72.79999999981374,
+        "loadMs": 100.5,
+        "lcpMs": 100,
+        "cls": 0.0002164059737091692,
+        "longTasks": [],
+        "resourceBytes": 213992,
+        "canvasPixels": 1287000
+      },
+      "idle": {
+        "editorialMutationsPerSecond": 0,
+        "canvasDrawsPerSecond": 60
+      },
+      "highDpi": [
+        {
+          "width": 2661,
+          "height": 1502,
+          "cssWidth": 2550,
+          "cssHeight": 1440,
+          "dpr": 1.5
+        },
+        {
+          "width": 760,
+          "height": 1688,
+          "cssWidth": 380,
+          "cssHeight": 844,
+          "dpr": 4
+        }
+      ]
+    },
+    "firefox": {
+      "initialLoad": {
+        "domContentLoadedMs": 225,
+        "loadMs": 251,
+        "lcpMs": 198,
+        "cls": 0,
+        "longTasks": [],
+        "resourceBytes": 214242,
+        "canvasPixels": 1296000
+      },
+      "idle": {
+        "editorialMutationsPerSecond": 0,
+        "canvasDrawsPerSecond": 60
+      },
+      "highDpi": [
+        {
+          "width": 2666,
+          "height": 1500,
+          "cssWidth": 2560,
+          "cssHeight": 1440,
+          "dpr": 1.5
+        },
+        {
+          "width": 780,
+          "height": 1688,
+          "cssWidth": 390,
+          "cssHeight": 844,
+          "dpr": 4
+        }
+      ]
+    },
+    "webkit": {
+      "initialLoad": {
+        "domContentLoadedMs": 141,
+        "loadMs": 211,
+        "lcpMs": 262,
+        "cls": 0,
+        "longTasks": [],
+        "resourceBytes": 232253,
+        "canvasPixels": 1296000
+      },
+      "idle": {
+        "editorialMutationsPerSecond": 0,
+        "canvasDrawsPerSecond": 21
+      },
+      "highDpi": [
+        {
+          "width": 2666,
+          "height": 1500,
+          "cssWidth": 2560,
+          "cssHeight": 1440,
+          "dpr": 1.5
+        },
+        {
+          "width": 780,
+          "height": 1688,
+          "cssWidth": 390,
+          "cssHeight": 844,
+          "dpr": 4
+        }
+      ]
+    }
+  },
+  "accessibility": [
+    {
+      "engine": "chromium",
+      "state": "Prologue",
+      "violations": [],
+      "needsManualReview": 1
+    },
+    {
+      "engine": "chromium",
+      "state": "Becoming",
+      "violations": [],
+      "needsManualReview": 1
+    },
+    {
+      "engine": "chromium",
+      "state": "Reading dialog",
+      "violations": [],
+      "needsManualReview": 0
+    },
+    {
+      "engine": "chromium",
+      "state": "Forced colours",
+      "violations": [],
+      "needsManualReview": 0
+    },
+    {
+      "engine": "firefox",
+      "state": "Prologue",
+      "violations": [],
+      "needsManualReview": 1
+    },
+    {
+      "engine": "firefox",
+      "state": "Becoming",
+      "violations": [],
+      "needsManualReview": 1
+    },
+    {
+      "engine": "firefox",
+      "state": "Reading dialog",
+      "violations": [],
+      "needsManualReview": 0
+    },
+    {
+      "engine": "firefox",
+      "state": "Forced colours",
+      "violations": [],
+      "needsManualReview": 0
+    },
+    {
+      "engine": "webkit",
+      "state": "Prologue",
+      "violations": [],
+      "needsManualReview": 1
+    },
+    {
+      "engine": "webkit",
+      "state": "Becoming",
+      "violations": [],
+      "needsManualReview": 1
+    },
+    {
+      "engine": "webkit",
+      "state": "Reading dialog",
+      "violations": [],
+      "needsManualReview": 0
+    },
+    {
+      "engine": "webkit",
+      "state": "Forced colours",
+      "violations": [],
+      "needsManualReview": 1
+    }
+  ],
+  "browserErrors": [],
+  "externalRequests": [],
+  "audioOutput": "Headless PulseAudio output (null sink in this verification run)",
+  "status": "passed"
+}
