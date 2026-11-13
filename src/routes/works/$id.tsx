@@ -212,9 +212,11 @@ function ProjectCaseStudy() {
 
             {/* What I Learned */}
             {project.learned && (
-              <SectionReveal className="space-y-4" style={{ borderLeft: "2px solid var(--fg)", paddingLeft: "24px", paddingTop: "8px", paddingBottom: "8px" }}>
-                <p className="t-label">04 ── WHAT I LEARNED</p>
-                <p className="t-display-3" style={{ fontStyle: "italic" }}>"{project.learned}"</p>
+              <SectionReveal className="space-y-4">
+                <div style={{ borderLeft: "2px solid var(--fg)", paddingLeft: "24px", paddingTop: "8px", paddingBottom: "8px" }}>
+                  <p className="t-label">04 ── WHAT I LEARNED</p>
+                  <p className="t-display-3" style={{ fontStyle: "italic" }}>"{project.learned}"</p>
+                </div>
               </SectionReveal>
             )}
 
@@ -235,24 +237,27 @@ function ProjectCaseStudy() {
             )}
 
             {/* Tech Stack - Section 06 */}
-            <SectionReveal className="space-y-4" style={{ backgroundColor: "var(--bg-raised)", padding: "24px", borderRadius: "4px" }}>
-              <p className="t-label">06 ── TECHNICAL STACK</p>
-              <h2 className="t-display-3">Tools and dependencies.</h2>
-              <div className="flex flex-wrap gap-2 pt-2">
-                {((project.stack || project.tags) as string[]).map((tech: string) => (
-                  <span
-                    key={tech}
-                    className="chip"
-                  >
-                    {tech}
-                  </span>
-                ))}
+            <SectionReveal className="space-y-4">
+              <div style={{ backgroundColor: "var(--bg-raised)", padding: "24px", borderRadius: "4px" }}>
+                <p className="t-label">06 ── TECHNICAL STACK</p>
+                <h2 className="t-display-3">Tools and dependencies.</h2>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {((project.stack || project.tags) as string[]).map((tech: string) => (
+                    <span
+                      key={tech}
+                      className="chip"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
               </div>
             </SectionReveal>
 
             {/* Related Essays & Dispatches */}
             {getRelatedNotesForProject(project.id).length > 0 && (
-              <SectionReveal className="space-y-4" style={{ border: "1px solid var(--hairline)", backgroundColor: "var(--bg)", padding: "24px", borderRadius: "4px" }}>
+              <SectionReveal className="space-y-4">
+                <div style={{ border: "1px solid var(--hairline)", backgroundColor: "var(--bg)", padding: "24px", borderRadius: "4px" }}>
                 <p className="t-label">07 ── RELATED ESSAYS & DISPATCHES</p>
                 <h2 className="t-display-3">Read the deeper thesis.</h2>
                 <p className="t-small" style={{ color: "var(--fg-muted)" }}>
@@ -280,6 +285,7 @@ function ProjectCaseStudy() {
                     </Link>
                   ))}
                 </div>
+              </div>
               </SectionReveal>
             )}
           </div>

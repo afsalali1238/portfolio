@@ -1,1 +1,1 @@
-S-5: Home sections, about, contact, lab, 404 restyled to Thesis spec
+S-8: Remove Inter/JetBrains fonts, fix type errors

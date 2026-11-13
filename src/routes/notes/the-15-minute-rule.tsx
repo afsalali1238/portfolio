@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { seo, SITE_URL, SITE_NAME, AUTHOR } from "../../lib/site";
 import { getDispatchByPath, getNextAndPrevDispatches } from "../../data/dispatches";
 import { ArticleLayout } from "../../components/site/ArticleConnect";
@@ -71,13 +71,13 @@ function FifteenMinuteRulePage() {
 
         <p>
           When I designed the rehabilitation engine for{" "}
-          <a
+          <Link
             to="/works/$id"
             params={{ id: "kine" }}
             className="text-link"
           >
             kinē
-          </a>
+          </Link>
           , we set an uncompromising constraint: the progressive plan (Calm → Load → Capacity)
           had to be hard-capped at fifteen minutes a day. No marathon workouts. No clinical
           jargon. Just targeted, progressive loading you can execute before your morning coffee.
@@ -85,13 +85,13 @@ function FifteenMinuteRulePage() {
 
         <p>
           We applied the exact same principle to licensing exam prep with{" "}
-          <a
+          <Link
             to="/works/$id"
             params={{ id: "provia" }}
             className="text-link"
           >
             Provia
-          </a>
+          </Link>
           . Pharmacists preparing for DHA and MOH examinations in Dubai work demanding retail or
           hospital shifts. They don&rsquo;t have three-hour study blocks.
         </p>

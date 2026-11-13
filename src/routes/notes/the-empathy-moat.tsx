@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { seo, SITE_URL, SITE_NAME, AUTHOR } from "../../lib/site";
 import { getDispatchByPath, getNextAndPrevDispatches } from "../../data/dispatches";
 import { ArticleLayout } from "../../components/site/ArticleConnect";
