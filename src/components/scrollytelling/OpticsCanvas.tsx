@@ -668,6 +668,8 @@ class OpticalRenderer {
     }
     if (dispersion > 0) {
       const baseAngle = Math.atan2(white.outgoing.y, white.outgoing.x);
+      // A vertical surface on the right where colours land — prevents the "Dark Side" rainbow fan.
+      const surfaceX = this.w - 80;
       for (let i = 0; i < SPECTRUM.length; i++) {
         const band = SPECTRUM[i],
           trace = tracePrism(origin, direction, this.vertices, cauchyIndex(band.wavelength));
@@ -678,7 +680,9 @@ class OpticalRenderer {
           const theta =
             baseAngle +
             (Math.atan2(trace.outgoing.y, trace.outgoing.x) - baseAngle) * (1 + emergence * 8);
-          const reach = Math.hypot(this.w, this.h) * 1.35 * emergence;
+          // Intersect with vertical surface instead of going off-screen
+          const dx = surfaceX - trace.exit.x;
+          const reach = Math.abs(dx / Math.cos(theta));
           const end = add(trace.exit, { x: Math.cos(theta) * reach, y: Math.sin(theta) * reach });
           const bloom = c.createLinearGradient(trace.exit.x, trace.exit.y, end.x, end.y);
           bloom.addColorStop(0, `rgba(${band.rgb},0)`);
@@ -697,6 +701,32 @@ class OpticalRenderer {
           c.beginPath();
           c.arc(trace.exit.x, trace.exit.y, 1.5, 0, TAU);
           c.fill();
+          c.globalAlpha = 1;
+        }
+      }
+      // Draw the colour band on the surface where rays land
+      if (emergence > 0.5 && !this.mobile) {
+        const bandTop = this.cy + this.prismHeight / 3 + 40;
+        const bandHeight = 60;
+        c.lineWidth = 0.5;
+        c.strokeStyle = "rgba(180,190,200,0.3)";
+        c.beginPath();
+        c.moveTo(surfaceX, bandTop);
+        c.lineTo(surfaceX, bandTop + bandHeight);
+        c.stroke();
+        for (let i = 0; i < SPECTRUM.length; i++) {
+          const band = SPECTRUM[i],
+            trace = tracePrism(origin, direction, this.vertices, cauchyIndex(band.wavelength));
+          if (!trace || trace.totalInternalReflection) continue;
+          const theta =
+            baseAngle +
+            (Math.atan2(trace.outgoing.y, trace.outgoing.x) - baseAngle) * (1 + emergence * 8);
+          const dx = surfaceX - trace.exit.x;
+          const reach = Math.abs(dx / Math.cos(theta));
+          const end = add(trace.exit, { x: Math.cos(theta) * reach, y: Math.sin(theta) * reach });
+          c.fillStyle = band.color;
+          c.globalAlpha = emergence * 0.4;
+          c.fillRect(surfaceX - 4, end.y - 2, 8, 4);
           c.globalAlpha = 1;
         }
       }

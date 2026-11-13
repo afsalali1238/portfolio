@@ -90,7 +90,6 @@ export function DiscussionFooter() {
     <footer className="discussion-footer" id="discussion" tabIndex={-1}>
       <div className="discussion-topline">
         <span className="eyebrow">THE END IS AN OPENING.</span>
-        <span className="eyebrow">PRIVATE FIELD NOTES ↗</span>
       </div>
       <div className="discussion-grid">
         <div className="discussion-intro">
@@ -204,7 +203,11 @@ export function DiscussionFooter() {
       )}
       <div className="site-footer">
         <Brand />
-        <span>© 2026 · INDEPENDENT THOUGHT, MADE REAL.</span>
+        <span className="t-label">© 2026 · INDEPENDENT THOUGHT, MADE REAL.</span>
+        <div className="footer-links" style={{ display: "flex", gap: "16px", margin: "0 16px" }}>
+          <a href="/works" className="text-link" style={{ fontSize: "12px" }}>Works</a>
+          <a href="/notes" className="text-link" style={{ fontSize: "12px" }}>Notes</a>
+        </div>
         <button className="text-link" onClick={top}>
           Back to the beginning <Icon name="arrow" size={14} />
         </button>

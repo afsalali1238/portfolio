@@ -210,9 +210,11 @@ export function ScrollyStage() {
           />
           <Telemetry ref={telemetry} />
           <div className="stage-footer">
-            <span className="footer-chapter">
-              <span className="footer-plus">+</span>
-              <span ref={chapterText}>00 / PROLOGUE</span>
+            <span className="footer-chapter" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <span ref={chapterText} style={{ fontVariantNumeric: "tabular-nums" }}>00 / PROLOGUE</span>
+              <span style={{ borderLeft: "1px solid var(--hairline)", paddingLeft: "12px", color: "var(--fg-muted)" }}>
+                {CHAPTERS[activeChapter].title}
+              </span>
             </span>
             <button
               className="scroll-prompt"
