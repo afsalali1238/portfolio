@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "./styles/tokens.css";
 @import "@fontsource/instrument-serif/latin-400.css";
 @import "@fontsource/instrument-serif/latin-400-italic.css";
 @import "@fontsource-variable/dm-sans/wght.css";
@@ -16,104 +17,87 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-serif: var(--font-display);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-paper: var(--paper);
-  --color-paper-deep: var(--paper-deep);
-  --color-ink: var(--ink);
-  --color-ink-soft: var(--ink-soft);
-  --color-ink-mute: var(--ink-mute);
-  --color-rule: var(--rule);
-  --color-accent-ink: var(--accent-ink);
-  --color-mark-dot: var(--mark-dot);
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-card: var(--bg-raised);
+  --color-card-foreground: var(--fg);
+  --color-popover: var(--bg-raised);
+  --color-popover-foreground: var(--fg);
+  --color-primary: var(--fg);
+  --color-primary-foreground: var(--bg);
+  --color-secondary: var(--bg-raised);
+  --color-secondary-foreground: var(--fg);
+  --color-muted: var(--bg-raised);
+  --color-muted-foreground: var(--fg-faint);
+  --color-accent: var(--bg-raised);
+  --color-accent-foreground: var(--fg);
+  --color-destructive: oklch(0.5 0.2 27);
+  --color-destructive-foreground: var(--bg);
+  --color-border: var(--hairline);
+  --color-input: var(--hairline);
+  --color-ring: var(--fg-faint);
+  --color-paper: var(--bg);
+  --color-paper-deep: var(--bg-raised);
+  --color-ink: var(--fg);
+  --color-ink-soft: var(--fg-muted);
+  --color-ink-mute: var(--fg-faint);
+  --color-rule: var(--hairline);
+  --color-accent-ink: var(--lit);
+  --color-mark-dot: var(--lit);
 }
 
 :root {
   --radius: 0.5rem;
-  --paper: oklch(0.972 0.008 90);
-  --paper-deep: oklch(0.945 0.012 88);
-  --ink: oklch(0.18 0.012 60);
-  --ink-soft: oklch(0.32 0.012 60);
-  --ink-mute: oklch(0.52 0.012 60);
-  --rule: oklch(0.82 0.008 88);
-  --accent-ink: oklch(0.52 0.14 42);
-  /* The logo dot sits on an ink tile, so it takes the opposite theme's clay. */
-  --mark-dot: oklch(0.7 0.14 42);
-
-  --background: var(--paper);
-  --foreground: var(--ink);
-  --card: var(--paper);
-  --card-foreground: var(--ink);
-  --popover: var(--paper);
-  --popover-foreground: var(--ink);
-  --primary: var(--ink);
-  --primary-foreground: var(--paper);
-  --secondary: var(--paper-deep);
-  --secondary-foreground: var(--ink);
-  --muted: var(--paper-deep);
-  --muted-foreground: var(--ink-mute);
-  --accent: var(--paper-deep);
-  --accent-foreground: var(--ink);
+  /* Light theme values are now in tokens.css :root */
+  --background: var(--bg);
+  --foreground: var(--fg);
+  --card: var(--bg-raised);
+  --card-foreground: var(--fg);
+  --popover: var(--bg-raised);
+  --popover-foreground: var(--fg);
+  --primary: var(--fg);
+  --primary-foreground: var(--bg);
+  --secondary: var(--bg-raised);
+  --secondary-foreground: var(--fg);
+  --muted: var(--bg-raised);
+  --muted-foreground: var(--fg-faint);
+  --accent: var(--bg-raised);
+  --accent-foreground: var(--fg);
   --destructive: oklch(0.5 0.2 27);
-  --destructive-foreground: var(--paper);
-  --border: var(--rule);
-  --input: var(--rule);
-  --ring: var(--ink-mute);
+  --destructive-foreground: var(--bg);
+  --border: var(--hairline);
+  --input: var(--hairline);
+  --ring: var(--fg-faint);
 }
 
 .dark {
-  --paper: oklch(0.15 0.012 60);
-  --paper-deep: oklch(0.18 0.012 60);
-  --ink: oklch(0.97 0.008 90);
-  --ink-soft: oklch(0.8 0.01 80);
-  --ink-mute: oklch(0.6 0.01 70);
-  --rule: oklch(0.25 0.01 60);
-  --accent-ink: oklch(0.7 0.14 42);
-  --mark-dot: oklch(0.52 0.14 42);
-
-  --background: var(--paper);
-  --foreground: var(--ink);
-  --card: var(--paper);
-  --card-foreground: var(--ink);
-  --popover: var(--paper);
-  --popover-foreground: var(--ink);
-  --primary: var(--ink);
-  --primary-foreground: var(--paper);
-  --secondary: var(--paper-deep);
-  --secondary-foreground: var(--ink);
-  --muted: var(--paper-deep);
-  --muted-foreground: var(--ink-mute);
-  --accent: var(--paper-deep);
-  --accent-foreground: var(--ink);
+  /* Dark theme values are now in tokens.css .dark */
+  --background: var(--bg);
+  --foreground: var(--fg);
+  --card: var(--bg-raised);
+  --card-foreground: var(--fg);
+  --popover: var(--bg-raised);
+  --popover-foreground: var(--fg);
+  --primary: var(--fg);
+  --primary-foreground: var(--bg);
+  --secondary: var(--bg-raised);
+  --secondary-foreground: var(--fg);
+  --muted: var(--bg-raised);
+  --muted-foreground: var(--fg-faint);
+  --accent: var(--bg-raised);
+  --accent-foreground: var(--fg);
   --destructive: oklch(0.5 0.2 27);
-  --destructive-foreground: var(--paper);
-  --border: var(--rule);
-  --input: var(--rule);
-  --ring: var(--ink-mute);
+  --destructive-foreground: var(--bg);
+  --border: var(--hairline);
+  --input: var(--hairline);
+  --ring: var(--fg-faint);
 }
 
 @layer base {

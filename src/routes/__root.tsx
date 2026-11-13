@@ -102,8 +102,8 @@ export const Route = createRootRoute({
       { name: "author", content: AUTHOR },
       { property: "og:site_name", content: SITE_NAME },
       { property: "og:locale", content: "en_GB" },
-      { name: "theme-color", content: "#F8F6F0", media: "(prefers-color-scheme: light)" },
-      { name: "theme-color", content: "#0F0A06", media: "(prefers-color-scheme: dark)" },
+      { name: "theme-color", content: "#eeeae1", media: "(prefers-color-scheme: light)" },
+      { name: "theme-color", content: "#0b0c0e", media: "(prefers-color-scheme: dark)" },
     ],
     links: [
       {

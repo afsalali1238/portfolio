@@ -1,1 +1,1 @@
-S-1: Load DM Sans Variable and IBM Plex Mono fonts
+S-2: One token file with Thesis palette

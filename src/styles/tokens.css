@@ -1,0 +1,30 @@
+:root {
+  /* type */
+  --font-display: "Instrument Serif", Georgia, serif;
+  --font-sans: "DM Sans Variable", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* light theme (paper) */
+  --bg: #eeeae1;          /* page */
+  --bg-raised: #e6e1d6;   /* cards, inputs */
+  --fg: #0b0c0e;          /* primary text */
+  --fg-muted: #45484d;    /* secondary text, about 8:1 on --bg */
+  --fg-faint: #5f6369;    /* labels, about 5.4:1 on --bg */
+  --hairline: rgba(11, 12, 14, 0.14);
+  --lit: #9a4e12;         /* interaction accent, about 5.5:1 on --bg */
+  --focus: #0b0c0e;
+}
+.dark, .page-shell {
+  --bg: #0b0c0e;
+  --bg-raised: #131418;
+  --fg: #eeeae1;
+  --fg-muted: #a6a7a7;    /* about 8:1 */
+  --fg-faint: #8a8e95;    /* about 5.6:1, the value e14de83 already moved to */
+  --hairline: rgba(205, 211, 221, 0.14);
+  --lit: #f2a65a;
+  --focus: #eeeae1;
+  /* spectrum: used only inside instrument pages and for "lit" moments */
+  --spectrum-1: #7aa7ff;
+  --spectrum-2: #7ee0b5;
+  --spectrum-3: #f2a65a;
+}
