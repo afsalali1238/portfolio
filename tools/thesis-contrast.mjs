@@ -1,14 +1,10 @@
 #!/usr/bin/env node
 /**
- * Measure visible text contrast against the actual thesis canvas and the light reading view.
+ * Sample the contrast of the native thesis reader against its actual optical background.
  *
  *   pnpm dev --host 0.0.0.0
  *   THESIS_URL=http://127.0.0.1:5173/thesis node tools/thesis-contrast.mjs
  *   THESIS_CHROMIUM=/path/to/chromium THESIS_URL=... node tools/thesis-contrast.mjs
- *
- * For the animated stage, text is temporarily hidden and screenshots sample the pixels behind
- * each real text line. The report uses the 5th percentile of per-pixel WCAG ratios, not the
- * average of the whole paragraph. The static reading view uses its opaque paper surface.
  */
 import { chromium } from "playwright-core";
 
@@ -37,12 +33,9 @@ const channel = (value) => {
 };
 const luminance = ({ r, g, b }) => 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
 const contrast = (foreground, background) => {
-  const foregroundLuminance = luminance(foreground);
-  const backgroundLuminance = luminance(background);
-  return (
-    (Math.max(foregroundLuminance, backgroundLuminance) + 0.05) /
-    (Math.min(foregroundLuminance, backgroundLuminance) + 0.05)
-  );
+  const a = luminance(foreground);
+  const b = luminance(background);
+  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 };
 const composite = (foreground, background) => ({
   r: foreground.r * foreground.a + background.r * (1 - foreground.a),
@@ -51,7 +44,7 @@ const composite = (foreground, background) => ({
   a: 1,
 });
 
-function report({ viewport, mode, label, foreground, fontSize, fontWeight, ratios }) {
+function report({ viewport, section, label, foreground, fontSize, fontWeight, ratios }) {
   const large = fontSize >= 24 || (fontSize >= 18.67 && fontWeight >= 700);
   const minimum = large ? 3 : 4.5;
   const sorted = ratios.filter(Number.isFinite).sort((a, b) => a - b);
@@ -60,9 +53,8 @@ function report({ viewport, mode, label, foreground, fontSize, fontWeight, ratio
   auditedTextNodes += 1;
   if (!pass) failures += 1;
   console.log(
-    `${pass ? "PASS" : "FAIL"} ${viewport} ${mode} ${JSON.stringify(label)} · ` +
-      `${ratio.toFixed(2)}:1 (minimum ${minimum.toFixed(2)}:1; ` +
-      `${fontSize}px ${fontWeight}; ${sorted.length} pixels; ${foreground})`,
+    `${pass ? "PASS" : "FAIL"} ${viewport} section ${section} ${JSON.stringify(label)} · ` +
+      `${ratio.toFixed(2)}:1 (minimum ${minimum.toFixed(2)}:1; ${fontSize}px ${fontWeight}; ${foreground})`,
   );
 }
 
@@ -79,69 +71,45 @@ for (const viewport of VIEWPORTS) {
   await page.goto(PAGE_URL, { waitUntil: "networkidle", timeout: 60_000 });
   await page.evaluate(() => document.fonts.ready);
 
-  for (let chapter = 0; chapter <= 6; chapter++) {
-    await page.locator(".chapter-rail .rail-stop").nth(chapter).click();
-    await page.waitForFunction(
-      (index) =>
-        document.querySelector(".pinned-stage")?.getAttribute("data-chapter") === String(index) &&
-        document.querySelectorAll(".editorial .beat")[index]?.getAttribute("aria-hidden") ===
-          "false",
-      chapter,
-      { timeout: 8_000 },
-    );
-    await page.waitForTimeout(350);
-
-    const textTargets = await page.evaluate(() => {
-      const active = document.querySelector('.editorial .beat[aria-hidden="false"]');
-      if (!active) return [];
-      const candidates = [...active.querySelectorAll("*")].filter((element) =>
-        [...element.childNodes].some(
-          (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
-        ),
-      );
-      const seen = new Set();
-      const targets = [];
-      for (const element of candidates) {
-        if (seen.has(element) || element.closest('[aria-hidden="true"]')) continue;
-        seen.add(element);
+  const sections = page.locator(".flow-opening, .flow-movement, .flow-closing");
+  for (let section = 0; section < (await sections.count()); section++) {
+    await sections.nth(section).scrollIntoViewIfNeeded();
+    await page.waitForTimeout(150);
+    const targets = await sections.nth(section).evaluate((root) => {
+      const candidates = [
+        ...root.querySelectorAll("h1,h2,h3,p,a,.flow-kicker,.flow-chapter-label"),
+      ];
+      return candidates.flatMap((element, index) => {
         const style = getComputedStyle(element);
-        if (
-          style.display === "none" ||
-          style.visibility === "hidden" ||
-          Number(style.opacity) < 0.1
-        )
-          continue;
-        const rects = [];
-        for (const node of element.childNodes) {
-          if (node.nodeType !== Node.TEXT_NODE || !node.textContent?.trim()) continue;
-          const range = document.createRange();
-          range.selectNodeContents(node);
-          for (const rect of range.getClientRects())
-            if (rect.width > 0 && rect.height > 0)
-              rects.push({
-                left: rect.left,
-                top: rect.top,
-                width: rect.width,
-                height: rect.height,
-              });
-        }
-        if (!rects.length) continue;
-        const id = String(targets.length);
+        if (style.display === "none" || style.visibility === "hidden") return [];
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        const rects = [...range.getClientRects()]
+          .filter((rect) => rect.width > 0 && rect.height > 0)
+          .map((rect) => ({
+            left: rect.left,
+            top: rect.top,
+            width: rect.width,
+            height: rect.height,
+          }));
+        if (!rects.length) return [];
+        const id = `${index}`;
         element.setAttribute("data-thesis-contrast-target", id);
-        targets.push({
-          id,
-          label: (element.textContent || "").trim().replace(/\s+/g, " ").slice(0, 64),
-          foreground: style.color,
-          fontSize: Number.parseFloat(style.fontSize),
-          fontWeight: Number.parseFloat(style.fontWeight) || 400,
-          rects,
-        });
-      }
-      return targets;
+        return [
+          {
+            id,
+            label: (element.textContent || "").trim().replace(/\s+/g, " ").slice(0, 64),
+            foreground: style.color,
+            fontSize: Number.parseFloat(style.fontSize),
+            fontWeight: Number.parseFloat(style.fontWeight) || 400,
+            rects,
+          },
+        ];
+      });
     });
-
     await page.addStyleTag({
-      content: "[data-thesis-contrast-target] { opacity: 0 !important; }",
+      content:
+        "[data-thesis-contrast-target] { color: transparent !important; text-shadow: none !important; }",
     });
     const screenshot = await page.screenshot({ type: "png" });
     const backgrounds = await page.evaluate(
@@ -157,35 +125,33 @@ for (const viewport of VIEWPORTS) {
         context.drawImage(image, 0, 0);
         const scaleX = image.width / window.innerWidth;
         const scaleY = image.height / window.innerHeight;
-        return targets.map(({ rects }) => {
-          const ratios = [];
-          for (const rect of rects) {
+        return targets.map(({ rects }) =>
+          rects.flatMap((rect) => {
             const x = Math.max(0, Math.floor(rect.left * scaleX));
             const y = Math.max(0, Math.floor(rect.top * scaleY));
             const right = Math.min(image.width, Math.ceil((rect.left + rect.width) * scaleX));
             const bottom = Math.min(image.height, Math.ceil((rect.top + rect.height) * scaleY));
-            const width = right - x;
-            const height = bottom - y;
-            if (width < 1 || height < 1) continue;
-            const pixels = context.getImageData(x, y, width, height).data;
+            if (right <= x || bottom <= y) return [];
+            const pixels = context.getImageData(x, y, right - x, bottom - y).data;
+            const values = [];
             for (let index = 0; index < pixels.length; index += 4)
-              ratios.push([pixels[index], pixels[index + 1], pixels[index + 2]]);
-          }
-          return ratios;
-        });
+              values.push([pixels[index], pixels[index + 1], pixels[index + 2]]);
+            return values;
+          }),
+        );
       },
-      { base64: screenshot.toString("base64"), targets: textTargets },
+      { base64: screenshot.toString("base64"), targets },
     );
     await page.locator("[data-thesis-contrast-target]").evaluateAll((elements) => {
       for (const element of elements) element.removeAttribute("data-thesis-contrast-target");
     });
 
-    for (const [index, target] of textTargets.entries()) {
+    for (const [index, target] of targets.entries()) {
       const foreground = parseColour(target.foreground);
       if (!foreground) {
         failures += 1;
         console.log(
-          `FAIL ${viewport.name} movement ${chapter} could not parse ${target.foreground}`,
+          `FAIL ${viewport.name} section ${section} could not parse ${target.foreground}`,
         );
         continue;
       }
@@ -196,59 +162,9 @@ for (const viewport of VIEWPORTS) {
           background,
         );
       });
-      report({
-        viewport: `${viewport.width}x${viewport.height}`,
-        mode: `dark stage ${chapter}`,
-        ...target,
-        ratios,
-      });
+      report({ viewport: `${viewport.width}x${viewport.height}`, section, ...target, ratios });
     }
   }
-
-  const readingButton = page.getByRole("button", { name: /read the words/i });
-  await readingButton.click();
-  await page.locator("dialog[open]").waitFor();
-  const readingTargets = await page.locator("dialog[open]").evaluate((dialog) => {
-    const targets = [];
-    const candidates = [...dialog.querySelectorAll("*")].filter((element) =>
-      [...element.childNodes].some(
-        (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
-      ),
-    );
-    const seen = new Set();
-    for (const element of candidates) {
-      if (seen.has(element) || element.closest('[aria-hidden="true"]')) continue;
-      seen.add(element);
-      const style = getComputedStyle(element);
-      if (style.display === "none" || style.visibility === "hidden") continue;
-      targets.push({
-        label: (element.textContent || "").trim().replace(/\s+/g, " ").slice(0, 64),
-        foreground: style.color,
-        background: getComputedStyle(dialog).backgroundColor,
-        fontSize: Number.parseFloat(style.fontSize),
-        fontWeight: Number.parseFloat(style.fontWeight) || 400,
-      });
-    }
-    return targets;
-  });
-  for (const target of readingTargets) {
-    const foreground = parseColour(target.foreground);
-    const background = parseColour(target.background);
-    if (!foreground || !background) {
-      failures += 1;
-      console.log(`FAIL ${viewport.name} reading view could not parse a computed colour`);
-      continue;
-    }
-    report({
-      viewport: `${viewport.width}x${viewport.height}`,
-      mode: "light reading",
-      ...target,
-      ratios: [
-        contrast(foreground.a < 1 ? composite(foreground, background) : foreground, background),
-      ],
-    });
-  }
-  await page.keyboard.press("Escape");
   await context.close();
 }
 

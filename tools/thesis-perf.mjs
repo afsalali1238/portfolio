@@ -1,20 +1,19 @@
 #!/usr/bin/env node
 /**
- * Measure the thesis route on simulated cellular 4G, including actual canvas draw cost.
+ * Measure the reading-first thesis route on simulated cellular 4G.
  *
  *   pnpm build && pnpm preview --host 0.0.0.0   # terminal 1
  *   THESIS_URL=http://127.0.0.1:4173/thesis node tools/thesis-perf.mjs
  *   THESIS_CPU_THROTTLE=6 THESIS_URL=... node tools/thesis-perf.mjs
  *
- * Canvas costs are measured inside the production draw loop. This measures JavaScript draw
- * time, not asynchronous GPU rasterisation. Browser and real-device results will vary.
+ * The optical field is event-driven: it redraws when reading position changes and is idle while
+ * prose is being read. The audit protects that contract as well as LCP, CLS, and JS weight.
  */
 import { gzipSync } from "node:zlib";
 import { chromium } from "playwright-core";
 
 const PAGE_URL = process.env.THESIS_URL ?? "http://127.0.0.1:4173/thesis";
 const CPU_THROTTLE = Number(process.env.THESIS_CPU_THROTTLE ?? "1");
-const SAMPLE_SECONDS = Number(process.env.THESIS_SAMPLE_SECONDS ?? "4");
 const JS_BUDGET = 200 * 1024;
 const LCP_BUDGET = 2500;
 const CLS_BUDGET = 0.01;
@@ -86,43 +85,55 @@ for (const response of scriptResponses) {
   }
 }
 
-await page.evaluate(() => {
-  window.__thesisCanvasDraws = 0;
-  window.__thesisCanvasPaintCosts = [];
-});
-await page.waitForTimeout(SAMPLE_SECONDS * 1000);
-const sample = await page.evaluate(() => ({
-  draws: window.__thesisCanvasDraws ?? 0,
-  paintCosts: window.__thesisCanvasPaintCosts ?? [],
-  lcp: window.__thesisMetrics?.lcp ?? 0,
-  cls: window.__thesisMetrics?.cls ?? 0,
-}));
-const visibleFps = sample.draws / SAMPLE_SECONDS;
+const resetCanvasMetrics = () =>
+  page.evaluate(() => {
+    window.__thesisCanvasDraws = 0;
+    window.__thesisCanvasPaintCosts = [];
+  });
+const canvasMetrics = () =>
+  page.evaluate(() => ({
+    draws: window.__thesisCanvasDraws ?? 0,
+    paintCosts: window.__thesisCanvasPaintCosts ?? [],
+    lcp: window.__thesisMetrics?.lcp ?? 0,
+    cls: window.__thesisMetrics?.cls ?? 0,
+  }));
+
+await resetCanvasMetrics();
+await page.waitForTimeout(1000);
+const idle = await canvasMetrics();
+
+await resetCanvasMetrics();
+await page.evaluate(() =>
+  document.querySelector(".flow-movement")?.scrollIntoView({ behavior: "instant", block: "start" }),
+);
+await page.waitForTimeout(500);
+const afterScroll = await canvasMetrics();
+await page.waitForTimeout(1000);
+const settled = await canvasMetrics();
+
 const jsGzipBytes = scriptBodies.reduce((total, body) => total + gzipSync(body).byteLength, 0);
-const sortedCosts = sample.paintCosts.filter(Number.isFinite).sort((a, b) => a - b);
+const sortedCosts = afterScroll.paintCosts.filter(Number.isFinite).sort((a, b) => a - b);
 const percentile = (values, fraction) =>
   values.length ? values[Math.min(values.length - 1, Math.floor(values.length * fraction))] : 0;
 const paintMedian = percentile(sortedCosts, 0.5);
 const paintP95 = percentile(sortedCosts, 0.95);
 
 await page.evaluate(() =>
-  window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }),
+  document.getElementById("discussion")?.scrollIntoView({ behavior: "instant" }),
 );
-await page.waitForTimeout(350);
-const offscreenStart = await page.evaluate(() => window.__thesisCanvasDraws ?? 0);
+await page.waitForTimeout(400);
+const offscreenStart = (await canvasMetrics()).draws;
 await page.waitForTimeout(1000);
-const offscreenEnd = await page.evaluate(() => window.__thesisCanvasDraws ?? 0);
-const offscreenDraws = offscreenEnd - offscreenStart;
+const offscreenDraws = (await canvasMetrics()).draws - offscreenStart;
 
-await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
-await page.waitForTimeout(450);
-const hiddenStart = await page.evaluate(() => window.__thesisCanvasDraws ?? 0);
 let hiddenDraws = null;
 try {
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await page.waitForTimeout(250);
+  await resetCanvasMetrics();
   await client.send("Emulation.setPageVisibilityOverride", { visibilityState: "hidden" });
   await page.waitForTimeout(1000);
-  const hiddenEnd = await page.evaluate(() => window.__thesisCanvasDraws ?? 0);
-  hiddenDraws = hiddenEnd - hiddenStart;
+  hiddenDraws = (await canvasMetrics()).draws;
   await client.send("Emulation.setPageVisibilityOverride", { visibilityState: "visible" });
 } catch {
   /* Some Chromium builds do not expose the page-visibility override. */
@@ -131,14 +142,14 @@ try {
 const results = [
   {
     label: "LCP",
-    value: `${(sample.lcp / 1000).toFixed(2)} s`,
-    pass: sample.lcp > 0 && sample.lcp < LCP_BUDGET,
+    value: `${(afterScroll.lcp / 1000).toFixed(2)} s`,
+    pass: afterScroll.lcp > 0 && afterScroll.lcp < LCP_BUDGET,
     budget: "< 2.50 s",
   },
   {
     label: "CLS",
-    value: sample.cls.toFixed(4),
-    pass: sample.cls <= CLS_BUDGET,
+    value: afterScroll.cls.toFixed(4),
+    pass: afterScroll.cls <= CLS_BUDGET,
     budget: "≤ 0.0100",
   },
   {
@@ -148,22 +159,34 @@ const results = [
     budget: "< 200 KB",
   },
   {
-    label: "Canvas draw median",
-    value: `${paintMedian.toFixed(2)} ms (${sortedCosts.length} frames)`,
+    label: "Canvas draw median after scroll",
+    value: `${paintMedian.toFixed(2)} ms (${sortedCosts.length} draws)`,
     pass: sortedCosts.length > 0 && paintMedian <= PAINT_BUDGET,
     budget: `≤ ${PAINT_BUDGET} ms at ${CPU_THROTTLE}× CPU`,
   },
   {
-    label: "Canvas draw p95",
+    label: "Canvas draw p95 after scroll",
     value: `${paintP95.toFixed(2)} ms`,
     pass: sortedCosts.length > 0 && paintP95 <= PAINT_BUDGET * 2,
     budget: `≤ ${(PAINT_BUDGET * 2).toFixed(0)} ms`,
   },
   {
-    label: "Visible canvas rate",
-    value: `${visibleFps.toFixed(1)} fps`,
-    pass: visibleFps > 0 && visibleFps <= 30.5,
-    budget: "> 0 and ≤ 30 fps on mobile",
+    label: "Idle canvas draws",
+    value: String(idle.draws),
+    pass: idle.draws === 0,
+    budget: "0 while the reader is at rest",
+  },
+  {
+    label: "Canvas draws after a reading scroll",
+    value: String(afterScroll.draws),
+    pass: afterScroll.draws > 0 && afterScroll.draws <= 4,
+    budget: "1–4 event-driven draws",
+  },
+  {
+    label: "Settled canvas draws",
+    value: String(settled.draws - afterScroll.draws),
+    pass: settled.draws === afterScroll.draws,
+    budget: "0 after the scroll settles",
   },
   {
     label: "Off-screen canvas draws",
@@ -182,7 +205,7 @@ const results = [
 console.log(`Thesis route performance · simulated cellular 4G · ${CPU_THROTTLE}× CPU`);
 for (const result of results)
   console.log(
-    `${result.pass ? "PASS" : "FAIL"}  ${result.label.padEnd(30)} ${result.value.padEnd(28)} ${result.budget}`,
+    `${result.pass ? "PASS" : "FAIL"}  ${result.label.padEnd(32)} ${result.value.padEnd(28)} ${result.budget}`,
   );
 
 await browser.close();

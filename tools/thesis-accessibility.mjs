@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Keyboard, focus-order, reduced-motion, local-notebook, and axe smoke audit for /thesis.
+ * Keyboard, native-reading, reduced-motion, local-notebook, and axe smoke audit for /thesis.
  *
  *   pnpm dev --host 0.0.0.0
  *   THESIS_URL=http://127.0.0.1:5173/thesis node tools/thesis-accessibility.mjs
@@ -91,50 +91,28 @@ check(
   (await page.locator(".discussion-footer:focus").count()) === 1,
 );
 
-const railButtons = page.locator(".chapter-rail .rail-stop");
-if (await railButtons.count()) {
-  await railButtons.first().focus();
-  await page.keyboard.press("ArrowDown");
-  check(
-    "chapter rail supports arrow navigation",
-    await railButtons.nth(1).evaluate((element) => element === document.activeElement),
-  );
-} else {
-  check("chapter rail supports arrow navigation", false, "no rail buttons found");
-}
-
-const readingButton = page.getByRole("button", { name: /read the words/i });
-if (await readingButton.count()) {
-  await readingButton.first().click();
-  check("reading view opens", (await page.locator("dialog[open]").count()) === 1);
-  check(
-    "reading view preserves editorial footnotes and the physics note",
-    (await page.locator("dialog[open] .reading-footnote").count()) === 5 &&
-      (await page
-        .locator("dialog[open] .reading-note")
-        .getByText(/Light can refract at a boundary/)
-        .count()) === 1,
-  );
-  check(
-    "reading view starts and keeps focus inside",
-    await page.evaluate(() => {
-      const dialog = document.querySelector("dialog[open]");
-      return !!dialog && dialog.contains(document.activeElement);
-    }),
-  );
-  await page.keyboard.press("Shift+Tab");
-  check(
-    "Shift+Tab stays inside reading view",
-    await page.evaluate(() => {
-      const dialog = document.querySelector("dialog[open]");
-      return !!dialog && dialog.contains(document.activeElement);
-    }),
-  );
-  await page.keyboard.press("Escape");
-  check("Escape closes reading view", (await page.locator("dialog[open]").count()) === 0);
-} else {
-  check("reading view opens", false, "Read the words button not found");
-}
+const reader = page.locator(".reading-flow");
+check(
+  "thesis uses one native article flow",
+  (await reader.isVisible()) &&
+    (await reader.locator(".flow-movement").count()) === 6 &&
+    (await reader.locator("h1").count()) === 1 &&
+    (await reader.locator("h2").count()) === 6,
+);
+check(
+  "reader preserves all surfaces, footnotes, and the physics note",
+  (await reader.locator(".flow-surface").count()) === 4 &&
+    (await reader.locator(".flow-footnote").count()) === 5 &&
+    (await reader.getByText(/Light can refract at a boundary/).count()) === 1,
+);
+check(
+  "reader has no competing dashboard controls",
+  (await page.locator(".chapter-rail, .telemetry, .stage-footer, dialog").count()) === 0,
+);
+check(
+  "reader offers a semantic path to the notebook",
+  (await page.locator('.flow-discussion-link[href="#discussion"]').count()) === 1,
+);
 
 const noteText = "A private note for the automated accessibility test.";
 const form = page.locator(".thought-form");
@@ -219,23 +197,13 @@ reducedPage.on("pageerror", (error) =>
 await reducedPage.goto(PAGE_URL, { waitUntil: "networkidle", timeout: 60_000 });
 await reducedPage.evaluate(() => document.fonts.ready);
 check(
-  "reduced-motion view is visible",
-  await reducedPage.locator(".reduced-motion-view").isVisible(),
+  "reduced-motion reader is visible with all six movements",
+  (await reducedPage.locator(".reading-flow").isVisible()) &&
+    (await reducedPage.locator(".flow-movement").count()) === 6,
 );
 check(
-  "reduced-motion canvas and scroll stage are absent",
-  !(await reducedPage.locator(".optics-canvas:visible").count()) &&
-    !(await reducedPage.locator(".scroll-track:visible").count()),
-);
-check(
-  "reduced-motion still includes all six movements",
-  (await reducedPage.locator(".reduced-motion-view .reading-chapter").count()) === 6,
-);
-check(
-  "reduced-motion view contains the author and date",
-  (await reducedPage.locator(".reduced-motion-view .reading-byline").innerText()).includes(
-    "Afsal Ali",
-  ) && (await reducedPage.locator(".reduced-motion-view .reading-byline time").count()) === 1,
+  "reduced-motion canvas is absent",
+  !(await reducedPage.locator(".optics-canvas:visible").count()),
 );
 check(
   "reduced-motion does not lock document scrolling",
@@ -253,10 +221,10 @@ const noScriptContext = await browser.newContext({
 });
 const noScriptPage = await noScriptContext.newPage();
 await noScriptPage.goto(PAGE_URL, { waitUntil: "networkidle", timeout: 60_000 });
-const noScriptReader = noScriptPage.locator(".no-script-reader");
-check("no-script reading fallback is visible", await noScriptReader.isVisible());
+const noScriptReader = noScriptPage.locator(".reading-flow");
+check("no-script native reader is visible", await noScriptReader.isVisible());
 check(
-  "no-script reading fallback includes footnotes and the physics note",
+  "no-script native reader includes footnotes and the physics note",
   (await noScriptReader.getByText("NOTHING → SOMETHING").count()) === 1 &&
     (await noScriptReader.getByText(/Light can refract at a boundary/).count()) === 1,
 );
