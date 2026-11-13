@@ -1,5 +1,4 @@
 import { Fragment, forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from "react";
-import { AUTHOR } from "../../lib/site";
 import { Icon } from "../Icons";
 import { lockDocumentScroll } from "./scrollLock";
 import {
@@ -8,9 +7,6 @@ import {
   PHYSICS_NOTE,
   PROLOGUE,
   SURFACES,
-  THESIS_PUBLISHED_AT,
-  THESIS_READ_TIME_MINUTES,
-  publishedDateLabel,
   type Movement,
   type StorySegment,
 } from "./story";
@@ -56,7 +52,6 @@ function StoryPaper({
   return (
     <div className="reading-paper">
       <header className="reading-header">
-        <span className="eyebrow">FOR THE TECH. / THE MANIFESTO</span>
         {onClose ? (
           <button
             className="icon-button"
@@ -73,19 +68,11 @@ function StoryPaper({
         )}
       </header>
       <div className="reading-intro">
-        <p className="eyebrow">THE WORDS, WITHOUT THE MOTION.</p>
         <h2 id={titleId}>{renderSegments(PROLOGUE.heading)}</h2>
         <p className="reading-deck">
           {PROLOGUE.deck[0]}
           <br />
           {PROLOGUE.deck[1]}
-        </p>
-        <p className="reading-byline">
-          <span>{AUTHOR}</span>
-          <span aria-hidden="true">·</span>
-          <time dateTime={THESIS_PUBLISHED_AT}>{publishedDateLabel()}</time>
-          <span aria-hidden="true">·</span>
-          <span>{THESIS_READ_TIME_MINUTES} min read</span>
         </p>
       </div>
       {MOVEMENTS.map((movement, index) => (

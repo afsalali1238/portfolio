@@ -49,9 +49,7 @@ export const PROLOGUE = {
     { text: "Thought.", emphasis: true },
   ],
   deck: ["Curiosity enters. Craft bends it.", "Reality catches the colour."],
-  begin: "Begin the experiment",
-  beginHint: "SCROLL OR TAP TO IGNITE",
-  colophon: ["THOUGHT → CRAFT → REALITY", "EST. IN CURIOSITY"],
+  begin: "Begin reading",
 } as const;
 
 export const THESIS_PUBLISHED_AT = "2026-11-12";
@@ -71,13 +69,13 @@ export const MOVEMENTS: readonly Movement[] = [
       { text: "the dark.", emphasis: true },
     ],
     blocks: [
-      paragraph("lead", { text: "Just like the universe." }),
+      paragraph("lead", { text: "Before a thing has form, it has a pressure." }),
       paragraph("body", {
-        text: "Out of nothing, a sudden ignition. It happened when the right conditions met.",
+        text: "A question gathers quietly. It returns at inconvenient moments. It asks for attention before it can explain why.",
       }),
-      paragraph("emphasis", { text: "Nobody asked for it." }),
+      paragraph("emphasis", { text: "The first permission is simply to begin." }),
     ],
-    footnote: "NOTHING → SOMETHING",
+    footnote: "EVERY BEGINNING MAKES A SMALL CLAIM ON THE UNKNOWN.",
   },
   {
     numeral: "II",
@@ -87,21 +85,23 @@ export const MOVEMENTS: readonly Movement[] = [
     target: 0.29,
     description: "A single white beam travels through empty space.",
     heading: [
-      { text: "There is a light" },
-      { text: " in ", breakBefore: true },
-      { text: "each of us.", emphasis: true },
+      { text: "An idea arrives" },
+      { text: " before it can ", breakBefore: true },
+      { text: "explain itself.", emphasis: true },
     ],
     blocks: [
       paragraph("body", {
-        text: "It arrives before it has a name. A question. An itch. A what if.",
+        text: "It begins as attention: a question that refuses to leave you alone. Long before it becomes a plan, it asks to be noticed.",
       }),
-      paragraph("italic", { text: "An idea in your head costs nothing and proves nothing." }),
+      paragraph("italic", {
+        text: "An idea is weightless while it remains private. It has not yet met consequence.",
+      }),
       paragraph("body", {
-        text: "Like light in empty space, it is invisible until it touches something real.",
+        text: "Like light in empty space, it becomes visible when it meets something real.",
       }),
-      paragraph("emphasis", { text: "So we shine." }),
+      paragraph("emphasis", { text: "So we place it in the world." }),
     ],
-    footnote: "MOVE YOUR CURSOR. FIND A DIRECTION.",
+    footnote: "DIRECTION IS DISCOVERED BY CONTACT.",
   },
   {
     numeral: "III",
@@ -116,10 +116,12 @@ export const MOVEMENTS: readonly Movement[] = [
       { text: " surrounds us.", breakBefore: true, emphasis: true },
     ],
     blocks: [
-      paragraph("body", { text: "We shine on people. On places. On problems." }),
+      paragraph("body", {
+        text: "We bring our attention to people, places, and problems. What returns tells us less about our intention than about the surface it met.",
+      }),
       { type: "surfaces" },
     ],
-    footnote: "THE SURFACE CHANGES EVERYTHING.",
+    footnote: "THE SURFACE CHANGES THE RETURN.",
   },
   {
     numeral: "IV",
@@ -129,22 +131,22 @@ export const MOVEMENTS: readonly Movement[] = [
     target: 0.625,
     description: "Wavefronts compress and slow inside a glass prism.",
     heading: [
-      { text: "Light bends when it enters" },
-      { text: " a ", breakBefore: true },
-      { text: "denser medium.", emphasis: true },
+      { text: "To become visible," },
+      { text: " light has to enter", breakBefore: true },
+      { text: " what slows it.", breakBefore: true, emphasis: true },
     ],
     blocks: [
       paragraph("body", {
         text: "It slows as it enters glass. At the boundary, its change in speed bends an angled ray.",
       }),
       paragraph("body", {
-        text: "The density is the work. The 1 AM rebuild. The fourth draft. The hours beside someone else’s problem, until it becomes yours.",
+        text: "The dense part is the work: returning to a question after the first answer has worn thin; making room for another person’s reality; staying long enough for the easy explanation to fail.",
       }),
       paragraph("italic", {
-        text: "To make anything real, you must surrender the easy, straight line.",
+        text: "A real practice asks us to trade speed for depth.",
       }),
     ],
-    footnote: "RESISTANCE IS NOT THE OPPOSITE OF PROGRESS.",
+    footnote: "DEPTH HAS A COST. IT IS STILL WORTH PAYING.",
   },
   {
     numeral: "V",
@@ -160,21 +162,21 @@ export const MOVEMENTS: readonly Movement[] = [
     ],
     blocks: [
       paragraph("body", {
-        text: "The colours were in it all along. The glass didn’t add them. It revealed them.",
+        text: "The colours were there all along. The glass did not invent them. It gave them a way to appear.",
       }),
       paragraph("body", {
-        text: "People are like this. In the wrong room, you remain quiet and unseparated.",
+        text: "People are not unfinished versions of one fixed thing. In the wrong conditions, whole registers of a life can remain unheard.",
       }),
       paragraph("body", {
-        text: "But inside the honest medium, you disperse into colour.",
+        text: "When attention, place, and practice align, more of us becomes legible — first to ourselves, then to others.",
       }),
       paragraph(
         "closing",
-        { text: "Sometimes we don’t need to change ourselves. " },
-        { text: "We need the right medium.", emphasis: true },
+        { text: "We do not always need to become someone else. " },
+        { text: "We may need a truer medium.", emphasis: true },
       ),
     ],
-    footnote: "REVELATION, NOT REINVENTION.",
+    footnote: "REVELATION IS NOT REINVENTION.",
   },
   {
     numeral: "VI",
@@ -184,13 +186,17 @@ export const MOVEMENTS: readonly Movement[] = [
     target: 0.965,
     description: "Five colours emerge beyond the glass, unbounded.",
     heading: [
-      { text: "The light that comes out" },
-      { text: " is not the light", breakBefore: true },
-      { text: " that went in.", breakBefore: true, emphasis: true },
+      { text: "What emerges" },
+      { text: " is not what", breakBefore: true },
+      { text: " entered.", breakBefore: true, emphasis: true },
     ],
     blocks: [
-      paragraph("body", { text: "It slowed. It bent. It paid the toll of density." }),
-      paragraph("body", { text: "This place holds what came out the other side." }),
+      paragraph("body", {
+        text: "It has been slowed, bent, and asked to meet an edge. None of that erased the light. It made a different expression possible.",
+      }),
+      paragraph("body", {
+        text: "Keep the work that can hold what you discover on the other side.",
+      }),
       paragraph("closing", {
         text: "You were never meant to remain a single beam of light.",
       }),
@@ -235,29 +241,29 @@ export const SURFACE_TARGETS = [0.397, 0.431, 0.468, 0.516] as const;
 export const SURFACES = [
   {
     label: "Mirror",
-    lead: "Some mirror us.",
-    detail: "We arrive open and leave exactly as we came.",
+    lead: "Some places return our image exactly.",
+    detail: "They can be kind, but they do not change the direction of the light.",
     material: "SILVER",
     status: "REFLECTION · NO CHANGE",
   },
   {
     label: "Wall",
-    lead: "Some throw us back hard.",
-    detail: "It stings, and it tempts us to dim. That is the nature of the wall.",
+    lead: "Some places answer with force.",
+    detail: "The impact stings. Still, resistance can reveal an edge we had not seen.",
     material: "STONE",
     status: "COLLISION · ENERGY LOST",
   },
   {
     label: "Void",
-    lead: "Some absorb us.",
-    detail: "Everything we pour in disappears without a sound.",
+    lead: "Some places take without receiving.",
+    detail: "You can keep pouring light in and never find a surface that answers back.",
     material: "MATTE BLACK",
     status: "ABSORPTION · NO RETURN",
   },
   {
     label: "Glass",
-    lead: "And a few refract.",
-    detail: "Finding the right medium is the play.",
+    lead: "A few places alter the path.",
+    detail: "The right medium does not flatter us. It gives our energy a new direction.",
     material: "OPTICAL GLASS",
     status: "A DIFFERENT POSSIBILITY",
   },
