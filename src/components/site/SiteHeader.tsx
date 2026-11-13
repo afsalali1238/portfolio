@@ -11,14 +11,9 @@ const NAV_LINKS = [
   { label: "The Man Behind", to: "/the-man-behind" },
 ] as const;
 
-const iconButton =
-  "flex h-11 w-11 items-center justify-center rounded-md transition-colors hover:bg-paper-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink";
-
 function useTheme() {
   const [isDark, setIsDark] = useState(false);
 
-  // The blocking script in __root.tsx already applied the class before paint.
-  // All we do here is sync React state to whatever it decided.
   useEffect(() => {
     setIsDark(document.documentElement.classList.contains("dark"));
   }, []);
@@ -48,7 +43,6 @@ export function SiteHeader() {
   useEffect(() => {
     if (!mobileOpen) return;
 
-    // Focus close button on open
     closeButtonRef.current?.focus();
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -95,52 +89,52 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 border-b rule-hair bg-paper/75 backdrop-blur">
-        <Container className="flex items-center justify-between py-2.5">
+      <header className="site-header">
+        <Container className="container">
           <Link
             to="/"
-            className="group flex items-center gap-3 rounded-md py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            className="brand"
             aria-label="forthe.tech — home"
           >
-            <LogoTile className="h-8 w-8 transition-opacity duration-150 group-hover:opacity-85" />
-            <Wordmark className="text-2xl" />
+            <LogoTile className="h-[29px] w-[29px]" />
+            <Wordmark className="text-[20px] font-semibold tracking-[-0.7px]" />
           </Link>
 
-          <nav aria-label="Site" className="hidden items-center gap-1 md:flex">
+          <nav aria-label="Site" className="header-nav">
             {NAV_LINKS.map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
-                className="group relative px-3 py-2.5 text-sm font-medium text-ink-soft transition-colors hover:text-ink data-[status=active]:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-md"
+                className="group"
+                data-status="active"
               >
                 {l.label}
-                <span className="absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-ink transition-transform duration-150 ease-out group-hover:scale-x-100 group-data-[status=active]:scale-x-100" />
               </Link>
             ))}
             <button
               type="button"
               onClick={toggleTheme}
-              className={iconButton}
+              className="header-actions"
               aria-label={themeLabel}
             >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
           </nav>
 
-          <div className="-mr-2 flex items-center md:hidden">
+          <div className="header-actions md:hidden">
             <button
               type="button"
               onClick={toggleTheme}
-              className={iconButton}
+              className="header-actions"
               aria-label={themeLabel}
             >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
             <button
               ref={menuTriggerRef}
               type="button"
               onClick={() => setMobileOpen((v) => !v)}
-              className={iconButton}
+              className="header-actions"
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav"
@@ -174,7 +168,7 @@ export function SiteHeader() {
           ref={closeButtonRef}
           type="button"
           onClick={handleClose}
-          className={`absolute right-3 top-3 ${iconButton}`}
+          className="absolute right-3 top-3 h-11 w-11 items-center justify-center rounded-md transition-colors hover:bg-paper-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           aria-label="Close menu"
         >
           <X className="h-5 w-5" />

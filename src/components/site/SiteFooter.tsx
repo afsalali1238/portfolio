@@ -8,117 +8,80 @@ export function SiteFooter() {
   return (
     <footer
       id="contact"
-      className="border-t rule-hair bg-paper-deep/40 py-16 text-sm text-ink-mute"
+      className="site-footer"
     >
-      <Container className="space-y-12">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
-          <div className="space-y-4 md:col-span-6">
-            <h2 className="font-serif text-3xl text-ink md:text-4xl">Let&rsquo;s talk tech.</h2>
-            <p className="max-w-md text-ink-soft">
-              Have an idea, want to build something quiet, or just talk shop? Reach out.
-            </p>
-            <div className="pt-2 flex flex-wrap items-center gap-3">
-              <Link
-                to="/the-man-behind"
-                className="inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-5 text-sm font-medium text-paper transition-colors hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
-              >
-                The Man Behind
-                <ArrowUpRight className="h-4 w-4" />
-              </Link>
-              <a
-                href="mailto:here@forthe.tech"
-                className="inline-flex min-h-11 items-center gap-2 rounded-md border rule-hair bg-paper px-4 text-sm font-medium text-ink transition-colors hover:bg-paper-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
-              >
-                here@forthe.tech
-              </a>
-            </div>
-          </div>
-
-          <div className="space-y-3 text-xs md:col-span-6 md:text-right">
-            <div className="text-ink font-medium">Dubai, United Arab Emirates</div>
-            <p className="text-ink-mute">Gulf Standard Time (UTC+4)</p>
-            <div className="pt-4 flex flex-wrap gap-4 md:justify-end text-sm">
-              <a
-                href="https://www.linkedin.com/in/afsalali1238/"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
-              >
-                LinkedIn ↗<span className="sr-only"> (opens in a new tab)</span>
-              </a>
-              <a
-                href="https://x.com/afsallali"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
-              >
-                X (Twitter) ↗<span className="sr-only"> (opens in a new tab)</span>
-              </a>
-              <a
-                href="https://substack.com/@afsalali"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
-              >
-                Substack ↗<span className="sr-only"> (opens in a new tab)</span>
-              </a>
-              <a
-                href="https://medium.com/@afsalali1238"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
-              >
-                Medium ↗<span className="sr-only"> (opens in a new tab)</span>
-              </a>
-              <a
-                href="https://github.com/afsalali1238"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
-              >
-                GitHub ↗<span className="sr-only"> (opens in a new tab)</span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t rule-hair pt-8">
-          <div className="flex flex-col gap-4 text-xs md:flex-row md:items-center md:justify-between">
+      <Container className="container">
+        <div className="footer-main">
+          <div className="footer-brand-group">
             <Link
               to="/"
-              className="flex min-h-11 items-center gap-2 text-ink"
+              className="footer-brand"
               aria-label="forthe.tech — home"
             >
               <LogoTile className="h-6 w-6" />
-              <Wordmark className="text-lg" />
+              <Wordmark className="text-[17px]" />
             </Link>
-            <nav aria-label="Footer" className="flex flex-wrap gap-x-5 gap-y-2">
-              <Link to="/works" className="inline-flex min-h-11 items-center hover:text-ink">
-                Work
-              </Link>
-              <Link to="/thesis" className="inline-flex min-h-11 items-center hover:text-ink">
-                Manifesto
-              </Link>
-              <Link to="/notes" className="inline-flex min-h-11 items-center hover:text-ink">
-                Notes
-              </Link>
-              <Link
-                to="/the-man-behind"
-                className="inline-flex min-h-11 items-center hover:text-ink"
-              >
-                The Man Behind
-              </Link>
-              <Link
-                to="/"
-                hash="origin"
-                className="inline-flex min-h-11 items-center hover:text-ink"
-              >
-                About
-              </Link>
-            </nav>
-            <div>
-              © {new Date().getFullYear()} {AUTHOR} · forthe.tech
-            </div>
+            <p className="footer-tagline">Independent thought, made real.</p>
+          </div>
+          
+          <nav aria-label="Footer" className="footer-links">
+            <Link to="/works" className="inline-flex min-h-11 items-center hover:text-ink">Work</Link>
+            <Link to="/thesis" className="inline-flex min-h-11 items-center hover:text-ink">Manifesto</Link>
+            <Link to="/notes" className="inline-flex min-h-11 items-center hover:text-ink">Notes</Link>
+            <Link to="/the-man-behind" className="inline-flex min-h-11 items-center hover:text-ink">The Man Behind</Link>
+            <Link to="/" hash="origin" className="inline-flex min-h-11 items-center hover:text-ink">About</Link>
+          </nav>
+
+          <div className="footer-contact">
+            here@forthe.tech · Dubai · GST (UTC+4)
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
+            <a
+              href="https://www.linkedin.com/in/afsalali1238/"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
+            >
+              LinkedIn
+            </a>
+            <a
+              href="https://x.com/afsallali"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
+            >
+              X (Twitter)
+            </a>
+            <a
+              href="https://substack.com/@afsalali"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
+            >
+              Substack
+            </a>
+            <a
+              href="https://medium.com/@afsalali1238"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
+            >
+              Medium
+            </a>
+            <a
+              href="https://github.com/afsalali1238"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center text-ink-soft hover:text-ink transition-colors"
+            >
+              GitHub
+            </a>
+          </div>
+          <div>
+            © {new Date().getFullYear()} {AUTHOR} · forthe.tech
           </div>
         </div>
       </Container>

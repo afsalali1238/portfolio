@@ -1,1 +1,1 @@
-S-2: One token file with Thesis palette
+S-4: Shared components restyled to Thesis spec
