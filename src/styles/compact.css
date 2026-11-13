@@ -2,7 +2,7 @@
    The native outer story track and chapter navigation remain available. */
 @media (max-height: 620px) and (max-width: 600px) {
   .editorial,
-  .pinned-stage[data-chapter='0'] .editorial {
+  .pinned-stage[data-chapter="0"] .editorial {
     top: 123px;
     bottom: 76px;
     height: auto;
@@ -12,13 +12,13 @@
     scrollbar-color: #414957 transparent;
     padding-right: 3px;
   }
-  .pinned-stage[data-chapter='0'] .editorial {
+  .pinned-stage[data-chapter="0"] .editorial {
     top: 157px;
   }
   .editorial .beat {
     position: relative;
   }
-  .editorial .beat[aria-hidden='true'] {
+  .editorial .beat[aria-hidden="true"] {
     display: none;
   }
   .beat h1 {
@@ -40,10 +40,10 @@
     margin-bottom: 18px;
   }
   .beat p {
-    font-size: 12px;
+    font-size: 16px;
   }
   .beat .prologue-deck {
-    font-size: 13px;
+    font-size: 16px;
   }
   .beat p.closing-thought {
     font-size: 22px;
@@ -86,7 +86,7 @@
     );
   }
   .editorial,
-  .pinned-stage[data-chapter='0'] .editorial {
+  .pinned-stage[data-chapter="0"] .editorial {
     left: 6%;
     right: 52%;
     top: 105px;
@@ -102,7 +102,7 @@
   .editorial .beat {
     position: relative;
   }
-  .editorial .beat[aria-hidden='true'] {
+  .editorial .beat[aria-hidden="true"] {
     display: none;
   }
   .beat h1 {
@@ -118,17 +118,17 @@
   }
   .beat-eyebrow {
     margin-bottom: 15px;
-    font-size: 6px;
+    font-size: 12px;
   }
   .beat p,
   .beat-density p,
   .beat-becoming p {
-    font-size: 12px;
+    font-size: 16px;
     line-height: 1.55;
     margin-bottom: 12px;
   }
   .beat .prologue-deck {
-    font-size: 12px;
+    font-size: 16px;
     line-height: 1.6;
     margin-top: 15px;
   }
@@ -153,11 +153,11 @@
     display: none;
   }
   .prologue-eyebrow {
-    font-size: 5.5px !important;
+    font-size: 12px !important;
   }
   .begin-button {
     margin-top: 17px;
-    font-size: 10px;
+    font-size: 12px;
     gap: 11px;
   }
   .button-subline {
@@ -181,51 +181,18 @@
   .surface-panel p.surface-lead {
     font-size: 24px;
   }
+  /* Keep the limited landscape stage clear for the scrollable story column. */
   .telemetry {
-    display: block;
-    left: 57%;
-    right: 11%;
-    bottom: 72px;
-  }
-  .telemetry-values {
-    display: flex;
-    padding-top: 8px;
-    gap: 25px;
-  }
-  .telemetry-status,
-  .telemetry-key {
-    display: none;
-  }
-  .telemetry-value {
-    font-size: 10px;
-    margin: 0;
-  }
-  .telemetry-top {
-    font-size: 5.5px;
-    border: 0;
-    padding: 0;
-  }
-  .telemetry-live {
-    display: none;
-  }
-  .spectral-legend {
-    gap: 10px;
-    top: -22px;
-  }
-  .spectral-legend > div {
-    font-size: 5px;
-  }
-  .spectral-legend small {
     display: none;
   }
   .stage-footer {
     height: 47px;
   }
   .footer-chapter {
-    font-size: 6px;
+    font-size: 12px;
   }
   .scroll-prompt {
-    font-size: 5px;
+    font-size: 12px;
   }
   .chapter-rail {
     top: 47%;
@@ -234,7 +201,7 @@
   }
   .rail-stop {
     height: 25px;
-    font-size: 7px;
+    font-size: 12px;
   }
   .rail-caption,
   .rail-end {
@@ -249,7 +216,7 @@
 }
 
 @media (max-width: 1023px) and (min-height: 521px) {
-  .pinned-stage:not([data-chapter='0']) .stage-scrim {
+  .pinned-stage:not([data-chapter="0"]) .stage-scrim {
     background: linear-gradient(
       180deg,
       transparent 8%,
@@ -263,7 +230,7 @@
 }
 
 @media (max-height: 620px) and (max-width: 600px) {
-  .pinned-stage:not([data-chapter='0']) .stage-scrim {
+  .pinned-stage:not([data-chapter="0"]) .stage-scrim {
     background: linear-gradient(
       180deg,
       transparent 6%,
@@ -292,7 +259,7 @@
     margin-right: 4px;
   }
   .read-button {
-    font-size: 9px;
+    font-size: 12px;
     gap: 5px;
   }
   .sound-button {

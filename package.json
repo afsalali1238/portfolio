@@ -9,8 +9,15 @@
     "build": "vite build && node scripts/generate-sitemap.mjs",
     "build:og": "node scripts/generate-og.mjs",
     "build:dev": "vite build --mode development",
-    "preview": "vite preview",
+    "preview": "nitro preview --port 4173",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint .",
+    "test": "tsx --test src/components/fieldNotes.test.ts src/components/scrollytelling/opticsEngine.test.ts src/components/scrollytelling/runtimeMath.test.ts src/components/scrollytelling/soundDirector.test.ts src/components/scrollytelling/story.test.ts",
+    "audit:thesis:accessibility": "node tools/thesis-accessibility.mjs",
+    "audit:thesis:layout": "node tools/thesis-layout.mjs",
+    "audit:thesis:contrast": "node tools/thesis-contrast.mjs",
+    "audit:thesis:perf": "node tools/thesis-perf.mjs",
+    "audit:thesis:browser": "node tools/thesis-accessibility.mjs && node tools/thesis-layout.mjs && node tools/thesis-contrast.mjs",
     "format": "prettier --write ."
   },
   "dependencies": {
@@ -35,6 +42,7 @@
     "vite-tsconfig-paths": "^6.0.2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^9.32.0",
     "@lovable.dev/vite-tanstack-config": "2.7.0",
     "@types/node": "^22.16.5",
@@ -48,7 +56,9 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^15.15.0",
     "nitro": "3.0.260603-beta",
+    "playwright-core": "^1.65.0",
     "prettier": "^3.7.3",
+    "tsx": "^4.23.15",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^8.0.16"

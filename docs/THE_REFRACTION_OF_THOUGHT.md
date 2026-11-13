@@ -8,9 +8,9 @@ It travels silently, crosses the plane of thought, and strikes the face of a hea
 
 The artwork brings together three visual archetypes:
 
-1. **The Hipgnosis prism** (_The Dark Side of the Moon_) — revealing the rich, hidden spectrum locked within what appeared singular.
-2. **Nikola Tesla’s luminous experiments** — high-frequency energy made observable, interactive, and alive.
-3. **Cosmic emergence** — the principle that structured, vast realities unfurl from modest, compact seeds.
+1. **The Hipgnosis prism** (_The Dark Side of the Moon_), revealing the rich, hidden spectrum within what appeared singular.
+2. **Nikola Tesla’s luminous experiments**, where high-frequency energy becomes observable, interactive, and alive.
+3. **Cosmic emergence**, the principle that structured, vast realities unfurl from modest, compact seeds.
 
 This is not a demonstration of technical spectacle, and it is not an exercise in idle daydreaming.
 
@@ -44,13 +44,13 @@ It reflects an essential posture:
 
 > **Born from genuine conviction, not because anyone asked.**
 
-You do not wait for external validation or permission to care deeply about an idea. True curiosity is self-igniting. It moves with direction, yet it remains fluid—alive with subtle motion, seeking form.
+You do not wait for external validation or permission to care deeply about an idea. True curiosity is self-igniting. It moves with direction, yet remains fluid, alive with subtle motion and seeking form.
 
 ---
 
 ## 2. The Prism: The Dense Medium of Reality
 
-In physics, light only refracts when it moves from empty space into a **denser medium**. In a vacuum, light moves straight, unchecked, and unrevealed. Only when it encounters the density of glass—when it must slow down and navigate physical resistance—does its internal nature reveal itself.
+In physics, light bends at a boundary between media with different refractive indices. Entering a **denser medium** slows it, and leaving one can bend it again. In a vacuum, light moves straight, unchecked, and unrevealed. At the boundary with glass, its speed changes and its internal nature becomes legible.
 
 In the life of the mind, that dense medium is **the craft of making**.
 
@@ -61,7 +61,7 @@ Anyone can entertain an abstract idea. In the mind, an idea remains weightless, 
 - The grit to stay with an elusive concept through weeks of false starts and confusion.
 - The willingness to dismantle your assumptions when the medium exposes their flaws.
 
-The prism is not a pedestal of effortless inspiration. It is the crucible of deliberate work.
+The prism is not a pedestal for inspiration without work. It is the crucible of deliberate work.
 
 You enter the glass with a simple, raw thought. You leave it transformed by what the journey demanded of you.
 
@@ -69,17 +69,17 @@ You enter the glass with a simple, raw thought. You leave it transformed by what
 
 ## 3. The Spectrum: The Compounding of Stacked Understanding
 
-When white light enters the prism, it splits because each wavelength interacts with the medium at a different angle. What looked like a solitary beam turns out to contain an entire architecture of colour.
+At the glass boundary, each wavelength refracts by a slightly different amount because the refractive index varies with wavelength. What looked like a solitary beam reveals an entire architecture of colour.
 
 This is what happens when you commit to **deep, stacked learning**.
 
-When you explore multiple fields with genuine depth—studying form alongside philosophy, spatial balance alongside mechanics, history alongside modern experimentation—your thoughts do not add up linearly. They compound combinatorially.
+When you explore multiple fields with genuine depth, studying form alongside philosophy, spatial balance alongside mechanics, and history alongside modern experimentation, your thoughts do not add up linearly. They compound combinatorially.
 
 - **Observation stacked with Craft** turns a vague feeling into a tangible artifact.
 - **Form stacked with Human Empathy** transforms a functional object into something that resonates emotionally.
 - **Rigor stacked with Intuition** allows you to see connections where others see isolated silos.
 
-The prism makes those layered depths visible. It is proof that learning is never lost: every book read, every craft practiced, and every failed attempt stacks into your intuition, ready to refract your next thought into richer frequencies.
+The prism makes those layered depths visible. It is proof that learning is never lost: every book read, every craft practised, and every failed attempt stacks into your intuition, ready to refract your next thought into richer frequencies.
 
 ---
 
@@ -89,13 +89,13 @@ Beyond the glass, the paths do not settle into a sterile, static diagram. They h
 
 This is the magic of an idea that has truly crossed into the world.
 
-Once you build something—once you take a concept out of your head and manifest it into physical or visual form—it develops an energy of its own:
+Once you build something, a concept moves from your head into physical or visual form. It develops an energy of its own:
 
 - An experiment made for yourself unexpectedly unlocks a breakthrough for someone else.
 - A small, focused artifact sparks a completely new line of inquiry you could never have planned in advance.
-- The discipline you gained in making one thing becomes the effortless springboard for a radically different medium tomorrow.
+- The discipline you gain in making one thing becomes the springboard for a radically different medium tomorrow.
 
-You cannot map this emergence on a linear timeline. You cannot manufacture it through superficial shortcuts. You earn it by stepping into the workshop, doing the heavy lifting, and honoring the process.
+You cannot map this emergence on a linear timeline. You cannot manufacture it through superficial shortcuts. You earn it by stepping into the workshop, doing the heavy lifting, and honouring the process.
 
 ---
 
