@@ -1,4 +1,4 @@
-import { useEffect, useState, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import type { OpticsHandle } from "./OpticsCanvas";
 import { clamp } from "./opticsEngine";
 
@@ -15,6 +15,12 @@ export function useReadingAtmosphere({
   canvas: RefObject<OpticsHandle | null>;
 }) {
   const [reducedMotion, setReducedMotion] = useState(false);
+  const tilt = useRef(0);
+  const scheduleDraw = useRef<() => void>(() => {});
+  const steer = useCallback((nextTilt: number) => {
+    tilt.current = clamp(nextTilt, -0.38, 0.38);
+    scheduleDraw.current();
+  }, []);
 
   useEffect(() => {
     const rootElement = root.current;
@@ -46,7 +52,7 @@ export function useReadingAtmosphere({
         progress: readingProgress(),
         time,
         delta,
-        tilt: 0,
+        tilt: tilt.current,
         reducedMotion: false,
       });
     };
@@ -55,6 +61,7 @@ export function useReadingAtmosphere({
       if (!frame && visible && !document.hidden && !reduced && !forcedColors)
         frame = requestAnimationFrame(draw);
     };
+    scheduleDraw.current = schedule;
     const preference = () => {
       reduced = motionMedia.matches;
       forcedColors = contrastMedia.matches;
@@ -92,8 +99,9 @@ export function useReadingAtmosphere({
       document.removeEventListener("visibilitychange", visibility);
       motionMedia.removeEventListener("change", preference);
       contrastMedia.removeEventListener("change", preference);
+      scheduleDraw.current = () => {};
     };
   }, [root, canvas]);
 
-  return reducedMotion;
+  return { reducedMotion, steer };
 }

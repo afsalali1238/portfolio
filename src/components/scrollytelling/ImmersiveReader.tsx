@@ -39,13 +39,18 @@ function paragraphClass(kind: ParagraphKind) {
 export function ImmersiveReader() {
   const root = useRef<HTMLElement>(null);
   const canvas = useRef<OpticsHandle>(null);
-  const reducedMotion = useReadingAtmosphere({ root, canvas });
+  const { reducedMotion, steer } = useReadingAtmosphere({ root, canvas });
 
   return (
     <section
       className="immersive-reader"
       ref={root}
       aria-label="The Refraction of Thought, an immersive essay"
+      onPointerMove={(event) => {
+        if (event.pointerType === "touch") return;
+        steer(((event.clientX / window.innerWidth) * 2 - 1) * 0.38);
+      }}
+      onPointerLeave={() => steer(0)}
     >
       <div className="immersive-reader-stage">
         {!reducedMotion && <OpticsCanvas ref={canvas} />}

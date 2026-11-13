@@ -2,7 +2,6 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import {
   TAU,
   add,
-  degrees,
   lerp,
   mix,
   normalize,
@@ -213,19 +212,6 @@ class OpticalRenderer {
       const y = (((i * 137 + 37) % 997) / 997) * this.h;
       c.fillRect(x, y, i % 6 === 0 ? 1.3 : 0.7, i % 6 === 0 ? 1.3 : 0.7);
     }
-    if (!this.mobile && this.h >= 520) {
-      c.font = '12px "IBM Plex Mono", monospace';
-      c.fillStyle = "rgba(210,218,227,.72)";
-      for (let i = 0; i < 7; i++) {
-        const x = this.left + (i * (this.w - this.left - 100)) / 6;
-        c.fillText(String(i * 100).padStart(3, "0"), x, 143);
-        c.strokeStyle = "rgba(210,218,227,.15)";
-        c.beginPath();
-        c.moveTo(x, 151);
-        c.lineTo(x, 157);
-        c.stroke();
-      }
-    }
   }
   draw(frame: CanvasFrame) {
     this.lastFrame = frame;
@@ -382,13 +368,6 @@ class OpticalRenderer {
       c.lineTo(x - dx * 9, y);
       c.stroke();
     }
-    if (!this.mobile) {
-      this.label("Y +", cx + 8, cy - r - 35, 0.24);
-      this.label("X +", cx + r + 35, cy - 8, 0.24);
-      this.label("90", cx - 6, cy - r - 17, 0.25);
-      this.label("270", cx - 10, cy + r + 29, 0.25);
-      if (p < 0.22) this.label("FIG. 00  /  UNREALIZED POTENTIAL", cx - r - 27, cy - r - 56, 0.5);
-    }
     c.restore();
   }
   private origin(p: number, t: number) {
@@ -421,20 +400,8 @@ class OpticalRenderer {
     c.moveTo(point.x, point.y + 5);
     c.lineTo(point.x, point.y + 13);
     c.stroke();
-    if (p < 0.145) {
-      this.label("[ 0, 0 ]", point.x, point.y + 37, 0.63, "center");
-      if (!this.mobile) {
-        this.label("A POINT OF POSSIBILITY", point.x, point.y + this.radius * 0.59, 0.43, "center");
-        this.label(
-          "CLICK TO DISTURB THE STILLNESS",
-          point.x,
-          point.y + this.radius * 0.69,
-          0.27,
-          "center",
-        );
-      }
-    } else if (!this.mobile)
-      this.label("01 / SPONTANEOUS ORIGIN", point.x + 12, point.y + 27, 0.48);
+    if (p < 0.145 && !this.mobile)
+      this.label("A POINT OF POSSIBILITY", point.x, point.y + this.radius * 0.63, 0.4, "center");
   }
   private vacuum(p: number, t: number, tilt: number) {
     const start = { x: this.left, y: this.cy },
@@ -447,15 +414,6 @@ class OpticalRenderer {
     c.beginPath();
     c.arc(start.x, start.y, 1.9, 0, TAU);
     c.fill();
-    if (!this.mobile) {
-      this.label("INCIDENT VECTOR", start.x + 8, start.y - 20, 0.5);
-      this.label(
-        `θ ${degrees(angle).toFixed(1)}°  /  NO RESISTANCE`,
-        this.cx - this.radius * 0.4,
-        this.cy + this.radius + 64,
-        0.4,
-      );
-    }
     const pulse = ((t * 0.28) % 1) * distance;
     const pos = add(start, { x: Math.cos(angle) * pulse, y: Math.sin(angle) * pulse });
     c.fillStyle = "rgba(255,255,255,.75)";
@@ -485,8 +443,6 @@ class OpticalRenderer {
           0.5,
           0.22 * alpha,
         );
-      this.label("Ag / REFLECTION", x + 22, y - 89, 0.5 * alpha);
-      this.label("180°", this.left + 40, y + 28, 0.4 * alpha);
     } else if (stage === 1) {
       this.ray(source, end, "#edeee9", alpha);
       c.fillStyle = "#121316";
@@ -512,7 +468,6 @@ class OpticalRenderer {
           alpha * (0.18 + Math.sin(t * 2 + i) ** 2 * 0.34),
         );
       }
-      this.label("STONE / COLLISION", x + 63, y - 86, 0.5 * alpha);
     } else if (stage === 2) {
       const gradient = c.createLinearGradient(x - 40, y, x + 50, y);
       gradient.addColorStop(0, `rgba(242,242,236,${alpha})`);
@@ -529,7 +484,6 @@ class OpticalRenderer {
       c.moveTo(x - 40, y);
       c.lineTo(x + 50, y);
       c.stroke();
-      this.label("ε ≈ 1 / ABSORPTION", x + 10, y + 130, 0.5 * alpha);
     }
   }
   private prism(alpha: number) {
@@ -571,15 +525,11 @@ class OpticalRenderer {
     this.line(mix(a, b, 0.06), mix(b, d, 0.58), "#b7c4d7", 0.5, alpha * 0.08);
     this.line(mix(a, d, 0.02), mix(b, d, 0.34), "#d3dfe9", 0.5, alpha * 0.09);
     c.restore();
-    // Small construction lines make the object read as a measured, physical specimen.
+    // Construction lines keep the prism tactile without turning the reading field into a diagram.
     if (!this.mobile) {
-      this.line({ x: b.x, y: b.y + 22 }, { x: d.x, y: d.y + 22 }, "#a0a8b8", 0.5, 0.22 * alpha);
-      this.line({ x: b.x, y: b.y + 17 }, { x: b.x, y: b.y + 27 }, "#a0a8b8", 0.5, 0.4 * alpha);
-      this.line({ x: d.x, y: d.y + 17 }, { x: d.x, y: d.y + 27 }, "#a0a8b8", 0.5, 0.4 * alpha);
-      this.label("60° / EQUILATERAL", this.cx, b.y + 43, 0.4 * alpha, "center");
-      this.label("A", a.x + 12, a.y - 5, 0.4 * alpha);
-      this.label("B", b.x - 17, b.y + 5, 0.4 * alpha);
-      this.label("C", d.x + 13, d.y + 5, 0.4 * alpha);
+      this.line({ x: b.x, y: b.y + 22 }, { x: d.x, y: d.y + 22 }, "#a0a8b8", 0.5, 0.18 * alpha);
+      this.line({ x: b.x, y: b.y + 17 }, { x: b.x, y: b.y + 27 }, "#a0a8b8", 0.5, 0.32 * alpha);
+      this.line({ x: d.x, y: d.y + 17 }, { x: d.x, y: d.y + 27 }, "#a0a8b8", 0.5, 0.32 * alpha);
     }
   }
   private wavefronts(
@@ -655,16 +605,8 @@ class OpticalRenderer {
     if (p > 0.55 && p < 0.75 && !this.mobile) {
       c.setLineDash([3, 5]);
       const normal = scale(white.normal, 64);
-      this.line(sub(entry, normal), add(entry, normal), "#acb8c9", 0.6, alpha * 0.45);
+      this.line(sub(entry, normal), add(entry, normal), "#acb8c9", 0.6, alpha * 0.32);
       c.setLineDash([]);
-      this.label("SURFACE NORMAL", entry.x - normal.x + 6, entry.y - normal.y + 16, 0.4);
-      this.label(`i ${degrees(white.incidentAngle).toFixed(1)}°`, entry.x - 83, entry.y - 22, 0.55);
-      this.label(
-        `r ${degrees(white.refractedAngle).toFixed(1)}°`,
-        entry.x + 18,
-        entry.y + 28,
-        0.55,
-      );
     }
     if (dispersion > 0) {
       const baseAngle = Math.atan2(white.outgoing.y, white.outgoing.x);
@@ -700,25 +642,6 @@ class OpticalRenderer {
           c.globalAlpha = 1;
         }
       }
-    }
-    if (!this.mobile && p > 0.515) {
-      this.label(
-        "FIG. 01 / THE TRANSFORMING MEDIUM",
-        this.cx - this.radius - 27,
-        this.cy - this.radius - 56,
-        0.48 * alpha,
-      );
-      this.label(
-        p >= 0.88
-          ? "STATE: UNBOUNDED // TRANSFORMATION PERMANENT"
-          : p >= 0.72
-            ? "THE GLASS ADDS NOTHING. IT REVEALS."
-            : "DECELERATION INDUCED CURVATURE",
-        this.cx,
-        this.cy + this.prismHeight / 3 + 68,
-        0.43 * alpha,
-        "center",
-      );
     }
   }
   private drawParticles(reduced: boolean) {
