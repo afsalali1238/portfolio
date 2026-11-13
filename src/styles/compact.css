@@ -1,0 +1,302 @@
+/* On very short screens, a chapter can be read in its own scrollable column.
+   The native outer story track and chapter navigation remain available. */
+@media (max-height: 620px) and (max-width: 600px) {
+  .editorial,
+  .pinned-stage[data-chapter='0'] .editorial {
+    top: 123px;
+    bottom: 76px;
+    height: auto;
+    transform: none;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #414957 transparent;
+    padding-right: 3px;
+  }
+  .pinned-stage[data-chapter='0'] .editorial {
+    top: 157px;
+  }
+  .editorial .beat {
+    position: relative;
+  }
+  .editorial .beat[aria-hidden='true'] {
+    display: none;
+  }
+  .beat h1 {
+    font-size: 48px;
+  }
+  .beat h2 {
+    font-size: 34px;
+  }
+  .beat-density h2,
+  .beat-becoming h2 {
+    font-size: 32px;
+  }
+  .prologue-colophon,
+  .beat-footnote,
+  .telemetry {
+    display: none;
+  }
+  .beat-eyebrow {
+    margin-bottom: 18px;
+  }
+  .beat p {
+    font-size: 12px;
+  }
+  .beat .prologue-deck {
+    font-size: 13px;
+  }
+  .beat p.closing-thought {
+    font-size: 22px;
+  }
+  .beat p.italic-copy {
+    font-size: 20px;
+  }
+  .beat p.signature {
+    font-size: 24px;
+  }
+  .begin-button {
+    margin-top: 23px;
+  }
+  .chapter-rail {
+    top: 51%;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .site-header {
+    height: 59px;
+  }
+  .instrument-meta {
+    top: 77px;
+  }
+  .instrument-meta-right {
+    display: none;
+  }
+  .current-page,
+  .margin-note {
+    display: none;
+  }
+  .stage-scrim {
+    background: linear-gradient(
+      90deg,
+      rgba(11, 12, 14, 0.97) 0%,
+      rgba(11, 12, 14, 0.94) 36%,
+      rgba(11, 12, 14, 0.65) 46%,
+      transparent 58%
+    );
+  }
+  .editorial,
+  .pinned-stage[data-chapter='0'] .editorial {
+    left: 6%;
+    right: 52%;
+    top: 105px;
+    bottom: 65px;
+    width: auto;
+    height: auto;
+    transform: none;
+    overflow-y: auto;
+    padding: 0 5px 5px 0;
+    scrollbar-width: thin;
+    scrollbar-color: #414957 transparent;
+  }
+  .editorial .beat {
+    position: relative;
+  }
+  .editorial .beat[aria-hidden='true'] {
+    display: none;
+  }
+  .beat h1 {
+    font-size: 48px;
+    margin-top: 15px;
+  }
+  .beat h2,
+  .beat-surfaces h2,
+  .beat-density h2,
+  .beat-becoming h2 {
+    font-size: 34px;
+    margin-bottom: 16px;
+  }
+  .beat-eyebrow {
+    margin-bottom: 15px;
+    font-size: 6px;
+  }
+  .beat p,
+  .beat-density p,
+  .beat-becoming p {
+    font-size: 12px;
+    line-height: 1.55;
+    margin-bottom: 12px;
+  }
+  .beat .prologue-deck {
+    font-size: 12px;
+    line-height: 1.6;
+    margin-top: 15px;
+  }
+  .beat p.italic-copy {
+    font-size: 20px;
+    margin-top: 15px;
+  }
+  .beat p.editorial-emphasis {
+    font-size: 25px;
+    margin-top: 16px;
+  }
+  .beat p.closing-thought {
+    font-size: 23px;
+    margin-top: 16px;
+  }
+  .beat p.signature {
+    font-size: 24px;
+    margin: 17px 0;
+  }
+  .beat-footnote,
+  .prologue-colophon {
+    display: none;
+  }
+  .prologue-eyebrow {
+    font-size: 5.5px !important;
+  }
+  .begin-button {
+    margin-top: 17px;
+    font-size: 10px;
+    gap: 11px;
+  }
+  .button-subline {
+    display: none;
+  }
+  .circle-arrow {
+    width: 28px;
+    height: 28px;
+  }
+  .circle-arrow svg {
+    width: 13px;
+  }
+  .surface-tabs {
+    margin-top: 15px;
+    padding-top: 10px;
+  }
+  .surface-panels {
+    margin-top: 18px;
+    height: 100px;
+  }
+  .surface-panel p.surface-lead {
+    font-size: 24px;
+  }
+  .telemetry {
+    display: block;
+    left: 57%;
+    right: 11%;
+    bottom: 72px;
+  }
+  .telemetry-values {
+    display: flex;
+    padding-top: 8px;
+    gap: 25px;
+  }
+  .telemetry-status,
+  .telemetry-key {
+    display: none;
+  }
+  .telemetry-value {
+    font-size: 10px;
+    margin: 0;
+  }
+  .telemetry-top {
+    font-size: 5.5px;
+    border: 0;
+    padding: 0;
+  }
+  .telemetry-live {
+    display: none;
+  }
+  .spectral-legend {
+    gap: 10px;
+    top: -22px;
+  }
+  .spectral-legend > div {
+    font-size: 5px;
+  }
+  .spectral-legend small {
+    display: none;
+  }
+  .stage-footer {
+    height: 47px;
+  }
+  .footer-chapter {
+    font-size: 6px;
+  }
+  .scroll-prompt {
+    font-size: 5px;
+  }
+  .chapter-rail {
+    top: 47%;
+    right: 4.5%;
+    transform: translateY(-34%);
+  }
+  .rail-stop {
+    height: 25px;
+    font-size: 7px;
+  }
+  .rail-caption,
+  .rail-end {
+    display: none;
+  }
+  .field-trigger {
+    left: 52%;
+    right: 10%;
+    top: 22%;
+    bottom: 28%;
+  }
+}
+
+@media (max-width: 1023px) and (min-height: 521px) {
+  .pinned-stage:not([data-chapter='0']) .stage-scrim {
+    background: linear-gradient(
+      180deg,
+      transparent 8%,
+      rgba(11, 12, 14, 0.15) 18%,
+      rgba(11, 12, 14, 0.94) 26%,
+      rgba(11, 12, 14, 0.96) 43%,
+      rgba(11, 12, 14, 0.96) 71%,
+      rgba(11, 12, 14, 0.88) 100%
+    );
+  }
+}
+
+@media (max-height: 620px) and (max-width: 600px) {
+  .pinned-stage:not([data-chapter='0']) .stage-scrim {
+    background: linear-gradient(
+      180deg,
+      transparent 6%,
+      rgba(11, 12, 14, 0.15) 12%,
+      rgba(11, 12, 14, 0.95) 20%,
+      rgba(11, 12, 14, 0.96) 80%,
+      rgba(11, 12, 14, 0.9) 100%
+    );
+  }
+}
+
+@media (max-width: 360px) {
+  .site-header {
+    left: 21px;
+    right: 21px;
+    gap: 8px;
+  }
+  .site-header .brand > span {
+    font-size: 16px;
+  }
+  .site-header .brand > svg {
+    width: 21px;
+    height: 21px;
+  }
+  .header-nav {
+    margin-right: 4px;
+  }
+  .read-button {
+    font-size: 9px;
+    gap: 5px;
+  }
+  .sound-button {
+    width: 28px;
+    height: 28px;
+  }
+}

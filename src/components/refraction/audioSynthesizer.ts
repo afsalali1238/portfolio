@@ -105,6 +105,7 @@ export class OpticalAudioSynthesizer {
   triggerSpectrum() {
     const context = this.audibleContext();
     if (!context || !this.masterGain) return;
+    const masterGain = this.masterGain;
 
     const now = context.currentTime;
     [440, 660, 880].forEach((frequency, index) => {
@@ -119,7 +120,7 @@ export class OpticalAudioSynthesizer {
       gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.22);
 
       oscillator.connect(gain);
-      gain.connect(this.masterGain);
+      gain.connect(masterGain);
       oscillator.start(start);
       oscillator.stop(start + 0.24);
     });

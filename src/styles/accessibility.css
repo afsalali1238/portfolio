@@ -1,0 +1,188 @@
+/* Keep secondary controls readable without turning the optical field into UI chrome. */
+.read-button {
+  color: #a2a8b1;
+}
+.button-subline {
+  color: #9299a4;
+}
+.prologue-colophon {
+  color: #818a99;
+}
+.beat-footnote {
+  color: #858f9d;
+}
+.instrument-meta {
+  color: #838d9b;
+}
+.surface-tab {
+  color: #929aa6;
+}
+.surface-tab > span {
+  color: #828b9a;
+}
+.rail-stop {
+  color: #8994a3;
+}
+.rail-caption,
+.rail-end {
+  color: #858f9c;
+}
+.progress-label {
+  color: #8c96a6;
+}
+.progress-total {
+  color: #858f9e;
+}
+.discussion-topline .eyebrow,
+.discussion-coordinate,
+.thought-form label > span,
+.form-actions > p,
+.site-footer > span {
+  color: #929cab;
+}
+.thought-form input::placeholder,
+.thought-form textarea::placeholder {
+  color: #8793a3;
+}
+.saved-thought button {
+  color: #95a3b6;
+}
+.saved-thoughts > h3 > span {
+  color: #929eb0;
+}
+.reading-intro > .eyebrow,
+.reading-header > .eyebrow {
+  color: #62675d;
+}
+.reading-chapter p {
+  color: #444a40;
+}
+.reading-deck,
+.reading-chapter-link {
+  color: #596050;
+}
+.reading-note p {
+  color: #5c6555;
+}
+.reading-note .eyebrow {
+  color: #5a6551;
+}
+
+@media (forced-colors: active) {
+  :root {
+    --paper: CanvasText;
+    --ink: Canvas;
+    --hairline: CanvasText;
+  }
+  html,
+  body,
+  .pinned-stage,
+  .discussion-footer,
+  .reading-dialog,
+  .no-script-reader {
+    background: Canvas;
+    color: CanvasText;
+    scrollbar-color: auto;
+  }
+  .optics-canvas,
+  .paper-grain,
+  .stage-scrim {
+    display: none;
+  }
+  /* Explicit system colours also support engines that emulate the media query without recolouring. */
+  .pinned-stage *,
+  .discussion-footer *,
+  .reading-dialog *,
+  .no-script-reader * {
+    color: CanvasText !important;
+    border-color: CanvasText !important;
+    text-shadow: none !important;
+  }
+  .submit-thought,
+  .thought-form input,
+  .thought-form textarea,
+  .sound-notice,
+  .reading-paper,
+  .begin-button:hover .circle-arrow {
+    background: Canvas !important;
+  }
+  .rail-dot,
+  .status-dot,
+  .sound-indicator {
+    background: CanvasText;
+    box-shadow: none;
+  }
+  .rail-stop[data-active='true'] {
+    border: 1px solid Highlight !important;
+  }
+  .beat[aria-hidden='true'],
+  .surface-panel[aria-hidden='true'] {
+    visibility: hidden !important;
+  }
+  .beat[aria-hidden='false'] {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+  }
+  .surface-panel[aria-hidden='false'] {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid Highlight !important;
+  }
+  .reading-dialog::backdrop {
+    background: Canvas;
+    opacity: 0.8;
+    backdrop-filter: none;
+  }
+}
+
+/* Reserve scrollbar width so opening the reading dialog does not shift the stage. */
+html {
+  scrollbar-gutter: stable;
+}
+.submit-thought:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.sound-button[aria-busy='true'] {
+  cursor: progress;
+}
+.failure-view {
+  min-height: 100svh;
+  max-width: 900px;
+}
+.failure-view h1 {
+  font-size: clamp(48px, 8vw, 88px);
+  line-height: 1.05;
+}
+.failure-view > p:not(.eyebrow) {
+  color: #b4bbc5;
+  font-size: 15px;
+  line-height: 1.7;
+  max-width: 480px;
+}
+.failure-view > button {
+  margin: 23px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #647182;
+}
+.failure-view > p.failure-help {
+  font-size: 11px;
+  color: #929daa;
+}
+@media (prefers-contrast: more) {
+  .beat p,
+  .beat p.italic-copy,
+  .beat-footnote,
+  .button-subline,
+  .prologue-colophon,
+  .rail-stop,
+  .instrument-meta {
+    color: #eeeae1;
+  }
+}
