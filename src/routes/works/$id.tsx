@@ -8,7 +8,7 @@ import { getProjectById, getNextAndPrevProjects, type Project } from "../../data
 import { getRelatedNotesForProject } from "../../data/dispatches";
 import { seo, SITE_URL, AUTHOR } from "../../lib/site";
 
-/** schema.org category from the project's tags — a recipe board isn't a DeveloperApplication. */
+/** schema.org category from the project's tags */
 function appCategory(p: Project) {
   const t = p.tags.join(" ").toLowerCase();
   if (t.includes("game")) return "GameApplication";
@@ -90,7 +90,7 @@ function ProjectCaseStudy() {
       <Container className="max-w-4xl pt-8">
         <Link
           to="/works"
-          className="group inline-flex min-h-11 items-center gap-2 text-sm text-ink-soft transition-colors hover:text-ink"
+          className="group inline-flex min-h-11 items-center gap-2 t-small text-nowrap transition-colors hover:is-lit"
         >
           <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
           All work
@@ -101,58 +101,60 @@ function ProjectCaseStudy() {
       <article className="pb-24">
         <Container className="max-w-4xl pt-6 md:pt-12">
           <SectionReveal>
-            {/* Meta badges */}
-            <div className="flex flex-wrap items-center gap-3 text-xs text-ink-mute">
-              <span className="rounded-full bg-paper-deep px-3 py-1 font-medium text-ink-soft">
-                {platformBadge(project)}
-              </span>
-              <span>·</span>
-              <span className="rounded-full bg-paper-deep px-3 py-1 font-medium text-ink-soft">
-                Built for{" "}
-                {project.for.toLowerCase() === "wife"
-                  ? "my wife"
-                  : project.for.toLowerCase() === "me"
-                    ? "me"
-                    : project.for}
-              </span>
-              {project.status && (
-                <>
-                  <span>·</span>
-                  <span className="rounded-full border rule-hair bg-paper px-3 py-1 font-medium capitalize text-ink">
-                    {project.status}
-                  </span>
-                </>
-              )}
-              {project.featured && (
-                <>
-                  <span>·</span>
-                  <span className="rounded-full bg-ink px-3 py-1 font-medium text-paper">
-                    Spotlight build
-                  </span>
-                </>
-              )}
+            {/* Four-column telemetry header — like Thesis telemetry row */}
+            <div 
+              className="telemetry-row"
+              style={{ 
+                display: "grid", 
+                gridTemplateColumns: "1fr 1fr 1.18fr 1fr", 
+                gap: "12px",
+                paddingBottom: "12px",
+                borderBottom: "1px solid var(--hairline)",
+                marginBottom: "24px"
+              }}
+            >
+              <div>
+                <div className="t-label" style={{ color: "var(--fg-faint)" }}>STATUS</div>
+                <div className="t-num" style={{ fontSize: "16px", color: "var(--fg)", marginTop: "8px" }}>
+                  {project.status ?? "—"}
+                </div>
+              </div>
+              <div>
+                <div className="t-label" style={{ color: "var(--fg-faint)" }}>PLATFORM</div>
+                <div className="t-num" style={{ fontSize: "16px", color: "var(--fg)", marginTop: "8px" }}>
+                  {platformBadge(project)}
+                </div>
+              </div>
+              <div>
+                <div className="t-label" style={{ color: "var(--fg-faint)" }}>BUILT FOR</div>
+                <div className="t-num" style={{ fontSize: "16px", color: "var(--fg)", marginTop: "8px" }}>
+                  {project.for.toLowerCase() === "wife" ? "My wife" : project.for.toLowerCase() === "me" ? "Me" : project.for}
+                </div>
+              </div>
+              <div>
+                <div className="t-label" style={{ color: "var(--fg-faint)" }}>STACK</div>
+                <div className="t-num" style={{ fontSize: "16px", color: "var(--fg)", marginTop: "8px" }}>
+                  {(project.stack || project.tags).slice(0, 3).join(" · ")}
+                  {(project.stack || project.tags).length > 3 && " …"}
+                </div>
+              </div>
             </div>
 
-            {/* Title & One-liner */}
-            <h1 className="mt-6 font-serif text-5xl md:text-7xl leading-[1.02] text-ink">
-              {project.name}
-            </h1>
-            <p className="mt-6 font-serif text-2xl md:text-3xl leading-relaxed text-ink-soft italic">
-              {project.blurb}
-            </p>
+            {/* Title & Lede */}
+            <h1 className="t-display-1">{project.name}</h1>
+            <p className="t-lede mt-6">{project.blurb}</p>
 
             {/* Primary Action Buttons */}
-            <div className="mt-8 flex flex-wrap items-center gap-3 border-b rule-hair pb-10">
+            <div className="mt-8 flex flex-wrap items-center gap-3" style={{ borderBottom: "1px solid var(--hairline)", paddingBottom: "24px" }}>
               {project.live && (
                 <a
                   href={project.live}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink-soft"
+                  className="btn-primary"
                 >
                   {project.platform === "windows" ? "Windows app · download" : "Visit live site"}
                   <ArrowUpRight className="h-4 w-4" />
-                  <span className="sr-only"> (opens in a new tab)</span>
                 </a>
               )}
               {project.github && (
@@ -160,17 +162,16 @@ function ProjectCaseStudy() {
                   href={project.github}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex min-h-11 items-center gap-2 rounded-md border rule-hair bg-paper px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-paper-deep"
+                  className="btn-secondary"
                 >
                   Source code <Github className="h-4 w-4" />
-                  <span className="sr-only"> (opens in a new tab)</span>
                 </a>
               )}
             </div>
 
             {/* Visual Explainer / Interactive Walkthrough */}
             {project.media && (
-              <div className="mt-12 border-b rule-hair pb-12">
+              <div className="mt-12" style={{ borderBottom: "1px solid var(--hairline)", paddingBottom: "24px" }}>
                 <ExplainerVideo
                   media={project.media}
                   title={project.name}
@@ -185,59 +186,47 @@ function ProjectCaseStudy() {
             {/* The Human Friction */}
             {problemText && (
               <SectionReveal className="space-y-4">
-                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-                  01 · Why this exists
-                </div>
-                <h2 className="font-serif text-3xl text-ink">Why this exists.</h2>
-                <p className="text-base md:text-lg leading-relaxed text-ink-soft">{problemText}</p>
+                <p className="t-label">01 ── WHY THIS EXISTS</p>
+                <h2 className="t-display-2">Why this exists.</h2>
+                <p className="t-body">{problemText}</p>
               </SectionReveal>
             )}
 
             {/* The Build & Architecture */}
             {solutionText && (
               <SectionReveal className="space-y-4">
-                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-                  02 · How it was built
-                </div>
-                <h2 className="font-serif text-3xl text-ink">How it was built.</h2>
-                <p className="text-base md:text-lg leading-relaxed text-ink-soft">{solutionText}</p>
+                <p className="t-label">02 ── HOW IT WAS BUILT</p>
+                <h2 className="t-display-2">How it was built.</h2>
+                <p className="t-body">{solutionText}</p>
               </SectionReveal>
             )}
 
             {/* Outcome */}
             {project.outcome && (
               <SectionReveal className="space-y-4">
-                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-                  03 · The outcome
-                </div>
-                <h2 className="font-serif text-3xl text-ink">The real result.</h2>
-                <p className="text-base leading-relaxed text-ink md:text-lg">{project.outcome}</p>
+                <p className="t-label">03 ── THE OUTCOME</p>
+                <h2 className="t-display-2">The real result.</h2>
+                <p className="t-body">{project.outcome}</p>
               </SectionReveal>
             )}
 
             {/* What I Learned */}
             {project.learned && (
-              <SectionReveal className="space-y-4 border-l-2 border-ink py-2 pl-6">
-                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-                  04 · What I learned
-                </div>
-                <p className="font-serif text-2xl italic leading-snug text-ink">
-                  &ldquo;{project.learned}&rdquo;
-                </p>
+              <SectionReveal className="space-y-4" style={{ borderLeft: "2px solid var(--fg)", paddingLeft: "24px", paddingTop: "8px", paddingBottom: "8px" }}>
+                <p className="t-label">04 ── WHAT I LEARNED</p>
+                <p className="t-display-3" style={{ fontStyle: "italic" }}>"{project.learned}"</p>
               </SectionReveal>
             )}
 
             {/* Key Highlights */}
             {project.highlights && project.highlights.length > 0 && (
               <SectionReveal className="space-y-4">
-                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-                  05 · Highlights
-                </div>
-                <h2 className="font-serif text-3xl text-ink">Concrete capabilities.</h2>
+                <p className="t-label">05 ── HIGHLIGHTS</p>
+                <h2 className="t-display-2">Concrete capabilities.</h2>
                 <ul className="space-y-3 pt-2">
                   {project.highlights.map((h: string, i: number) => (
-                    <li key={i} className="flex items-start gap-3 text-base text-ink-soft">
-                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-ink shrink-0" />
+                    <li key={i} className="t-body flex items-start gap-3">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: "var(--fg)" }} />
                       <span>{h}</span>
                     </li>
                   ))}
@@ -245,17 +234,15 @@ function ProjectCaseStudy() {
               </SectionReveal>
             )}
 
-            {/* Tech Stack - Section 06 (fixes numbering bug!) */}
-            <SectionReveal className="space-y-4 rounded-lg bg-paper-deep/50 p-6 md:p-8">
-              <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-                06 · Technical stack
-              </div>
-              <h2 className="font-serif text-2xl text-ink">Tools and dependencies.</h2>
+            {/* Tech Stack - Section 06 */}
+            <SectionReveal className="space-y-4" style={{ backgroundColor: "var(--bg-raised)", padding: "24px", borderRadius: "4px" }}>
+              <p className="t-label">06 ── TECHNICAL STACK</p>
+              <h2 className="t-display-3">Tools and dependencies.</h2>
               <div className="flex flex-wrap gap-2 pt-2">
                 {((project.stack || project.tags) as string[]).map((tech: string) => (
                   <span
                     key={tech}
-                    className="rounded-md border rule-hair bg-paper px-3 py-1.5 text-xs font-medium text-ink"
+                    className="chip"
                   >
                     {tech}
                   </span>
@@ -265,12 +252,10 @@ function ProjectCaseStudy() {
 
             {/* Related Essays & Dispatches */}
             {getRelatedNotesForProject(project.id).length > 0 && (
-              <SectionReveal className="space-y-4 rounded-lg border rule-hair bg-paper p-6 md:p-8">
-                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-                  07 · Related Essays & Dispatches
-                </div>
-                <h2 className="font-serif text-2xl text-ink">Read the deeper thesis.</h2>
-                <p className="text-sm text-ink-soft">
+              <SectionReveal className="space-y-4" style={{ border: "1px solid var(--hairline)", backgroundColor: "var(--bg)", padding: "24px", borderRadius: "4px" }}>
+                <p className="t-label">07 ── RELATED ESSAYS & DISPATCHES</p>
+                <h2 className="t-display-3">Read the deeper thesis.</h2>
+                <p className="t-small" style={{ color: "var(--fg-muted)" }}>
                   The operational context, design philosophy, and lessons behind this build:
                 </p>
                 <div className="space-y-3 pt-2">
@@ -278,20 +263,19 @@ function ProjectCaseStudy() {
                     <Link
                       key={note.number}
                       to={note.path}
-                      className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-md border rule-hair bg-paper-deep/40 p-4 transition-colors hover:border-ink hover:bg-paper-deep"
+                      className="card-row"
+                      style={{ padding: "16px", borderRadius: "4px", borderColor: "var(--hairline)" }}
                     >
                       <div className="space-y-1">
-                        <div className="text-xs text-ink-mute tabular-nums">
+                        <div className="t-label" style={{ color: "var(--fg-muted)" }}>
                           No. {note.number} · {note.date}
                         </div>
-                        <div className="font-serif text-xl text-ink group-hover:text-ink">
-                          {note.title}
-                        </div>
-                        <div className="text-xs text-ink-soft line-clamp-1">{note.subtitle}</div>
+                        <div className="t-display-3 group-hover:is-lit transition-colors">{note.title}</div>
+                        <div className="t-small" style={{ color: "var(--fg-muted)" }}>{note.subtitle}</div>
                       </div>
-                      <div className="inline-flex items-center gap-1.5 text-xs font-medium text-ink shrink-0">
+                      <div className="inline-flex items-center gap-1.5 t-label">
                         <span>Read essay</span>
-                        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                       </div>
                     </Link>
                   ))}
@@ -300,43 +284,38 @@ function ProjectCaseStudy() {
             )}
           </div>
 
-          {/* Next / Previous Project Footer */}
-          <div className="mt-16 border-t rule-hair pt-10 flex flex-col sm:flex-row items-center justify-between gap-6">
-            {prev ? (
-              <Link
-                to="/works/$id"
-                params={{ id: prev.id }}
-                className="group flex flex-col text-left"
-              >
-                <span className="text-xs text-ink-mute flex items-center gap-1">
-                  <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" />
-                  Previous build
-                </span>
-                <span className="font-serif text-xl text-ink group-hover:text-ink-soft transition-colors mt-1">
-                  {prev.name}
-                </span>
-              </Link>
-            ) : (
-              <div />
-            )}
-
-            {next ? (
-              <Link
-                to="/works/$id"
-                params={{ id: next.id }}
-                className="group flex flex-col text-right sm:text-right"
-              >
-                <span className="text-xs text-ink-mute flex items-center justify-end gap-1">
-                  Next build
-                  <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
-                </span>
-                <span className="font-serif text-xl text-ink group-hover:text-ink-soft transition-colors mt-1">
-                  {next.name}
-                </span>
-              </Link>
-            ) : (
-              <div />
-            )}
+          {/* Next / Previous Project Footer — hairline rows */}
+          <div className="mt-16" style={{ borderTop: "1px solid var(--hairline)", paddingTop: "24px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              {prev ? (
+                <Link
+                  to="/works/$id"
+                  params={{ id: prev.id }}
+                  className="card-row group"
+                  style={{ padding: "0", borderTop: "none", borderBottom: "none" }}
+                >
+                  <span className="t-label" style={{ minWidth: "100px" }}>
+                    <ArrowLeft className="h-3 w-3 inline transition-transform group-hover:-translate-x-1" />
+                    Previous build
+                  </span>
+                  <span className="t-display-3 card-title flex-1 min-w-0">{prev.name}</span>
+                </Link>
+              ) : null}
+              {next ? (
+                <Link
+                  to="/works/$id"
+                  params={{ id: next.id }}
+                  className="card-row group"
+                  style={{ padding: "0", borderTop: "none", borderBottom: "none" }}
+                >
+                  <span className="t-label" style={{ minWidth: "100px" }}>
+                    Next build
+                    <ArrowRight className="h-3 w-3 inline transition-transform group-hover:translate-x-1" />
+                  </span>
+                  <span className="t-display-3 card-title flex-1 min-w-0 text-right">{next.name}</span>
+                </Link>
+              ) : null}
+            </div>
           </div>
         </Container>
       </article>
@@ -349,15 +328,15 @@ function ProjectNotFound() {
     <PageShell>
       <div className="flex min-h-[60svh] items-center justify-center px-4">
         <div className="max-w-md text-center">
-          <h1 className="font-serif text-6xl text-ink">404</h1>
-          <h2 className="mt-2 font-serif text-2xl text-ink-soft">Build not found</h2>
-          <p className="mt-2 text-sm text-ink-mute">
+          <h1 className="t-display-1">404</h1>
+          <h2 className="t-display-3 mt-4">Build not found</h2>
+          <p className="t-body mt-4" style={{ color: "var(--fg-muted)" }}>
             The requested project does not exist in the public ledger.
           </p>
-          <div className="mt-6">
+          <div className="mt-8">
             <Link
               to="/works"
-              className="inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-5 text-sm text-paper"
+              className="btn-primary"
             >
               <ArrowLeft className="h-4 w-4" /> See all work
             </Link>

@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight, LayoutGrid, List } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Container } from "../layout/Container";
 import { SectionReveal } from "../animations/SectionReveal";
 import { projects, projectCount, sourceCount, numberWord, type Project } from "../../data/projects";
@@ -28,32 +27,6 @@ function builtForLabel(forWho: string) {
   return `Built for ${forWho}`;
 }
 
-function CardPoster({ src, isMobile }: { src: string; isMobile: boolean }) {
-  const [landscape, setLandscape] = useState(false);
-  const check = (img: HTMLImageElement | null) => {
-    if (img && img.complete && img.naturalWidth) {
-      setLandscape(img.naturalWidth > img.naturalHeight);
-    }
-  };
-  const framed = isMobile && !landscape;
-  return (
-    <div className="flex h-full w-full items-center justify-center p-3 bg-paper-deep">
-      <img
-        ref={check}
-        src={src}
-        alt=""
-        loading="lazy"
-        onLoad={(e) => check(e.currentTarget)}
-        className={`block h-auto max-h-full w-auto max-w-full bg-paper transition-opacity duration-150 ${
-          framed
-            ? "rounded-[1.25rem] border-[4px] border-ink"
-            : "rounded-md border rule-hair object-contain"
-        }`}
-      />
-    </div>
-  );
-}
-
 /** The full catalogue on /works. Every build features rich visuals, media preview, and teardowns. */
 export function Works({
   filter,
@@ -62,7 +35,6 @@ export function Works({
   filter: ProjectFilter;
   view?: "grid" | "table";
 }) {
-  const viewMode = view;
   const filtered = projects.filter((p) => matchesFilter(p, filter));
 
   return (
@@ -71,52 +43,20 @@ export function Works({
         <SectionReveal>
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <div className="text-sm font-medium text-ink-mute">Catalogue of builds</div>
-              <h1 className="mt-2 font-serif text-5xl md:text-7xl">The catalogue.</h1>
-              <p className="mt-3 max-w-xl text-base leading-relaxed text-ink-soft">
+              <p className="t-label">II ── CATALOGUE</p>
+              <h1 className="t-display-1">The builds.</h1>
+              <p className="t-lede mt-4 max-w-xl">
                 {numberWord(projectCount)} quiet tools, clinical companions, and experiments.{" "}
                 {numberWord(sourceCount)} have public source code.
               </p>
             </div>
 
-            <div className="flex items-center gap-4">
-              {/* View Switcher */}
-              <div className="inline-flex items-center rounded-md border rule-hair bg-paper p-1 text-xs text-ink-mute">
-                <Link
-                  to="/works"
-                  search={(prev) => ({ ...prev, view: undefined })}
-                  replace
-                  resetScroll={false}
-                  className={`inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 font-medium transition-colors ${
-                    viewMode === "grid" ? "bg-ink text-paper" : "hover:text-ink"
-                  }`}
-                  aria-pressed={viewMode === "grid"}
-                >
-                  <LayoutGrid className="h-3.5 w-3.5" />
-                  <span>Visual gallery</span>
-                </Link>
-                <Link
-                  to="/works"
-                  search={(prev) => ({ ...prev, view: "table" as const })}
-                  replace
-                  resetScroll={false}
-                  className={`inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 font-medium transition-colors ${
-                    viewMode === "table" ? "bg-ink text-paper" : "hover:text-ink"
-                  }`}
-                  aria-pressed={viewMode === "table"}
-                >
-                  <List className="h-3.5 w-3.5" />
-                  <span>Index table</span>
-                </Link>
-              </div>
-
-              <p className="text-xs text-ink-mute" aria-live="polite">
-                {numberWord(filtered.length)} of {numberWord(projectCount).toLowerCase()} shown
-              </p>
-            </div>
+            <p className="t-small" aria-live="polite">
+              {numberWord(filtered.length)} of {numberWord(projectCount).toLowerCase()} shown
+            </p>
           </div>
 
-          {/* Filter Pills: 44 px tall */}
+          {/* Filter Pills: chips */}
           <nav aria-label="Filter builds" className="mt-8 flex flex-wrap items-center gap-2">
             {PROJECT_FILTERS.map((key) => {
               const active = filter === key;
@@ -131,173 +71,43 @@ export function Works({
                   replace
                   resetScroll={false}
                   aria-current={active ? "true" : undefined}
-                  className={`inline-flex min-h-11 items-center rounded-full px-4 text-xs md:text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink ${
-                    active
-                      ? "bg-ink text-paper"
-                      : "bg-paper-deep/70 text-ink-soft hover:bg-paper-deep hover:text-ink"
-                  }`}
+                  className={`chip ${active ? "selected" : ""}`}
                 >
                   {FILTER_LABELS[key]}
-                  <span className="ml-1.5 text-xs opacity-60">{countFor(key)}</span>
+                  {active && <span className="chip-dot" />}
+                  <span className="ml-1.5 opacity-60">{countFor(key)}</span>
                 </Link>
               );
             })}
           </nav>
         </SectionReveal>
 
-        {/* Visual Gallery View (Default) */}
-        {viewMode === "grid" ? (
-          <ul className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((p) => {
-              const posterSrc = p.media?.poster ?? `/works/${p.id}/poster.jpg`;
-              const isMobile = p.media?.kind === "mobile" || p.platform === "pwa";
-
-              return (
-                <li key={p.id}>
-                  <div className="group flex h-full flex-col justify-between overflow-hidden rounded-lg border rule-hair bg-paper transition-colors duration-150 hover:border-ink/40 hover:bg-paper-deep/40">
-                    <div>
-                      {/* Media Container with Phone/Desktop Frame Preview */}
-                      <Link
-                        to="/works/$id"
-                        params={{ id: p.id }}
-                        className="relative block aspect-[16/10] overflow-hidden border-b rule-hair bg-paper-deep"
-                        tabIndex={-1}
-                        aria-hidden="true"
-                      >
-                        <CardPoster src={posterSrc} isMobile={isMobile} />
-
-                        {/* Device / Platform Badge */}
-                        <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-ink/90 px-3 py-1 text-xs font-medium text-paper backdrop-blur-xs">
-                          <span className="h-1.5 w-1.5 rounded-full bg-paper" />
-                          <span>{platformBadge(p)}</span>
-                        </div>
-
-                        {/* Status Badge */}
-                        {p.status && (
-                          <div className="absolute right-3 top-3 rounded-full bg-paper/95 px-3 py-1 text-xs font-medium text-ink backdrop-blur-xs capitalize border rule-hair">
-                            {p.status}
-                          </div>
-                        )}
-                      </Link>
-
-                      {/* Card Content: 24 px padding */}
-                      <div className="p-6">
-                        <div className="text-xs text-ink-mute">
-                          <span className="font-medium">{builtForLabel(p.for)}</span>
-                        </div>
-
-                        <div className="mt-3 flex items-baseline gap-2">
-                          <Link
-                            to="/works/$id"
-                            params={{ id: p.id }}
-                            className="font-serif text-3xl leading-none text-ink hover:text-ink-soft transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
-                          >
-                            {p.name}
-                          </Link>
-                          {p.featured && (
-                            <span className="inline-flex items-center rounded-xs bg-ink px-1.5 py-0.5 text-xs font-medium text-paper">
-                              Spotlight
-                            </span>
-                          )}
-                        </div>
-
-                        <p className="mt-3 text-sm leading-relaxed text-ink-soft">{p.blurb}</p>
-
-                        {/* Tech Stack Chips */}
-                        {p.stack && p.stack.length > 0 && (
-                          <div className="mt-4 flex flex-wrap gap-1.5">
-                            {p.stack.slice(0, 4).map((tech) => (
-                              <span
-                                key={tech}
-                                className="rounded-md bg-paper-deep px-2 py-0.5 text-xs text-ink-soft"
-                              >
-                                {tech}
-                              </span>
-                            ))}
-                            {p.stack.length > 4 && (
-                              <span className="text-xs text-ink-mute self-center">
-                                +{p.stack.length - 4}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Bottom Actions */}
-                    <div className="flex items-center justify-between border-t rule-hair px-6 py-4 text-xs font-medium">
-                      <Link
-                        to="/works/$id"
-                        params={{ id: p.id }}
-                        className="inline-flex items-center gap-1.5 text-ink hover:text-ink-soft transition-colors"
-                      >
-                        <span>Case study</span>
-                        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                      </Link>
-
-                      <div className="flex items-center gap-3">
-                        {p.github && (
-                          <a
-                            href={p.github}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-ink-mute hover:text-ink transition-colors"
-                          >
-                            Source ↗<span className="sr-only"> (opens in a new tab)</span>
-                          </a>
-                        )}
-                        {p.live && (
-                          <a
-                            href={p.live}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-1 text-ink hover:text-ink-soft transition-colors"
-                          >
-                            <span>{p.platform === "windows" ? "Download" : "Live site"}</span>
-                            <ArrowUpRight className="h-3.5 w-3.5" />
-                            <span className="sr-only"> (opens in a new tab)</span>
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          /* Index Table View */
-          <ul className="mt-10 border-t rule-hair">
-            {filtered.map((p) => (
-              <li key={p.id} className="border-b rule-hair">
+        {/* Hairline rows - no boxes */}
+        <ul className="mt-8 border-t" style={{ borderColor: "var(--hairline)" }}>
+          {filtered.map((p, index) => (
+            <li key={p.id} className="card-row">
+              <div className="flex items-center gap-4 flex-wrap">
+                <span className="t-label" style={{ minWidth: "40px" }}>
+                  {String(index + 1).padStart(2, "0")}
+                </span>
                 <Link
                   to="/works/$id"
                   params={{ id: p.id }}
-                  className="group grid grid-cols-12 items-baseline gap-x-4 gap-y-2 py-6 transition-colors hover:bg-paper-deep/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink md:px-3"
+                  className="t-display-3 card-title flex-1 min-w-0"
                 >
-                  <span className="col-span-12 flex flex-wrap items-baseline gap-3 md:col-span-5">
-                    <span className="font-serif text-2xl leading-tight transition-transform duration-150 group-hover:translate-x-1 md:text-3xl">
-                      {p.name}
-                    </span>
-                    {p.featured && (
-                      <span className="rounded-xs bg-ink px-2 py-0.5 text-xs font-medium text-paper">
-                        Spotlight
-                      </span>
-                    )}
-                  </span>
-                  <span className="col-span-12 text-sm text-ink-soft md:col-span-4">{p.blurb}</span>
-                  <span className="col-span-12 flex flex-wrap items-center justify-between gap-2.5 text-xs text-ink-mute md:col-span-3 md:justify-end">
-                    <span className="rounded-full bg-paper-deep px-2.5 py-0.5 font-medium text-ink-soft">
-                      {platformBadge(p)}
-                    </span>
-                    <span>{builtForLabel(p.for)}</span>
-                    <ArrowRight className="h-4 w-4 text-ink transition-transform duration-150 group-hover:translate-x-1" />
-                  </span>
+                  {p.name}
                 </Link>
-              </li>
-            ))}
-          </ul>
-        )}
+                <span className="t-small flex-1 min-w-0 truncate">{p.blurb}</span>
+                <span className="t-label flex items-center gap-2 text-nowrap">
+                  {p.status && <span className="status-dot" style={{ backgroundColor: p.status === "live" ? "var(--lit)" : "transparent", borderColor: p.status === "live" ? "var(--lit)" : "var(--fg-faint)" }} />}
+                  <span>{platformBadge(p)}</span>
+                  <span>·</span>
+                  <span>{builtForLabel(p.for)}</span>
+                </span>
+              </div>
+            </li>
+          ))}
+        </ul>
       </Container>
     </section>
   );
