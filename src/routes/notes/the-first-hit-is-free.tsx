@@ -1,15 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
-import { PageShell } from "../../components/site/PageShell";
-import { Container } from "../../components/layout/Container";
-import { SectionReveal } from "../../components/animations/SectionReveal";
+import { createFileRoute } from "@tanstack/react-router";
 import { seo, SITE_URL, SITE_NAME, AUTHOR } from "../../lib/site";
-import {
-  ArticlePlatformBar,
-  RelatedBuildsSection,
-  ArticleDiscussionFooter,
-} from "../../components/site/ArticleConnect";
 import { getDispatchByPath, getNextAndPrevDispatches } from "../../data/dispatches";
+import { ArticleLayout } from "../../components/site/ArticleConnect";
 
 const PATH = "/notes/the-first-hit-is-free";
 const dispatch = getDispatchByPath(PATH)!;
@@ -47,41 +39,14 @@ export const Route = createFileRoute("/notes/the-first-hit-is-free")({
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],
   }),
-  component: FirstHitIsFreePage,
+  component: ArticlePage,
 });
 
-function FirstHitIsFreePage() {
+function ArticlePage() {
   return (
-    <PageShell readingProgress>
-      <div className="pb-24">
-        <Container className="max-w-3xl pt-14 md:pt-24">
-          <SectionReveal>
-            <Link
-              to="/notes"
-              className="mb-6 inline-flex items-center gap-1.5 text-xs text-ink-mute transition-colors hover:text-ink"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" /> Back to Notes
-            </Link>
-            <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-              No. 07 · 30 October 2026
-            </div>
-            <h1 className="mt-3 font-serif text-5xl leading-[1.05] tracking-tight text-ink md:text-6xl">
-              The first hit is free.
-            </h1>
-            <p className="mt-4 font-serif text-xl italic text-ink-mute">
-              AI, usage limits, and the unfinished horse: why cognitive offloading feels like genius
-              until the rate limit hits.
-            </p>
-
-            <ArticlePlatformBar
-              external={dispatch.external}
-              readTime={dispatch.readTime}
-              words={dispatch.words}
-            />
-          </SectionReveal>
-
-          <article className="mt-10 space-y-6 text-base leading-relaxed text-ink-soft md:text-lg">
-            <p>The first time you try it, they don&rsquo;t ask you for anything.</p>
+    <ArticleLayout dispatch={dispatch} prev={prev} next={next}>
+      <>
+<p>The first time you try it, they don&rsquo;t ask you for anything.</p>
 
             <p>
               They hand it to you with an open palm. Take as much as you want. Try it on your
@@ -212,13 +177,7 @@ function FirstHitIsFreePage() {
               The first hit is free. The second hit costs twenty dollars. The third hit costs your
               attention. Use the tool with ruthless clarity — but never surrender your judgment.
             </p>
-          </article>
-
-          <RelatedBuildsSection projectIds={dispatch.relatedWorks} />
-
-          <ArticleDiscussionFooter dispatch={dispatch} prev={prev} next={next} />
-        </Container>
-      </div>
-    </PageShell>
+      </>
+    </ArticleLayout>
   );
 }

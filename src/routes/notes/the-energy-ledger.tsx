@@ -1,15 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
-import { Container } from "../../components/layout/Container";
-import { SectionReveal } from "../../components/animations/SectionReveal";
-import { PageShell } from "../../components/site/PageShell";
+import { createFileRoute } from "@tanstack/react-router";
 import { seo, SITE_URL, SITE_NAME, AUTHOR } from "../../lib/site";
-import {
-  ArticlePlatformBar,
-  RelatedBuildsSection,
-  ArticleDiscussionFooter,
-} from "../../components/site/ArticleConnect";
 import { getDispatchByPath, getNextAndPrevDispatches } from "../../data/dispatches";
+import { ArticleLayout } from "../../components/site/ArticleConnect";
 
 const PATH = "/notes/the-energy-ledger";
 const dispatch = getDispatchByPath(PATH)!;
@@ -42,46 +34,19 @@ export const Route = createFileRoute("/notes/the-energy-ledger")({
       description:
         "Every time an AI says 'hello' back to you, an electric bulb could have run for minutes. When tokens are physical IOUs of energy, aimless prompting becomes a moral issue.",
       path: PATH,
-      image: "/og/the-energy-ledger.png",
+      image: "/og/home.png",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],
   }),
-  component: EnergyLedgerPage,
+  component: ArticlePage,
 });
 
-function EnergyLedgerPage() {
+function ArticlePage() {
   return (
-    <PageShell readingProgress>
-      <div className="pb-24">
-        <Container className="max-w-3xl pt-14 md:pt-24">
-          <SectionReveal>
-            <Link
-              to="/notes"
-              className="mb-6 inline-flex items-center gap-1.5 text-xs text-ink-mute transition-colors hover:text-ink"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" /> Back to Notes
-            </Link>
-            <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-              No. 01 · 14 May 2026
-            </div>
-
-            <h1 className="mt-4 font-serif text-5xl leading-[1.02] text-ink md:text-7xl">
-              The Energy Ledger.
-            </h1>
-            <p className="mt-6 font-serif text-2xl italic leading-snug text-ink-soft md:text-3xl">
-              AI tokens are the new currency. And every token is an IOU on physical energy.
-            </p>
-
-            <ArticlePlatformBar
-              external={dispatch.external}
-              readTime={dispatch.readTime}
-              words={dispatch.words}
-            />
-          </SectionReveal>
-
-          <article className="mt-10 space-y-6 text-base leading-relaxed text-ink-soft md:text-lg">
-            <p>
+    <ArticleLayout dispatch={dispatch} prev={prev} next={next}>
+      <>
+<p>
               For three decades, software lived under a seductive illusion: it felt completely
               weightless.
             </p>
@@ -286,13 +251,7 @@ function EnergyLedgerPage() {
               The compute economy is already here. The only question is whether we will treat it
               with the reverence that physical energy demands — or drown in our own automated noise.
             </p>
-          </article>
-
-          <RelatedBuildsSection projectIds={dispatch.relatedWorks} />
-
-          <ArticleDiscussionFooter dispatch={dispatch} prev={prev} next={next} />
-        </Container>
-      </div>
-    </PageShell>
+      </>
+    </ArticleLayout>
   );
 }

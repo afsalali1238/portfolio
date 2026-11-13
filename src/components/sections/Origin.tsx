@@ -6,15 +6,15 @@ import postureDrawing from "@/assets/posture-drawing.webp";
 export function Origin({ isPage = false }: { isPage?: boolean }) {
   const TitleTag = isPage ? "h1" : "h2";
   return (
-    <section id="origin" className="py-20 md:py-28 border-t rule-hair">
+    <section id="origin" className="py-20 md:py-28" style={{ borderTop: "1px solid var(--hairline)" }}>
       <Container className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center">
         <SectionReveal className="lg:col-span-7 space-y-6">
-          <div className="text-sm font-medium text-ink-mute">Origin</div>
-          <TitleTag className="font-serif text-4xl italic leading-tight text-ink md:text-5xl">
+          <p className="t-label">V ── ORIGIN</p>
+          <TitleTag className="t-display-2" style={{ fontStyle: "italic" }}>
             What is forthe.tech?
           </TitleTag>
 
-          <div className="space-y-5 text-base md:text-lg leading-relaxed text-ink-soft">
+          <div className="space-y-5 t-body" style={{ color: "var(--fg-muted)" }}>
             <p>
               The wall between having an idea and building it came down. I&rsquo;ve been walking
               through the gap ever since.
@@ -32,20 +32,19 @@ export function Origin({ isPage = false }: { isPage?: boolean }) {
             </p>
           </div>
 
-          <div className="border-l-2 border-ink py-2 pl-6 my-6">
-            <p className="font-serif text-xl italic text-ink md:text-2xl leading-snug">
+          <div style={{ borderLeft: "2px solid var(--fg)", paddingLeft: "24px", paddingTop: "8px", paddingBottom: "8px", margin: "24px 0" }}>
+            <p className="t-display-3" style={{ fontStyle: "italic", color: "var(--fg)" }}>
               &ldquo;I haven&rsquo;t moved in four hours. My spine has become a question mark. But
               the logic is pure.&rdquo;
             </p>
           </div>
 
-          <div className="pt-4 border-t rule-hair text-xs text-ink-mute">
-            <span>{numberWord(projectCount)} documented builds · forthe.tech · Dubai, UAE.</span>
+          <div className="pt-4" style={{ borderTop: "1px solid var(--hairline)" }}>
+            <p className="t-label">{numberWord(projectCount)} documented builds · forthe.tech · Dubai, UAE.</p>
           </div>
         </SectionReveal>
 
         <SectionReveal className="flex items-center justify-center lg:col-span-5">
-          {/* Static transparent line art; invert flips it to a light line on the dark theme. Zero parallax drift. */}
           <img
             src={postureDrawing}
             width={448}

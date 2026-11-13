@@ -1,15 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
-import { PageShell } from "../../components/site/PageShell";
-import { Container } from "../../components/layout/Container";
-import { SectionReveal } from "../../components/animations/SectionReveal";
+import { createFileRoute } from "@tanstack/react-router";
 import { seo, SITE_URL, SITE_NAME, AUTHOR } from "../../lib/site";
-import {
-  ArticlePlatformBar,
-  RelatedBuildsSection,
-  ArticleDiscussionFooter,
-} from "../../components/site/ArticleConnect";
 import { getDispatchByPath, getNextAndPrevDispatches } from "../../data/dispatches";
+import { ArticleLayout } from "../../components/site/ArticleConnect";
 
 const PATH = "/notes/the-empathy-moat";
 const dispatch = getDispatchByPath(PATH)!;
@@ -42,45 +34,19 @@ export const Route = createFileRoute("/notes/the-empathy-moat")({
       description:
         "Why building for someone you love beats every synthetic product persona and corporate metrics deck ever written.",
       path: PATH,
-      image: "/og/the-empathy-moat.png",
+      image: "/og/home.png",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],
   }),
-  component: EmpathyMoatPage,
+  component: ArticlePage,
 });
 
-function EmpathyMoatPage() {
+function ArticlePage() {
   return (
-    <PageShell readingProgress>
-      <div className="pb-24">
-        <Container className="max-w-3xl pt-14 md:pt-24">
-          <SectionReveal>
-            <Link
-              to="/notes"
-              className="mb-6 inline-flex items-center gap-1.5 text-xs text-ink-mute transition-colors hover:text-ink"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" /> Back to Notes
-            </Link>
-            <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-              No. 03 · 28 July 2026
-            </div>
-            <h1 className="mt-3 font-serif text-5xl leading-[1.05] tracking-tight text-ink md:text-6xl">
-              The empathy moat.
-            </h1>
-            <p className="mt-4 font-serif text-xl italic text-ink-mute">
-              Why building for someone you love beats every product framework ever written.
-            </p>
-
-            <ArticlePlatformBar
-              external={dispatch.external}
-              readTime={dispatch.readTime}
-              words={dispatch.words}
-            />
-          </SectionReveal>
-
-          <article className="mt-10 space-y-6 text-base leading-relaxed text-ink-soft md:text-lg">
-            <p>
+    <ArticleLayout dispatch={dispatch} prev={prev} next={next}>
+      <>
+<p>
               Silicon Valley loves to talk about &ldquo;target user personas.&rdquo; They invent
               synthetic characters named &ldquo;Sarah, 32, Marketing Manager&rdquo; and map her
               journey across Miro boards.
@@ -186,13 +152,7 @@ function EmpathyMoatPage() {
                 follow the relief.
               </p>
             </div>
-          </article>
-
-          <RelatedBuildsSection projectIds={dispatch.relatedWorks} />
-
-          <ArticleDiscussionFooter dispatch={dispatch} prev={prev} next={next} />
-        </Container>
-      </div>
-    </PageShell>
+      </>
+    </ArticleLayout>
   );
 }

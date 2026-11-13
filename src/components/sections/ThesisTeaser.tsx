@@ -30,39 +30,33 @@ export function ThesisTeaser() {
   return (
     <section
       aria-labelledby="notes-heading"
-      className="bg-paper-deep/40 py-20 md:py-28 border-t rule-hair"
+      className="py-20 md:py-28"
+      style={{ borderTop: "1px solid var(--hairline)" }}
     >
       <Container className="grid grid-cols-1 gap-12 lg:grid-cols-12">
         <SectionReveal className="lg:col-span-5 space-y-6">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-mute">
-            <span>Manifesto</span>
-            <span>·</span>
-            <span>Foundation Thesis</span>
-          </div>
-
+          <p className="t-label">IV ── MANIFESTO</p>
           <div>
-            <div className="text-xs text-ink-mute">
-              Dispatch No. {latest.number} · {latest.readTime}
-            </div>
-            <h2 id="notes-heading" className="mt-2 font-serif text-3xl md:text-4xl text-ink">
-              <Link to={latest.path} className="hover:text-ink-soft transition-colors">
+            <p className="t-label">Dispatch Nº {String(latest.number).padStart(2, "0")} · {latest.readTime}</p>
+            <h2 id="notes-heading" className="t-display-2 mt-2">
+              <Link to={latest.path} className="hover:is-lit transition-colors">
                 {latest.title}
               </Link>
             </h2>
-            <p className="mt-3 text-sm leading-relaxed text-ink-soft">{latest.subtitle}</p>
+            <p className="t-small mt-3" style={{ color: "var(--fg-muted)" }}>{latest.subtitle}</p>
           </div>
 
           <div className="pt-2 flex flex-wrap items-center gap-3">
             <Link
               to="/thesis"
-              className="group inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-5 text-sm text-paper transition-colors hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+              className="btn-primary group"
             >
               Read Manifesto
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
             <Link
               to="/notes"
-              className="inline-flex min-h-11 items-center gap-2 rounded-md border rule-hair bg-paper px-4 text-sm font-medium text-ink transition-colors hover:bg-paper-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+              className="btn-secondary"
             >
               All notes
             </Link>
@@ -70,15 +64,15 @@ export function ThesisTeaser() {
         </SectionReveal>
 
         <SectionReveal className="space-y-6 lg:col-span-7">
-          <p className="font-serif text-2xl leading-snug text-ink md:text-3xl">
-            An idea in your head <span className="italic">costs nothing and proves nothing</span>.
+          <p className="t-display-3" style={{ maxWidth: "500px" }}>
+            An idea in your head <span style={{ fontStyle: "italic" }}>costs nothing and proves nothing</span>.
             It is invisible until it collides with real glass.
           </p>
           <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {NOTES.map((n) => (
-              <li key={n.k} className="rounded-lg bg-paper p-5 border rule-hair">
-                <div className="text-xs font-medium text-ink-mute">{n.k}</div>
-                <div className="mt-1.5 font-serif text-lg leading-snug text-ink">{n.v}</div>
+              <li key={n.k} className="p-5" style={{ border: "1px solid var(--hairline)", backgroundColor: "var(--bg)", borderRadius: "4px" }}>
+                <div className="t-label">{n.k}</div>
+                <div className="mt-1.5" style={{ fontFamily: "var(--font-display)", fontSize: "18px", lineHeight: "1.2", color: "var(--fg)" }}>{n.v}</div>
               </li>
             ))}
           </ul>

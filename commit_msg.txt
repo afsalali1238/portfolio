@@ -1,1 +1,1 @@
-S-5: Notes index and article layout restyled to Thesis spec
+S-5: Home sections, about, contact, lab, 404 restyled to Thesis spec

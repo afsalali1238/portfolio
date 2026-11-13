@@ -24,21 +24,21 @@ function NotFoundComponent() {
     <PageShell>
       <div className="flex min-h-[60svh] items-center justify-center px-4">
         <div className="max-w-md text-center">
-          <h1 className="font-serif text-7xl text-ink">404</h1>
-          <p className="mt-3 font-serif text-2xl text-ink-soft">Not in the ledger.</p>
-          <p className="mt-2 text-sm text-ink-mute">
+          <h1 className="t-display-1">404</h1>
+          <p className="t-display-3 mt-4">Light absorbed.</p>
+          <p className="t-body mt-4" style={{ color: "var(--fg-muted)" }}>
             This page doesn&rsquo;t exist, or it moved when the site split into pages.
           </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-2">
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               to="/"
-              className="inline-flex min-h-11 items-center rounded-md bg-ink px-5 text-sm font-medium text-paper"
+              className="btn-primary"
             >
               Home
             </Link>
             <Link
               to="/works"
-              className="inline-flex min-h-11 items-center rounded-md border rule-hair px-5 text-sm font-medium text-ink"
+              className="btn-secondary"
             >
               All work
             </Link>

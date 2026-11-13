@@ -1,15 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
-import { PageShell } from "../../components/site/PageShell";
-import { Container } from "../../components/layout/Container";
-import { SectionReveal } from "../../components/animations/SectionReveal";
+import { createFileRoute } from "@tanstack/react-router";
 import { seo, SITE_URL, SITE_NAME, AUTHOR } from "../../lib/site";
-import {
-  ArticlePlatformBar,
-  RelatedBuildsSection,
-  ArticleDiscussionFooter,
-} from "../../components/site/ArticleConnect";
 import { getDispatchByPath, getNextAndPrevDispatches } from "../../data/dispatches";
+import { ArticleLayout } from "../../components/site/ArticleConnect";
 
 const PATH = "/notes/the-reality-test";
 const dispatch = getDispatchByPath(PATH)!;
@@ -42,46 +34,19 @@ export const Route = createFileRoute("/notes/the-reality-test")({
       description:
         "Building is safe because it only involves you. Finding customers is brutal because they have zero bias toward your baby.",
       path: PATH,
-      image: "/og/the-reality-test.png",
+      image: "/og/home.png",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],
   }),
-  component: RealityTestPage,
+  component: ArticlePage,
 });
 
-function RealityTestPage() {
+function ArticlePage() {
   return (
-    <PageShell readingProgress>
-      <div className="pb-24">
-        <Container className="max-w-3xl pt-14 md:pt-24">
-          <SectionReveal>
-            <Link
-              to="/notes"
-              className="mb-6 inline-flex items-center gap-1.5 text-xs text-ink-mute transition-colors hover:text-ink"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" /> Back to Notes
-            </Link>
-            <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
-              No. 06 · 21 October 2026
-            </div>
-            <h1 className="mt-3 font-serif text-5xl leading-[1.05] tracking-tight text-ink md:text-6xl">
-              The reality test.
-            </h1>
-            <p className="mt-4 font-serif text-xl italic text-ink-mute">
-              Building is easy because it only involves you. Finding customers is brutal because
-              strangers have zero bias toward your baby.
-            </p>
-
-            <ArticlePlatformBar
-              external={dispatch.external}
-              readTime={dispatch.readTime}
-              words={dispatch.words}
-            />
-          </SectionReveal>
-
-          <article className="mt-10 space-y-6 text-base leading-relaxed text-ink-soft md:text-lg">
-            <p>
+    <ArticleLayout dispatch={dispatch} prev={prev} next={next}>
+      <>
+<p>
               Building a new product or a slick new feature is addictive. It feels like playing god.
               At 2:00 AM, inside your dark room with your editor glowing, you have total control.
               You tweak the padding, tune the animations to sixty frames per second, write clean
@@ -208,13 +173,7 @@ function RealityTestPage() {
               bolt, you don&rsquo;t polish the handle for six months — you put it down and find a
               different tool.
             </p>
-          </article>
-
-          <RelatedBuildsSection projectIds={dispatch.relatedWorks} />
-
-          <ArticleDiscussionFooter dispatch={dispatch} prev={prev} next={next} />
-        </Container>
-      </div>
-    </PageShell>
+      </>
+    </ArticleLayout>
   );
 }
