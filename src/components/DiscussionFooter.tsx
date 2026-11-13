@@ -205,8 +205,8 @@ export function DiscussionFooter() {
         <Brand />
         <span className="t-label">© 2026 · INDEPENDENT THOUGHT, MADE REAL.</span>
         <div className="footer-links" style={{ display: "flex", gap: "16px", margin: "0 16px" }}>
-          <a href="/works" className="text-link" style={{ fontSize: "12px" }}>Works</a>
-          <a href="/notes" className="text-link" style={{ fontSize: "12px" }}>Notes</a>
+          <a href="/works" className="t-label text-link">Works</a>
+          <a href="/notes" className="t-label text-link">Notes</a>
         </div>
         <button className="text-link" onClick={top}>
           Back to the beginning <Icon name="arrow" size={14} />

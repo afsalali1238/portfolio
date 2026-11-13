@@ -233,7 +233,7 @@ export const EditorialBeats = forwardRef<EditorialHandle, Props>(function Editor
             )}
             {movementIndex === MOVEMENTS.length - 1 && (
               <button className="text-link closing-link" onClick={onDiscussion}>
-                Write it down <Icon name="arrow" size={15} />
+                Your turn ↓
               </button>
             )}
           </article>

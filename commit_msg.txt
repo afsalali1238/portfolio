@@ -1,1 +1,0 @@
-T2: Fix thesis page issues - header scrim, final frame, em dash, ray position, byline, movement counter, duplicate text

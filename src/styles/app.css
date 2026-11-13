@@ -138,12 +138,15 @@
   align-items: center;
   justify-content: space-between;
   z-index: 6;
-  background: linear-gradient(
-    180deg,
-    var(--bg) 0%,
-    var(--bg) 60%,
-    rgba(11, 12, 14, 0) 100%
-  );
+}
+.page-shell .site-header::before {
+  content: "";
+  position: absolute;
+  inset: -20px -5vw auto;
+  height: 140px;
+  background: linear-gradient(var(--bg) 55%, transparent);
+  z-index: -1;
+  pointer-events: none;
 }
 .page-shell .brand {
   display: inline-flex;
