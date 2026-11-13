@@ -110,8 +110,8 @@ function TheManBehindPage() {
           {/* Builder Manifesto Quote */}
           <SectionReveal>
             <p className="font-serif text-xl italic text-ink-soft border-l-2 border-emerald-500/60 pl-5 py-2 leading-relaxed">
-              &ldquo;Giving an operations guy modern AI tools is like handing a chimpanzee an
-              AK-47: zero committees, lethal execution speed, and software built purely out of
+              &ldquo;Giving an operations guy modern AI tools is like handing a chimpanzee an AK-47:
+              zero committees, lethal execution speed, and software built purely out of
               curiosity.&rdquo;
             </p>
           </SectionReveal>

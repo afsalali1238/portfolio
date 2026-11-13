@@ -71,9 +71,8 @@ export function ThesisTeaser() {
 
         <SectionReveal className="space-y-6 lg:col-span-7">
           <p className="font-serif text-2xl leading-snug text-ink md:text-3xl">
-            An idea in your head{" "}
-            <span className="italic">costs nothing and proves nothing</span>. It is invisible until
-            it collides with real glass.
+            An idea in your head <span className="italic">costs nothing and proves nothing</span>.
+            It is invisible until it collides with real glass.
           </p>
           <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {NOTES.map((n) => (

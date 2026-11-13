@@ -14,6 +14,7 @@ Cinematic volumetric 3D Matrix digital rain visual of a wild chimpanzee holding 
 The entire subject and environment are rendered purely out of falling monospace alphanumeric characters, hexadecimal code (0-9, A-F, #, $, @, &), and green phosphor glyphs against a deep void pitch-black background (#050a07).
 
 Scene Choreography & Motion Sequence:
+
 - 00:00 - 00:03 (Triumph): The chimpanzee stands tall in silhouette, holding the AK-47 rifle high above its head with both hands in triumphant celebration, shifting weight and posturing aggressively as dense streams of emerald-green digital rain (#10b981) flow downwards across its muscular silhouette, delineating its hairy shoulders, arms, ears, and the mechanical geometry of the banana magazine and barrel.
 - 00:03 - 00:05 (The Transition): The chimp swiftly brings the rifle down from overhead, slamming the stock into its shoulder and racking the charging bolt. Its silhouette hunkers down into a firing stance, teeth bared in an aggressive grin traced in bright neon mint green (#6ee7b7).
 - 00:05 - 00:08 (Full Auto Fire): The chimpanzee pulls the trigger and fires rapid bursts into the forward frame. Violent weapon recoil shakes the digital code streams. Each muzzle flash is an explosion of blinding white-green phosphor data particles (#ecfdf5, #34d399) that illuminates the chimpanzee's digital face. Ejected brass shell casings tumble through the air, fragmenting into disintegrating green ASCII code blocks and glowing hex particles.
@@ -36,13 +37,13 @@ A wild chimpanzee standing centered, triumphantly holding an AK-47 rifle high ov
 
 ## 3. Camera, Lighting & Particle Direction Deck
 
-| Attribute | Specification |
-| :--- | :--- |
-| **Color Grading** | Dominant Matrix emerald `#10b981`, deep shadow moss `#064e3b`, muzzle highlight white-mint `#ecfdf5` / `#34d399`, background pure OLED black `#050807`. |
-| **Typography / Code Texture** | Cryptographic hex pairs (`0x7F`, `AF`, `9C`), punctuation (`#`, `@`, `%`, `*`), and monospace numbers cascading at variable velocities. |
-| **Primate Motion Fidelity** | Heavy primate weight shifts, realistic muscle flexing under the rain streams, authentic AK-47 muzzle rise, and recoil shockwaves sending ripples through the matrix grid. |
-| **Muzzle Flash FX** | Volumetric shockwave emitting exploding clusters of glowing characters rather than standard fire smoke, dissolving into digital residue. |
-| **Negative Prompt** | `photorealistic human, cartoon, smooth plastic skin, 3D clay render, colorful daylight, solid realistic fur, low resolution, blurry, jittery frame, neon pink/purple colors, text watermark`. |
+| Attribute                     | Specification                                                                                                                                                                                 |
+| :---------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Color Grading**             | Dominant Matrix emerald `#10b981`, deep shadow moss `#064e3b`, muzzle highlight white-mint `#ecfdf5` / `#34d399`, background pure OLED black `#050807`.                                       |
+| **Typography / Code Texture** | Cryptographic hex pairs (`0x7F`, `AF`, `9C`), punctuation (`#`, `@`, `%`, `*`), and monospace numbers cascading at variable velocities.                                                       |
+| **Primate Motion Fidelity**   | Heavy primate weight shifts, realistic muscle flexing under the rain streams, authentic AK-47 muzzle rise, and recoil shockwaves sending ripples through the matrix grid.                     |
+| **Muzzle Flash FX**           | Volumetric shockwave emitting exploding clusters of glowing characters rather than standard fire smoke, dissolving into digital residue.                                                      |
+| **Negative Prompt**           | `photorealistic human, cartoon, smooth plastic skin, 3D clay render, colorful daylight, solid realistic fur, low resolution, blurry, jittery frame, neon pink/purple colors, text watermark`. |
 
 ---
 

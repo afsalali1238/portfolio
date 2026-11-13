@@ -105,7 +105,9 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
     if (!soundEnabledRef.current) return;
     try {
       if (!audioCtxRef.current) {
-        const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        const AudioCtx =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
         audioCtxRef.current = new AudioCtx();
       }
       const actx = audioCtxRef.current;
@@ -251,7 +253,16 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
 
     // Authentic Katakana & Matrix Alphanumeric Character Set
     const CHARS = "0123456789ABCDEF$#@%&*+-/=<>~VUGX日ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ";
-    const DECRYPT_WORDS = ["OP:AFSAL", "SYS:BUILDER", "NODE:DUBAI", "PORT:0x443", "LAT:25.2048", "LON:55.2708", "STATUS:ARMED", "VERIFIED"];
+    const DECRYPT_WORDS = [
+      "OP:AFSAL",
+      "SYS:BUILDER",
+      "NODE:DUBAI",
+      "PORT:0x443",
+      "LAT:25.2048",
+      "LON:55.2708",
+      "STATUS:ARMED",
+      "VERIFIED",
+    ];
 
     // 1. Offscreen mask for human silhouette
     const humanMaskCanvas = document.createElement("canvas");
@@ -501,7 +512,8 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
 
         const figureScale = Math.min(height * 0.92, width * 0.72);
         const swayX = gait === "vigil" ? 0 : Math.sin(walkCycle) * (figureScale * 0.018);
-        const bobY = gait === "vigil" ? 0 : Math.abs(Math.sin(walkCycle * 2)) * (figureScale * 0.014);
+        const bobY =
+          gait === "vigil" ? 0 : Math.abs(Math.sin(walkCycle * 2)) * (figureScale * 0.014);
         const shoulderTilt = gait === "vigil" ? 0 : Math.sin(walkCycle) * 0.016;
         const armSwing = gait === "vigil" ? 0 : Math.sin(walkCycle) * (figureScale * 0.026);
 
@@ -512,7 +524,14 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
         if (humanMaskCtx && maskW > 0 && maskH > 0) {
           const scaledSway = (swayX / width) * maskW;
           const scaledBob = (bobY / height) * maskH;
-          drawWalkingHumanSilhouette(humanMaskCtx, maskW, maskH, scaledSway, scaledBob, shoulderTilt);
+          drawWalkingHumanSilhouette(
+            humanMaskCtx,
+            maskW,
+            maskH,
+            scaledSway,
+            scaledBob,
+            shoulderTilt,
+          );
         }
 
         const maskData = humanMaskCtx?.getImageData(0, 0, maskW, maskH);
@@ -593,7 +612,8 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
               // but very dim/dark phosphor green (~0.30 - 0.40 alpha)!
               if (isEdge) {
                 // Razor-sharp illuminated green contour tracing the head & shoulders
-                ctx.fillStyle = mouseDist < 85 ? getThemeColor("head", 1.0) : getThemeColor("bright", 0.95);
+                ctx.fillStyle =
+                  mouseDist < 85 ? getThemeColor("head", 1.0) : getThemeColor("bright", 0.95);
               } else {
                 if (mouseDist < 95) {
                   // Cursor hover acts like a decryption scanner
@@ -617,12 +637,12 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
                 if (distFromHead < 4) {
                   ctx.fillStyle = getThemeColor("bright", 0.98);
                 } else {
-                  const trailAlpha = Math.max(0.40, 1 - distFromHead / (drop?.length || 20));
+                  const trailAlpha = Math.max(0.4, 1 - distFromHead / (drop?.length || 20));
                   ctx.fillStyle = getThemeColor("mid", trailAlpha);
                 }
               } else {
                 // Dense cascading ambient matrix rain
-                const ambientAlpha = ((r * 7 + c * 13) % 4 === 0) ? 0.70 : 0.46;
+                const ambientAlpha = (r * 7 + c * 13) % 4 === 0 ? 0.7 : 0.46;
                 ctx.fillStyle = getThemeColor("mid", ambientAlpha);
               }
             }
@@ -754,7 +774,8 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
           ctx.save();
           ctx.translate(p.x, p.y);
           ctx.rotate(p.rot);
-          ctx.fillStyle = theme === "amber" ? `rgba(251, 191, 36, ${p.alpha})` : `rgba(234, 179, 8, ${p.alpha})`;
+          ctx.fillStyle =
+            theme === "amber" ? `rgba(251, 191, 36, ${p.alpha})` : `rgba(234, 179, 8, ${p.alpha})`;
           ctx.fillRect(-5, -2, 10, 4);
           ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha * 0.8})`;
           ctx.fillRect(-6, -1.5, 2, 3);
@@ -916,7 +937,9 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
             ? `GAIT: ${gait.toUpperCase()}`
             : mode === "ape-ak47"
               ? `MAG: ${ammoRef.current}/30 · 7.62MM`
-              : (cicadaEmergedRef.current ? "4.4 kHz RES" : "NYMPH PHASE");
+              : cicadaEmergedRef.current
+                ? "4.4 kHz RES"
+                : "NYMPH PHASE";
 
         ctx.fillText(
           `${mode.toUpperCase()} // ${(mouse.x / width).toFixed(2)}, ${(mouse.y / height).toFixed(2)} [${subLabel}]`,
@@ -1156,7 +1179,9 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
                   ? "border-emerald-500/50 bg-emerald-500/20 text-emerald-300"
                   : "border-zinc-800 bg-black/60 text-zinc-400 hover:text-zinc-200"
               }`}
-              title={soundEnabled ? "Synthesizer SFX: ON" : "Synthesizer SFX: MUTED (Click to enable)"}
+              title={
+                soundEnabled ? "Synthesizer SFX: ON" : "Synthesizer SFX: MUTED (Click to enable)"
+              }
             >
               {soundEnabled ? "SFX: ON" : "SFX: OFF"}
             </button>
@@ -1271,7 +1296,11 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
               </button>
               <div className="hidden sm:flex items-center gap-1.5 rounded-full border border-zinc-800 bg-black/60 px-3 py-1 text-[11px] text-zinc-400 font-mono">
                 <span>MAG:</span>
-                <span className={ammoCount < 9 ? "text-red-400 font-bold" : "text-emerald-400 font-bold"}>
+                <span
+                  className={
+                    ammoCount < 9 ? "text-red-400 font-bold" : "text-emerald-400 font-bold"
+                  }
+                >
                   {ammoCount}/30
                 </span>
                 <span className="text-zinc-600">|</span>

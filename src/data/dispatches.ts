@@ -26,8 +26,8 @@ export const DISPATCHES: Dispatch[] = [
     subtitle:
       "A manifesto of light, friction, effort, and becoming: why ideas prove nothing until they collide with the dense glass of honest craft.",
     path: "/thesis",
-    readTime: "6 min read",
-    words: "~1,100 words",
+    readTime: "2 min read",
+    words: "~420 words",
     external: {
       substack: "https://substack.com/@afsalali",
       medium: "https://medium.com/@afsalali1238",
