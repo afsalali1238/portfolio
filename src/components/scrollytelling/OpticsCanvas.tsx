@@ -291,31 +291,32 @@ class OpticalRenderer {
   private instrument(p: number, time: number, reduced: boolean) {
     const c = this.ctx,
       { cx, cy, radius: r } = this;
-    const visibility = lerp(1, 0.32, smoothstep(0.48, 0.7, p));
+    // The prologue plate is intentionally quiet, but it still needs to read at a glance on
+    // imperfect laptop panels. Keep it present after the prism appears rather than letting it
+    // disappear into the black field.
+    const visibility = lerp(1, 0.48, smoothstep(0.48, 0.7, p));
     c.save();
-    c.globalAlpha = visibility;
     this.line(
       { x: cx - r - 42, y: cy },
       { x: cx + r + 42, y: cy },
       "#b5bac2",
       0.5,
-      0.1 * visibility,
+      0.16 * visibility,
     );
     this.line(
       { x: cx, y: cy - r - 25 },
       { x: cx, y: cy + r + 25 },
       "#b5bac2",
       0.5,
-      0.1 * visibility,
+      0.16 * visibility,
     );
-    c.globalAlpha = visibility;
-    c.lineWidth = 0.5;
-    c.strokeStyle = "rgba(196,204,218,.15)";
+    c.lineWidth = 0.55;
+    c.strokeStyle = `rgba(196,204,218,${0.24 * visibility})`;
     c.beginPath();
     c.arc(cx, cy, r, 0, TAU);
     c.stroke();
     c.setLineDash([1, 7]);
-    c.strokeStyle = "rgba(196,204,218,.17)";
+    c.strokeStyle = `rgba(196,204,218,${0.25 * visibility})`;
     c.beginPath();
     c.arc(cx, cy, r * 0.86, 0, TAU);
     c.stroke();
@@ -323,22 +324,23 @@ class OpticalRenderer {
     for (let i = 0; i < 72; i++) {
       const angle = (TAU * i) / 72,
         inner = r + (i % 6 === 0 ? 7 : 2),
-        outer = r + (i % 6 === 0 ? 15 : 5);
-      c.strokeStyle = `rgba(196,204,218,${i % 6 === 0 ? 0.28 : 0.13})`;
+        outer = r + (i % 6 === 0 ? 15 : 5),
+        tickAlpha = (i % 6 === 0 ? 0.38 : 0.18) * visibility;
+      c.strokeStyle = `rgba(196,204,218,${tickAlpha})`;
       c.beginPath();
       c.moveTo(cx + Math.cos(angle) * inner, cy + Math.sin(angle) * inner);
       c.lineTo(cx + Math.cos(angle) * outer, cy + Math.sin(angle) * outer);
       c.stroke();
     }
     if (p < 0.22) {
-      c.strokeStyle = "rgba(220,224,232,.2)";
+      c.strokeStyle = `rgba(220,224,232,${0.3 * visibility})`;
       c.beginPath();
       c.arc(cx, cy, r, -1.8 + time * 0.035, -1.8 + time * 0.035 + 0.6);
       c.stroke();
       c.save();
       c.translate(cx, cy);
       c.rotate(-0.52);
-      c.strokeStyle = "rgba(196,204,218,.13)";
+      c.strokeStyle = `rgba(196,204,218,${0.21 * visibility})`;
       c.beginPath();
       c.ellipse(0, 0, r * 1.15, r * 0.27, 0, 0, TAU);
       c.stroke();
@@ -346,7 +348,7 @@ class OpticalRenderer {
       const halo = c.createRadialGradient(cx, cy, 0, cx, cy, r * 0.9);
       halo.addColorStop(
         0,
-        `rgba(162,169,190,${reduced ? 0.035 : 0.035 + Math.sin(time * 0.6) * 0.008})`,
+        `rgba(162,169,190,${(reduced ? 0.06 : 0.06 + Math.sin(time * 0.6) * 0.012) * visibility})`,
       );
       halo.addColorStop(1, "rgba(162,169,190,0)");
       c.fillStyle = halo;
@@ -358,7 +360,7 @@ class OpticalRenderer {
       [-1, 1],
       [1, 1],
     ];
-    c.strokeStyle = "rgba(196,204,218,.24)";
+    c.strokeStyle = `rgba(196,204,218,${0.34 * visibility})`;
     for (const [dx, dy] of corners) {
       const x = cx + dx * (r + 29),
         y = cy + dy * (r + 29);
@@ -401,7 +403,7 @@ class OpticalRenderer {
     c.lineTo(point.x, point.y + 13);
     c.stroke();
     if (p < 0.145 && !this.mobile)
-      this.label("A POINT OF POSSIBILITY", point.x, point.y + this.radius * 0.63, 0.4, "center");
+      this.label("A POINT OF POSSIBILITY", point.x, point.y + this.radius * 0.63, 0.5, "center");
   }
   private vacuum(p: number, t: number, tilt: number) {
     const start = { x: this.left, y: this.cy },
