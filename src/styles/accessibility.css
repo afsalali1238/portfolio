@@ -78,13 +78,12 @@
 }
 
 @media (forced-colors: active) {
-  :root {
+  .page-shell {
     --paper: CanvasText;
     --ink: Canvas;
     --hairline: CanvasText;
   }
-  html,
-  body,
+  .page-shell,
   .pinned-stage,
   .discussion-footer,
   .reading-dialog,
@@ -137,10 +136,10 @@
     opacity: 1 !important;
     visibility: visible !important;
   }
-  button:focus-visible,
-  a:focus-visible,
-  input:focus-visible,
-  textarea:focus-visible {
+  .page-shell button:focus-visible,
+  .page-shell a:focus-visible,
+  .page-shell input:focus-visible,
+  .page-shell textarea:focus-visible {
     outline: 2px solid Highlight !important;
   }
   .reading-dialog::backdrop {
@@ -150,10 +149,6 @@
   }
 }
 
-/* Reserve scrollbar width so opening the reading dialog does not shift the stage. */
-html {
-  scrollbar-gutter: stable;
-}
 .submit-thought:disabled {
   cursor: not-allowed;
   opacity: 0.55;

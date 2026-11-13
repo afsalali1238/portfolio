@@ -15,5 +15,5 @@ export function FailureView() {
         If the interruption continues, try another browser or disable extensions for this page.
       </p>
     </main>
-  )
+  );
 }

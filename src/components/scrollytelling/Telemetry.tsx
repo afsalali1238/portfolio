@@ -1,59 +1,59 @@
-import { forwardRef, useImperativeHandle, useRef } from 'react'
-import { chapterAt, surfaceAt, SURFACES } from './story'
-import { lerp, smoothstep, SPECTRUM } from './opticsEngine'
+import { forwardRef, useImperativeHandle, useRef } from "react";
+import { chapterAt, surfaceAt, SURFACES } from "./story";
+import { lerp, smoothstep, SPECTRUM } from "./opticsEngine";
 
 export interface TelemetryHandle {
-  update: (progress: number) => void
+  update: (progress: number) => void;
 }
 
 export const Telemetry = forwardRef<TelemetryHandle>(function Telemetry(_, ref) {
-  const label = useRef<HTMLSpanElement>(null)
-  const index = useRef<HTMLSpanElement>(null)
-  const velocity = useRef<HTMLSpanElement>(null)
-  const status = useRef<HTMLSpanElement>(null)
-  const spectrum = useRef<HTMLDivElement>(null)
+  const label = useRef<HTMLSpanElement>(null);
+  const index = useRef<HTMLSpanElement>(null);
+  const velocity = useRef<HTMLSpanElement>(null);
+  const status = useRef<HTMLSpanElement>(null);
+  const spectrum = useRef<HTMLDivElement>(null);
   useImperativeHandle(
     ref,
     () => ({
       update(p) {
         const chapter = chapterAt(p),
           glass = smoothstep(0.54, 0.7, p),
-          n = lerp(1, 1.52, glass)
+          n = lerp(1, 1.52, glass);
         if (label.current)
           label.current.textContent =
             chapter === 0
-              ? 'FIELD / AT REST'
+              ? "FIELD / AT REST"
               : chapter === 1
-                ? 'ORIGIN / SPONTANEOUS'
+                ? "ORIGIN / SPONTANEOUS"
                 : chapter === 2
-                  ? 'MEDIUM / VACUUM'
+                  ? "MEDIUM / VACUUM"
                   : chapter === 3
                     ? `SURFACE / ${SURFACES[surfaceAt(p)].material}`
                     : chapter === 6
-                      ? 'STATE / UNBOUNDED'
-                      : 'MEDIUM / OPTICAL GLASS'
-        if (index.current) index.current.textContent = n.toFixed(3)
-        if (velocity.current) velocity.current.textContent = `${(1 / n).toFixed(3)}c`
+                      ? "STATE / UNBOUNDED"
+                      : "MEDIUM / OPTICAL GLASS";
+        if (index.current) index.current.textContent = n.toFixed(3);
+        if (velocity.current) velocity.current.textContent = `${(1 / n).toFixed(3)}c`;
         if (status.current)
           status.current.textContent =
             chapter === 0
-              ? 'AWAITING INPUT'
+              ? "AWAITING INPUT"
               : chapter === 1
-                ? 'IGNITION'
+                ? "IGNITION"
                 : chapter === 2
-                  ? 'FRICTION: 0.00'
+                  ? "FRICTION: 0.00"
                   : chapter === 3
                     ? SURFACES[surfaceAt(p)].status
                     : chapter === 4
-                      ? 'SLOWING TO BECOME'
+                      ? "SLOWING TO BECOME"
                       : chapter === 5
-                        ? '410–680 nm'
-                        : 'PERMANENT'
-        if (spectrum.current) spectrum.current.style.opacity = String(smoothstep(0.72, 0.8, p))
+                        ? "410–680 nm"
+                        : "PERMANENT";
+        if (spectrum.current) spectrum.current.style.opacity = String(smoothstep(0.72, 0.8, p));
       },
     }),
     [],
-  )
+  );
   return (
     <aside className="telemetry" aria-label="Optical telemetry" aria-hidden="true">
       <div className="spectral-legend" ref={spectrum}>
@@ -95,5 +95,5 @@ export const Telemetry = forwardRef<TelemetryHandle>(function Telemetry(_, ref) 
         </div>
       </div>
     </aside>
-  )
-})
+  );
+});

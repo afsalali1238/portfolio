@@ -1,4 +1,4 @@
-:root {
+.page-shell {
   font-family: "DM Sans Variable", "DM Sans", sans-serif;
   color: #eeeae1;
   background: #0b0c0e;
@@ -14,63 +14,50 @@
   --mono: "IBM Plex Mono", monospace;
   --serif: "Instrument Serif", Georgia, serif;
   color-scheme: dark;
+  position: relative;
+  min-height: 100vh;
 }
-* {
+.page-shell * {
   box-sizing: border-box;
 }
-html,
-body,
-#root {
-  margin: 0;
-  min-width: 320px;
-}
-html {
-  scrollbar-width: thin;
-  scrollbar-color: #36383d #0b0c0e;
-}
-body {
-  overflow-x: hidden;
-}
-button,
-input,
-textarea {
+.page-shell button,
+.page-shell input,
+.page-shell textarea {
   font: inherit;
 }
-button,
-a {
+.page-shell button,
+.page-shell a {
   -webkit-tap-highlight-color: transparent;
 }
-button {
+.page-shell button {
   color: inherit;
   cursor: pointer;
   border: 0;
   background: none;
-}
-button {
   padding: 0;
 }
-a {
+.page-shell a {
   color: inherit;
   text-decoration: none;
 }
-button:disabled {
+.page-shell button:disabled {
   cursor: default;
 }
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-textarea:focus-visible {
+.page-shell button:focus-visible,
+.page-shell a:focus-visible,
+.page-shell input:focus-visible,
+.page-shell textarea:focus-visible {
   outline: 2px solid var(--paper);
   outline-offset: 4px;
 }
-button:focus:not(:focus-visible) {
+.page-shell button:focus:not(:focus-visible) {
   outline: none;
 }
-::selection {
+.page-shell ::selection {
   background: #dad6cc;
   color: #0b0c0e;
 }
-button svg {
+.page-shell button svg {
   flex-shrink: 0;
 }
 .sr-only {
@@ -145,7 +132,7 @@ button svg {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.84' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath filter='url(%23grain)' opacity='.6' d='M0 0h180v180H0z'/%3E%3C/svg%3E");
   background-size: 180px 180px;
 }
-.site-header {
+.page-shell .site-header {
   position: absolute;
   top: 0;
   left: 4.5%;
@@ -157,23 +144,23 @@ button svg {
   justify-content: space-between;
   z-index: 6;
 }
-.brand {
+.page-shell .brand {
   display: inline-flex;
   gap: 12px;
   align-items: center;
   white-space: nowrap;
   color: var(--paper);
 }
-.brand > svg {
+.page-shell .brand > svg {
   width: 29px;
   height: 29px;
 }
-.brand > span {
+.page-shell .brand > span {
   font-size: 20px;
   font-weight: 600;
   letter-spacing: -0.7px;
 }
-.brand-period {
+.page-shell .brand-period {
   margin-left: 1px;
   color: #d5d2ca;
 }
@@ -1141,7 +1128,7 @@ button svg {
 .saved-thought button:hover {
   color: #eeeae1;
 }
-.site-footer {
+.page-shell .site-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1149,19 +1136,19 @@ button svg {
   padding: 35px 0;
   border-top: 1px solid #303641;
 }
-.site-footer > .brand > span {
+.page-shell .site-footer > .brand > span {
   font-size: 17px;
 }
-.site-footer > .brand > svg {
+.page-shell .site-footer > .brand > svg {
   width: 24px;
   height: 24px;
 }
-.site-footer > span {
+.page-shell .site-footer > span {
   font: 12px var(--mono);
   letter-spacing: 1px;
   color: #677386;
 }
-.site-footer > .text-link {
+.page-shell .site-footer > .text-link {
   font-size: 12px;
   gap: 18px;
   color: #919cae;
@@ -1491,7 +1478,7 @@ button svg {
   }
 }
 @media (max-height: 760px) and (min-width: 1024px) {
-  .site-header {
+  .page-shell .site-header {
     height: 77px;
   }
   .instrument-meta {
@@ -1591,7 +1578,7 @@ button svg {
   }
 }
 @media (max-width: 1023px) {
-  .site-header {
+  .page-shell .site-header {
     left: 5%;
     right: 5%;
     height: 85px;
@@ -1789,7 +1776,7 @@ button svg {
     font-size: 12px;
     letter-spacing: 0.7px;
   }
-  .site-footer > span {
+  .page-shell .site-footer > span {
     display: none;
   }
   .discussion-coordinate {
@@ -1803,20 +1790,20 @@ button svg {
   }
 }
 @media (max-width: 600px) {
-  .site-header {
+  .page-shell .site-header {
     left: 24px;
     right: 24px;
     height: 76px;
     gap: 10px;
   }
-  .brand {
+  .page-shell .brand {
     gap: 8px;
   }
-  .brand > span {
+  .page-shell .brand > span {
     font-size: 18px;
     letter-spacing: -0.6px;
   }
-  .brand > svg {
+  .page-shell .brand > svg {
     width: 24px;
     height: 24px;
   }
@@ -2209,24 +2196,24 @@ button svg {
   .saved-thought > p {
     font-size: 24px;
   }
-  .site-footer {
+  .page-shell .site-footer {
     padding: 27px 0;
     align-items: center;
   }
-  .site-footer > .brand > span {
+  .page-shell .site-footer > .brand > span {
     font-size: 15px;
   }
-  .site-footer > .brand > svg {
+  .page-shell .site-footer > .brand > svg {
     width: 21px;
     height: 21px;
   }
-  .site-footer > .text-link {
+  .page-shell .site-footer > .text-link {
     font-size: 12px;
     gap: 9px;
     max-width: 140px;
     text-align: right;
   }
-  .site-footer .brand {
+  .page-shell .site-footer .brand {
     gap: 7px;
   }
   .reading-dialog {
@@ -2371,7 +2358,7 @@ button svg {
   .instrument-meta {
     top: 91px;
   }
-  .site-header {
+  .page-shell .site-header {
     height: 70px;
   }
   .beat h1 {
@@ -2411,9 +2398,9 @@ button svg {
   .reduced-motion-view {
     display: block;
   }
-  *,
-  *::before,
-  *::after {
+  .page-shell *,
+  .page-shell *::before,
+  .page-shell *::after {
     scroll-behavior: auto !important;
     animation: none !important;
     transition: none !important;
