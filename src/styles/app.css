@@ -2412,3 +2412,139 @@
     opacity: 0.025;
   }
 }
+
+/* Reading-first revision: keep the optical field as atmosphere, not as dashboard chrome. */
+.page-shell .site-header-minimal {
+  top: 30px;
+  height: auto;
+  border-bottom: 0;
+  pointer-events: none;
+}
+.page-shell .site-header-minimal .brand {
+  pointer-events: auto;
+  opacity: 0.76;
+  transition: opacity 180ms ease;
+}
+.page-shell .site-header-minimal .brand:hover,
+.page-shell .site-header-minimal .brand:focus-visible {
+  opacity: 1;
+}
+.page-shell .site-header-minimal .brand > svg {
+  width: 23px;
+  height: 23px;
+}
+.page-shell .site-header-minimal .brand > span {
+  font-size: 16px;
+  letter-spacing: -0.45px;
+}
+.editorial {
+  left: 10.5%;
+  width: min(43%, 610px);
+  max-width: 610px;
+  height: 460px;
+  transform: translateY(-45%);
+}
+.beat .prologue-deck {
+  max-width: 420px;
+  color: #babbb9;
+}
+.beat p {
+  max-width: 445px;
+  color: #b9bbb9;
+  font-size: 17px;
+  line-height: 1.72;
+}
+.beat p.lead-copy {
+  color: #d7d5cf;
+}
+.stage-footer {
+  left: 10.5%;
+  right: auto;
+  bottom: 28px;
+  width: auto;
+  height: auto;
+  min-height: 0;
+  display: flex;
+  border-top: 0;
+}
+.footer-chapter {
+  display: none;
+}
+.scroll-prompt {
+  gap: 11px;
+  color: #b9bdc4;
+  font-size: 12px;
+  letter-spacing: 1.1px;
+}
+.scroll-progress-line {
+  opacity: 0.48;
+}
+
+@media (max-width: 1023px) {
+  .page-shell .site-header-minimal {
+    top: 24px;
+  }
+  .editorial {
+    left: 10%;
+    right: 11%;
+    width: auto;
+    height: 470px;
+    transform: translateY(-42%);
+  }
+  .stage-footer {
+    left: 10%;
+    bottom: 24px;
+  }
+  .beat p {
+    font-size: 16px;
+    line-height: 1.68;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-shell .site-header-minimal {
+    top: 23px;
+  }
+  .page-shell .site-header-minimal .brand > svg {
+    width: 21px;
+    height: 21px;
+  }
+  .page-shell .site-header-minimal .brand > span {
+    font-size: 15px;
+  }
+  .editorial {
+    left: 27px;
+    right: 48px;
+    height: 445px;
+  }
+  .pinned-stage[data-chapter="0"] .editorial {
+    top: 53%;
+    height: 360px;
+    transform: translateY(-30%);
+  }
+  .stage-footer {
+    left: 27px;
+    bottom: 18px;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 1024px) {
+  .editorial {
+    top: 122px;
+    right: 52%;
+    bottom: 74px;
+    height: auto;
+    transform: none;
+  }
+  .stage-footer {
+    bottom: 18px;
+  }
+}
+
+@media (max-height: 760px) and (max-width: 600px) {
+  .editorial,
+  .pinned-stage[data-chapter="0"] .editorial {
+    top: 96px;
+    bottom: 82px;
+  }
+}

@@ -3,7 +3,6 @@ import type { OpticsHandle } from "./OpticsCanvas";
 import type { EditorialHandle } from "./EditorialBeats";
 import type { RailHandle } from "./ChapterRail";
 import type { TelemetryHandle } from "./Telemetry";
-import { SoundDirector } from "./soundDirector";
 import { CHAPTERS, chapterAt } from "./story";
 import { dampedStep, measureTrack, progressAt, scrollAt, type TrackMetrics } from "./runtimeMath";
 
@@ -14,12 +13,9 @@ interface RuntimeRefs {
   editorial: RefObject<EditorialHandle | null>;
   rail: RefObject<RailHandle | null>;
   telemetry: RefObject<TelemetryHandle | null>;
-  progressText: RefObject<HTMLSpanElement | null>;
   chapterText: RefObject<HTMLSpanElement | null>;
-  sound: RefObject<SoundDirector | null>;
   motion: RefObject<{ target: number; current: number; tilt: number; targetTilt: number }>;
   reduced: RefObject<boolean>;
-  readerOpen: RefObject<boolean>;
   forceDraw: RefObject<boolean>;
   wake: RefObject<() => void>;
   onChapter: (chapter: number) => void;
@@ -35,12 +31,9 @@ export function useStageRuntime({
   editorial,
   rail,
   telemetry,
-  progressText,
   chapterText,
-  sound,
   motion,
   reduced,
-  readerOpen,
   forceDraw,
   wake,
   onChapter,
@@ -51,8 +44,6 @@ export function useStageRuntime({
     const trackElement = track.current,
       stageElement = stage.current;
     if (!trackElement || !stageElement) return;
-    const director = new SoundDirector();
-    sound.current = director;
     const motionMedia = window.matchMedia("(prefers-reduced-motion: reduce)");
     const contrastMedia = window.matchMedia("(forced-colors: active)");
     let alive = true,
@@ -68,10 +59,8 @@ export function useStageRuntime({
     let lastDOMProgress = NaN,
       lastTelemetryProgress = NaN,
       lastDrawnProgress = NaN;
-    let previousProgress = 0;
     let metrics: TrackMetrics = measureTrack(trackElement, stageElement);
-    const canRun = () =>
-      alive && pageActive && !document.hidden && visible && !readerOpen.current && !reduced.current;
+    const canRun = () => alive && pageActive && !document.hidden && visible && !reduced.current;
     const immediate = () => reduced.current || forcedColors;
     function pause() {
       if (frameId) cancelAnimationFrame(frameId);
@@ -82,7 +71,6 @@ export function useStageRuntime({
       if (!frameId && canRun()) frameId = requestAnimationFrame(tick);
     }
     function reconcile() {
-      director.setVisible(canRun());
       if (canRun()) schedule();
       else pause();
     }
@@ -129,10 +117,8 @@ export function useStageRuntime({
         lastChapter = chapter;
         onChapter(chapter);
         if (chapterText.current)
-          chapterText.current.textContent = `${CHAPTERS[chapter].numeral} / ${CHAPTERS[chapter].title.toUpperCase()}`;
+          chapterText.current.textContent = CHAPTERS[chapter].title.toUpperCase();
       }
-      if (p >= 0.1 && previousProgress < 0.1) director.ignition();
-      previousProgress = p;
       const mobileFrameDue =
         !window.matchMedia("(max-width: 767px)").matches || now - lastCanvasDrawTime >= 1000 / 30;
       const drawRequested = !staticMotion || forceDraw.current || p !== lastDrawnProgress;
@@ -154,7 +140,6 @@ export function useStageRuntime({
         editorial.current?.update(p);
         rail.current?.update(p);
         stageElement!.style.setProperty("--scroll-progress", String(p));
-        director.update(p);
         lastDOMProgress = p;
       }
       if (
@@ -162,7 +147,6 @@ export function useStageRuntime({
         (staticMotion || now - lastTelemetryTime >= 80 || p === state.target)
       ) {
         telemetry.current?.update(p);
-        if (progressText.current) progressText.current.textContent = p.toFixed(3);
         lastTelemetryProgress = p;
         lastTelemetryTime = now;
       }
@@ -260,7 +244,6 @@ export function useStageRuntime({
     contrastMedia.addEventListener("change", preference);
     measure();
     motion.current.current = motion.current.target;
-    previousProgress = motion.current.target;
     preference();
     void document.fonts.ready.then(() => {
       if (alive) {
@@ -282,8 +265,6 @@ export function useStageRuntime({
       document.removeEventListener("visibilitychange", visibility);
       motionMedia.removeEventListener("change", preference);
       contrastMedia.removeEventListener("change", preference);
-      director.destroy();
-      if (sound.current === director) sound.current = null;
       wake.current = () => {};
     };
   }, [
@@ -293,12 +274,9 @@ export function useStageRuntime({
     editorial,
     rail,
     telemetry,
-    progressText,
     chapterText,
-    sound,
     motion,
     reduced,
-    readerOpen,
     forceDraw,
     wake,
     onChapter,

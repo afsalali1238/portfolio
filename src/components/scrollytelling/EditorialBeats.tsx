@@ -1,15 +1,11 @@
 import { Fragment, forwardRef, useImperativeHandle, useRef } from "react";
-import { AUTHOR } from "../../lib/site";
 import {
   CHAPTERS,
   MOVEMENTS,
   PROLOGUE,
   SURFACES,
   SURFACE_TARGETS,
-  THESIS_PUBLISHED_AT,
-  THESIS_READ_TIME_MINUTES,
   chapterAt,
-  publishedDateLabel,
   segmentsText,
   surfaceAt,
   type ParagraphKind,
@@ -142,27 +138,12 @@ export const EditorialBeats = forwardRef<EditorialHandle, Props>(function Editor
           <br />
           {PROLOGUE.deck[1]}
         </p>
-        <p className="prologue-byline">
-          <span>{AUTHOR}</span>
-          <span aria-hidden="true">·</span>
-          <time dateTime={THESIS_PUBLISHED_AT}>{publishedDateLabel()}</time>
-          <span aria-hidden="true">·</span>
-          <span>{THESIS_READ_TIME_MINUTES} min read</span>
-        </p>
         <button className="begin-button" onClick={onBegin}>
           <span className="circle-arrow">
             <Icon name="down" size={17} />
           </span>
-          <span>
-            {PROLOGUE.begin}
-            <span className="button-subline">{PROLOGUE.beginHint}</span>
-          </span>
+          <span>{PROLOGUE.begin}</span>
         </button>
-        <div className="prologue-colophon">
-          <span>{PROLOGUE.colophon[0]}</span>
-          <span className="colophon-dash" />
-          {PROLOGUE.colophon[1]}
-        </div>
       </article>
 
       {MOVEMENTS.map((movement, movementIndex) => {

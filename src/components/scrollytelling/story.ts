@@ -49,9 +49,7 @@ export const PROLOGUE = {
     { text: "Thought.", emphasis: true },
   ],
   deck: ["Curiosity enters. Craft bends it.", "Reality catches the colour."],
-  begin: "Begin the experiment",
-  beginHint: "SCROLL OR TAP TO IGNITE",
-  colophon: ["THOUGHT → CRAFT → REALITY", "EST. IN CURIOSITY"],
+  begin: "Begin reading",
 } as const;
 
 export const THESIS_PUBLISHED_AT = "2026-11-12";

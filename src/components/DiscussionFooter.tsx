@@ -204,7 +204,7 @@ export function DiscussionFooter() {
       )}
       <div className="site-footer">
         <Brand />
-        <span>© 2026 · INDEPENDENT THOUGHT, MADE REAL.</span>
+        <span>© 2026</span>
         <button className="text-link" onClick={top}>
           Back to the beginning <Icon name="arrow" size={14} />
         </button>
