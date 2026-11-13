@@ -1,5 +1,5 @@
 .page-shell {
-  font-family: "DM Sans Variable", "DM Sans", sans-serif;
+  font-family: "DM Sans Variable", system-ui, sans-serif;
   color: #eeeae1;
   background: #0b0c0e;
   font-synthesis: none;
@@ -11,7 +11,7 @@
   --muted: #a6a7a7;
   --faint: #8a8e95;
   --hairline: rgba(205, 211, 221, 0.14);
-  --mono: "IBM Plex Mono", monospace;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
   --serif: "Instrument Serif", Georgia, serif;
   color-scheme: dark;
   position: relative;

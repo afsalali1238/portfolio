@@ -12,6 +12,8 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import instrumentSerif from "@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff2?url";
 import instrumentSerifItalic from "@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff2?url";
+import dmSansWght from "@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2?url";
+import dmSansWghtItalic from "@fontsource-variable/dm-sans/files/dm-sans-latin-wght-italic.woff2?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 import { PageShell } from "../components/site/PageShell";
