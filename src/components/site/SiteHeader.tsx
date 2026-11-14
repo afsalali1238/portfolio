@@ -85,7 +85,7 @@ export function SiteHeader() {
               <Link
                 key={l.to}
                 to={l.to}
-                className="group relative rounded-md px-3 py-2.5 font-mono text-xs uppercase tracking-wider text-[#8a8e95] transition-colors hover:text-white data-[status=active]:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                className="group relative rounded-md px-3 py-2.5 font-mono text-xs uppercase tracking-wider text-[#9a9ea5] transition-colors hover:text-white data-[status=active]:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               >
                 {l.label}
                 <span className="absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-accent-ink transition-transform duration-150 ease-out group-hover:scale-x-100 group-data-[status=active]:scale-x-100" />

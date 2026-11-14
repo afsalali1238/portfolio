@@ -3,19 +3,20 @@
 @import "tw-animate-css";
 @import "@fontsource/instrument-serif/latin-400.css";
 @import "@fontsource/instrument-serif/latin-400-italic.css";
-@import "@fontsource/inter/latin-400.css";
-@import "@fontsource/inter/latin-500.css";
-@import "@fontsource/inter/latin-600.css";
-@import "@fontsource/inter/latin-700.css";
-@import "@fontsource/jetbrains-mono/latin-400.css";
-@import "@fontsource/jetbrains-mono/latin-500.css";
+@import "@fontsource/dm-sans/latin-400.css";
+@import "@fontsource/dm-sans/latin-500.css";
+@import "@fontsource/dm-sans/latin-600.css";
+@import "@fontsource/dm-sans/latin-700.css";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-500.css";
+@import "@fontsource/ibm-plex-mono/latin-600.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -50,6 +51,17 @@
   --color-rule: var(--rule);
   --color-accent-ink: var(--accent-ink);
   --color-mark-dot: var(--mark-dot);
+
+  /* forthe.tech brand guide tokens */
+  --color-bone: var(--bone);
+  --color-clay: var(--clay);
+  --color-gold: var(--gold);
+  --color-slate: var(--slate);
+  --color-clay-deep: var(--clay-deep);
+  --color-gold-deep: var(--gold-deep);
+  --color-slate-deep: var(--slate-deep);
+  --color-grey: var(--grey);
+  --color-line: var(--line);
 }
 
 /* Native dark optical-lab palette. Semantic utilities inherit this on every route,
@@ -62,11 +74,20 @@
   --paper-glass: rgba(18, 21, 25, 0.75);
   --ink: #eeeae1;
   --ink-soft: #a6a7a7;
-  --ink-mute: #8a8e95;
+  --ink-mute: #9a9ea5;
+  --grey: #9a9ea5;
+  --line: #55585e;
+  --bone: #eeeae1;
+  --clay: #d96346;
+  --gold: #cba666;
+  --slate: #899fcc;
+  --clay-deep: #ae4024;
+  --gold-deep: #906a21;
+  --slate-deep: #496297;
   --faint: var(--ink-mute);
   --rule: rgba(205, 211, 221, 0.12);
   --hairline: var(--rule);
-  --accent-ink: #c95135;
+  --accent-ink: #d96346;
   --mark-dot: var(--accent-ink);
 
   --background: var(--paper);
@@ -112,6 +133,10 @@
 
 @utility rule-hair {
   border-color: var(--color-rule);
+}
+
+@utility tracking-label {
+  letter-spacing: 0.12em;
 }
 
 @utility grain {
