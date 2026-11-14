@@ -62,7 +62,8 @@ function FifteenMinuteRulePage() {
             >
               <ArrowLeft className="h-3.5 w-3.5" /> Back to Notes
             </Link>
-            <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
+            <div className="flex items-center gap-3.5 font-mono text-xs font-medium uppercase tracking-[0.12em] text-grey">
+              <span aria-hidden="true" className="h-px w-[34px] shrink-0 bg-white/20" />
               No. 04 · 30 August 2026
             </div>
             <h1 className="mt-3 font-serif text-5xl leading-[1.05] tracking-tight text-ink md:text-6xl">

@@ -28,7 +28,7 @@ function StatLink({
       data-hero-tile
     >
       <div className="flex items-baseline justify-between">
-        <span className="font-mono text-3xl leading-none tracking-tight tabular-nums text-ink transition-colors duration-150 group-hover:text-accent-ink sm:text-4xl">
+        <span className="font-mono text-3xl leading-none tabular-nums text-ink transition-colors duration-150 group-hover:text-clay sm:text-4xl">
           {value}
         </span>
         <span
@@ -38,7 +38,7 @@ function StatLink({
           →
         </span>
       </div>
-      <span className="mt-4 block font-mono text-[10px] uppercase tracking-wider text-ink-mute transition-colors duration-150 group-hover:text-ink sm:text-xs">
+      <span className="mt-4 block font-mono text-[11px] uppercase tracking-[0.12em] text-grey transition-colors duration-150 group-hover:text-ink">
         {coordinate} / {label}
       </span>
     </Link>
@@ -122,7 +122,7 @@ export function Hero() {
               edge of the italic, the lede and the CTA row is what decides where the glass
               settles. Widening any of them pushes the whole picture back to the right. */}
           <div className="lg:col-span-7 space-y-6" data-hero-copy>
-            <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-[#9a9ea5] sm:text-xs">
+            <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 font-mono text-[11px] uppercase tracking-[0.12em] text-[#9a9ea5]">
               <span
                 aria-hidden="true"
                 className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-[#d96346]"
@@ -130,12 +130,14 @@ export function Hero() {
               <span>Refraction of Thought · Continuous Engine</span>
             </div>
             <h1 id="hero-heading" className="font-serif tracking-tight">
-              <span className="block text-[11.5vw] leading-[0.88] text-[#eeeae1] sm:text-[4.6rem] md:text-[5.5rem] lg:text-[6rem] xl:text-[6.8rem]">
-                <RevealWord delay={0.05}>For the tech.</RevealWord>
+              <span className="block text-[11.5vw] leading-[0.88] text-ink sm:text-[4.6rem] md:text-[5.5rem] lg:text-[6rem] xl:text-[6.8rem]">
+                <RevealWord delay={0.05}>
+                  for the tech<span className="text-clay">.</span>
+                </RevealWord>
               </span>
               <span
                 data-hero-thesis
-                className="mt-2 block text-[7.5vw] italic leading-[1.02] text-[#9ba0a9] sm:text-[3rem] md:text-[3.2rem] lg:text-[3.3rem] xl:text-[3.4rem]"
+                className="mt-2 block text-[7.5vw] italic leading-[1.02] text-ink-soft sm:text-[3rem] md:text-[3.2rem] lg:text-[3.3rem] xl:text-[3.4rem]"
               >
                 <RevealWord delay={0.18} italic>
                   Not because anyone asked.
@@ -212,7 +214,7 @@ export function Hero() {
               </Link>
               <Link
                 to="/notes"
-                className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-white/15 bg-white/5 px-6 text-[#eeeae1] transition-all duration-150 hover:bg-white/10 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-white/15 bg-white/5 px-6 font-medium text-[#eeeae1] transition-all duration-150 hover:bg-white/10 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               >
                 Read the notes
                 <ArrowRight

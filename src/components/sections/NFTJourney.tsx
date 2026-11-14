@@ -20,7 +20,7 @@ export function NFTJourney() {
     >
       <Container>
         <SectionReveal className="space-y-4">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-mute">
+          <div className="flex items-center gap-2 font-mono text-xs font-medium uppercase tracking-[0.12em] text-grey">
             <span className="inline-block h-2 w-2 rounded-full bg-amber-500/80" />
             The Journey · Honest Ledgers
           </div>
@@ -168,7 +168,7 @@ export function NFTJourney() {
 
               {/* Lesson Callout */}
               <div className="mt-6 border-t rule-hair pt-4">
-                <div className="text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
+                <div className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-grey">
                   The Hard Lesson
                 </div>
                 <p className="mt-1 font-serif text-sm italic text-ink">

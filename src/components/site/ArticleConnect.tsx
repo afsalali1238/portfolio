@@ -38,7 +38,7 @@ export function ArticlePlatformBar({
   return (
     <div className="my-6 flex flex-wrap items-center justify-between gap-3 border-y rule-hair py-3 text-xs text-ink-mute">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="uppercase tracking-wider text-ink font-medium">Read on:</span>
+        <span className="font-mono uppercase tracking-[0.12em] text-ink font-medium">Read on:</span>
         <span className="rounded bg-paper-deep px-2 py-0.5 font-medium text-ink">
           forthe.tech (canonical)
         </span>
@@ -97,7 +97,7 @@ export function RelatedBuildsSection({ projectIds }: { projectIds?: string[] }) 
       aria-label="Mentioned builds"
       className="my-14 rounded-lg border rule-hair bg-paper-deep/30 p-6 md:p-8"
     >
-      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-mute">
+      <div className="flex items-center gap-2 font-mono text-xs font-medium uppercase tracking-[0.12em] text-grey">
         <Layers className="h-3.5 w-3.5" />
         <span>Builds mentioned in this note</span>
       </div>
@@ -154,7 +154,7 @@ export function ArticleDiscussionFooter({
     <div className="mt-16 space-y-12">
       {/* Discussion & cross-platform card */}
       <div className="rounded-lg border rule-hair bg-paper-deep/50 p-6 md:p-8">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-mute">
+        <div className="flex items-center gap-2 font-mono text-xs font-medium uppercase tracking-[0.12em] text-grey">
           <MessageSquare className="h-3.5 w-3.5" />
           <span>Connect & Discuss</span>
         </div>

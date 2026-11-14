@@ -111,12 +111,14 @@ function ReadableMovement({
       {onChapter ? (
         <button className="reading-chapter-link" onClick={() => onChapter(chapterIndex)}>
           <span>{CHAPTERS[chapterIndex].numeral}</span>
+          <span aria-hidden="true">·</span>
           <span>{CHAPTERS[chapterIndex].title}</span>
           <Icon name="arrow" size={14} />
         </button>
       ) : (
         <div className="reading-chapter-link">
           <span>{CHAPTERS[chapterIndex].numeral}</span>
+          <span aria-hidden="true">·</span>
           <span>{CHAPTERS[chapterIndex].title}</span>
         </div>
       )}

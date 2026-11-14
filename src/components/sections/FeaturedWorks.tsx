@@ -45,10 +45,14 @@ export function FeaturedWorks() {
       <Container>
         <SectionReveal className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <div className="font-mono text-xs uppercase tracking-wider text-ink-mute">
+            <div className="flex items-center gap-3.5 font-mono text-xs uppercase tracking-[0.12em] text-grey">
+              <span aria-hidden="true" className="h-px w-[34px] shrink-0 bg-white/20" />
               Selected builds
             </div>
-            <h2 id="featured-heading" className="mt-2 font-serif text-4xl md:text-5xl">
+            <h2
+              id="featured-heading"
+              className="mt-2 font-serif text-4xl leading-[1.05] tracking-tight text-ink sm:text-5xl"
+            >
               Made for someone.
             </h2>
           </div>
@@ -75,8 +79,8 @@ export function FeaturedWorks() {
                     {p.media && (
                       <div className="relative -mx-6 -mt-6 mb-5 aspect-[16/10] overflow-hidden rounded-t-lg border-b rule-hair bg-paper-deep transition-transform duration-200 group-hover:scale-[1.03]">
                         <FeaturedPoster src={p.media.poster} isMobile={isMobile} />
-                        <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-ink/90 px-3 py-1 text-xs font-medium text-paper backdrop-blur-xs">
-                          <span className="h-1.5 w-1.5 rounded-full bg-paper" />
+                        <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[11px] font-medium tracking-[0.08em] text-ink backdrop-blur-xs">
+                          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-clay" />
                           <span className="capitalize">
                             {isMobile ? "Phone build" : "Web build"}
                           </span>
@@ -84,18 +88,18 @@ export function FeaturedWorks() {
                       </div>
                     )}
 
-                    <div className="text-xs text-ink-mute">
+                    <div className="font-mono text-xs tracking-[0.06em] text-grey">
                       <span>Built for {p.for.toLowerCase() === "wife" ? "my wife" : p.for}</span>
                     </div>
-                    <h3 className="mt-3 font-serif text-3xl leading-none text-ink">{p.name}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-ink-soft line-clamp-3">
+                    <h3 className="mt-3 font-serif text-[2rem] leading-none text-ink">{p.name}</h3>
+                    <p className="mt-2 text-[15px] leading-relaxed text-ink-soft line-clamp-3">
                       {p.blurb}
                     </p>
                   </div>
 
-                  <div className="mt-5 flex items-center justify-between border-t rule-hair pt-3 text-xs font-medium text-ink">
+                  <div className="mt-5 flex items-center justify-between border-t rule-hair pt-3 font-mono text-xs font-medium uppercase tracking-[0.08em] text-ink transition-colors duration-150 group-hover:text-clay">
                     <span>Read case study</span>
-                    <ArrowRight className="h-3.5 w-3.5 text-ink-mute transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="h-3.5 w-3.5 text-ink-mute transition-all duration-150 group-hover:translate-x-1 group-hover:text-clay" />
                   </div>
                 </Link>
               </li>

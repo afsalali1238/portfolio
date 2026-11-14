@@ -210,7 +210,7 @@ const items = [
   })),
   {
     id: "thesis",
-    kicker: "A thesis in six movements",
+    kicker: "A thesis in seven movements",
     title: "The Refraction\nof Thought.",
     size: 120,
     sub: "Curiosity enters. Craft bends it.\nReality catches the colour.",

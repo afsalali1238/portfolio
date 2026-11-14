@@ -42,7 +42,7 @@ const paragraph = (kind: ParagraphKind, ...segments: StorySegment[]): StoryParag
 });
 
 export const PROLOGUE = {
-  eyebrow: "A THESIS IN SIX MOVEMENTS",
+  eyebrow: "A THESIS IN SEVEN MOVEMENTS",
   heading: [
     { text: "The Refraction" },
     { text: " of ", breakBefore: true },
@@ -57,90 +57,90 @@ export const THESIS_READ_TIME_MINUTES = 2;
 
 export const MOVEMENTS: readonly Movement[] = [
   {
-    numeral: "I",
-    title: "The dark",
+    numeral: "01",
+    title: "The Incident Beam",
     start: 0.08,
     end: 0.22,
     target: 0.145,
-    description: "A sudden ignition sends particles into the dark.",
+    description: "A beam ignites in the dark and gathers into a single line of white.",
     heading: [
-      { text: "Every real thing" },
-      { text: " begins in ", breakBefore: true },
-      { text: "the dark.", emphasis: true },
+      { text: "The idea in your head" },
+      { text: " proves nothing.", breakBefore: true, emphasis: true },
     ],
     blocks: [
       paragraph("lead", { text: "Before a thing has form, it has a pressure." }),
       paragraph("body", {
         text: "A question gathers quietly. It returns at inconvenient moments. It asks for attention before it can explain why.",
       }),
+      paragraph("italic", {
+        text: "An idea is weightless while it remains private. It has not yet met consequence.",
+      }),
       paragraph("emphasis", { text: "The first permission is simply to begin." }),
     ],
     footnote: "EVERY BEGINNING MAKES A SMALL CLAIM ON THE UNKNOWN.",
   },
   {
-    numeral: "II",
-    title: "The light",
+    numeral: "02",
+    title: "The First Boundary",
     start: 0.22,
     end: 0.38,
     target: 0.29,
-    description: "A single white beam travels through empty space.",
+    description: "The single white beam travels through empty space toward its first edge.",
     heading: [
-      { text: "An idea arrives" },
-      { text: " before it can ", breakBefore: true },
-      { text: "explain itself.", emphasis: true },
+      { text: "Contact is where" },
+      { text: " the work begins.", breakBefore: true, emphasis: true },
     ],
     blocks: [
       paragraph("body", {
-        text: "It begins as attention: a question that refuses to leave you alone. Long before it becomes a plan, it asks to be noticed.",
-      }),
-      paragraph("italic", {
-        text: "An idea is weightless while it remains private. It has not yet met consequence.",
+        text: "Like light in empty space, it becomes visible when it meets something real.",
       }),
       paragraph("body", {
-        text: "Like light in empty space, it becomes visible when it meets something real.",
+        text: "That meeting is not an interruption of the idea. It is the first honest measurement of it.",
       }),
       paragraph("emphasis", { text: "So we place it in the world." }),
     ],
     footnote: "DIRECTION IS DISCOVERED BY CONTACT.",
   },
   {
-    numeral: "III",
-    title: "What we meet",
+    numeral: "03",
+    title: "The Glass",
     start: 0.38,
     end: 0.54,
     target: 0.397,
     description: "The beam encounters reflection, collision, absorption, and glass.",
     heading: [
-      { text: "What comes back" },
-      { text: " depends on what", breakBefore: true },
-      { text: " surrounds us.", breakBefore: true, emphasis: true },
+      { text: "Resistance is not friction;" },
+      { text: " it is medium.", breakBefore: true, emphasis: true },
     ],
     blocks: [
       paragraph("body", {
         text: "We bring our attention to people, places, and problems. What returns tells us less about our intention than about the surface it met.",
       }),
       { type: "surfaces" },
+      paragraph("body", {
+        text: "Glass is the surface that does not flatter us. At the boundary, its change in speed bends an angled ray.",
+      }),
     ],
     footnote: "THE SURFACE CHANGES THE RETURN.",
   },
   {
-    numeral: "IV",
-    title: "The bend",
+    numeral: "04",
+    title: "Dispersion",
     start: 0.54,
-    end: 0.72,
-    target: 0.625,
-    description: "Wavefronts compress and slow inside a glass prism.",
+    end: 0.7,
+    target: 0.615,
+    description:
+      "Wavefronts compress and slow inside the glass, and the white line parts into its wavelengths.",
     heading: [
-      { text: "To become visible," },
-      { text: " light has to enter", breakBefore: true },
-      { text: " what slows it.", breakBefore: true, emphasis: true },
+      { text: "One light enters;" },
+      { text: " every wavelength answers.", breakBefore: true, emphasis: true },
     ],
     blocks: [
       paragraph("body", {
-        text: "It slows as it enters glass. At the boundary, its change in speed bends an angled ray.",
+        text: "It slows as it enters glass. The dense part is the work: returning to a question after the first answer has worn thin; making room for another person’s reality; staying long enough for the easy explanation to fail.",
       }),
       paragraph("body", {
-        text: "The dense part is the work: returning to a question after the first answer has worn thin; making room for another person’s reality; staying long enough for the easy explanation to fail.",
+        text: "What entered as one effort separates under load — study, patience, craft, and care each travel at their own speed.",
       }),
       paragraph("italic", {
         text: "A real practice asks us to trade speed for depth.",
@@ -149,21 +149,38 @@ export const MOVEMENTS: readonly Movement[] = [
     footnote: "DEPTH HAS A COST. IT IS STILL WORTH PAYING.",
   },
   {
-    numeral: "V",
-    title: "The colours",
-    start: 0.72,
-    end: 0.88,
-    target: 0.8,
-    description: "White light separates into five spectral filaments.",
+    numeral: "05",
+    title: "The Emergent Ray",
+    start: 0.7,
+    end: 0.83,
+    target: 0.765,
+    description: "The separated rays leave the far face of the glass.",
     heading: [
-      { text: "White light was" },
-      { text: " never ", breakBefore: true },
-      { text: "only white.", emphasis: true },
+      { text: "Out of the far face," },
+      { text: " the work stands separated.", breakBefore: true, emphasis: true },
     ],
     blocks: [
       paragraph("body", {
         text: "The colours were there all along. The glass did not invent them. It gave them a way to appear.",
       }),
+      paragraph("italic", { text: "What emerges is not what entered." }),
+      paragraph("body", {
+        text: "It has been slowed, bent, and asked to meet an edge. None of that erased the light. It made a different expression possible.",
+      }),
+    ],
+  },
+  {
+    numeral: "06",
+    title: "The Spectrum",
+    start: 0.83,
+    end: 0.92,
+    target: 0.875,
+    description: "Five colours land in the field as one spectrum.",
+    heading: [
+      { text: "Colour is earned," },
+      { text: " never applied.", breakBefore: true, emphasis: true },
+    ],
+    blocks: [
       paragraph("body", {
         text: "People are not unfinished versions of one fixed thing. In the wrong conditions, whole registers of a life can remain unheard.",
       }),
@@ -179,28 +196,27 @@ export const MOVEMENTS: readonly Movement[] = [
     footnote: "REVELATION IS NOT REINVENTION.",
   },
   {
-    numeral: "VI",
-    title: "Becoming",
-    start: 0.88,
+    numeral: "07",
+    title: "The Continuous Engine",
+    start: 0.92,
     end: 1.001,
-    target: 0.965,
-    description: "Five colours emerge beyond the glass, unbounded.",
+    target: 0.955,
+    description: "The colours run on beyond the glass, unbounded — the engine is continuous.",
     heading: [
-      { text: "What emerges" },
-      { text: " is not what", breakBefore: true },
-      { text: " entered.", breakBefore: true, emphasis: true },
+      { text: "Turn off the room light." },
+      { text: " Let the beam run.", breakBefore: true, emphasis: true },
     ],
     blocks: [
       paragraph("body", {
-        text: "It has been slowed, bent, and asked to meet an edge. None of that erased the light. It made a different expression possible.",
+        text: "Keep the work that can hold what you discover on the other side.",
       }),
       paragraph("body", {
-        text: "Keep the work that can hold what you discover on the other side.",
+        text: "The work is never a closed collection of finished trophies. Every completed piece is an antenna for the next question; the beam keeps arriving from outside the frame.",
       }),
       paragraph("closing", {
         text: "You were never meant to remain a single beam of light.",
       }),
-      paragraph("signature", { text: "For the tech." }),
+      paragraph("signature", { text: "for the tech." }),
     ],
   },
 ];

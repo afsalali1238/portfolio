@@ -9,8 +9,11 @@ export function Origin({ isPage = false }: { isPage?: boolean }) {
     <section id="origin" className="py-20 md:py-28 border-t rule-hair">
       <Container className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center">
         <SectionReveal className="lg:col-span-7 space-y-6">
-          <div className="text-sm font-medium text-ink-mute">Origin</div>
-          <TitleTag className="font-serif text-4xl italic leading-tight text-ink md:text-5xl">
+          <div className="flex items-center gap-3.5 font-mono text-xs uppercase tracking-[0.12em] text-grey">
+            <span aria-hidden="true" className="h-px w-[34px] shrink-0 bg-white/20" />
+            Origin
+          </div>
+          <TitleTag className="font-serif text-4xl leading-[1.05] tracking-tight text-ink md:text-5xl">
             What is forthe.tech?
           </TitleTag>
 

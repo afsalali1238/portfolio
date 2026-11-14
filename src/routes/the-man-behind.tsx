@@ -70,13 +70,14 @@ function TheManBehindPage() {
         {/* 1. Header Title & Location Section */}
         <Container className="max-w-5xl">
           <SectionReveal className="space-y-4">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-mute">
+            <div className="flex items-center gap-3.5 font-mono text-xs uppercase tracking-[0.12em] text-grey">
+              <span aria-hidden="true" className="h-px w-[34px] shrink-0 bg-white/20" />
               <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               Contact &amp; Identity
             </div>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div>
-                <h1 className="font-serif text-5xl leading-tight text-ink md:text-6xl">
+                <h1 className="font-serif text-5xl leading-[1.05] tracking-tight text-ink md:text-6xl">
                   The Man Behind.
                 </h1>
                 <p className="mt-2 text-base text-ink-soft">
@@ -122,7 +123,9 @@ function TheManBehindPage() {
             <SectionReveal className="space-y-6 lg:col-span-7">
               <div className="rounded-xl border rule-hair bg-paper p-6 sm:p-8 space-y-6">
                 <div>
-                  <h2 className="font-serif text-3xl text-ink">Let&rsquo;s talk tech.</h2>
+                  <h2 className="font-serif text-3xl tracking-tight text-ink">
+                    Let&rsquo;s talk tech.
+                  </h2>
                   <p className="mt-2 text-sm leading-relaxed text-ink-soft">
                     Whether you have an idea, want to talk about software workflows, or want to
                     discuss building focused tools — feel free to reach out.
