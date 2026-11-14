@@ -39,7 +39,7 @@ function paragraphClass(kind: ParagraphKind) {
 export function ImmersiveReader() {
   const root = useRef<HTMLElement>(null);
   const canvas = useRef<OpticsHandle>(null);
-  const { reducedMotion, steer } = useReadingAtmosphere({ root, canvas });
+  const { reducedMotion, steer, ignite } = useReadingAtmosphere({ root, canvas });
 
   return (
     <section
@@ -70,6 +70,18 @@ export function ImmersiveReader() {
             <br />
             {PROLOGUE.deck[1]}
           </p>
+          {!reducedMotion && (
+            <button
+              className="flow-field-action"
+              type="button"
+              onClick={ignite}
+              aria-label="Release the spectrum in the optical field"
+            >
+              <span className="field-action-mark" aria-hidden="true" />
+              <span>Release the spectrum</span>
+              <span className="field-action-hint">Tap / click</span>
+            </button>
+          )}
           <p className="flow-invitation">
             <Icon name="down" size={15} />
             <span>{PROLOGUE.begin}</span>

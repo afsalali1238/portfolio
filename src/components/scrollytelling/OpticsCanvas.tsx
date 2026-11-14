@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import {
   TAU,
   add,
+  clamp,
   lerp,
   mix,
   normalize,
@@ -24,6 +25,8 @@ export interface CanvasFrame {
   delta: number;
   tilt: number;
   reducedMotion: boolean;
+  /** A short-lived, user-triggered charge for the prologue field. */
+  energy?: number;
 }
 export interface OpticsHandle {
   draw: (frame: CanvasFrame) => void;
@@ -117,6 +120,7 @@ class OpticalRenderer {
     delta: 0,
     tilt: 0,
     reducedMotion: false,
+    energy: 0,
   };
   private perfDebug = false;
   constructor(
@@ -148,15 +152,17 @@ class OpticalRenderer {
     this.canvas.width = this.grid.width = backing.width;
     this.canvas.height = this.grid.height = backing.height;
     this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-    this.cx = width * (this.mobile ? 0.53 : 0.735);
-    this.cy = height * (this.mobile ? 0.275 : 0.49);
+    // On phones the field has its own clear upper stage rather than shrinking into a faint
+    // desktop illustration behind the headline.
+    this.cx = width * (this.mobile ? 0.5 : 0.735);
+    this.cy = height * (this.mobile ? 0.28 : 0.49);
     this.radius = Math.min(
-      width * (this.mobile ? 0.285 : 0.172),
-      height * (this.mobile ? 0.16 : 0.263),
+      width * (this.mobile ? 0.34 : 0.172),
+      height * (this.mobile ? 0.22 : 0.263),
     );
     this.prismHeight = Math.min(
-      width * (this.mobile ? 0.41 : 0.236),
-      height * (this.mobile ? 0.225 : 0.385),
+      width * (this.mobile ? 0.43 : 0.236),
+      height * (this.mobile ? 0.265 : 0.385),
     );
     this.left = this.mobile ? -width * 0.05 : width * 0.488;
     const half = this.prismHeight / Math.sqrt(3);
@@ -190,9 +196,9 @@ class OpticalRenderer {
     c.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     c.fillStyle = "#0b0c0e";
     c.fillRect(0, 0, this.w, this.h);
-    const cell = this.mobile ? 64 : 96;
+    const cell = this.mobile ? 52 : 96;
     c.lineWidth = 0.5;
-    c.strokeStyle = "rgba(210,218,227,0.045)";
+    c.strokeStyle = this.mobile ? "rgba(210,218,227,0.075)" : "rgba(210,218,227,0.055)";
     c.setLineDash([1, 5]);
     c.beginPath();
     for (let x = this.cx % cell; x < this.w; x += cell) {
@@ -224,7 +230,7 @@ class OpticalRenderer {
         })
       : null;
     if (debugWindow) debugWindow.__thesisCanvasDraws = (debugWindow.__thesisCanvasDraws ?? 0) + 1;
-    const { progress: p, time: clock, delta, reducedMotion } = frame;
+    const { progress: p, time: clock, delta, reducedMotion, energy = 0 } = frame;
     const t = reducedMotion ? 0 : clock / 1000;
     const c = this.ctx;
     c.drawImage(this.grid, 0, 0, this.w, this.h);
@@ -232,8 +238,9 @@ class OpticalRenderer {
     if (p >= 0.1 && this.previousProgress < 0.1) this.ignite();
     this.previousProgress = p;
     this.particles.update(reducedMotion ? 0.05 : delta);
-    this.instrument(p, t, reducedMotion);
+    this.instrument(p, t, reducedMotion, energy);
     if (p < 0.24) this.origin(p, t);
+    if (energy > 0.015 && p < 0.54) this.explorer(energy, t, frame.tilt);
     if (p >= 0.21 && p < 0.382) this.vacuum(p, t, frame.tilt);
     if (p >= 0.38 && p < 0.505) this.gauntlet(p, t);
     else this.previousSurface = -1;
@@ -288,35 +295,35 @@ class OpticalRenderer {
     }
     this.line(a, b, color, 0.85, alpha);
   }
-  private instrument(p: number, time: number, reduced: boolean) {
+  private instrument(p: number, time: number, reduced: boolean, energy: number) {
     const c = this.ctx,
       { cx, cy, radius: r } = this;
-    // The prologue plate is intentionally quiet, but it still needs to read at a glance on
-    // imperfect laptop panels. Keep it present after the prism appears rather than letting it
-    // disappear into the black field.
-    const visibility = lerp(1, 0.48, smoothstep(0.48, 0.7, p));
+    // The prologue plate remains calm but intentionally legible on low-contrast phone panels.
+    // A small extra charge answers deliberate pointer and tap input without becoming a dashboard.
+    const interaction = clamp(energy);
+    const visibility = lerp(1, 0.62, smoothstep(0.48, 0.7, p));
     c.save();
     this.line(
       { x: cx - r - 42, y: cy },
       { x: cx + r + 42, y: cy },
       "#b5bac2",
-      0.5,
-      0.16 * visibility,
+      0.6,
+      (0.24 + interaction * 0.14) * visibility,
     );
     this.line(
       { x: cx, y: cy - r - 25 },
       { x: cx, y: cy + r + 25 },
       "#b5bac2",
-      0.5,
-      0.16 * visibility,
+      0.6,
+      (0.24 + interaction * 0.14) * visibility,
     );
     c.lineWidth = 0.55;
-    c.strokeStyle = `rgba(196,204,218,${0.24 * visibility})`;
+    c.strokeStyle = `rgba(196,204,218,${(0.38 + interaction * 0.16) * visibility})`;
     c.beginPath();
     c.arc(cx, cy, r, 0, TAU);
     c.stroke();
     c.setLineDash([1, 7]);
-    c.strokeStyle = `rgba(196,204,218,${0.25 * visibility})`;
+    c.strokeStyle = `rgba(196,204,218,${(0.33 + interaction * 0.15) * visibility})`;
     c.beginPath();
     c.arc(cx, cy, r * 0.86, 0, TAU);
     c.stroke();
@@ -325,7 +332,7 @@ class OpticalRenderer {
       const angle = (TAU * i) / 72,
         inner = r + (i % 6 === 0 ? 7 : 2),
         outer = r + (i % 6 === 0 ? 15 : 5),
-        tickAlpha = (i % 6 === 0 ? 0.38 : 0.18) * visibility;
+        tickAlpha = (i % 6 === 0 ? 0.5 : 0.27) * visibility + interaction * 0.08;
       c.strokeStyle = `rgba(196,204,218,${tickAlpha})`;
       c.beginPath();
       c.moveTo(cx + Math.cos(angle) * inner, cy + Math.sin(angle) * inner);
@@ -333,14 +340,14 @@ class OpticalRenderer {
       c.stroke();
     }
     if (p < 0.22) {
-      c.strokeStyle = `rgba(220,224,232,${0.3 * visibility})`;
+      c.strokeStyle = `rgba(220,224,232,${(0.4 + interaction * 0.13) * visibility})`;
       c.beginPath();
       c.arc(cx, cy, r, -1.8 + time * 0.035, -1.8 + time * 0.035 + 0.6);
       c.stroke();
       c.save();
       c.translate(cx, cy);
       c.rotate(-0.52);
-      c.strokeStyle = `rgba(196,204,218,${0.21 * visibility})`;
+      c.strokeStyle = `rgba(196,204,218,${(0.3 + interaction * 0.12) * visibility})`;
       c.beginPath();
       c.ellipse(0, 0, r * 1.15, r * 0.27, 0, 0, TAU);
       c.stroke();
@@ -348,7 +355,7 @@ class OpticalRenderer {
       const halo = c.createRadialGradient(cx, cy, 0, cx, cy, r * 0.9);
       halo.addColorStop(
         0,
-        `rgba(162,169,190,${(reduced ? 0.06 : 0.06 + Math.sin(time * 0.6) * 0.012) * visibility})`,
+        `rgba(162,169,190,${(reduced ? 0.095 : 0.1 + Math.sin(time * 0.6) * 0.018 + interaction * 0.08) * visibility})`,
       );
       halo.addColorStop(1, "rgba(162,169,190,0)");
       c.fillStyle = halo;
@@ -360,7 +367,7 @@ class OpticalRenderer {
       [-1, 1],
       [1, 1],
     ];
-    c.strokeStyle = `rgba(196,204,218,${0.34 * visibility})`;
+    c.strokeStyle = `rgba(196,204,218,${(0.42 + interaction * 0.12) * visibility})`;
     for (const [dx, dy] of corners) {
       const x = cx + dx * (r + 29),
         y = cy + dy * (r + 29);
@@ -404,6 +411,84 @@ class OpticalRenderer {
     c.stroke();
     if (p < 0.145 && !this.mobile)
       this.label("A POINT OF POSSIBILITY", point.x, point.y + this.radius * 0.63, 0.5, "center");
+  }
+  /**
+   * A compact, touch-triggered trace for the opening field. It is intentionally separate from
+   * the essay's scroll narrative: readers can test the metaphor before they begin reading.
+   */
+  private explorer(energy: number, time: number, tilt: number) {
+    const c = this.ctx;
+    const charge = clamp(energy);
+    const alpha = 0.22 + charge * 0.7;
+    const size = this.radius * 0.98;
+    const vertices: Vec2[] = [
+      { x: this.cx, y: this.cy - size * 0.58 },
+      { x: this.cx - size * 0.62, y: this.cy + size * 0.5 },
+      { x: this.cx + size * 0.62, y: this.cy + size * 0.5 },
+    ];
+    const entryAim = mix(vertices[0], vertices[1], 0.55);
+    const source = { x: this.cx - this.radius * 1.45, y: this.cy };
+    const baseAngle = Math.atan2(entryAim.y - source.y, entryAim.x - source.x);
+    const direction = {
+      x: Math.cos(baseAngle + tilt * 0.23),
+      y: Math.sin(baseAngle + tilt * 0.23),
+    };
+    const reference = tracePrism(source, direction, vertices, cauchyIndex(680));
+    if (!reference) return;
+
+    c.save();
+    c.beginPath();
+    c.moveTo(vertices[0].x, vertices[0].y);
+    c.lineTo(vertices[1].x, vertices[1].y);
+    c.lineTo(vertices[2].x, vertices[2].y);
+    c.closePath();
+    const prismFill = c.createLinearGradient(
+      vertices[1].x,
+      vertices[0].y,
+      vertices[2].x,
+      vertices[1].y,
+    );
+    prismFill.addColorStop(0, `rgba(219,230,241,${alpha * 0.13})`);
+    prismFill.addColorStop(0.52, `rgba(146,171,206,${alpha * 0.035})`);
+    prismFill.addColorStop(1, `rgba(218,232,244,${alpha * 0.17})`);
+    c.fillStyle = prismFill;
+    c.fill();
+    c.strokeStyle = `rgba(232,239,246,${alpha * 0.9})`;
+    c.lineWidth = this.mobile ? 1 : 0.8;
+    c.stroke();
+    c.restore();
+
+    this.ray(source, reference.entry, "#f4f1e9", alpha * 0.96);
+    this.ray(reference.entry, reference.exit, "#eef1eb", alpha * 0.72);
+    const exitBaseAngle = Math.atan2(reference.outgoing.y, reference.outgoing.x);
+
+    SPECTRUM.forEach((band) => {
+      const trace = tracePrism(source, direction, vertices, cauchyIndex(band.wavelength));
+      if (!trace) return;
+      this.ray(trace.entry, trace.exit, band.color, alpha * 0.58);
+      const outgoingAngle = Math.atan2(trace.outgoing.y, trace.outgoing.x);
+      const spreadAngle = exitBaseAngle + (outgoingAngle - exitBaseAngle) * 8.5;
+      const reach = this.radius * (1.08 + charge * 1.1);
+      const pulse = Math.sin(time * 3.5 + band.wavelength * 0.015) * this.radius * 0.025;
+      const end = add(trace.exit, {
+        x: Math.cos(spreadAngle) * (reach + pulse),
+        y: Math.sin(spreadAngle) * (reach + pulse),
+      });
+      this.ray(trace.exit, end, band.color, (0.26 + charge * 0.58) * 0.9);
+    });
+
+    const impact = c.createRadialGradient(
+      reference.entry.x,
+      reference.entry.y,
+      0,
+      reference.entry.x,
+      reference.entry.y,
+      23,
+    );
+    impact.addColorStop(0, `rgba(244,247,238,${alpha * 0.55})`);
+    impact.addColorStop(1, "rgba(244,247,238,0)");
+    c.fillStyle = impact;
+    c.fillRect(reference.entry.x - 23, reference.entry.y - 23, 46, 46);
   }
   private vacuum(p: number, t: number, tilt: number) {
     const start = { x: this.left, y: this.cy },
