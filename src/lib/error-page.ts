@@ -7,22 +7,13 @@ export function renderErrorPage(): string {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
       :root {
-        --paper: #F8F6F0;
-        --ink: #2B231D;
-        --ink-soft: #5A524A;
-        --ink-mute: #8C847B;
-        --rule: #DCD8CF;
-        --paper-deep: #EDEAE1;
-      }
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --paper: #16120F;
-          --ink: #F5F2EB;
-          --ink-soft: #C8C3BA;
-          --ink-mute: #928C84;
-          --rule: #2C2621;
-          --paper-deep: #211B17;
-        }
+        color-scheme: dark;
+        --paper: #0b0c0e;
+        --ink: #eeeae1;
+        --ink-soft: #a6a7a7;
+        --ink-mute: #8a8e95;
+        --rule: rgba(205, 211, 221, 0.12);
+        --paper-deep: #121519;
       }
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -42,23 +33,10 @@ export function renderErrorPage(): string {
         padding: 2.5rem 1.5rem;
       }
       .mark {
-        display: inline-block;
-        width: 2.5rem;
-        height: 2.5rem;
-        background: var(--ink);
-        border-radius: 6px;
-        margin-bottom: 1.5rem;
-        position: relative;
-      }
-      .mark::after {
-        content: "";
-        position: absolute;
-        top: 0.6rem;
-        left: 0.6rem;
-        width: 0.5rem;
-        height: 0.5rem;
-        background: #A8471B;
-        border-radius: 50%;
+        display: block;
+        width: 3rem;
+        height: 3rem;
+        margin: 0 auto 1.5rem;
       }
       h1 {
         font-family: "Instrument Serif", Georgia, serif;
@@ -114,7 +92,7 @@ export function renderErrorPage(): string {
   </head>
   <body>
     <div class="card">
-      <div class="mark" aria-hidden="true"></div>
+      <img class="mark" src="/favicon.svg" width="48" height="48" alt="" />
       <h1>A glitch in the ledger.</h1>
       <p>The server encountered an error while assembling this page. Try reloading, or return to safety.</p>
       <div class="actions">

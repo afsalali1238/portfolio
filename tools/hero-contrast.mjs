@@ -3,7 +3,7 @@
  * tools/hero-contrast.mjs — does the light actually leave the words readable?
  *
  *   npm run build && node tools/hero-serve-prod.mjs      # shell 1
- *   node tools/hero-contrast.mjs                         # all breakpoints, both themes
+ *   node tools/hero-contrast.mjs                         # all breakpoints, both OS preferences
  *
  * Measures two things instead of trusting a screenshot:
  *
@@ -43,7 +43,8 @@ const contrast = (a, b) => {
 
 /** Average the composited page behind each target box from a text-hidden screenshot. */
 const readBackdrops = async (page, targets) => {
-  const shot = await page.screenshot({ type: "png" });
+  // Include the lower telemetry row on phones, even when it falls below the first viewport.
+  const shot = await page.screenshot({ type: "png", fullPage: true });
   return page.evaluate(
     async ({ b64, boxes }) => {
       const image = new Image();
@@ -90,16 +91,20 @@ for (const vp of VIEWPORTS) {
     const context = await browser.newContext({
       viewport: { width: vp.w, height: vp.h },
       deviceScaleFactor: 1,
+      colorScheme: dark ? "dark" : "light",
     });
     const page = await context.newPage();
     await page.goto(`${URL_BASE}?heroDebug=1`, { waitUntil: "networkidle", timeout: 60_000 });
     await page.evaluate(() => document.fonts.ready);
-    if (dark) await page.evaluate(() => document.documentElement.classList.add("dark"));
+    await page.evaluate(() => {
+      // Keep the debug API, but measure the artwork visitors see, not geometry guides.
+      document.querySelector("section[data-hero]").dataset.hideDebug = "1";
+    });
     await page.waitForTimeout(1200);
 
-    // Resolve every computed colour to sRGB by painting it: the theme tokens are oklch, and a
-    // regex can't read those. Opaque ancestors inside the hero (filled button, tile panel)
-    // stand in for the drawing as the text's real backdrop.
+    // Resolve CSS Color 4 values through canvas instead of parsing colour strings. Truly
+    // opaque ancestors can stand in for the drawing; translucent surfaces are sampled from
+    // the composited page, including their real fill and backdrop blur.
     const textColours = await page.evaluate(() => {
       const canvas = document.createElement("canvas");
       canvas.width = canvas.height = 1;
@@ -109,8 +114,8 @@ for (const vp of VIEWPORTS) {
         ctx.fillStyle = "#000";
         ctx.fillStyle = css;
         ctx.fillRect(0, 0, 1, 1);
-        const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-        return [r, g, b];
+        const [r, g, b, alpha] = ctx.getImageData(0, 0, 1, 1).data;
+        return [r, g, b, alpha / 255];
       };
       const hero = document.querySelector("section[data-hero]");
       const ownSurface = (el) => {
@@ -118,8 +123,9 @@ for (const vp of VIEWPORTS) {
         while (node && node !== hero && node !== document.body) {
           const bg = getComputedStyle(node).backgroundColor;
           const resolved = resolve(bg);
-          const alpha = /rgba?\([^)]*,\s*([\d.]+)\)/.exec(bg);
-          const opaque = !alpha || Number(alpha[1]) > 0.9;
+          // Tailwind v4 emits color(srgb ... / alpha), not just rgba(). Read real alpha
+          // through canvas; a translucent white telemetry cell is not an opaque white tile.
+          const opaque = resolved[3] >= 0.99;
           if (opaque && (resolved[0] !== 0 || resolved[1] !== 0 || resolved[2] !== 0)) {
             return resolved;
           }
@@ -180,14 +186,15 @@ for (const vp of VIEWPORTS) {
       return out;
     });
 
-    // Hide the text once; both resting and pinned audits photograph the same boxes.
+    // Hide glyphs, not entire elements: opacity:0 also removes button backgrounds. Keeping
+    // translucent fills and backdrop blur in the screenshot measures the actual composite.
     await page.addStyleTag({
-      content: `#hero-heading, [data-hero-thesis], [data-hero-copy] p, [data-hero-copy] a, [data-hero-tile] span { opacity: 0 !important; }`,
+      content: `#hero-heading, #hero-heading *, [data-hero-copy] p, [data-hero-copy] a, [data-hero-copy] a *, [data-hero-tile] span { color: transparent !important; text-shadow: none !important; }`,
     });
     await page.waitForTimeout(120);
 
     const report = (label, backdrops, strict) => {
-      console.log(`\n${vp.name} ${dark ? "dark" : "light"} · ${label}`);
+      console.log(`\n${vp.name} OS ${dark ? "dark" : "light"} · ${label}`);
       for (const [index, entry] of targets.entries()) {
         const behind = backdrops[index];
         if (!behind) continue;
@@ -241,10 +248,11 @@ for (const vp of VIEWPORTS) {
       report("right-pinned leftward fan", pinnedBackdrops, true);
     }
 
-    // Seam: a row band with no type in it, full width, on the resting page plate.
+    // Seam: sample the hero's bottom drafting margin. A viewport-relative strip can cross
+    // the glass after a layout change and misidentify its deliberately bright facet as a seam.
     await page.evaluate(() => window.__heroRay?.resetSource?.());
     await page.waitForTimeout(950);
-    const restingShot = await page.screenshot({ type: "png" });
+    const restingShot = await page.screenshot({ type: "png", fullPage: true });
     const seam = await page.evaluate(
       async ({ b64 }) => {
         const image = new Image();
@@ -255,8 +263,12 @@ for (const vp of VIEWPORTS) {
         canvas.height = image.height;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(image, 0, 0);
-        const bandY = Math.round(canvas.height * 0.62);
+        const hero = document.querySelector("section[data-hero]").getBoundingClientRect();
         const bandH = 6;
+        const bandY = Math.max(
+          0,
+          Math.min(canvas.height - bandH, Math.round(hero.bottom + scrollY - 14)),
+        );
         const { data } = ctx.getImageData(0, bandY, canvas.width, bandH);
         const columns = [];
         for (let x = 0; x < canvas.width; x++) {

@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "tsx --test src/components/fieldNotes.test.ts src/components/scrollytelling/opticsEngine.test.ts src/components/scrollytelling/runtimeMath.test.ts src/components/scrollytelling/soundDirector.test.ts src/components/scrollytelling/story.test.ts",
+    "audit:optical-lab": "node tools/optical-lab.mjs",
     "audit:thesis:accessibility": "node tools/thesis-accessibility.mjs",
     "audit:thesis:layout": "node tools/thesis-layout.mjs",
     "audit:thesis:contrast": "node tools/thesis-contrast.mjs",

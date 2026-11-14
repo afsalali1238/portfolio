@@ -156,13 +156,10 @@
   height: 29px;
 }
 .page-shell .brand > span {
+  font-family: var(--font-sans);
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.7px;
-}
-.page-shell .brand-period {
-  margin-left: 1px;
-  color: #d5d2ca;
 }
 .header-nav {
   position: absolute;

@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { LogoMark, Wordmark } from "./site/LogoMark";
 
 export function Icon({
   name,
@@ -62,14 +63,9 @@ export function Icon({
 
 export function Brand() {
   return (
-    <a href="/" className="brand" aria-label="For the tech, home">
-      <svg viewBox="0 0 34 34" fill="none" aria-hidden="true">
-        <path d="m17 4 13 25H4L17 4Z" stroke="currentColor" strokeWidth=".9" />
-        <path d="M0 19h12l22 9M12 19l22 4M12 19l22-1" stroke="currentColor" strokeWidth=".8" />
-      </svg>
-      <span>
-        for the tech<span className="brand-period">.</span>
-      </span>
+    <a href="/" className="brand" aria-label="for the tech. — home">
+      <LogoMark />
+      <Wordmark />
     </a>
   );
 }

@@ -100,8 +100,8 @@ export const Route = createRootRoute({
       { name: "author", content: AUTHOR },
       { property: "og:site_name", content: SITE_NAME },
       { property: "og:locale", content: "en_GB" },
-      { name: "theme-color", content: "#F8F6F0", media: "(prefers-color-scheme: light)" },
-      { name: "theme-color", content: "#0F0A06", media: "(prefers-color-scheme: dark)" },
+      { name: "theme-color", content: "#0b0c0e" },
+      { name: "color-scheme", content: "dark" },
     ],
     links: [
       {
@@ -130,12 +130,6 @@ export const Route = createRootRoute({
   errorComponent: ErrorComponent,
 });
 
-/**
- * Runs before first paint so dark-mode visitors never see a white flash.
- * Must stay inline and blocking — a useEffect runs too late.
- */
-const THEME_SCRIPT = `(function(){try{var s=localStorage.getItem("theme");var d=s==="dark"||(!s&&window.matchMedia("(prefers-color-scheme: dark)").matches);if(d)document.documentElement.classList.add("dark");}catch(e){}})();`;
-
 const PERSON_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Person",
@@ -156,9 +150,8 @@ const PERSON_SCHEMA = {
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en-GB">
+    <html lang="en-GB" className="dark">
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <HeadContent />
         <script
           type="application/ld+json"

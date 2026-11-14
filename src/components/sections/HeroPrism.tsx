@@ -244,7 +244,8 @@ export function HeroPrism({
       cssH = Math.max(1, rect.height);
       scrollProgress = clamp01((heroDocTop - rectTop) / Math.max(1, cssH));
 
-      ray.setTheme(document.documentElement.classList.contains("dark"));
+      // Native dark optics, including the first paint; independent of saved theme preferences.
+      ray.setTheme(true);
       const tMeasure = performance.now();
       const snapshot = measureHero(hero);
       if (debug) console.log(`[hero] measure ${(performance.now() - tMeasure).toFixed(2)}`);
@@ -601,7 +602,7 @@ export function HeroPrism({
     visObs.observe(hero);
 
     const themeObs = new MutationObserver(() => {
-      ray.setTheme(document.documentElement.classList.contains("dark"));
+      ray.setTheme(true);
       if (!running) paintStill();
     });
     themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });

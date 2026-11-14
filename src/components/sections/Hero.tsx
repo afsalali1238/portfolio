@@ -7,15 +7,14 @@ import { RevealWord } from "./hero-helpers";
 import { HeroPrism, type HeroPrismControl, type HeroSourceMode } from "./HeroPrism";
 import type { ProjectFilter } from "../../data/filters";
 
-/**
- * An interactive stat tile that opens the works catalogue pre-filtered.
- * Governed strictly by brand guidelines: tokens only, 150ms hover, 6px radius, no drop shadow.
- */
+/** Interactive telemetry cell: opens the works catalogue with its existing filter. */
 function StatLink({
+  coordinate,
   label,
   value,
   filterKey,
 }: {
+  coordinate: string;
   label: string;
   value: string;
   filterKey: ProjectFilter;
@@ -24,12 +23,12 @@ function StatLink({
     <Link
       to="/works"
       search={filterKey === "all" ? {} : { filter: filterKey }}
-      className="group flex flex-col justify-between rounded-md p-3.5 sm:p-4 text-left transition-colors duration-150 hover:bg-paper-deep/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+      className="group flex h-full flex-col justify-between rounded-lg border border-white/[0.08] bg-white/[0.02] p-4 text-left backdrop-blur-[2px] transition-all duration-150 hover:border-white/20 hover:bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink sm:p-6"
       aria-label={`${value} builds — ${label}. See them.`}
       data-hero-tile
     >
       <div className="flex items-baseline justify-between">
-        <span className="font-serif text-3xl sm:text-4xl leading-none text-ink transition-colors duration-150 group-hover:text-accent-ink">
+        <span className="font-mono text-3xl leading-none tracking-tight tabular-nums text-ink transition-colors duration-150 group-hover:text-accent-ink sm:text-4xl">
           {value}
         </span>
         <span
@@ -39,8 +38,8 @@ function StatLink({
           →
         </span>
       </div>
-      <span className="mt-2.5 block text-xs font-medium text-ink-mute transition-colors duration-150 group-hover:text-ink">
-        {label}
+      <span className="mt-4 block font-mono text-[10px] uppercase tracking-wider text-ink-mute transition-colors duration-150 group-hover:text-ink sm:text-xs">
+        {coordinate} / {label}
       </span>
     </Link>
   );
@@ -123,13 +122,20 @@ export function Hero() {
               edge of the italic, the lede and the CTA row is what decides where the glass
               settles. Widening any of them pushes the whole picture back to the right. */}
           <div className="lg:col-span-7 space-y-6" data-hero-copy>
+            <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-[#8a8e95] sm:text-xs">
+              <span
+                aria-hidden="true"
+                className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-[#c95135]"
+              />
+              <span>Refraction of Thought · Continuous Engine</span>
+            </div>
             <h1 id="hero-heading" className="font-serif tracking-tight">
-              <span className="block text-[11.5vw] leading-[0.88] text-ink sm:text-[4.6rem] md:text-[5.5rem] lg:text-[6rem] xl:text-[6.8rem]">
+              <span className="block text-[11.5vw] leading-[0.88] text-[#eeeae1] sm:text-[4.6rem] md:text-[5.5rem] lg:text-[6rem] xl:text-[6.8rem]">
                 <RevealWord delay={0.05}>For the tech.</RevealWord>
               </span>
               <span
                 data-hero-thesis
-                className="mt-2 block text-[7.5vw] italic leading-[1.02] text-ink-mute dark:text-[color-mix(in_oklch,var(--ink-soft)_55%,var(--ink-mute))] sm:text-[3rem] md:text-[3.2rem] lg:text-[3.3rem] xl:text-[3.4rem]"
+                className="mt-2 block text-[7.5vw] italic leading-[1.02] text-[#9ba0a9] sm:text-[3rem] md:text-[3.2rem] lg:text-[3.3rem] xl:text-[3.4rem]"
               >
                 <RevealWord delay={0.18} italic>
                   Not because anyone asked.
@@ -140,22 +146,18 @@ export function Hero() {
             {/* Mobile centerpiece stage: interactive refraction playground */}
             <div
               data-hero-stage
-              className="lg:hidden relative w-full h-[240px] sm:h-[280px] my-3 rounded-xl border border-ink/[0.08] dark:border-paper/[0.08] bg-transparent flex flex-col justify-between p-3 select-none touch-none"
+              className="lg:hidden relative w-full h-[240px] sm:h-[280px] my-3 rounded-xl border border-white/[0.08] bg-transparent flex flex-col justify-between p-3 select-none touch-none"
               aria-label="Interactive prism refraction artwork"
             >
               {/* Subtle top indicator */}
-              <div className="flex items-center justify-between w-full pointer-events-none">
-                <span className="text-xs tracking-wider uppercase text-ink-mute/70 font-medium">
-                  Refraction of Thought
-                </span>
-                <span className="text-xs text-ink-mute/60">
-                  {sourceMode === "rest" ? "Resting ray" : "Pinned light"}
-                </span>
+              <div className="flex items-center justify-between gap-2 w-full pointer-events-none font-mono text-[10px] text-ink-mute">
+                <span className="tracking-wider uppercase">Refraction of Thought</span>
+                <span>{sourceMode === "rest" ? "Resting ray" : "Pinned light"}</span>
               </div>
 
               {/* Bottom interactive controls */}
-              <div className="flex items-center justify-between w-full pt-2 pointer-events-auto">
-                <span className="inline-flex items-center gap-1.5 text-xs text-ink-mute/80 select-none">
+              <div className="flex flex-wrap items-center justify-between gap-2 w-full pt-2 pointer-events-auto">
+                <span className="inline-flex items-center gap-1.5 font-mono text-[10px] text-ink-mute select-none">
                   {!hasInteracted && (
                     <span className="relative flex h-1.5 w-1.5">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-ink/40 opacity-75" />
@@ -174,7 +176,7 @@ export function Hero() {
                     setHasInteracted(true);
                     prismControlRef.current?.cyclePreset();
                   }}
-                  className="inline-flex min-h-7 items-center gap-1.5 rounded-md border rule-hair bg-paper/90 dark:bg-paper-deep/90 px-2.5 py-1 text-xs font-medium text-ink shadow-xs transition-colors hover:bg-paper-deep active:scale-95"
+                  className="inline-flex min-h-8 items-center gap-1.5 rounded-md border border-white/15 bg-paper-glass px-2.5 py-1 font-mono text-[10px] text-ink transition-all hover:bg-white/10 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
                 >
                   <span
                     aria-hidden="true"
@@ -200,7 +202,7 @@ export function Hero() {
             >
               <Link
                 to="/works"
-                className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-ink px-6 text-paper transition-all duration-150 hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
+                className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[#eeeae1] px-6 font-medium text-[#0b0c0e] transition-all duration-150 hover:bg-white active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
               >
                 See the builds
                 <ArrowRight
@@ -210,7 +212,7 @@ export function Hero() {
               </Link>
               <Link
                 to="/notes"
-                className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-md border rule-hair bg-paper px-6 text-ink transition-all duration-150 hover:bg-paper-deep hover:border-ink/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-white/15 bg-white/5 px-6 text-[#eeeae1] transition-all duration-150 hover:bg-white/10 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               >
                 Read the notes
                 <ArrowRight
@@ -231,13 +233,29 @@ export function Hero() {
         {/* Shipped & verified metrics — stat tiles that pre-filter the catalogue */}
         <div
           data-hero-tiles
-          className="mt-12 sm:mt-14 grid grid-cols-2 gap-3 sm:gap-4 rounded-lg bg-paper/[0.08] p-4 sm:p-6 backdrop-blur-[1.5px] text-sm md:grid-cols-4 border rule-hair shadow-xs"
+          className="mt-12 grid grid-cols-2 gap-3 text-sm sm:mt-14 sm:gap-4 md:grid-cols-4"
         >
-          <StatLink label="Total shipped" value={String(projectCount)} filterKey="all" />
-          <StatLink label="Live on the internet" value={String(liveCount)} filterKey="live" />
-          <StatLink label="Open source" value={String(sourceCount)} filterKey="oss" />
           <StatLink
-            label="For wife, friends, me"
+            coordinate="01"
+            label="Total shipped"
+            value={String(projectCount)}
+            filterKey="all"
+          />
+          <StatLink
+            coordinate="02"
+            label="Live deployments"
+            value={String(liveCount)}
+            filterKey="live"
+          />
+          <StatLink
+            coordinate="03"
+            label="Open source"
+            value={String(sourceCount)}
+            filterKey="oss"
+          />
+          <StatLink
+            coordinate="04"
+            label="For people"
             value={String(forPeopleCount)}
             filterKey="for-people"
           />
@@ -261,7 +279,7 @@ export function Hero() {
               prismControlRef.current?.reset();
             }
           }}
-          className="motion-reduce:hidden hidden lg:inline-flex absolute right-6 md:right-10 -bottom-7 sm:-bottom-8 min-h-6 items-center gap-1.5 rounded px-1.5 py-0.5 text-xs font-medium tracking-wide text-ink-mute transition-colors duration-150 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+          className="motion-reduce:hidden hidden lg:inline-flex absolute right-6 md:right-10 -bottom-7 sm:-bottom-8 min-h-6 items-center gap-1.5 rounded px-1.5 py-0.5 font-mono text-xs uppercase tracking-wider text-ink-mute transition-colors duration-150 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
         >
           <span
             aria-hidden="true"
