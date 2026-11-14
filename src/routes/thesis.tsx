@@ -7,6 +7,7 @@ import { THESIS_PUBLISHED_AT } from "../components/scrollytelling/story";
 import "../styles/app.css";
 import "../styles/compact.css";
 import "../styles/accessibility.css";
+import "../styles/interactive-field.css";
 
 const PATH = "/thesis";
 

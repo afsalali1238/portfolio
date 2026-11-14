@@ -2,10 +2,12 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from "react"
 import type { OpticsHandle } from "./OpticsCanvas";
 import { clamp } from "./opticsEngine";
 
+const INTERACTION_ENERGY_FLOOR = 0.02;
+const INTERACTION_ENERGY_DECAY = 2.4;
+
 /**
- * Maps native document reading progress onto the optical field. The canvas is deliberately
- * redrawn only for meaningful document events: it stays atmospheric without asking readers to
- * compete with a perpetual animation loop.
+ * Maps native document reading progress onto the optical field. The field stays idle while the
+ * reader reads, then briefly wakes for an intentional drag or spectrum release.
  */
 export function useReadingAtmosphere({
   root,
@@ -16,11 +18,20 @@ export function useReadingAtmosphere({
 }) {
   const [reducedMotion, setReducedMotion] = useState(false);
   const tilt = useRef(0);
+  const energy = useRef(0);
   const scheduleDraw = useRef<() => void>(() => {});
+
   const steer = useCallback((nextTilt: number) => {
-    tilt.current = clamp(nextTilt, -0.38, 0.38);
+    tilt.current = clamp(nextTilt, -0.72, 0.72);
+    energy.current = Math.max(energy.current, 0.52);
     scheduleDraw.current();
   }, []);
+
+  const ignite = useCallback(() => {
+    energy.current = 1;
+    canvas.current?.ignite();
+    scheduleDraw.current();
+  }, [canvas]);
 
   useEffect(() => {
     const rootElement = root.current;
@@ -48,13 +59,17 @@ export function useReadingAtmosphere({
       const delta = lastTime ? Math.min((now - lastTime) / 1000, 0.05) : 1 / 60;
       lastTime = now;
       time += delta * 1000;
+      energy.current *= Math.exp(-delta * INTERACTION_ENERGY_DECAY);
       canvas.current?.draw({
         progress: readingProgress(),
         time,
         delta,
         tilt: tilt.current,
         reducedMotion: false,
+        energy: energy.current,
       });
+      // A release is legible for a short beat, then the canvas returns to a zero-draw idle state.
+      if (energy.current > INTERACTION_ENERGY_FLOOR) schedule();
     };
 
     const schedule = () => {
@@ -103,5 +118,5 @@ export function useReadingAtmosphere({
     };
   }, [root, canvas]);
 
-  return { reducedMotion, steer };
+  return { reducedMotion, steer, ignite };
 }

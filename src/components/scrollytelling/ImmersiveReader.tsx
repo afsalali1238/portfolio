@@ -1,4 +1,5 @@
-import { Fragment, useRef } from "react";
+import { Fragment, useRef, type PointerEvent as ReactPointerEvent } from "react";
+import { Link } from "@tanstack/react-router";
 import { Brand, Icon } from "../Icons";
 import { OpticsCanvas, type OpticsHandle } from "./OpticsCanvas";
 import { useReadingAtmosphere } from "./useReadingAtmosphere";
@@ -39,18 +40,41 @@ function paragraphClass(kind: ParagraphKind) {
 export function ImmersiveReader() {
   const root = useRef<HTMLElement>(null);
   const canvas = useRef<OpticsHandle>(null);
-  const { reducedMotion, steer } = useReadingAtmosphere({ root, canvas });
+  const activeFieldPointer = useRef<number | null>(null);
+  const { reducedMotion, steer, ignite } = useReadingAtmosphere({ root, canvas });
+
+  const fieldTilt = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    if (rect.width <= 0) return 0;
+    return (((event.clientX - rect.left) / rect.width) * 2 - 1) * 0.72;
+  };
+
+  const beginFieldDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    // Touch keeps native page scroll. The labelled button below remains the mobile interaction.
+    if (event.pointerType === "touch") return;
+    activeFieldPointer.current = event.pointerId;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    steer(fieldTilt(event));
+    ignite();
+  };
+
+  const moveFieldDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (activeFieldPointer.current !== event.pointerId) return;
+    steer(fieldTilt(event));
+  };
+
+  const endFieldDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (activeFieldPointer.current !== event.pointerId) return;
+    if (event.currentTarget.hasPointerCapture(event.pointerId))
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    activeFieldPointer.current = null;
+  };
 
   return (
     <section
       className="immersive-reader"
       ref={root}
       aria-label="The Refraction of Thought, an immersive essay"
-      onPointerMove={(event) => {
-        if (event.pointerType === "touch") return;
-        steer(((event.clientX / window.innerWidth) * 2 - 1) * 0.38);
-      }}
-      onPointerLeave={() => steer(0)}
     >
       <div className="immersive-reader-stage">
         {!reducedMotion && <OpticsCanvas ref={canvas} />}
@@ -60,6 +84,18 @@ export function ImmersiveReader() {
           <Brand />
         </header>
       </div>
+      {!reducedMotion && (
+        <div
+          className="field-gesture-zone"
+          aria-hidden="true"
+          onPointerDown={beginFieldDrag}
+          onPointerMove={moveFieldDrag}
+          onPointerUp={endFieldDrag}
+          onPointerCancel={endFieldDrag}
+        >
+          <span>Drag to bend the ray</span>
+        </div>
+      )}
 
       <article className="reading-flow" aria-labelledby="thesis-title">
         <section className="flow-opening">
@@ -70,10 +106,29 @@ export function ImmersiveReader() {
             <br />
             {PROLOGUE.deck[1]}
           </p>
-          <p className="flow-invitation">
+          {!reducedMotion && (
+            <>
+              <button
+                className="flow-field-action"
+                type="button"
+                onClick={ignite}
+                aria-label="Release the spectrum in the optical field"
+                aria-describedby="field-control-help"
+              >
+                <span className="field-action-mark" aria-hidden="true" />
+                <span>Release the spectrum</span>
+                <span className="field-action-hint">Tap / click</span>
+              </button>
+              <p className="sr-only" id="field-control-help">
+                On desktop, drag the optical field to change the beam angle. On touch devices, use
+                this button to release the spectrum.
+              </p>
+            </>
+          )}
+          <a className="flow-invitation" href="#movement-i">
             <Icon name="down" size={15} />
             <span>{PROLOGUE.begin}</span>
-          </p>
+          </a>
         </section>
 
         {MOVEMENTS.map((movement) => (
@@ -119,6 +174,14 @@ export function ImmersiveReader() {
           <a className="flow-discussion-link" href="#discussion">
             Write it down <Icon name="arrow" size={15} />
           </a>
+          <nav className="flow-next-steps" aria-label="Continue exploring">
+            <Link className="flow-next-step" to="/works">
+              Explore selected work <Icon name="arrow" size={14} />
+            </Link>
+            <Link className="flow-next-step" to="/lab/refraction">
+              Open the optical lab <Icon name="arrow" size={14} />
+            </Link>
+          </nav>
         </footer>
       </article>
     </section>
