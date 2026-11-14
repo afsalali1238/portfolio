@@ -2617,7 +2617,7 @@
   text-transform: uppercase;
 }
 .flow-kicker {
-  color: #9ba1aa;
+  color: #9a9ea5;
   margin: 0 0 28px;
 }
 .flow-opening h1 {
@@ -2626,9 +2626,12 @@
   font: 400 clamp(76px, 7.25vw, 120px)/0.94 var(--serif);
   letter-spacing: -0.042em;
 }
+/* Dual-tone editorial voice: the italic clause always sits one register below the bone
+   headline — muted on the page, never greyed into the background. */
 .flow-opening h1 em,
 .flow-movement h2 em {
   font-weight: 400;
+  color: var(--muted);
 }
 .flow-deck {
   margin: 28px 0 0;
@@ -2663,22 +2666,22 @@
   flex-direction: column;
   justify-content: center;
 }
+/* Chapter tag: one grey voice, preceded by a 34 px hairline — the section-header
+   benchmark every page aligns to. */
 .flow-chapter-label {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 28px;
-  color: #b0b4ba;
+  margin-bottom: 24px;
+  font-size: 11px;
+  color: #9a9ea5;
 }
 .flow-chapter-label::after {
   content: "";
   height: 1px;
   width: 34px;
-  background: rgba(220, 224, 229, 0.32);
+  background: rgba(205, 211, 221, 0.2);
   order: -1;
-}
-.flow-chapter-label > span:first-child {
-  color: var(--paper);
 }
 .flow-movement h2 {
   margin: 0 0 31px;
@@ -2868,7 +2871,6 @@
   }
   .flow-chapter-label {
     margin-bottom: 21px;
-    font-size: 11px;
   }
   .flow-movement h2 {
     margin-bottom: 25px;

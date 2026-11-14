@@ -71,10 +71,13 @@ export function Works({
         <SectionReveal>
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <div className="font-mono text-xs uppercase tracking-wider text-ink-mute">
+              <div className="flex items-center gap-3.5 font-mono text-xs uppercase tracking-[0.12em] text-grey">
+                <span aria-hidden="true" className="h-px w-[34px] shrink-0 bg-white/20" />
                 Catalogue of builds
               </div>
-              <h1 className="mt-2 font-serif text-5xl md:text-7xl">The catalogue.</h1>
+              <h1 className="mt-2 font-serif text-5xl leading-[1.05] tracking-tight text-ink md:text-7xl">
+                The catalogue.
+              </h1>
               <p className="mt-3 max-w-xl text-base leading-relaxed text-ink-soft">
                 {numberWord(projectCount)} quiet tools, clinical companions, and experiments.{" "}
                 {numberWord(sourceCount)} have public source code.
@@ -169,14 +172,14 @@ export function Works({
                         <CardPoster src={posterSrc} isMobile={isMobile} />
 
                         {/* Device / Platform Badge */}
-                        <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-ink/90 px-3 py-1 text-xs font-medium text-paper backdrop-blur-xs">
-                          <span className="h-1.5 w-1.5 rounded-full bg-paper" />
+                        <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[11px] font-medium tracking-[0.08em] text-ink backdrop-blur-xs">
+                          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-clay" />
                           <span>{platformBadge(p)}</span>
                         </div>
 
                         {/* Status Badge */}
                         {p.status && (
-                          <div className="absolute right-3 top-3 rounded-full bg-paper/95 px-3 py-1 text-xs font-medium text-ink backdrop-blur-xs capitalize border rule-hair">
+                          <div className="absolute right-3 top-3 rounded-full bg-paper/95 px-3 py-1 font-mono text-[11px] font-medium tracking-[0.08em] text-ink backdrop-blur-xs capitalize border rule-hair">
                             {p.status}
                           </div>
                         )}
@@ -184,7 +187,7 @@ export function Works({
 
                       {/* Card Content: 24 px padding */}
                       <div className="p-6">
-                        <div className="text-xs text-ink-mute">
+                        <div className="font-mono text-xs tracking-[0.06em] text-grey">
                           <span className="font-medium">{builtForLabel(p.for)}</span>
                         </div>
 
@@ -192,7 +195,7 @@ export function Works({
                           <Link
                             to="/works/$id"
                             params={{ id: p.id }}
-                            className="font-serif text-3xl leading-none text-ink hover:text-ink-soft transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                            className="font-serif text-[2rem] leading-none text-ink hover:text-ink-soft transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
                           >
                             {p.name}
                           </Link>
@@ -203,7 +206,7 @@ export function Works({
                           )}
                         </div>
 
-                        <p className="mt-3 text-sm leading-relaxed text-ink-soft">{p.blurb}</p>
+                        <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">{p.blurb}</p>
 
                         {/* Tech Stack Chips */}
                         {p.stack && p.stack.length > 0 && (
@@ -211,7 +214,7 @@ export function Works({
                             {p.stack.slice(0, 4).map((tech) => (
                               <span
                                 key={tech}
-                                className="rounded-md bg-paper-deep px-2 py-0.5 text-xs text-ink-soft"
+                                className="rounded-md bg-paper-deep px-2 py-0.5 font-mono text-[11px] text-ink-soft"
                               >
                                 {tech}
                               </span>
@@ -227,11 +230,11 @@ export function Works({
                     </div>
 
                     {/* Bottom Actions */}
-                    <div className="flex items-center justify-between border-t rule-hair px-6 py-4 text-xs font-medium">
+                    <div className="flex items-center justify-between border-t rule-hair px-6 py-4 font-mono text-xs font-medium uppercase tracking-[0.08em]">
                       <Link
                         to="/works/$id"
                         params={{ id: p.id }}
-                        className="inline-flex items-center gap-1.5 text-ink hover:text-ink-soft transition-colors"
+                        className="inline-flex items-center gap-1.5 text-ink hover:text-clay transition-colors duration-150"
                       >
                         <span>Case study</span>
                         <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
@@ -289,7 +292,7 @@ export function Works({
                   </span>
                   <span className="col-span-12 text-sm text-ink-soft md:col-span-4">{p.blurb}</span>
                   <span className="col-span-12 flex flex-wrap items-center justify-between gap-2.5 text-xs text-ink-mute md:col-span-3 md:justify-end">
-                    <span className="rounded-full bg-paper-deep px-2.5 py-0.5 font-medium text-ink-soft">
+                    <span className="rounded-full bg-paper-deep px-2.5 py-0.5 font-mono text-[11px] font-medium tracking-[0.06em] text-ink-soft">
                       {platformBadge(p)}
                     </span>
                     <span>{builtForLabel(p.for)}</span>

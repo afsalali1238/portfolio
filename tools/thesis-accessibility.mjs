@@ -197,9 +197,9 @@ reducedPage.on("pageerror", (error) =>
 await reducedPage.goto(PAGE_URL, { waitUntil: "networkidle", timeout: 60_000 });
 await reducedPage.evaluate(() => document.fonts.ready);
 check(
-  "reduced-motion reader is visible with all six movements",
+  "reduced-motion reader is visible with all seven movements",
   (await reducedPage.locator(".reading-flow").isVisible()) &&
-    (await reducedPage.locator(".flow-movement").count()) === 6,
+    (await reducedPage.locator(".flow-movement").count()) === 7,
 );
 check(
   "reduced-motion canvas is absent",

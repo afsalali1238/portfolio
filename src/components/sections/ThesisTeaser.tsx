@@ -34,17 +34,21 @@ export function ThesisTeaser() {
     >
       <Container className="grid grid-cols-1 gap-12 lg:grid-cols-12">
         <SectionReveal className="lg:col-span-5 space-y-6">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-mute">
+          <div className="flex items-center gap-3.5 font-mono text-xs uppercase tracking-[0.12em] text-grey">
+            <span aria-hidden="true" className="h-px w-[34px] shrink-0 bg-white/20" />
             <span>Manifesto</span>
             <span>·</span>
             <span>Foundation Thesis</span>
           </div>
 
           <div>
-            <div className="text-xs text-ink-mute">
+            <div className="font-mono text-xs tracking-[0.06em] text-grey">
               Dispatch No. {latest.number} · {latest.readTime}
             </div>
-            <h2 id="notes-heading" className="mt-2 font-serif text-3xl md:text-4xl text-ink">
+            <h2
+              id="notes-heading"
+              className="mt-2 font-serif text-4xl leading-[1.05] tracking-tight text-ink sm:text-5xl"
+            >
               <Link to={latest.path} className="hover:text-ink-soft transition-colors">
                 {latest.title}
               </Link>
@@ -71,13 +75,16 @@ export function ThesisTeaser() {
 
         <SectionReveal className="space-y-6 lg:col-span-7">
           <p className="font-serif text-2xl leading-snug text-ink md:text-3xl">
-            An idea in your head <span className="italic">costs nothing and proves nothing</span>.
-            It is invisible until it collides with real glass.
+            An idea in your head{" "}
+            <span className="italic text-ink-soft">costs nothing and proves nothing</span>. It is
+            invisible until it collides with real glass.
           </p>
           <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {NOTES.map((n) => (
               <li key={n.k} className="rounded-lg bg-paper p-5 border rule-hair">
-                <div className="text-xs font-medium text-ink-mute">{n.k}</div>
+                <div className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-grey">
+                  {n.k}
+                </div>
                 <div className="mt-1.5 font-serif text-lg leading-snug text-ink">{n.v}</div>
               </li>
             ))}

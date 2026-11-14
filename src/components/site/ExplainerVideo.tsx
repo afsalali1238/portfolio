@@ -182,7 +182,7 @@ export function ExplainerVideo({
       {/* Step-by-Step Flow Explanation (only when walkthrough exists) */}
       {hasWalkthrough && media.steps && (
         <figcaption className={media.kind === "mobile" ? "md:col-span-7" : "md:col-span-5"}>
-          <div className="flex items-center justify-between border-b rule-hair pb-2 text-xs font-semibold uppercase tracking-wider text-ink-mute">
+          <div className="flex items-center justify-between border-b rule-hair pb-2 font-mono text-xs font-medium uppercase tracking-[0.12em] text-grey">
             <span>Walkthrough &amp; interaction</span>
             <span>{media.kind === "mobile" ? "Mobile view" : "Desktop view"}</span>
           </div>

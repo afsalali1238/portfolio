@@ -125,7 +125,7 @@ export function ImmersiveReader() {
               </p>
             </>
           )}
-          <a className="flow-invitation" href="#movement-i">
+          <a className="flow-invitation" href="#movement-01">
             <Icon name="down" size={15} />
             <span>{PROLOGUE.begin}</span>
           </a>
@@ -140,6 +140,7 @@ export function ImmersiveReader() {
           >
             <header className="flow-chapter-label">
               <span>{movement.numeral}</span>
+              <span aria-hidden="true">·</span>
               <span>{movement.title}</span>
             </header>
             <h2 id={`movement-${movement.numeral.toLowerCase()}-title`}>

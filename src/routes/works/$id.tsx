@@ -103,11 +103,11 @@ function ProjectCaseStudy() {
           <SectionReveal>
             {/* Meta badges */}
             <div className="flex flex-wrap items-center gap-3 text-xs text-ink-mute">
-              <span className="rounded-full bg-paper-deep px-3 py-1 font-medium text-ink-soft">
+              <span className="rounded-full bg-paper-deep px-3 py-1 font-mono text-[11px] font-medium tracking-[0.08em] text-ink-soft">
                 {platformBadge(project)}
               </span>
               <span>·</span>
-              <span className="rounded-full bg-paper-deep px-3 py-1 font-medium text-ink-soft">
+              <span className="rounded-full bg-paper-deep px-3 py-1 font-mono text-[11px] font-medium tracking-[0.08em] text-ink-soft">
                 Built for{" "}
                 {project.for.toLowerCase() === "wife"
                   ? "my wife"
@@ -134,7 +134,7 @@ function ProjectCaseStudy() {
             </div>
 
             {/* Title & One-liner */}
-            <h1 className="mt-6 font-serif text-5xl md:text-7xl leading-[1.02] text-ink">
+            <h1 className="mt-6 font-serif text-5xl leading-[1.02] tracking-tight text-ink md:text-7xl">
               {project.name}
             </h1>
             <p className="mt-6 font-serif text-2xl md:text-3xl leading-relaxed text-ink-soft italic">
@@ -185,10 +185,11 @@ function ProjectCaseStudy() {
             {/* The Human Friction */}
             {problemText && (
               <SectionReveal className="space-y-4">
-                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
+                <div className="flex items-center gap-3.5 font-mono text-xs font-medium uppercase tracking-[0.12em] text-grey">
+                  <span aria-hidden="true" className="h-px w-[34px] shrink-0 bg-white/20" />
                   01 · Why this exists
                 </div>
-                <h2 className="font-serif text-3xl text-ink">Why this exists.</h2>
+                <h2 className="font-serif text-3xl tracking-tight text-ink">Why this exists.</h2>
                 <p className="text-base md:text-lg leading-relaxed text-ink-soft">{problemText}</p>
               </SectionReveal>
             )}
@@ -196,10 +197,11 @@ function ProjectCaseStudy() {
             {/* The Build & Architecture */}
             {solutionText && (
               <SectionReveal className="space-y-4">
-                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
+                <div className="flex items-center gap-3.5 font-mono text-xs font-medium uppercase tracking-[0.12em] text-grey">
+                  <span aria-hidden="true" className="h-px w-[34px] shrink-0 bg-white/20" />
                   02 · How it was built
                 </div>
-                <h2 className="font-serif text-3xl text-ink">How it was built.</h2>
+                <h2 className="font-serif text-3xl tracking-tight text-ink">How it was built.</h2>
                 <p className="text-base md:text-lg leading-relaxed text-ink-soft">{solutionText}</p>
               </SectionReveal>
             )}
@@ -207,10 +209,11 @@ function ProjectCaseStudy() {
             {/* Outcome */}
             {project.outcome && (
               <SectionReveal className="space-y-4">
-                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
+                <div className="flex items-center gap-3.5 font-mono text-xs font-medium uppercase tracking-[0.12em] text-grey">
+                  <span aria-hidden="true" className="h-px w-[34px] shrink-0 bg-white/20" />
                   03 · The outcome
                 </div>
-                <h2 className="font-serif text-3xl text-ink">The real result.</h2>
+                <h2 className="font-serif text-3xl tracking-tight text-ink">The real result.</h2>
                 <p className="text-base leading-relaxed text-ink md:text-lg">{project.outcome}</p>
               </SectionReveal>
             )}
@@ -218,7 +221,8 @@ function ProjectCaseStudy() {
             {/* What I Learned */}
             {project.learned && (
               <SectionReveal className="space-y-4 border-l-2 border-ink py-2 pl-6">
-                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
+                <div className="flex items-center gap-3.5 font-mono text-xs font-medium uppercase tracking-[0.12em] text-grey">
+                  <span aria-hidden="true" className="h-px w-[34px] shrink-0 bg-white/20" />
                   04 · What I learned
                 </div>
                 <p className="font-serif text-2xl italic leading-snug text-ink">
@@ -230,10 +234,13 @@ function ProjectCaseStudy() {
             {/* Key Highlights */}
             {project.highlights && project.highlights.length > 0 && (
               <SectionReveal className="space-y-4">
-                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
+                <div className="flex items-center gap-3.5 font-mono text-xs font-medium uppercase tracking-[0.12em] text-grey">
+                  <span aria-hidden="true" className="h-px w-[34px] shrink-0 bg-white/20" />
                   05 · Highlights
                 </div>
-                <h2 className="font-serif text-3xl text-ink">Concrete capabilities.</h2>
+                <h2 className="font-serif text-3xl tracking-tight text-ink">
+                  Concrete capabilities.
+                </h2>
                 <ul className="space-y-3 pt-2">
                   {project.highlights.map((h: string, i: number) => (
                     <li key={i} className="flex items-start gap-3 text-base text-ink-soft">
@@ -247,10 +254,13 @@ function ProjectCaseStudy() {
 
             {/* Tech Stack - Section 06 (fixes numbering bug!) */}
             <SectionReveal className="space-y-4 rounded-lg bg-paper-deep/50 p-6 md:p-8">
-              <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
+              <div className="flex items-center gap-3.5 font-mono text-xs font-medium uppercase tracking-[0.12em] text-grey">
+                <span aria-hidden="true" className="h-px w-[34px] shrink-0 bg-white/20" />
                 06 · Technical stack
               </div>
-              <h2 className="font-serif text-2xl text-ink">Tools and dependencies.</h2>
+              <h2 className="font-serif text-2xl tracking-tight text-ink">
+                Tools and dependencies.
+              </h2>
               <div className="flex flex-wrap gap-2 pt-2">
                 {((project.stack || project.tags) as string[]).map((tech: string) => (
                   <span
@@ -266,10 +276,13 @@ function ProjectCaseStudy() {
             {/* Related Essays & Dispatches */}
             {getRelatedNotesForProject(project.id).length > 0 && (
               <SectionReveal className="space-y-4 rounded-lg border rule-hair bg-paper p-6 md:p-8">
-                <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
+                <div className="flex items-center gap-3.5 font-mono text-xs font-medium uppercase tracking-[0.12em] text-grey">
+                  <span aria-hidden="true" className="h-px w-[34px] shrink-0 bg-white/20" />
                   07 · Related Essays & Dispatches
                 </div>
-                <h2 className="font-serif text-2xl text-ink">Read the deeper thesis.</h2>
+                <h2 className="font-serif text-2xl tracking-tight text-ink">
+                  Read the deeper thesis.
+                </h2>
                 <p className="text-sm text-ink-soft">
                   The operational context, design philosophy, and lessons behind this build:
                 </p>
@@ -281,7 +294,7 @@ function ProjectCaseStudy() {
                       className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-md border rule-hair bg-paper-deep/40 p-4 transition-colors hover:border-ink hover:bg-paper-deep"
                     >
                       <div className="space-y-1">
-                        <div className="text-xs text-ink-mute tabular-nums">
+                        <div className="font-mono text-xs text-grey tabular-nums">
                           No. {note.number} · {note.date}
                         </div>
                         <div className="font-serif text-xl text-ink group-hover:text-ink">
@@ -350,7 +363,7 @@ function ProjectNotFound() {
       <div className="flex min-h-[60svh] items-center justify-center px-4">
         <div className="max-w-md text-center">
           <h1 className="font-serif text-6xl text-ink">404</h1>
-          <h2 className="mt-2 font-serif text-2xl text-ink-soft">Build not found</h2>
+          <h2 className="mt-2 font-serif text-2xl tracking-tight text-ink-soft">Build not found</h2>
           <p className="mt-2 text-sm text-ink-mute">
             The requested project does not exist in the public ledger.
           </p>

@@ -25,10 +25,11 @@ function NotesIndexPage() {
       <div className="pb-24 pt-14 md:pt-20">
         <Container className="max-w-4xl">
           <SectionReveal>
-            <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
+            <div className="flex items-center gap-3.5 font-mono text-xs uppercase tracking-[0.12em] text-grey">
+              <span aria-hidden="true" className="h-px w-[34px] shrink-0 bg-white/20" />
               Ledger Dispatches & Essays
             </div>
-            <h1 className="mt-3 font-serif text-5xl leading-tight text-ink md:text-6xl">
+            <h1 className="mt-3 font-serif text-5xl leading-[1.05] tracking-tight text-ink md:text-6xl">
               Notes on the shift.
             </h1>
             <p className="mt-4 max-w-2xl text-base text-ink-mute md:text-lg">
@@ -40,7 +41,7 @@ function NotesIndexPage() {
             <div className="mt-8 rounded-lg border rule-hair bg-paper-deep/40 p-5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-ink">
+                  <span className="font-mono text-xs font-medium uppercase tracking-[0.12em] text-ink">
                     Connected Publishing Hub
                   </span>
                   <p className="text-xs text-ink-soft">
@@ -96,7 +97,7 @@ function NotesIndexPage() {
             {DISPATCHES.map((d) => (
               <SectionReveal key={d.number}>
                 <div className="group block rounded-lg border rule-hair bg-paper p-6 transition-all hover:border-ink hover:bg-paper-deep/60 md:p-8">
-                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-ink-mute">
+                  <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-grey">
                     <span className="tabular-nums font-medium">
                       No. {d.number} · {d.date}
                     </span>

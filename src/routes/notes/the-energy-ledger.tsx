@@ -62,11 +62,12 @@ function EnergyLedgerPage() {
             >
               <ArrowLeft className="h-3.5 w-3.5" /> Back to Notes
             </Link>
-            <div className="text-xs font-semibold uppercase tracking-wider text-ink-mute">
+            <div className="flex items-center gap-3.5 font-mono text-xs font-medium uppercase tracking-[0.12em] text-grey">
+              <span aria-hidden="true" className="h-px w-[34px] shrink-0 bg-white/20" />
               No. 01 · 14 May 2026
             </div>
 
-            <h1 className="mt-4 font-serif text-5xl leading-[1.02] text-ink md:text-7xl">
+            <h1 className="mt-4 font-serif text-5xl leading-[1.02] tracking-tight text-ink md:text-7xl">
               The Energy Ledger.
             </h1>
             <p className="mt-6 font-serif text-2xl italic leading-snug text-ink-soft md:text-3xl">
