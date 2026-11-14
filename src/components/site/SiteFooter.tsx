@@ -1,14 +1,41 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Container } from "../layout/Container";
 import { LogoTile, Wordmark } from "./LogoMark";
 import { AUTHOR } from "../../lib/site";
+
+const gstClock = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Asia/Dubai",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: false,
+});
+
+function GulfTimestamp() {
+  // A stable server/first-client placeholder avoids a time-dependent hydration mismatch.
+  const [now, setNow] = useState<Date | null>(null);
+
+  useEffect(() => {
+    const tick = () => setNow(new Date());
+    tick();
+    const timer = window.setInterval(tick, 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return (
+    <time dateTime={now?.toISOString()} className="tabular-nums font-mono">
+      {now ? gstClock.format(now) : "--:--:--"} GST
+    </time>
+  );
+}
 
 export function SiteFooter() {
   return (
     <footer
       id="contact"
-      className="border-t rule-hair bg-paper-deep/40 py-16 text-sm text-ink-mute"
+      className="border-t border-white/[0.08] bg-paper-deep/40 py-16 text-sm text-ink-mute"
     >
       <Container className="space-y-12">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
@@ -37,6 +64,9 @@ export function SiteFooter() {
           <div className="space-y-3 text-xs md:col-span-6 md:text-right">
             <div className="text-ink font-medium">Dubai, United Arab Emirates</div>
             <p className="text-ink-mute">Gulf Standard Time (UTC+4)</p>
+            <p className="text-ink-soft">
+              <GulfTimestamp />
+            </p>
             <div className="pt-4 flex flex-wrap gap-4 md:justify-end text-sm">
               <a
                 href="https://www.linkedin.com/in/afsalali1238/"
@@ -82,17 +112,20 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="border-t rule-hair pt-8">
+        <div className="border-t border-white/[0.08] pt-8">
           <div className="flex flex-col gap-4 text-xs md:flex-row md:items-center md:justify-between">
             <Link
               to="/"
               className="flex min-h-11 items-center gap-2 text-ink"
-              aria-label="forthe.tech — home"
+              aria-label="for the tech. — home"
             >
-              <LogoTile className="h-6 w-6" />
+              <LogoTile className="h-7 w-9" />
               <Wordmark className="text-lg" />
             </Link>
-            <nav aria-label="Footer" className="flex flex-wrap gap-x-5 gap-y-2">
+            <nav
+              aria-label="Footer"
+              className="flex flex-wrap gap-x-5 gap-y-2 font-mono text-[11px] uppercase tracking-wider"
+            >
               <Link to="/works" className="inline-flex min-h-11 items-center hover:text-ink">
                 Work
               </Link>

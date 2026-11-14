@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Moon, Sun, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Container } from "../layout/Container";
 import { LogoTile, Wordmark } from "./LogoMark";
@@ -12,33 +12,9 @@ const NAV_LINKS = [
 ] as const;
 
 const iconButton =
-  "flex h-11 w-11 items-center justify-center rounded-md transition-colors hover:bg-paper-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink";
-
-function useTheme() {
-  const [isDark, setIsDark] = useState(false);
-
-  // The blocking script in __root.tsx already applied the class before paint.
-  // All we do here is sync React state to whatever it decided.
-  useEffect(() => {
-    setIsDark(document.documentElement.classList.contains("dark"));
-  }, []);
-
-  const toggle = () => {
-    const next = !isDark;
-    setIsDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    try {
-      localStorage.setItem("theme", next ? "dark" : "light");
-    } catch {
-      /* private mode: theme still applies for this visit */
-    }
-  };
-
-  return [isDark, toggle] as const;
-}
+  "flex h-11 w-11 items-center justify-center rounded-md text-ink-mute transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink";
 
 export function SiteHeader() {
-  const [isDark, toggleTheme] = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -91,19 +67,17 @@ export function SiteHeader() {
     menuTriggerRef.current?.focus();
   };
 
-  const themeLabel = isDark ? "Switch to light theme" : "Switch to dark theme";
-
   return (
     <>
-      <header className="sticky top-0 z-30 border-b rule-hair bg-paper/75 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-[#0b0c0e]/80 backdrop-blur-md">
         <Container className="flex items-center justify-between py-2.5">
           <Link
             to="/"
             className="group flex items-center gap-3 rounded-md py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
-            aria-label="forthe.tech — home"
+            aria-label="for the tech. — home"
           >
-            <LogoTile className="h-8 w-8 transition-opacity duration-150 group-hover:opacity-85" />
-            <Wordmark className="text-2xl" />
+            <LogoTile className="h-8 w-10 transition-opacity duration-150 group-hover:opacity-85" />
+            <Wordmark className="text-xl sm:text-2xl" />
           </Link>
 
           <nav aria-label="Site" className="hidden items-center gap-1 md:flex">
@@ -111,31 +85,15 @@ export function SiteHeader() {
               <Link
                 key={l.to}
                 to={l.to}
-                className="group relative px-3 py-2.5 text-sm font-medium text-ink-soft transition-colors hover:text-ink data-[status=active]:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-md"
+                className="group relative rounded-md px-3 py-2.5 font-mono text-xs uppercase tracking-wider text-[#8a8e95] transition-colors hover:text-white data-[status=active]:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               >
                 {l.label}
-                <span className="absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-ink transition-transform duration-150 ease-out group-hover:scale-x-100 group-data-[status=active]:scale-x-100" />
+                <span className="absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-accent-ink transition-transform duration-150 ease-out group-hover:scale-x-100 group-data-[status=active]:scale-x-100" />
               </Link>
             ))}
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className={iconButton}
-              aria-label={themeLabel}
-            >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
           </nav>
 
           <div className="-mr-2 flex items-center md:hidden">
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className={iconButton}
-              aria-label={themeLabel}
-            >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
             <button
               ref={menuTriggerRef}
               type="button"
@@ -153,7 +111,7 @@ export function SiteHeader() {
 
       {/* Mobile Drawer Backdrop */}
       <div
-        className={`fixed inset-0 z-40 bg-ink/40 transition-opacity duration-150 md:hidden ${
+        className={`fixed inset-0 z-40 bg-black/60 transition-opacity duration-150 md:hidden ${
           mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         onClick={handleClose}
@@ -166,7 +124,9 @@ export function SiteHeader() {
         role="dialog"
         aria-modal="true"
         aria-label="Navigation menu"
-        className={`fixed bottom-0 right-0 top-0 z-50 flex w-72 flex-col gap-1 border-l rule-hair bg-paper px-8 pt-20 shadow-none transition-transform duration-200 ease-out md:hidden ${
+        aria-hidden={!mobileOpen}
+        inert={!mobileOpen}
+        className={`fixed bottom-0 right-0 top-0 z-50 flex w-80 max-w-[calc(100vw-1.5rem)] flex-col gap-1 border-l border-white/[0.08] bg-paper px-6 pt-20 transition-transform duration-200 ease-out md:hidden ${
           mobileOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -182,17 +142,18 @@ export function SiteHeader() {
         <Link
           to="/"
           onClick={handleClose}
-          className="mb-6 flex items-center gap-3 border-b rule-hair pb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-md"
+          className="mb-6 flex min-h-11 items-center gap-3 rounded-md border-b border-white/[0.08] pb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+          aria-label="for the tech. — home"
         >
-          <LogoTile className="h-8 w-8" />
-          <Wordmark className="text-2xl" />
+          <LogoTile className="h-8 w-10" />
+          <Wordmark className="text-xl" />
         </Link>
         {NAV_LINKS.map((l) => (
           <Link
             key={l.to}
             to={l.to}
             onClick={handleClose}
-            className="font-serif text-3xl leading-loose text-ink-soft transition-colors hover:text-ink data-[status=active]:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-md"
+            className="flex min-h-11 items-center rounded-md py-3 font-mono text-xs uppercase tracking-wider text-ink-mute transition-colors hover:text-white data-[status=active]:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             {l.label}
           </Link>

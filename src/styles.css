@@ -6,6 +6,7 @@
 @import "@fontsource/inter/latin-400.css";
 @import "@fontsource/inter/latin-500.css";
 @import "@fontsource/inter/latin-600.css";
+@import "@fontsource/inter/latin-700.css";
 @import "@fontsource/jetbrains-mono/latin-400.css";
 @import "@fontsource/jetbrains-mono/latin-500.css";
 
@@ -40,6 +41,9 @@
   --color-ring: var(--ring);
   --color-paper: var(--paper);
   --color-paper-deep: var(--paper-deep);
+  --color-paper-glass: var(--paper-glass);
+  --color-faint: var(--faint);
+  --color-hairline: var(--hairline);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-ink-mute: var(--ink-mute);
@@ -48,54 +52,28 @@
   --color-mark-dot: var(--mark-dot);
 }
 
+/* Native dark optical-lab palette. Semantic utilities inherit this on every route,
+   including first paint, regardless of OS theme or a previously saved light preference. */
 :root {
+  color-scheme: dark;
   --radius: 0.5rem;
-  --paper: oklch(0.972 0.008 90);
-  --paper-deep: oklch(0.945 0.012 88);
-  --ink: oklch(0.18 0.012 60);
-  --ink-soft: oklch(0.32 0.012 60);
-  --ink-mute: oklch(0.52 0.012 60);
-  --rule: oklch(0.82 0.008 88);
-  --accent-ink: oklch(0.52 0.14 42);
-  /* The logo dot sits on an ink tile, so it takes the opposite theme's clay. */
-  --mark-dot: oklch(0.7 0.14 42);
+  --paper: #0b0c0e;
+  --paper-deep: #121519;
+  --paper-glass: rgba(18, 21, 25, 0.75);
+  --ink: #eeeae1;
+  --ink-soft: #a6a7a7;
+  --ink-mute: #8a8e95;
+  --faint: var(--ink-mute);
+  --rule: rgba(205, 211, 221, 0.12);
+  --hairline: var(--rule);
+  --accent-ink: #c95135;
+  --mark-dot: var(--accent-ink);
 
   --background: var(--paper);
   --foreground: var(--ink);
-  --card: var(--paper);
+  --card: var(--paper-deep);
   --card-foreground: var(--ink);
-  --popover: var(--paper);
-  --popover-foreground: var(--ink);
-  --primary: var(--ink);
-  --primary-foreground: var(--paper);
-  --secondary: var(--paper-deep);
-  --secondary-foreground: var(--ink);
-  --muted: var(--paper-deep);
-  --muted-foreground: var(--ink-mute);
-  --accent: var(--paper-deep);
-  --accent-foreground: var(--ink);
-  --destructive: oklch(0.5 0.2 27);
-  --destructive-foreground: var(--paper);
-  --border: var(--rule);
-  --input: var(--rule);
-  --ring: var(--ink-mute);
-}
-
-.dark {
-  --paper: oklch(0.15 0.012 60);
-  --paper-deep: oklch(0.18 0.012 60);
-  --ink: oklch(0.97 0.008 90);
-  --ink-soft: oklch(0.8 0.01 80);
-  --ink-mute: oklch(0.6 0.01 70);
-  --rule: oklch(0.25 0.01 60);
-  --accent-ink: oklch(0.7 0.14 42);
-  --mark-dot: oklch(0.52 0.14 42);
-
-  --background: var(--paper);
-  --foreground: var(--ink);
-  --card: var(--paper);
-  --card-foreground: var(--ink);
-  --popover: var(--paper);
+  --popover: var(--paper-deep);
   --popover-foreground: var(--ink);
   --primary: var(--ink);
   --primary-foreground: var(--paper);
@@ -206,22 +184,6 @@
   .cell-build {
     animation: cell-build 0.2s cubic-bezier(0.22, 1, 0.36, 1) backwards;
     animation-delay: calc(0.45s + var(--i, 0) * 0.04s);
-  }
-
-  /* Logo guide 07: the clay pixel row is built outward on first paint. */
-  @keyframes pixel-build {
-    from {
-      opacity: 0;
-      transform: scale(0.4);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-  .logo-clay-pixel {
-    transform-origin: 16px 14px;
-    animation: pixel-build 0.25s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   }
 }
 

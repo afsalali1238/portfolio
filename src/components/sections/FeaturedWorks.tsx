@@ -45,7 +45,9 @@ export function FeaturedWorks() {
       <Container>
         <SectionReveal className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <div className="text-sm font-medium text-ink-mute">Selected builds</div>
+            <div className="font-mono text-xs uppercase tracking-wider text-ink-mute">
+              Selected builds
+            </div>
             <h2 id="featured-heading" className="mt-2 font-serif text-4xl md:text-5xl">
               Made for someone.
             </h2>
@@ -67,7 +69,7 @@ export function FeaturedWorks() {
                 <Link
                   to="/works/$id"
                   params={{ id: p.id }}
-                  className="group flex h-full flex-col justify-between overflow-hidden rounded-lg border rule-hair bg-paper p-6 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:border-ink/60 hover:bg-paper-deep/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                  className="group flex h-full flex-col justify-between overflow-hidden rounded-lg border border-white/[0.08] bg-paper-deep/70 p-6 transition-all duration-200 hover:border-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
                 >
                   <div>
                     {p.media && (

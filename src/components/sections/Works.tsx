@@ -71,7 +71,9 @@ export function Works({
         <SectionReveal>
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <div className="text-sm font-medium text-ink-mute">Catalogue of builds</div>
+              <div className="font-mono text-xs uppercase tracking-wider text-ink-mute">
+                Catalogue of builds
+              </div>
               <h1 className="mt-2 font-serif text-5xl md:text-7xl">The catalogue.</h1>
               <p className="mt-3 max-w-xl text-base leading-relaxed text-ink-soft">
                 {numberWord(projectCount)} quiet tools, clinical companions, and experiments.{" "}
@@ -154,7 +156,7 @@ export function Works({
 
               return (
                 <li key={p.id}>
-                  <div className="group flex h-full flex-col justify-between overflow-hidden rounded-lg border rule-hair bg-paper transition-colors duration-150 hover:border-ink/40 hover:bg-paper-deep/40">
+                  <div className="group flex h-full flex-col justify-between overflow-hidden rounded-lg border border-white/[0.08] bg-paper-deep/70 transition-all duration-150 hover:border-white/20">
                     <div>
                       {/* Media Container with Phone/Desktop Frame Preview */}
                       <Link
