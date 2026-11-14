@@ -4,18 +4,82 @@
   overflow-x: clip;
 }
 
-.flow-field-action {
+.field-gesture-zone {
+  position: absolute;
+  z-index: 3;
+  top: 14svh;
+  right: 7%;
+  left: 54%;
+  height: 72svh;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.field-gesture-zone::before {
+  position: absolute;
+  inset: 8% 5%;
+  border: 1px dashed rgba(211, 220, 233, 0.14);
+  content: "";
+  opacity: 0.5;
+  transition:
+    border-color 180ms ease,
+    opacity 180ms ease;
+}
+
+.field-gesture-zone > span {
+  position: absolute;
+  bottom: 5%;
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(214, 222, 235, 0.17);
+  background: rgba(11, 12, 14, 0.5);
+  color: #b6c0cf;
+  font: 12px/1 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  opacity: 0.78;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease;
+}
+
+.field-gesture-zone > span::before {
+  width: 6px;
+  height: 6px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  content: "";
+}
+
+.field-gesture-zone:hover::before {
+  border-color: rgba(222, 230, 242, 0.38);
+  opacity: 1;
+}
+
+.field-gesture-zone:hover > span {
+  border-color: rgba(226, 233, 243, 0.5);
+  color: #eef1f4;
+  opacity: 1;
+}
+
+.page-shell .flow-field-action {
   display: inline-flex;
   align-items: center;
   align-self: flex-start;
   gap: 10px;
-  min-height: 43px;
+  min-height: 46px;
   margin: 26px 0 0;
-  padding: 0 13px;
-  border: 1px solid rgba(221, 227, 236, 0.35) !important;
-  background: rgba(11, 12, 14, 0.45) !important;
-  color: #eeebe4 !important;
-  font: 12px/1 var(--mono) !important;
+  padding: 0 14px;
+  border: 1px solid rgba(221, 227, 236, 0.35);
+  background: rgba(11, 12, 14, 0.45);
+  color: #eeebe4;
+  font: 12px/1 var(--mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   backdrop-filter: blur(8px);
@@ -25,24 +89,24 @@
     transform 180ms ease;
 }
 
-.flow-field-action:hover {
-  border-color: rgba(241, 244, 249, 0.75) !important;
-  background: rgba(28, 32, 39, 0.72) !important;
+.page-shell .flow-field-action:hover {
+  border-color: rgba(241, 244, 249, 0.75);
+  background: rgba(28, 32, 39, 0.72);
   transform: translateY(-1px);
 }
 
-.flow-field-action:active {
+.page-shell .flow-field-action:active {
   transform: translateY(0) scale(0.985);
 }
 
-.flow-field-action:focus-visible {
-  outline-offset: 5px !important;
+.page-shell .flow-field-action:focus-visible {
+  outline-offset: 5px;
 }
 
 .field-action-mark {
   position: relative;
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   flex: 0 0 auto;
   border: 1px solid #e9edf2;
   border-radius: 50%;
@@ -61,9 +125,70 @@
   margin-left: 3px;
   padding-left: 10px;
   border-left: 1px solid rgba(218, 225, 234, 0.22);
-  color: #aeb5c0;
-  font-size: 10px;
+  color: #b8c0cb;
+  font-size: 11px;
   letter-spacing: 0.07em;
+}
+
+.flow-invitation {
+  width: fit-content;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.flow-invitation:hover,
+.flow-invitation:focus-visible {
+  border-color: rgba(226, 231, 238, 0.58);
+  color: #f0f0ec;
+}
+
+.flow-next-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 29px;
+}
+
+.flow-next-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 13px;
+  border: 1px solid rgba(222, 227, 232, 0.28);
+  color: #e7e5df;
+  font: 12px/1 var(--mono);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.flow-next-step:hover,
+.flow-next-step:focus-visible {
+  border-color: rgba(236, 239, 242, 0.68);
+  background: rgba(225, 230, 239, 0.08);
+  color: #fffdf7;
+}
+
+.flow-next-step svg {
+  transition: transform 180ms ease;
+}
+
+.flow-next-step:hover svg,
+.flow-next-step:focus-visible svg {
+  transform: translate(3px, -3px);
+}
+
+@media (max-width: 1023px) {
+  .field-gesture-zone {
+    display: none;
+  }
 }
 
 @media (max-width: 600px) {
@@ -90,9 +215,9 @@
   }
 
   .flow-opening {
-    min-height: calc(100svh + 2rem);
-    padding-top: max(20rem, 44svh);
-    padding-bottom: max(3.5rem, calc(env(safe-area-inset-bottom) + 2.25rem));
+    min-height: 100svh;
+    padding-top: max(19rem, 41svh);
+    padding-bottom: max(3rem, calc(env(safe-area-inset-bottom) + 2rem));
     justify-content: flex-start;
   }
 
@@ -106,33 +231,45 @@
     max-width: 21rem;
   }
 
-  .flow-field-action {
-    width: min(100%, 20.5rem);
-    min-height: 46px;
+  .page-shell .flow-field-action {
+    width: min(100%, 21rem);
+    min-height: 48px;
     margin-top: 21px;
-    padding: 0 12px;
-    font-size: 10px !important;
+    padding: 0 13px;
+    font-size: 12px;
   }
 
   .field-action-hint {
     margin-left: auto;
     padding-left: 8px;
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .flow-invitation {
     margin-top: 25px;
   }
+
+  .flow-next-steps {
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 21rem;
+    margin-top: 25px;
+  }
+
+  .flow-next-step {
+    justify-content: space-between;
+    min-height: 48px;
+  }
 }
 
 @media (max-width: 360px) {
   .flow-opening {
-    padding-top: max(19rem, 43svh);
+    padding-top: max(18rem, 40svh);
   }
 
-  .flow-field-action {
+  .page-shell .flow-field-action {
     gap: 8px;
-    padding: 0 10px;
+    padding: 0 11px;
     letter-spacing: 0.055em;
   }
 
@@ -141,7 +278,43 @@
   }
 }
 
+@media (max-height: 700px) and (max-width: 600px) {
+  .flow-opening {
+    padding-top: max(17rem, 40svh);
+    padding-bottom: 2.5rem;
+  }
+
+  .flow-kicker {
+    margin-bottom: 17px;
+  }
+
+  .flow-opening h1 {
+    font-size: clamp(52px, 14vw, 64px);
+  }
+
+  .flow-deck {
+    margin-top: 18px;
+    font-size: 15px;
+    line-height: 1.62;
+  }
+
+  .page-shell .flow-field-action {
+    margin-top: 17px;
+  }
+
+  .flow-invitation {
+    margin-top: 20px;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .field-gesture-zone {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce), (forced-colors: active) {
+  .field-gesture-zone,
   .flow-field-action {
     display: none;
   }
