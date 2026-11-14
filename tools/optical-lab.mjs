@@ -24,12 +24,12 @@ const palette = {
   "--paper-glass": "rgba(18, 21, 25, 0.75)",
   "--ink": "#eeeae1",
   "--ink-soft": "#a6a7a7",
-  "--ink-mute": "#8a8e95",
-  "--faint": "#8a8e95",
+  "--ink-mute": "#9a9ea5",
+  "--faint": "#9a9ea5",
   "--rule": "rgba(205, 211, 221, 0.12)",
   "--hairline": "rgba(205, 211, 221, 0.12)",
-  "--accent-ink": "#c95135",
-  "--mark-dot": "#c95135",
+  "--accent-ink": "#d96346",
+  "--mark-dot": "#d96346",
 };
 
 async function checkPalette(page) {
@@ -114,8 +114,8 @@ try {
     weight: getComputedStyle(link.querySelector("span > span") ?? link.lastElementChild).fontWeight,
   }));
   assert.equal(brand.text, "for the tech.");
-  assert.equal(brand.viewBox, "0 0 40 34");
-  assert.equal(brand.weight, "700");
+  assert.equal(brand.viewBox, "-2.01 1.9 44.13 29.2");
+  assert.equal(brand.weight, "600");
   const clock = await page.locator("#contact time").textContent();
   assert.match(clock, /^\d{2}:\d{2}:\d{2} GST$/);
   console.log("✓ Shared prism lockup, CTA polarity and live GST timestamp");

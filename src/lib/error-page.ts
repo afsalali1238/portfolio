@@ -11,7 +11,7 @@ export function renderErrorPage(): string {
         --paper: #0b0c0e;
         --ink: #eeeae1;
         --ink-soft: #a6a7a7;
-        --ink-mute: #8a8e95;
+        --ink-mute: #9a9ea5;
         --rule: rgba(205, 211, 221, 0.12);
         --paper-deep: #121519;
       }

@@ -122,10 +122,10 @@ export function Hero() {
               edge of the italic, the lede and the CTA row is what decides where the glass
               settles. Widening any of them pushes the whole picture back to the right. */}
           <div className="lg:col-span-7 space-y-6" data-hero-copy>
-            <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-[#8a8e95] sm:text-xs">
+            <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-[#9a9ea5] sm:text-xs">
               <span
                 aria-hidden="true"
-                className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-[#c95135]"
+                className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-[#d96346]"
               />
               <span>Refraction of Thought · Continuous Engine</span>
             </div>
