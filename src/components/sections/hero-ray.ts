@@ -279,103 +279,103 @@ export type BandSpec = {
  */
 export const BANDS: readonly BandSpec[] = [
   {
-    name: "red",
-    light: [176, 58, 43],
-    lightAlpha: 0.5,
-    dark: [232, 106, 85],
-    darkAlpha: 0.6,
-    width: 1.05,
+    name: "clay-lead",
+    light: [174, 64, 36],
+    lightAlpha: 0.65,
+    dark: [217, 99, 70],
+    darkAlpha: 0.85,
+    width: 1.4,
     amplitude: 8.5,
-    cycles: 1.05,
-    hz: 0.19,
-    ribbon: 15,
-    ribbonAlpha: 0.062,
-    plasma: 0.8,
-  },
-  {
-    name: "amber",
-    light: [191, 106, 24],
-    lightAlpha: 0.56,
-    dark: [240, 165, 68],
-    darkAlpha: 0.68,
-    width: 1.25,
-    amplitude: 9.5,
     cycles: 0.95,
     hz: 0.17,
     ribbon: 18,
-    ribbonAlpha: 0.074,
-    plasma: 0.9,
+    ribbonAlpha: 0.075,
+    plasma: 0.8,
+  },
+  {
+    name: "clay-warm",
+    light: [185, 75, 42],
+    lightAlpha: 0.72,
+    dark: [224, 110, 78],
+    darkAlpha: 0.9,
+    width: 1.6,
+    amplitude: 9.5,
+    cycles: 0.9,
+    hz: 0.16,
+    ribbon: 22,
+    ribbonAlpha: 0.085,
+    plasma: 0.85,
   },
   {
     name: "clay",
-    light: [168, 71, 27],
-    lightAlpha: 0.94,
-    dark: [230, 126, 84],
+    light: [174, 64, 36],
+    lightAlpha: 0.92,
+    dark: [217, 99, 70],
     darkAlpha: 1,
-    width: 2.1,
-    amplitude: 12,
+    width: 2.0,
+    amplitude: 11,
     cycles: 0.82,
     hz: 0.15,
     ribbon: 26,
     ribbonAlpha: 0.1,
-    plasma: 1.0,
+    plasma: 0.9,
     flagship: true,
   },
   {
-    name: "emerald",
-    light: [47, 125, 94],
-    lightAlpha: 0.46,
-    dark: [49, 200, 154],
-    darkAlpha: 0.56,
-    width: 1.1,
-    amplitude: 10.5,
-    cycles: 0.9,
-    hz: 0.21,
-    ribbon: 20,
-    ribbonAlpha: 0.07,
-    plasma: 0.9,
-  },
-  {
-    name: "cyan",
-    light: [42, 111, 134],
-    lightAlpha: 0.42,
-    dark: [57, 192, 218],
-    darkAlpha: 0.54,
-    width: 1.05,
-    amplitude: 9,
-    cycles: 1.0,
-    hz: 0.23,
-    ribbon: 17,
-    ribbonAlpha: 0.062,
+    name: "ochre",
+    light: [165, 95, 38],
+    lightAlpha: 0.75,
+    dark: [210, 142, 84],
+    darkAlpha: 0.9,
+    width: 1.6,
+    amplitude: 9.5,
+    cycles: 0.95,
+    hz: 0.18,
+    ribbon: 22,
+    ribbonAlpha: 0.085,
     plasma: 0.85,
   },
   {
-    name: "cobalt",
-    light: [51, 81, 142],
-    lightAlpha: 0.38,
-    dark: [90, 138, 240],
-    darkAlpha: 0.5,
-    width: 1,
-    amplitude: 8,
-    cycles: 1.1,
-    hz: 0.25,
-    ribbon: 15,
-    ribbonAlpha: 0.054,
-    plasma: 0.8,
+    name: "gold",
+    light: [144, 106, 33],
+    lightAlpha: 0.88,
+    dark: [203, 166, 102],
+    darkAlpha: 0.98,
+    width: 2.0,
+    amplitude: 9,
+    cycles: 1.0,
+    hz: 0.2,
+    ribbon: 25,
+    ribbonAlpha: 0.095,
+    plasma: 0.9,
   },
   {
-    name: "violet",
-    light: [91, 74, 140],
-    lightAlpha: 0.34,
-    dark: [155, 123, 240],
-    darkAlpha: 0.46,
-    width: 0.95,
-    amplitude: 6.5,
-    cycles: 1.2,
-    hz: 0.18,
-    ribbon: 13,
-    ribbonAlpha: 0.046,
-    plasma: 0.75,
+    name: "soft-slate",
+    light: [115, 128, 160],
+    lightAlpha: 0.72,
+    dark: [167, 181, 210],
+    darkAlpha: 0.88,
+    width: 1.6,
+    amplitude: 8,
+    cycles: 1.08,
+    hz: 0.22,
+    ribbon: 20,
+    ribbonAlpha: 0.08,
+    plasma: 0.85,
+  },
+  {
+    name: "slate",
+    light: [73, 98, 151],
+    lightAlpha: 0.88,
+    dark: [137, 159, 204],
+    darkAlpha: 0.98,
+    width: 2.0,
+    amplitude: 7.5,
+    cycles: 1.15,
+    hz: 0.19,
+    ribbon: 25,
+    ribbonAlpha: 0.095,
+    plasma: 0.9,
   },
 ];
 
@@ -2834,83 +2834,24 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const base = (isDark ? band.darkAlpha : band.lightAlpha) * weight * strand.alpha;
       const strikeAmp = clamp(lane * 0.035, 5, 15);
 
-      // --- anchors: sparse, so the segments between them are straight and angular
+      // --- smooth optical beam path
       ctx.beginPath();
       ctx.moveTo(buf[gate * 2], buf[gate * 2 + 1]);
-      for (let k = 1; k <= STRIKE_ANCHORS; k++) {
-        const s = k / STRIKE_ANCHORS;
-        const at = Math.max(gate, Math.round(s * STRAND_STEPS));
-        if (at === gate) continue;
-        const env = Math.pow(Math.sin(Math.PI * s), 0.9);
-        const offset =
-          (hash(i * 97 + k * 31 + 7, frame) - 0.5) * 2 * strikeAmp * Math.pow(s, 0.45) * env;
-        const jx = (hash(i * 41 + k * 17 + 3, frame) - 0.5) * 1.6;
-        ctx.lineTo(buf[at * 2] + nx * (offset + jx), buf[at * 2 + 1] + ny * (offset + jx));
+      for (let k = gate + 1; k < STRAND_STEPS; k++) {
+        ctx.lineTo(buf[k * 2], buf[k * 2 + 1]);
       }
 
-      // ionised haze: wide, faint, coloured
+      // Spectral emission glow
       ctx.strokeStyle = rgba(colour, 1);
-      ctx.globalAlpha = clamp(base * (isDark ? 0.16 : 0.2), 0, 1);
-      ctx.lineWidth = isDark ? 7 : 6;
+      ctx.globalAlpha = clamp(base * (isDark ? 0.22 : 0.18), 0, 1);
+      ctx.lineWidth = isDark ? 4.5 : 3.6;
       ctx.stroke();
 
-      // the channel proper
-      ctx.globalAlpha = clamp(base * 0.68, 0, 1);
-      ctx.lineWidth = isDark ? 1.9 : 1.7;
+      // Refracted core filament: crisp optical ray
+      ctx.strokeStyle = isDark ? "rgba(255,252,246,0.92)" : rgba(mix(colour, INK, 0.35), 0.95);
+      ctx.globalAlpha = clamp(base * (isDark ? 0.55 : 0.45), 0, 1);
+      ctx.lineWidth = 0.95;
       ctx.stroke();
-
-      // Hot core. On ink it is white-hot; on paper a white core would vanish into the cream,
-      // so light theme drops to a saturated filament instead — the same read, inverted.
-      ctx.strokeStyle = isDark ? "rgba(255,252,246,0.95)" : rgba(mix(colour, INK, 0.42), 1);
-      ctx.globalAlpha = clamp(base * (isDark ? 0.5 : 0.45), 0, 1);
-      ctx.lineWidth = 0.85;
-      ctx.stroke();
-
-      // --- dendrites: one fork per site, one level deep, tapering to nothing at the tip.
-      for (let b = 0; b < FORK_AT.length; b++) {
-        const sPos = FORK_AT[b] + (hash(i * 19 + b * 7 + 3, 0) - 0.5) * 0.08;
-        const at = Math.round(sPos * STRAND_STEPS);
-        if (at <= gate) continue;
-        const rootX = buf[at * 2];
-        const rootY = buf[at * 2 + 1];
-        const seed = hash(i * 131 + b * 37 + 17, frame);
-        const reach = Math.min(lane * 0.09 * (0.82 + seed * 0.36), STRIKE_REACH_MAX);
-        const sway = (hash(i * 61 + b * 23 + 5, frame) - 0.5) * 0.9;
-        const side = ((i + b) % 2 === 0 ? 1 : -1) * (0.6 + seed * 0.3);
-        const angle = Math.atan2(ny, nx) + side;
-        const dx = Math.cos(angle) * reach;
-        const dy = Math.sin(angle) * reach;
-        const wobAmp = reach * 0.22;
-
-        for (let k = 0; k <= FORK_STEPS; k++) {
-          const t = k / FORK_STEPS;
-          const wander = (hash(i * 17 + b * 71 + k * 11, frame) - 0.5) * wobAmp * t * t;
-          const bend = sway * reach * t * t * 0.35;
-          forkBuf[k * 2] = rootX + dx * t - dy * (wander / reach) - dy * (bend / reach);
-          forkBuf[k * 2 + 1] = rootY + dy * t + dx * (wander / reach) + dx * (bend / reach);
-        }
-
-        let runStart = 0;
-        for (let run = 0; run < FORK_RUNS.length; run++) {
-          const runEnd = runStart + Math.round(FORK_RUNS[run] * FORK_STEPS);
-          const fade = 1 - run / FORK_RUNS.length;
-          ctx.beginPath();
-          ctx.moveTo(forkBuf[runStart * 2], forkBuf[runStart * 2 + 1]);
-          for (let k = runStart + 1; k <= Math.min(runEnd, FORK_STEPS); k++) {
-            ctx.lineTo(forkBuf[k * 2], forkBuf[k * 2 + 1]);
-          }
-          const isTip = run === FORK_RUNS.length - 1;
-          ctx.strokeStyle = isTip
-            ? isDark
-              ? "rgba(255,252,246,0.95)"
-              : rgba(mix(colour, INK, 0.4), 1)
-            : rgba(colour, 1);
-          ctx.globalAlpha = clamp(base * (isTip ? 0.45 : 0.6) * fade, 0, 1);
-          ctx.lineWidth = isTip ? 0.55 : 1.3 * (1 - run * 0.22);
-          ctx.stroke();
-          runStart = runEnd;
-        }
-      }
     }
 
     ctx.globalAlpha = 1;
@@ -3519,31 +3460,30 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const warm = isDark ? BANDS[2].dark : BANDS[2].light;
     const voice = isDark ? 1 : 0.94;
 
-    const coronaR = prismSize * (0.72 + surgeEnergy * 0.35);
+    const coronaR = prismSize * (0.24 + surgeEnergy * 0.12);
     const corona = ctx.createRadialGradient(exit.x, exit.y, 0, exit.x, exit.y, coronaR);
     const bandAlpha = isDark ? BANDS[2].darkAlpha : BANDS[2].lightAlpha;
-    corona.addColorStop(0, rgba(warm, bandAlpha * 0.34 * voice));
-    corona.addColorStop(0.45, rgba(warm, bandAlpha * 0.12 * voice));
+    corona.addColorStop(0, rgba(warm, bandAlpha * 0.18 * voice));
+    corona.addColorStop(0.5, rgba(warm, bandAlpha * 0.05 * voice));
     corona.addColorStop(1, rgba(warm, 0));
     ctx.fillStyle = corona;
     ctx.beginPath();
     ctx.arc(exit.x, exit.y, coronaR, 0, TAU);
     ctx.fill();
 
-    const r = prismSize * 0.36 * pulse;
+    const r = prismSize * 0.12 * pulse;
     const bloom = ctx.createRadialGradient(exit.x, exit.y, 0, exit.x, exit.y, r);
-    bloom.addColorStop(0, "rgba(255,255,252,0.98)");
-    bloom.addColorStop(0.16, rgba(warm, isDark ? 0.8 : 0.74));
-    bloom.addColorStop(0.46, rgba(warm, isDark ? 0.22 : 0.15));
+    bloom.addColorStop(0, "rgba(255,255,252,0.88)");
+    bloom.addColorStop(0.25, rgba(warm, isDark ? 0.45 : 0.35));
+    bloom.addColorStop(0.6, rgba(warm, isDark ? 0.1 : 0.06));
     bloom.addColorStop(1, rgba(warm, 0));
     ctx.fillStyle = bloom;
     ctx.beginPath();
     ctx.arc(exit.x, exit.y, r, 0, TAU);
     ctx.fill();
 
-    // A pair of thin flares crossing at the point: the shortest way to read "light source"
-    // rather than "pale circle".
-    const flare = prismSize * (0.42 + surgeEnergy * 0.2);
+    // A pair of thin subtle flares crossing at the optical emission point.
+    const flare = prismSize * (0.18 + surgeEnergy * 0.1);
     for (const [ax, ay, alpha] of [
       [1, 0, 0.22],
       [0, 1, 0.14],
