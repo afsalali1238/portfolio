@@ -92,7 +92,7 @@ export function Works({
                   replace
                   resetScroll={false}
                   className={`inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 font-medium transition-colors ${
-                    viewMode === "grid" ? "bg-fg text-bg" : "hover:is-lit"
+                    viewMode === "grid" ? "bg-ink text-paper" : "hover:is-lit text-ink-mute"
                   }`}
                   aria-pressed={viewMode === "grid"}
                 >
@@ -105,7 +105,7 @@ export function Works({
                   replace
                   resetScroll={false}
                   className={`inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 font-medium transition-colors ${
-                    viewMode === "table" ? "bg-fg text-bg" : "hover:is-lit"
+                    viewMode === "table" ? "bg-ink text-paper" : "hover:is-lit text-ink-mute"
                   }`}
                   aria-pressed={viewMode === "table"}
                 >

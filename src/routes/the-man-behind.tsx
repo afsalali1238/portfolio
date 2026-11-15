@@ -182,7 +182,7 @@ function TheManBehindPage() {
                 <h3 className="t-display-3">Find me on</h3>
                 <div className="space-y-3 mt-4">
                   <a
-                    href="https://linkedin.com/in/afsalali"
+                    href="https://www.linkedin.com/in/afsalali1238/"
                     target="_blank"
                     rel="noreferrer"
                     className="card-row group"

@@ -140,13 +140,12 @@ const THEME_SCRIPT = `(function(){try{var s=localStorage.getItem("theme");var d=
 
 const PERSON_SCHEMA = {
   "@context": "https://schema.org",
-  "@type": "Person",
+  "@type": "Organization",
   name: AUTHOR,
   url: SITE_URL,
-  image: `${SITE_URL}/og/home.png`,
-  jobTitle: "Indie builder",
+  logo: `${SITE_URL}/brand/svg/mark_on-ink-colour.svg`,
   description:
-    "Curious builder and indie shipper. AI tools, learning maps, cozy games, and quiet software.",
+    "Documenting what happens when the wall between having an idea and building it disappears. Small software, applied AI tools, and quiet experiments.",
   email: "mailto:here@forthe.tech",
   sameAs: [
     "https://github.com/afsalali1238",

@@ -629,6 +629,12 @@
   color: var(--lit);
   transition: color 160ms;
 }
+.hover\:is-lit:hover {
+  color: var(--lit);
+}
+.group:hover .group-hover\:is-lit {
+  color: var(--lit);
+}
 
 /* Keyboard-only escape hatch to the main content. */
 .skip-link {

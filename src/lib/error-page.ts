@@ -7,21 +7,23 @@ export function renderErrorPage(): string {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
       :root {
-        --paper: #F8F6F0;
-        --ink: #2B231D;
-        --ink-soft: #5A524A;
-        --ink-mute: #8C847B;
-        --rule: #DCD8CF;
-        --paper-deep: #EDEAE1;
+        --paper: #EEEAE1;
+        --ink: #0B0C0E;
+        --ink-soft: #55585E;
+        --ink-mute: #6E7279;
+        --rule: rgba(11, 12, 14, 0.14);
+        --paper-deep: #E6E1D6;
+        --clay: #AE4024;
       }
       @media (prefers-color-scheme: dark) {
         :root {
-          --paper: #16120F;
-          --ink: #F5F2EB;
-          --ink-soft: #C8C3BA;
-          --ink-mute: #928C84;
-          --rule: #2C2621;
-          --paper-deep: #211B17;
+          --paper: #0B0C0E;
+          --ink: #EEEAE1;
+          --ink-soft: #9A9EA5;
+          --ink-mute: #6E7279;
+          --rule: rgba(205, 211, 221, 0.14);
+          --paper-deep: #131418;
+          --clay: #D96346;
         }
       }
       body {
@@ -57,7 +59,7 @@ export function renderErrorPage(): string {
         left: 0.6rem;
         width: 0.5rem;
         height: 0.5rem;
-        background: #A8471B;
+        background: var(--clay);
         border-radius: 50%;
       }
       h1 {

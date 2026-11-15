@@ -103,14 +103,9 @@ function ProjectCaseStudy() {
           <SectionReveal>
             {/* Four-column telemetry header — like Thesis telemetry row */}
             <div 
-              className="telemetry-row"
+              className="telemetry-row grid grid-cols-2 gap-4 pb-3 sm:grid-cols-4 sm:gap-3 mb-6"
               style={{ 
-                display: "grid", 
-                gridTemplateColumns: "1fr 1fr 1.18fr 1fr", 
-                gap: "12px",
-                paddingBottom: "12px",
-                borderBottom: "1px solid var(--hairline)",
-                marginBottom: "24px"
+                borderBottom: "1px solid var(--hairline)"
               }}
             >
               <div>
