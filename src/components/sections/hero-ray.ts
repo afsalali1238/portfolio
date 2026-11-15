@@ -274,15 +274,16 @@ export type BandSpec = {
 };
 
 /**
- * Seven bands, red → violet, clay carrying the light. Hue reads as pigment on paper and as
- * light on ink; clay is the only band allowed to be heavy.
+ * Seven bands, clay → gold → slate, grounded in the forthe.tech brand guide palette.
+ * Clay carries the light as the flagship ray (#D96346), dispersing through Gold (#CBA666)
+ * to Slate (#899FCC). No unbranded neon or arbitrary rainbow tones.
  */
 export const BANDS: readonly BandSpec[] = [
   {
-    name: "red",
-    light: [176, 58, 43],
+    name: "clay-lead",
+    light: [180, 68, 38],
     lightAlpha: 0.5,
-    dark: [232, 106, 85],
+    dark: [224, 108, 80],
     darkAlpha: 0.6,
     width: 1.05,
     amplitude: 8.5,
@@ -293,10 +294,10 @@ export const BANDS: readonly BandSpec[] = [
     plasma: 0.8,
   },
   {
-    name: "amber",
-    light: [191, 106, 24],
+    name: "clay-warm",
+    light: [176, 65, 36],
     lightAlpha: 0.56,
-    dark: [240, 165, 68],
+    dark: [220, 102, 74],
     darkAlpha: 0.68,
     width: 1.25,
     amplitude: 9.5,
@@ -308,9 +309,9 @@ export const BANDS: readonly BandSpec[] = [
   },
   {
     name: "clay",
-    light: [168, 71, 27],
+    light: [174, 64, 36],
     lightAlpha: 0.94,
-    dark: [230, 126, 84],
+    dark: [217, 99, 70],
     darkAlpha: 1,
     width: 2.1,
     amplitude: 12,
@@ -322,10 +323,10 @@ export const BANDS: readonly BandSpec[] = [
     flagship: true,
   },
   {
-    name: "emerald",
-    light: [47, 125, 94],
+    name: "clay-gold",
+    light: [159, 85, 34],
     lightAlpha: 0.46,
-    dark: [49, 200, 154],
+    dark: [210, 135, 86],
     darkAlpha: 0.56,
     width: 1.1,
     amplitude: 10.5,
@@ -336,10 +337,10 @@ export const BANDS: readonly BandSpec[] = [
     plasma: 0.9,
   },
   {
-    name: "cyan",
-    light: [42, 111, 134],
+    name: "gold",
+    light: [144, 106, 33],
     lightAlpha: 0.42,
-    dark: [57, 192, 218],
+    dark: [203, 166, 102],
     darkAlpha: 0.54,
     width: 1.05,
     amplitude: 9,
@@ -350,10 +351,10 @@ export const BANDS: readonly BandSpec[] = [
     plasma: 0.85,
   },
   {
-    name: "cobalt",
-    light: [51, 81, 142],
+    name: "gold-slate",
+    light: [108, 102, 92],
     lightAlpha: 0.38,
-    dark: [90, 138, 240],
+    dark: [170, 162, 153],
     darkAlpha: 0.5,
     width: 1,
     amplitude: 8,
@@ -364,10 +365,10 @@ export const BANDS: readonly BandSpec[] = [
     plasma: 0.8,
   },
   {
-    name: "violet",
-    light: [91, 74, 140],
+    name: "slate",
+    light: [73, 98, 151],
     lightAlpha: 0.34,
-    dark: [155, 123, 240],
+    dark: [137, 159, 204],
     darkAlpha: 0.46,
     width: 0.95,
     amplitude: 6.5,

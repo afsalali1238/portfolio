@@ -71,8 +71,9 @@ export function LogoTile({
   monochrome = false,
   ground = "ink",
 }: LogoMarkProps) {
+  const strokeColor = ground === "bone" ? "text-[#0b0c0e]" : "text-[#eeeae1]";
   return (
-    <span className={`inline-flex shrink-0 items-center justify-center text-ink ${className}`}>
+    <span className={`inline-flex shrink-0 items-center justify-center ${strokeColor} ${className}`}>
       <LogoMark className="h-full w-full" cut={cut} monochrome={monochrome} ground={ground} />
     </span>
   );
@@ -87,9 +88,10 @@ export function Wordmark({
   ground?: "ink" | "bone";
 }) {
   const dotColor = ground === "bone" ? "text-[#ae4024]" : "text-[#d96346]";
+  const textColor = ground === "bone" ? "text-[#0b0c0e]" : "text-[#eeeae1]";
   return (
     <span
-      className={`whitespace-nowrap font-sans font-semibold leading-none tracking-tight text-ink ${className}`}
+      className={`whitespace-nowrap font-sans font-semibold leading-none tracking-tight ${textColor} ${className}`}
     >
       for the tech<span className={dotColor}>.</span>
     </span>

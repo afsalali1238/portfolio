@@ -6,8 +6,9 @@
   font-optical-sizing: auto;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
-  --ink: #0b0c0e;
+  --ink: #eeeae1;
   --paper: #eeeae1;
+  --paper-ground: #0b0c0e;
   --muted: #a6a7a7;
   --faint: #9a9ea5;
   --hairline: rgba(205, 211, 221, 0.14);
@@ -149,7 +150,7 @@
   gap: 12px;
   align-items: center;
   white-space: nowrap;
-  color: var(--paper);
+  color: #eeeae1;
 }
 .page-shell .brand > svg {
   width: 29px;
@@ -160,6 +161,7 @@
   font-size: 20px;
   font-weight: 600;
   letter-spacing: -0.7px;
+  color: #eeeae1;
 }
 .header-nav {
   position: absolute;

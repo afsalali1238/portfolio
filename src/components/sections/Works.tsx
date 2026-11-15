@@ -76,7 +76,7 @@ export function Works({
                 Catalogue of builds
               </div>
               <h1 className="mt-2 font-serif text-5xl leading-[1.05] tracking-tight text-ink md:text-7xl">
-                The catalogue.
+                The catalogue <span className="italic text-ink-soft">of builds.</span>
               </h1>
               <p className="mt-3 max-w-xl text-base leading-relaxed text-ink-soft">
                 {numberWord(projectCount)} quiet tools, clinical companions, and experiments.{" "}
@@ -89,7 +89,7 @@ export function Works({
               <div className="inline-flex items-center rounded-md border rule-hair bg-paper p-1 text-xs text-ink-mute">
                 <Link
                   to="/works"
-                  search={(prev) => ({ ...prev, view: undefined })}
+                  search={(prev: any) => ({ ...prev, view: undefined })}
                   replace
                   resetScroll={false}
                   className={`inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 font-medium transition-colors ${
@@ -102,7 +102,7 @@ export function Works({
                 </Link>
                 <Link
                   to="/works"
-                  search={(prev) => ({ ...prev, view: "table" as const })}
+                  search={(prev: any) => ({ ...prev, view: "table" as const })}
                   replace
                   resetScroll={false}
                   className={`inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 font-medium transition-colors ${
@@ -129,7 +129,7 @@ export function Works({
                 <Link
                   key={key}
                   to="/works"
-                  search={(prev) => ({
+                  search={(prev: any) => ({
                     ...prev,
                     filter: key === "all" ? undefined : key,
                   })}

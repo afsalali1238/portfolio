@@ -30,7 +30,7 @@ function NotesIndexPage() {
               Ledger Dispatches & Essays
             </div>
             <h1 className="mt-3 font-serif text-5xl leading-[1.05] tracking-tight text-ink md:text-6xl">
-              Notes on the shift.
+              Notes on <span className="italic text-ink-soft">the shift.</span>
             </h1>
             <p className="mt-4 max-w-2xl text-base text-ink-mute md:text-lg">
               Essays and field notes on what happens when anyone can build software, what

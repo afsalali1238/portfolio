@@ -80,9 +80,6 @@ export function ImmersiveReader() {
         {!reducedMotion && <OpticsCanvas ref={canvas} />}
         <div className="stage-scrim" />
         <div className="paper-grain" />
-        <header className="site-header site-header-minimal">
-          <Brand />
-        </header>
       </div>
       {!reducedMotion && (
         <div
