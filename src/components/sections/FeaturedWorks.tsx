@@ -10,12 +10,18 @@ const featured = FEATURED_IDS.map(getProjectById).filter((p): p is Project => Bo
 
 export function FeaturedWorks() {
   return (
-    <section aria-labelledby="featured-heading" className="py-20 md:py-28" style={{ borderTop: "1px solid var(--hairline)" }}>
+    <section
+      aria-labelledby="featured-heading"
+      className="py-20 md:py-28"
+      style={{ borderTop: "1px solid var(--hairline)" }}
+    >
       <Container>
         <SectionReveal className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="t-label">I ── FEATURED</p>
-            <h2 id="featured-heading" className="t-display-2 mt-2">Made for someone.</h2>
+            <h2 id="featured-heading" className="t-display-2 mt-2">
+              Made for someone.
+            </h2>
           </div>
           <Link
             to="/works"
@@ -39,7 +45,13 @@ export function FeaturedWorks() {
                 >
                   <div className="flex flex-col gap-2">
                     {p.media && (
-                      <div className="aspect-[16/10] overflow-hidden rounded-md" style={{ backgroundColor: "var(--bg-raised)", border: "1px solid var(--hairline)" }}>
+                      <div
+                        className="aspect-[16/10] overflow-hidden rounded-md"
+                        style={{
+                          backgroundColor: "var(--bg-raised)",
+                          border: "1px solid var(--hairline)",
+                        }}
+                      >
                         <img
                           src={p.media.poster}
                           alt=""
@@ -53,7 +65,9 @@ export function FeaturedWorks() {
                         Built for {p.for.toLowerCase() === "wife" ? "my wife" : p.for}
                       </p>
                       <h3 className="t-display-3 card-title">{p.name}</h3>
-                      <p className="t-small" style={{ color: "var(--fg-muted)" }}>{p.blurb}</p>
+                      <p className="t-small" style={{ color: "var(--fg-muted)" }}>
+                        {p.blurb}
+                      </p>
                     </div>
                     <div className="inline-flex items-center gap-1.5 t-label">
                       <span>Read case study</span>
@@ -68,10 +82,7 @@ export function FeaturedWorks() {
 
         {/* Secondary CTA Button */}
         <div className="mt-14 flex flex-col items-center justify-center text-center">
-          <Link
-            to="/works"
-            className="btn-secondary group"
-          >
+          <Link to="/works" className="btn-secondary group">
             <span>Explore all {numberWord(projectCount).toLowerCase()} builds</span>
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>

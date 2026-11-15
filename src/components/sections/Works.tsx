@@ -37,7 +37,10 @@ function CardPoster({ src, isMobile }: { src: string; isMobile: boolean }) {
   };
   const framed = isMobile && !landscape;
   return (
-    <div className="flex h-full w-full items-center justify-center p-3" style={{ backgroundColor: "var(--bg-raised)" }}>
+    <div
+      className="flex h-full w-full items-center justify-center p-3"
+      style={{ backgroundColor: "var(--bg-raised)" }}
+    >
       <img
         ref={check}
         src={src}
@@ -45,9 +48,7 @@ function CardPoster({ src, isMobile }: { src: string; isMobile: boolean }) {
         loading="lazy"
         onLoad={(e) => check(e.currentTarget)}
         className={`block h-auto max-h-full w-auto max-w-full transition-opacity duration-150 ${
-          framed
-            ? "rounded-[1.25rem] border-[4px]"
-            : "rounded-md"
+          framed ? "rounded-[1.25rem] border-[4px]" : "rounded-md"
         }`}
         style={{
           borderColor: framed ? "var(--fg)" : "var(--hairline)",
@@ -85,7 +86,14 @@ export function Works({
 
             <div className="flex items-center gap-4">
               {/* View Switcher */}
-              <div className="inline-flex items-center rounded-md" style={{ border: "1px solid var(--hairline)", backgroundColor: "var(--bg)", padding: "4px" }}>
+              <div
+                className="inline-flex items-center rounded-md"
+                style={{
+                  border: "1px solid var(--hairline)",
+                  backgroundColor: "var(--bg)",
+                  padding: "4px",
+                }}
+              >
                 <Link
                   to="/works"
                   search={(prev) => ({ ...prev, view: undefined })}
@@ -158,24 +166,53 @@ export function Works({
                   <Link
                     to="/works/$id"
                     params={{ id: p.id }}
-                    className="group flex h-full flex-col justify-between overflow-hidden rounded-lg" style={{ border: "1px solid var(--hairline)", backgroundColor: "var(--bg)", transition: "all 150ms" }}
+                    className="group flex h-full flex-col justify-between overflow-hidden rounded-lg"
+                    style={{
+                      border: "1px solid var(--hairline)",
+                      backgroundColor: "var(--bg)",
+                      transition: "all 150ms",
+                    }}
                   >
                     <div>
                       {/* Media Container with Phone/Desktop Frame Preview */}
-                      <div className="relative block aspect-[16/10] overflow-hidden border-b" style={{ borderColor: "var(--hairline)", backgroundColor: "var(--bg-raised)" }} tabIndex={-1} aria-hidden="true">
+                      <div
+                        className="relative block aspect-[16/10] overflow-hidden border-b"
+                        style={{
+                          borderColor: "var(--hairline)",
+                          backgroundColor: "var(--bg-raised)",
+                        }}
+                        tabIndex={-1}
+                        aria-hidden="true"
+                      >
                         <CardPoster src={posterSrc} isMobile={isMobile} />
 
                         {/* Device / Platform Badge */}
-                        <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full" style={{ backgroundColor: "rgba(11,12,14,0.9)", padding: "4px 12px" }}>
-                          <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: "var(--fg)" }} />
-                          <span className="capitalize text-xs font-medium" style={{ color: "var(--bg)" }}>
+                        <div
+                          className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full"
+                          style={{ backgroundColor: "rgba(11,12,14,0.9)", padding: "4px 12px" }}
+                        >
+                          <span
+                            className="h-1.5 w-1.5 rounded-full"
+                            style={{ backgroundColor: "var(--fg)" }}
+                          />
+                          <span
+                            className="capitalize text-xs font-medium"
+                            style={{ color: "var(--bg)" }}
+                          >
                             {isMobile ? "Phone build" : "Web build"}
                           </span>
                         </div>
 
                         {/* Status Badge */}
                         {p.status && (
-                          <div className="absolute right-3 top-3 rounded-full px-3 py-1 text-xs font-medium capitalize" style={{ backgroundColor: "rgba(238,234,225,0.95)", color: "var(--fg)", border: "1px solid var(--hairline)" }}>
+                          <div
+                            className="absolute right-3 top-3 rounded-full px-3 py-1 text-xs font-medium capitalize"
+                            style={{
+                              backgroundColor: "rgba(238,234,225,0.95)",
+                              color: "var(--fg)",
+                              border: "1px solid var(--hairline)",
+                            }}
+                          >
                             {p.status}
                           </div>
                         )}
@@ -184,7 +221,9 @@ export function Works({
                       {/* Card Content */}
                       <div className="p-6">
                         <div className="t-label" style={{ color: "var(--fg-muted)" }}>
-                          <span style={{ fontWeight: "500", color: "var(--fg)" }}>{builtForLabel(p.for)}</span>
+                          <span style={{ fontWeight: "500", color: "var(--fg)" }}>
+                            {builtForLabel(p.for)}
+                          </span>
                         </div>
 
                         <div className="mt-3 flex items-baseline gap-2">
@@ -196,22 +235,32 @@ export function Works({
                             {p.name}
                           </Link>
                           {p.featured && (
-                            <span className="rounded-xs px-1.5 py-0.5 text-xs font-medium" style={{ backgroundColor: "var(--fg)", color: "var(--bg)" }}>
+                            <span
+                              className="rounded-xs px-1.5 py-0.5 text-xs font-medium"
+                              style={{ backgroundColor: "var(--fg)", color: "var(--bg)" }}
+                            >
                               Spotlight
                             </span>
                           )}
                         </div>
 
-                        <p className="mt-3 t-small" style={{ color: "var(--fg-muted)" }}>{p.blurb}</p>
+                        <p className="mt-3 t-small" style={{ color: "var(--fg-muted)" }}>
+                          {p.blurb}
+                        </p>
 
                         {/* Tech Stack Chips */}
                         {p.stack && p.stack.length > 0 && (
                           <div className="mt-4 flex flex-wrap gap-1.5">
                             {p.stack.slice(0, 4).map((tech) => (
-                              <span key={tech} className="chip">{tech}</span>
+                              <span key={tech} className="chip">
+                                {tech}
+                              </span>
                             ))}
                             {p.stack.length > 4 && (
-                              <span className="text-xs self-center" style={{ color: "var(--fg-muted)" }}>
+                              <span
+                                className="text-xs self-center"
+                                style={{ color: "var(--fg-muted)" }}
+                              >
                                 +{p.stack.length - 4}
                               </span>
                             )}
@@ -221,7 +270,10 @@ export function Works({
                     </div>
 
                     {/* Bottom Actions */}
-                    <div className="flex items-center justify-between border-t px-6 py-4 text-xs font-medium" style={{ borderColor: "var(--hairline)" }}>
+                    <div
+                      className="flex items-center justify-between border-t px-6 py-4 text-xs font-medium"
+                      style={{ borderColor: "var(--hairline)" }}
+                    >
                       <Link
                         to="/works/$id"
                         params={{ id: p.id }}
@@ -276,22 +328,42 @@ export function Works({
                   style={{ backgroundColor: "transparent" }}
                 >
                   <span className="col-span-12 flex flex-wrap items-baseline gap-3 md:col-span-5">
-                    <span className="font-serif text-2xl leading-tight transition-transform duration-150 group-hover:translate-x-1 md:text-3xl card-title" style={{ color: "var(--fg)" }}>
+                    <span
+                      className="font-serif text-2xl leading-tight transition-transform duration-150 group-hover:translate-x-1 md:text-3xl card-title"
+                      style={{ color: "var(--fg)" }}
+                    >
                       {p.name}
                     </span>
                     {p.featured && (
-                      <span className="rounded-xs px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "var(--fg)", color: "var(--bg)" }}>
+                      <span
+                        className="rounded-xs px-2 py-0.5 text-xs font-medium"
+                        style={{ backgroundColor: "var(--fg)", color: "var(--bg)" }}
+                      >
                         Spotlight
                       </span>
                     )}
                   </span>
-                  <span className="col-span-12 text-sm md:col-span-4" style={{ color: "var(--fg-muted)" }}>{p.blurb}</span>
-                  <span className="col-span-12 flex flex-wrap items-center justify-between gap-2.5 text-xs md:col-span-3 md:justify-end" style={{ color: "var(--fg-muted)" }}>
-                    <span className="rounded-full px-2.5 py-0.5 font-medium chip" style={{ backgroundColor: "var(--bg-raised)", color: "var(--fg-muted)" }}>
+                  <span
+                    className="col-span-12 text-sm md:col-span-4"
+                    style={{ color: "var(--fg-muted)" }}
+                  >
+                    {p.blurb}
+                  </span>
+                  <span
+                    className="col-span-12 flex flex-wrap items-center justify-between gap-2.5 text-xs md:col-span-3 md:justify-end"
+                    style={{ color: "var(--fg-muted)" }}
+                  >
+                    <span
+                      className="rounded-full px-2.5 py-0.5 font-medium chip"
+                      style={{ backgroundColor: "var(--bg-raised)", color: "var(--fg-muted)" }}
+                    >
                       {platformBadge(p)}
                     </span>
                     <span>{builtForLabel(p.for)}</span>
-                    <ArrowRight className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1" style={{ color: "var(--fg)" }} />
+                    <ArrowRight
+                      className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1"
+                      style={{ color: "var(--fg)" }}
+                    />
                   </span>
                 </Link>
               </li>

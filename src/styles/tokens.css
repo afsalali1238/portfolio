@@ -17,27 +17,28 @@
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 
   /* light theme (bone ground) */
-  --bg: #eeeae1;          /* page: bone */
-  --bg-raised: #e6e1d6;   /* cards, inputs */
-  --fg: #0b0c0e;          /* primary text: ink */
-  --fg-muted: #55585e;    /* secondary text: line */
-  --fg-faint: #6e7279;    /* labels */
+  --bg: #eeeae1; /* page: bone */
+  --bg-raised: #e6e1d6; /* cards, inputs */
+  --fg: #0b0c0e; /* primary text: ink */
+  --fg-muted: #55585e; /* secondary text: line */
+  --fg-faint: #6e7279; /* labels */
   --hairline: rgba(11, 12, 14, 0.14);
-  --lit: #ae4024;         /* clay deep on light ground */
+  --lit: #ae4024; /* clay deep on light ground */
   --color-clay: #ae4024;
   --color-gold: #906a21;
   --color-slate: #496297;
   --focus: #0b0c0e;
 }
-.dark, .page-shell {
+.dark,
+.page-shell {
   /* dark theme (ink ground) */
-  --bg: #0b0c0e;          /* page: ink */
+  --bg: #0b0c0e; /* page: ink */
   --bg-raised: #131418;
-  --fg: #eeeae1;          /* primary text: bone */
-  --fg-muted: #9a9ea5;    /* secondary text: grey */
+  --fg: #eeeae1; /* primary text: bone */
+  --fg-muted: #9a9ea5; /* secondary text: grey */
   --fg-faint: #6e7279;
   --hairline: rgba(205, 211, 221, 0.14);
-  --lit: #d96346;         /* clay on ink */
+  --lit: #d96346; /* clay on ink */
   --color-clay: #d96346;
   --color-gold: #cba666;
   --color-slate: #899fcc;

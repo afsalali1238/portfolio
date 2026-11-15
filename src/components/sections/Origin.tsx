@@ -6,7 +6,11 @@ import postureDrawing from "@/assets/posture-drawing.webp";
 export function Origin({ isPage = false }: { isPage?: boolean }) {
   const TitleTag = isPage ? "h1" : "h2";
   return (
-    <section id="origin" className="py-20 md:py-28" style={{ borderTop: "1px solid var(--hairline)" }}>
+    <section
+      id="origin"
+      className="py-20 md:py-28"
+      style={{ borderTop: "1px solid var(--hairline)" }}
+    >
       <Container className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center">
         <SectionReveal className="lg:col-span-7 space-y-6">
           <p className="t-label">V ── ORIGIN</p>
@@ -32,7 +36,15 @@ export function Origin({ isPage = false }: { isPage?: boolean }) {
             </p>
           </div>
 
-          <div style={{ borderLeft: "2px solid var(--fg)", paddingLeft: "24px", paddingTop: "8px", paddingBottom: "8px", margin: "24px 0" }}>
+          <div
+            style={{
+              borderLeft: "2px solid var(--fg)",
+              paddingLeft: "24px",
+              paddingTop: "8px",
+              paddingBottom: "8px",
+              margin: "24px 0",
+            }}
+          >
             <p className="t-display-3" style={{ fontStyle: "italic", color: "var(--fg)" }}>
               &ldquo;I haven&rsquo;t moved in four hours. My spine has become a question mark. But
               the logic is pure.&rdquo;
@@ -40,7 +52,9 @@ export function Origin({ isPage = false }: { isPage?: boolean }) {
           </div>
 
           <div className="pt-4" style={{ borderTop: "1px solid var(--hairline)" }}>
-            <p className="t-label">{numberWord(projectCount)} documented builds · forthe.tech · Dubai, UAE.</p>
+            <p className="t-label">
+              {numberWord(projectCount)} documented builds · forthe.tech · Dubai, UAE.
+            </p>
           </div>
         </SectionReveal>
 

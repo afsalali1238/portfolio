@@ -1,2 +1,15 @@
-:root{--ink:#0B0C0E;--bone:#EEEAE1;--clay:#D96346;--gold:#CBA666;--slate:#899FCC;--clay-deep:#AE4024;--gold-deep:#906A21;--slate-deep:#496297;--grey:#9A9EA5;--line:#55585E;
---font-display:'Instrument Serif',serif;--font-body:'DM Sans',sans-serif;--font-label:'IBM Plex Mono',monospace}
+:root {
+  --ink: #0b0c0e;
+  --bone: #eeeae1;
+  --clay: #d96346;
+  --gold: #cba666;
+  --slate: #899fcc;
+  --clay-deep: #ae4024;
+  --gold-deep: #906a21;
+  --slate-deep: #496297;
+  --grey: #9a9ea5;
+  --line: #55585e;
+  --font-display: "Instrument Serif", serif;
+  --font-body: "DM Sans", sans-serif;
+  --font-label: "IBM Plex Mono", monospace;
+}

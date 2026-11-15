@@ -41,11 +41,18 @@ function NotesIndexPage() {
                   className="card-row group"
                   style={{ padding: "24px 0", borderRadius: "0" }}
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-2 t-label" style={{ color: "var(--fg-muted)" }}>
-                    <span className="tabular-nums">Dispatch Nº {String(d.number).padStart(2, "0")} · {d.date} · {d.readTime}</span>
+                  <div
+                    className="flex flex-wrap items-center justify-between gap-2 t-label"
+                    style={{ color: "var(--fg-muted)" }}
+                  >
+                    <span className="tabular-nums">
+                      Dispatch Nº {String(d.number).padStart(2, "0")} · {d.date} · {d.readTime}
+                    </span>
                   </div>
                   <div className="t-display-3 card-title mt-4">{d.title}</div>
-                  <div className="t-small mt-2" style={{ color: "var(--fg-muted)" }}>{d.subtitle}</div>
+                  <div className="t-small mt-2" style={{ color: "var(--fg-muted)" }}>
+                    {d.subtitle}
+                  </div>
                   <div className="inline-flex items-center gap-1.5 t-label">
                     <span>Read dispatch</span>
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

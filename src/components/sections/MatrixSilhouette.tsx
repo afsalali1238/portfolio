@@ -1022,6 +1022,7 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
       video.pause();
       video.src = "";
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

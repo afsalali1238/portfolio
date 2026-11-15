@@ -6,35 +6,36 @@ import { AUTHOR } from "../../lib/site";
 
 export function SiteFooter() {
   return (
-    <footer
-      id="contact"
-      className="site-footer"
-    >
+    <footer id="contact" className="site-footer">
       <Container className="container">
         <div className="footer-main">
           <div className="footer-brand-group">
-            <Link
-              to="/"
-              className="footer-brand"
-              aria-label="forthe.tech — home"
-            >
+            <Link to="/" className="footer-brand" aria-label="forthe.tech — home">
               <LogoTile className="h-6 w-6" />
               <Wordmark className="text-[17px]" />
             </Link>
             <p className="footer-tagline">Independent thought, made real.</p>
           </div>
-          
+
           <nav aria-label="Footer" className="footer-links">
-            <Link to="/works" className="inline-flex min-h-11 items-center hover:text-ink">Work</Link>
-            <Link to="/thesis" className="inline-flex min-h-11 items-center hover:text-ink">Manifesto</Link>
-            <Link to="/notes" className="inline-flex min-h-11 items-center hover:text-ink">Notes</Link>
-            <Link to="/the-man-behind" className="inline-flex min-h-11 items-center hover:text-ink">The Man Behind</Link>
-            <Link to="/" hash="origin" className="inline-flex min-h-11 items-center hover:text-ink">About</Link>
+            <Link to="/works" className="inline-flex min-h-11 items-center hover:text-ink">
+              Work
+            </Link>
+            <Link to="/thesis" className="inline-flex min-h-11 items-center hover:text-ink">
+              Manifesto
+            </Link>
+            <Link to="/notes" className="inline-flex min-h-11 items-center hover:text-ink">
+              Notes
+            </Link>
+            <Link to="/the-man-behind" className="inline-flex min-h-11 items-center hover:text-ink">
+              The Man Behind
+            </Link>
+            <Link to="/" hash="origin" className="inline-flex min-h-11 items-center hover:text-ink">
+              About
+            </Link>
           </nav>
 
-          <div className="footer-contact">
-            here@forthe.tech · Dubai · GST (UTC+4)
-          </div>
+          <div className="footer-contact">here@forthe.tech · Dubai · GST (UTC+4)</div>
         </div>
 
         <div className="footer-bottom">

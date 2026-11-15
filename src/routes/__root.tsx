@@ -30,16 +30,10 @@ function NotFoundComponent() {
             This page doesn&rsquo;t exist, or it moved when the site split into pages.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link
-              to="/"
-              className="btn-primary"
-            >
+            <Link to="/" className="btn-primary">
               Home
             </Link>
-            <Link
-              to="/works"
-              className="btn-secondary"
-            >
+            <Link to="/works" className="btn-secondary">
               All work
             </Link>
           </div>

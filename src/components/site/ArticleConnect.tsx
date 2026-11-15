@@ -44,18 +44,44 @@ export function ArticleLayout({
             >
               <ArrowLeft className="h-3.5 w-3.5" /> Back to Dispatches
             </Link>
-            <p className="t-label">Dispatch Nº {String(dispatch.number).padStart(2, "0")} · {dispatch.date} · {dispatch.readTime}</p>
+            <p className="t-label">
+              Dispatch Nº {String(dispatch.number).padStart(2, "0")} · {dispatch.date} ·{" "}
+              {dispatch.readTime}
+            </p>
             <h1 className="t-display-1 mt-3">{dispatch.title}</h1>
-            <p className="t-lede mt-4" style={{ fontStyle: "italic", color: "var(--fg-muted)" }}>{dispatch.subtitle}</p>
+            <p className="t-lede mt-4" style={{ fontStyle: "italic", color: "var(--fg-muted)" }}>
+              {dispatch.subtitle}
+            </p>
 
-            <div className="my-6 flex flex-wrap items-center justify-between gap-3" style={{ borderTop: "1px solid var(--hairline)", borderBottom: "1px solid var(--hairline)", paddingTop: "12px", paddingBottom: "12px" }}>
-              <div className="flex flex-wrap items-center gap-2 t-label" style={{ color: "var(--fg-muted)" }}>
-                <span className="font-medium" style={{ color: "var(--fg)" }}>Read on:</span>
+            <div
+              className="my-6 flex flex-wrap items-center justify-between gap-3"
+              style={{
+                borderTop: "1px solid var(--hairline)",
+                borderBottom: "1px solid var(--hairline)",
+                paddingTop: "12px",
+                paddingBottom: "12px",
+              }}
+            >
+              <div
+                className="flex flex-wrap items-center gap-2 t-label"
+                style={{ color: "var(--fg-muted)" }}
+              >
+                <span className="font-medium" style={{ color: "var(--fg)" }}>
+                  Read on:
+                </span>
                 <span style={{ color: "var(--fg)" }}>forthe.tech (canonical)</span>
-                <a href={substackUrl} target="_blank" rel="noreferrer" className="chip">Substack <ArrowUpRight className="h-3 w-3" /></a>
-                <a href={mediumUrl} target="_blank" rel="noreferrer" className="chip">Medium <ArrowUpRight className="h-3 w-3" /></a>
-                <a href={linkedinUrl} target="_blank" rel="noreferrer" className="chip">LinkedIn <ArrowUpRight className="h-3 w-3" /></a>
-                <a href={twitterUrl} target="_blank" rel="noreferrer" className="chip">X <ArrowUpRight className="h-3 w-3" /></a>
+                <a href={substackUrl} target="_blank" rel="noreferrer" className="chip">
+                  Substack <ArrowUpRight className="h-3 w-3" />
+                </a>
+                <a href={mediumUrl} target="_blank" rel="noreferrer" className="chip">
+                  Medium <ArrowUpRight className="h-3 w-3" />
+                </a>
+                <a href={linkedinUrl} target="_blank" rel="noreferrer" className="chip">
+                  LinkedIn <ArrowUpRight className="h-3 w-3" />
+                </a>
+                <a href={twitterUrl} target="_blank" rel="noreferrer" className="chip">
+                  X <ArrowUpRight className="h-3 w-3" />
+                </a>
               </div>
               <div className="t-small" style={{ color: "var(--fg-muted)" }}>
                 {dispatch.words} · {dispatch.readTime}
@@ -63,56 +89,42 @@ export function ArticleLayout({
             </div>
           </SectionReveal>
 
-          <article className="mt-10 space-y-6 t-article">
-            {children}
-          </article>
+          <article className="mt-10 space-y-6 t-article">{children}</article>
 
           <RelatedBuildsSection projectIds={dispatch.relatedWorks} />
 
           {/* Discussion & cross-platform footer with next / prev links */}
           <div className="mt-16 space-y-12">
-            <div style={{ border: "1px solid var(--hairline)", backgroundColor: "var(--bg-raised)", padding: "24px", borderRadius: "4px" }}>
+            <div
+              style={{
+                border: "1px solid var(--hairline)",
+                backgroundColor: "var(--bg-raised)",
+                padding: "24px",
+                borderRadius: "4px",
+              }}
+            >
               <p className="t-label">DISCUSS</p>
               <h3 className="t-display-3 mt-2">Join the conversation across platforms.</h3>
               <p className="t-body mt-2" style={{ color: "var(--fg-muted)" }}>
-                forthe.tech is an open field laboratory. We publish and debate every piece in public with
-                operators, founders, and engineers. Read, critique, or share where you spend your time:
+                forthe.tech is an open field laboratory. We publish and debate every piece in public
+                with operators, founders, and engineers. Read, critique, or share where you spend
+                your time:
               </p>
 
               <div className="mt-6 flex flex-wrap gap-3">
-                <a
-                  href={linkedinUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn-primary"
-                >
+                <a href={linkedinUrl} target="_blank" rel="noreferrer" className="btn-primary">
                   <MessageSquare className="h-3.5 w-3.5" /> Discuss on LinkedIn
                   <ArrowUpRight className="h-3.5 w-3.5" />
                 </a>
-                <a
-                  href={substackUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn-secondary"
-                >
+                <a href={substackUrl} target="_blank" rel="noreferrer" className="btn-secondary">
                   <Bookmark className="h-3.5 w-3.5" /> Read on Substack
                   <ArrowUpRight className="h-3.5 w-3.5" />
                 </a>
-                <a
-                  href={mediumUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn-secondary"
-                >
+                <a href={mediumUrl} target="_blank" rel="noreferrer" className="btn-secondary">
                   Read on Medium
                   <ArrowUpRight className="h-3.5 w-3.5" />
                 </a>
-                <a
-                  href={twitterUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn-secondary"
-                >
+                <a href={twitterUrl} target="_blank" rel="noreferrer" className="btn-secondary">
                   <Share2 className="h-3.5 w-3.5" /> Thread on X
                   <ArrowUpRight className="h-3.5 w-3.5" />
                 </a>
@@ -145,7 +157,9 @@ export function ArticleLayout({
                       Next dispatch
                       <ArrowRight className="h-3 w-3 inline transition-transform group-hover:translate-x-1" />
                     </span>
-                    <span className="t-display-3 card-title flex-1 min-w-0 text-right">{next.title}</span>
+                    <span className="t-display-3 card-title flex-1 min-w-0 text-right">
+                      {next.title}
+                    </span>
                   </Link>
                 ) : null}
               </div>
@@ -186,7 +200,12 @@ export function RelatedBuildsSection({ projectIds }: { projectIds?: string[] }) 
     <section
       aria-label="Mentioned builds"
       className="my-14"
-      style={{ border: "1px solid var(--hairline)", backgroundColor: "var(--bg-raised)", padding: "24px", borderRadius: "4px" }}
+      style={{
+        border: "1px solid var(--hairline)",
+        backgroundColor: "var(--bg-raised)",
+        padding: "24px",
+        borderRadius: "4px",
+      }}
     >
       <p className="t-label">BUILDS MENTIONED</p>
       <h2 className="t-display-3 mt-1">Builds mentioned in this dispatch.</h2>
@@ -208,7 +227,9 @@ export function RelatedBuildsSection({ projectIds }: { projectIds?: string[] }) 
                 {p.for} · {p.year}
               </div>
               <div className="t-display-3 group-hover:is-lit transition-colors">{p.name}</div>
-              <div className="t-small line-clamp-2" style={{ color: "var(--fg-muted)" }}>{p.blurb}</div>
+              <div className="t-small line-clamp-2" style={{ color: "var(--fg-muted)" }}>
+                {p.blurb}
+              </div>
             </div>
             <div className="inline-flex items-center gap-1.5 t-label">
               <span>View build log</span>

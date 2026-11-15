@@ -91,23 +91,14 @@ export function SiteHeader() {
     <>
       <header className="site-header">
         <Container className="container">
-          <Link
-            to="/"
-            className="brand"
-            aria-label="forthe.tech — home"
-          >
+          <Link to="/" className="brand" aria-label="forthe.tech — home">
             <LogoTile className="h-[29px] w-[29px]" />
             <Wordmark className="text-[20px] font-semibold tracking-[-0.7px]" />
           </Link>
 
           <nav aria-label="Site" className="header-nav">
             {NAV_LINKS.map((l) => (
-              <Link
-                key={l.to}
-                to={l.to}
-                className="group"
-                data-status="active"
-              >
+              <Link key={l.to} to={l.to} className="group" data-status="active">
                 {l.label}
               </Link>
             ))}

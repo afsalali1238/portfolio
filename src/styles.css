@@ -386,7 +386,9 @@
   background: transparent;
   color: var(--fg-muted);
   border-radius: 8px;
-  transition: color 160ms, background 160ms;
+  transition:
+    color 160ms,
+    background 160ms;
 }
 .header-actions button:hover {
   color: var(--fg);
@@ -472,7 +474,9 @@
   font-size: 15px;
   font-weight: 500;
   text-decoration: none;
-  transition: background 160ms, color 160ms;
+  transition:
+    background 160ms,
+    color 160ms;
 }
 .btn-primary:hover {
   background: var(--lit);
@@ -491,7 +495,10 @@
   font-size: 15px;
   font-weight: 500;
   text-decoration: none;
-  transition: border-color 160ms, color 160ms, background 160ms;
+  transition:
+    border-color 160ms,
+    color 160ms,
+    background 160ms;
 }
 .btn-secondary:hover {
   border-color: var(--fg);
@@ -529,7 +536,9 @@
   color: var(--lit);
 }
 .card-title {
-  transition: color 160ms, transform 160ms;
+  transition:
+    color 160ms,
+    transform 160ms;
 }
 .card-row:hover .card-title {
   transform: translateX(4px);
@@ -547,7 +556,10 @@
   letter-spacing: 1px;
   color: var(--fg-faint);
   background: transparent;
-  transition: border-color 160ms, color 160ms, background 160ms;
+  transition:
+    border-color 160ms,
+    color 160ms,
+    background 160ms;
 }
 .chip:hover {
   border-color: var(--fg);

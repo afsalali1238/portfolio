@@ -102,33 +102,57 @@ function ProjectCaseStudy() {
         <Container className="max-w-4xl pt-6 md:pt-12">
           <SectionReveal>
             {/* Four-column telemetry header — like Thesis telemetry row */}
-            <div 
+            <div
               className="telemetry-row grid grid-cols-2 gap-4 pb-3 sm:grid-cols-4 sm:gap-3 mb-6"
-              style={{ 
-                borderBottom: "1px solid var(--hairline)"
+              style={{
+                borderBottom: "1px solid var(--hairline)",
               }}
             >
               <div>
-                <div className="t-label" style={{ color: "var(--fg-faint)" }}>STATUS</div>
-                <div className="t-num" style={{ fontSize: "16px", color: "var(--fg)", marginTop: "8px" }}>
+                <div className="t-label" style={{ color: "var(--fg-faint)" }}>
+                  STATUS
+                </div>
+                <div
+                  className="t-num"
+                  style={{ fontSize: "16px", color: "var(--fg)", marginTop: "8px" }}
+                >
                   {project.status ?? "—"}
                 </div>
               </div>
               <div>
-                <div className="t-label" style={{ color: "var(--fg-faint)" }}>PLATFORM</div>
-                <div className="t-num" style={{ fontSize: "16px", color: "var(--fg)", marginTop: "8px" }}>
+                <div className="t-label" style={{ color: "var(--fg-faint)" }}>
+                  PLATFORM
+                </div>
+                <div
+                  className="t-num"
+                  style={{ fontSize: "16px", color: "var(--fg)", marginTop: "8px" }}
+                >
                   {platformBadge(project)}
                 </div>
               </div>
               <div>
-                <div className="t-label" style={{ color: "var(--fg-faint)" }}>BUILT FOR</div>
-                <div className="t-num" style={{ fontSize: "16px", color: "var(--fg)", marginTop: "8px" }}>
-                  {project.for.toLowerCase() === "wife" ? "My wife" : project.for.toLowerCase() === "me" ? "Me" : project.for}
+                <div className="t-label" style={{ color: "var(--fg-faint)" }}>
+                  BUILT FOR
+                </div>
+                <div
+                  className="t-num"
+                  style={{ fontSize: "16px", color: "var(--fg)", marginTop: "8px" }}
+                >
+                  {project.for.toLowerCase() === "wife"
+                    ? "My wife"
+                    : project.for.toLowerCase() === "me"
+                      ? "Me"
+                      : project.for}
                 </div>
               </div>
               <div>
-                <div className="t-label" style={{ color: "var(--fg-faint)" }}>STACK</div>
-                <div className="t-num" style={{ fontSize: "16px", color: "var(--fg)", marginTop: "8px" }}>
+                <div className="t-label" style={{ color: "var(--fg-faint)" }}>
+                  STACK
+                </div>
+                <div
+                  className="t-num"
+                  style={{ fontSize: "16px", color: "var(--fg)", marginTop: "8px" }}
+                >
                   {(project.stack || project.tags).slice(0, 3).join(" · ")}
                   {(project.stack || project.tags).length > 3 && " …"}
                 </div>
@@ -140,25 +164,18 @@ function ProjectCaseStudy() {
             <p className="t-lede mt-6">{project.blurb}</p>
 
             {/* Primary Action Buttons */}
-            <div className="mt-8 flex flex-wrap items-center gap-3" style={{ borderBottom: "1px solid var(--hairline)", paddingBottom: "24px" }}>
+            <div
+              className="mt-8 flex flex-wrap items-center gap-3"
+              style={{ borderBottom: "1px solid var(--hairline)", paddingBottom: "24px" }}
+            >
               {project.live && (
-                <a
-                  href={project.live}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn-primary"
-                >
+                <a href={project.live} target="_blank" rel="noreferrer" className="btn-primary">
                   {project.platform === "windows" ? "Windows app · download" : "Visit live site"}
                   <ArrowUpRight className="h-4 w-4" />
                 </a>
               )}
               {project.github && (
-                <a
-                  href={project.github}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn-secondary"
-                >
+                <a href={project.github} target="_blank" rel="noreferrer" className="btn-secondary">
                   Source code <Github className="h-4 w-4" />
                 </a>
               )}
@@ -166,7 +183,10 @@ function ProjectCaseStudy() {
 
             {/* Visual Explainer / Interactive Walkthrough */}
             {project.media && (
-              <div className="mt-12" style={{ borderBottom: "1px solid var(--hairline)", paddingBottom: "24px" }}>
+              <div
+                className="mt-12"
+                style={{ borderBottom: "1px solid var(--hairline)", paddingBottom: "24px" }}
+              >
                 <ExplainerVideo
                   media={project.media}
                   title={project.name}
@@ -208,9 +228,18 @@ function ProjectCaseStudy() {
             {/* What I Learned */}
             {project.learned && (
               <SectionReveal className="space-y-4">
-                <div style={{ borderLeft: "2px solid var(--fg)", paddingLeft: "24px", paddingTop: "8px", paddingBottom: "8px" }}>
+                <div
+                  style={{
+                    borderLeft: "2px solid var(--fg)",
+                    paddingLeft: "24px",
+                    paddingTop: "8px",
+                    paddingBottom: "8px",
+                  }}
+                >
                   <p className="t-label">04 ── WHAT I LEARNED</p>
-                  <p className="t-display-3" style={{ fontStyle: "italic" }}>"{project.learned}"</p>
+                  <p className="t-display-3" style={{ fontStyle: "italic" }}>
+                    "{project.learned}"
+                  </p>
                 </div>
               </SectionReveal>
             )}
@@ -223,7 +252,10 @@ function ProjectCaseStudy() {
                 <ul className="space-y-3 pt-2">
                   {project.highlights.map((h: string, i: number) => (
                     <li key={i} className="t-body flex items-start gap-3">
-                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: "var(--fg)" }} />
+                      <span
+                        className="mt-1.5 h-1.5 w-1.5 rounded-full shrink-0"
+                        style={{ backgroundColor: "var(--fg)" }}
+                      />
                       <span>{h}</span>
                     </li>
                   ))}
@@ -233,15 +265,18 @@ function ProjectCaseStudy() {
 
             {/* Tech Stack - Section 06 */}
             <SectionReveal className="space-y-4">
-              <div style={{ backgroundColor: "var(--bg-raised)", padding: "24px", borderRadius: "4px" }}>
+              <div
+                style={{
+                  backgroundColor: "var(--bg-raised)",
+                  padding: "24px",
+                  borderRadius: "4px",
+                }}
+              >
                 <p className="t-label">06 ── TECHNICAL STACK</p>
                 <h2 className="t-display-3">Tools and dependencies.</h2>
                 <div className="flex flex-wrap gap-2 pt-2">
                   {((project.stack || project.tags) as string[]).map((tech: string) => (
-                    <span
-                      key={tech}
-                      className="chip"
-                    >
+                    <span key={tech} className="chip">
                       {tech}
                     </span>
                   ))}
@@ -252,41 +287,59 @@ function ProjectCaseStudy() {
             {/* Related Essays & Dispatches */}
             {getRelatedNotesForProject(project.id).length > 0 && (
               <SectionReveal className="space-y-4">
-                <div style={{ border: "1px solid var(--hairline)", backgroundColor: "var(--bg)", padding: "24px", borderRadius: "4px" }}>
-                <p className="t-label">07 ── RELATED ESSAYS & DISPATCHES</p>
-                <h2 className="t-display-3">Read the deeper thesis.</h2>
-                <p className="t-small" style={{ color: "var(--fg-muted)" }}>
-                  The operational context, design philosophy, and lessons behind this build:
-                </p>
-                <div className="space-y-3 pt-2">
-                  {getRelatedNotesForProject(project.id).map((note) => (
-                    <Link
-                      key={note.number}
-                      to={note.path}
-                      className="card-row"
-                      style={{ padding: "16px", borderRadius: "4px", borderColor: "var(--hairline)" }}
-                    >
-                      <div className="space-y-1">
-                        <div className="t-label" style={{ color: "var(--fg-muted)" }}>
-                          No. {note.number} · {note.date}
+                <div
+                  style={{
+                    border: "1px solid var(--hairline)",
+                    backgroundColor: "var(--bg)",
+                    padding: "24px",
+                    borderRadius: "4px",
+                  }}
+                >
+                  <p className="t-label">07 ── RELATED ESSAYS & DISPATCHES</p>
+                  <h2 className="t-display-3">Read the deeper thesis.</h2>
+                  <p className="t-small" style={{ color: "var(--fg-muted)" }}>
+                    The operational context, design philosophy, and lessons behind this build:
+                  </p>
+                  <div className="space-y-3 pt-2">
+                    {getRelatedNotesForProject(project.id).map((note) => (
+                      <Link
+                        key={note.number}
+                        to={note.path}
+                        className="card-row"
+                        style={{
+                          padding: "16px",
+                          borderRadius: "4px",
+                          borderColor: "var(--hairline)",
+                        }}
+                      >
+                        <div className="space-y-1">
+                          <div className="t-label" style={{ color: "var(--fg-muted)" }}>
+                            No. {note.number} · {note.date}
+                          </div>
+                          <div className="t-display-3 group-hover:is-lit transition-colors">
+                            {note.title}
+                          </div>
+                          <div className="t-small" style={{ color: "var(--fg-muted)" }}>
+                            {note.subtitle}
+                          </div>
                         </div>
-                        <div className="t-display-3 group-hover:is-lit transition-colors">{note.title}</div>
-                        <div className="t-small" style={{ color: "var(--fg-muted)" }}>{note.subtitle}</div>
-                      </div>
-                      <div className="inline-flex items-center gap-1.5 t-label">
-                        <span>Read essay</span>
-                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                      </div>
-                    </Link>
-                  ))}
+                        <div className="inline-flex items-center gap-1.5 t-label">
+                          <span>Read essay</span>
+                          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
                 </div>
-              </div>
               </SectionReveal>
             )}
           </div>
 
           {/* Next / Previous Project Footer — hairline rows */}
-          <div className="mt-16" style={{ borderTop: "1px solid var(--hairline)", paddingTop: "24px" }}>
+          <div
+            className="mt-16"
+            style={{ borderTop: "1px solid var(--hairline)", paddingTop: "24px" }}
+          >
             <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
               {prev ? (
                 <Link
@@ -313,7 +366,9 @@ function ProjectCaseStudy() {
                     Next build
                     <ArrowRight className="h-3 w-3 inline transition-transform group-hover:translate-x-1" />
                   </span>
-                  <span className="t-display-3 card-title flex-1 min-w-0 text-right">{next.name}</span>
+                  <span className="t-display-3 card-title flex-1 min-w-0 text-right">
+                    {next.name}
+                  </span>
                 </Link>
               ) : null}
             </div>
@@ -335,10 +390,7 @@ function ProjectNotFound() {
             The requested project does not exist in the public ledger.
           </p>
           <div className="mt-8">
-            <Link
-              to="/works"
-              className="btn-primary"
-            >
+            <Link to="/works" className="btn-primary">
               <ArrowLeft className="h-4 w-4" /> See all work
             </Link>
           </div>
