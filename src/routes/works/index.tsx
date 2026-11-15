@@ -19,7 +19,7 @@ export const Route = createFileRoute("/works/")({
   head: () =>
     seo({
       title: "Work · forthe.tech",
-      description: `${numberWord(projectCount)} builds by Afsal Ali — learning tools, clinical Arabic courses, a 3D physio guide, cozy games and quiet software, most of them made for someone he knows.`,
+      description: `${numberWord(projectCount)} builds — learning tools, clinical Arabic courses, a 3D physio guide, cozy games and quiet software, made for the people around us.`,
       path: "/works",
       image: "/og/works.png",
     }),

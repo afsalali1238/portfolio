@@ -80,8 +80,8 @@ export function SiteFooter() {
               GitHub
             </a>
           </div>
-          <div>
-            © {new Date().getFullYear()} {AUTHOR} · forthe.tech
+          <div className="text-sm text-ink-soft">
+            © {new Date().getFullYear()} forthe.tech. All rights reserved.
           </div>
         </div>
       </Container>

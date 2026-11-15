@@ -254,7 +254,7 @@ export function MatrixSilhouette({ className = "" }: { className?: string }) {
     // Authentic Katakana & Matrix Alphanumeric Character Set
     const CHARS = "0123456789ABCDEF$#@%&*+-/=<>~VUGX日ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ";
     const DECRYPT_WORDS = [
-      "OP:AFSAL",
+      "OP:BUILDER",
       "SYS:BUILDER",
       "NODE:DUBAI",
       "PORT:0x443",

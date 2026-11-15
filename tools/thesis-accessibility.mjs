@@ -234,7 +234,7 @@ check(
 check(
   "reduced-motion view contains the author and date",
   (await reducedPage.locator(".reduced-motion-view .reading-byline").innerText()).includes(
-    "Afsal Ali",
+    "forthe.tech",
   ) && (await reducedPage.locator(".reduced-motion-view .reading-byline time").count()) === 1,
 );
 check(

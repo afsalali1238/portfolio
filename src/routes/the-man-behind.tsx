@@ -22,7 +22,7 @@ export const Route = createFileRoute("/the-man-behind")({
     ...seo({
       title: "The Man Behind · forthe.tech",
       description:
-        "Get in touch with Afsal Ali, the builder behind forthe.tech. Dubai, United Arab Emirates (UTC+4).",
+        "Get in touch with the builder behind forthe.tech. Dubai, United Arab Emirates (UTC+4).",
       path: "/the-man-behind",
       image: "/og/home.png",
     }),

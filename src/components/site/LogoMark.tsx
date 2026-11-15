@@ -1,73 +1,107 @@
 /**
- * Logo: Half thought, half built. One line breaks through.
- * Left half: smooth semi-circle (thinking, philosophy) with a line cutting through.
- * Right half: 26 pixel blocks (building, tech) with the 4-pixel row turning clay (#A8471B / #E67E54).
+ * forthe.tech Brand Guide v1
+ * Mark: Light in, bent twice by glass, drawn as it behaves in a prism.
+ * Glass: n 1.505 at 590 nm, apex 55°.
+ * Beam enters rising 16.5°, runs level inside, leaves falling.
+ * Rays leave at -4°, -16.5°, -29°: red (clay) bent least, slate most.
+ * Nothing is drawn inside the glass: clear glass shows no beam.
+ * Below 24 px use the small cut (stroke 3.1).
+ * Wordmark: DM Sans 600, lower case, full stop in clay.
  */
 
-export function LogoMark({ className = "h-4 w-4" }: { className?: string }) {
+interface LogoMarkProps {
+  className?: string;
+  /** Force small cut (recommended for display below 24px) */
+  small?: boolean;
+  /** Force monochrome rendering using currentColor */
+  mono?: boolean;
+}
+
+export function LogoMark({
+  className = "h-6 w-6",
+  small = false,
+  mono = false,
+}: LogoMarkProps) {
+  if (small) {
+    return (
+      <svg
+        viewBox="0.42 1.45 41.22 30.1"
+        fill="none"
+        className={className}
+        aria-hidden="true"
+        strokeWidth="3.1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {/* Incident ray */}
+        <path d="M2.97 20.84L9.20 19.00" stroke="currentColor" />
+        {/* Dispersed rays: Clay, Gold, Slate */}
+        <path
+          d="M23.28 16.07L37.84 17.09"
+          stroke={mono ? "currentColor" : "var(--color-clay, #d96346)"}
+        />
+        <path
+          d="M24.80 19.00L38.79 23.14"
+          stroke={mono ? "currentColor" : "var(--color-gold, #cba666)"}
+        />
+        <path
+          d="M26.32 21.93L39.09 29.00"
+          stroke={mono ? "currentColor" : "var(--color-slate, #899fcc)"}
+        />
+        {/* Prism glass triangle */}
+        <path d="M17 4L30 29L4 29Z" stroke="currentColor" />
+      </svg>
+    );
+  }
+
   return (
-    <svg viewBox="0 0 32 32" fill="none" className={className} aria-hidden="true">
-      {/* Smooth left half with curiosity cut (the wall) and standard pixel blocks */}
-      <g fill="currentColor">
-        <path d="M16 4.8A11.2 11.2 0 0 0 5.329 12.6H16Z" />
-        <path d="M16 15.7H4.804A11.2 11.2 0 0 0 16 27.2Z" />
-        <rect x="16.3" y="5.2" width="3.1" height="3.1" rx="0.5" />
-        <rect x="16.3" y="8.9" width="3.1" height="3.1" rx="0.5" />
-        <rect x="16.3" y="16.3" width="3.1" height="3.1" rx="0.5" />
-        <rect x="16.3" y="20" width="3.1" height="3.1" rx="0.5" />
-        <rect x="16.3" y="23.7" width="3.1" height="3.1" rx="0.5" />
-        <rect x="20" y="8.9" width="3.1" height="3.1" rx="0.5" />
-        <rect x="20" y="16.3" width="3.1" height="3.1" rx="0.5" />
-        <rect x="20" y="20" width="3.1" height="3.1" rx="0.5" />
-        <rect x="23.7" y="16.3" width="3.1" height="3.1" rx="0.5" />
-      </g>
-      {/* Clay pixel row continuing through the cut gap */}
-      <g fill="var(--color-mark-dot, #E67E54)">
-        <rect
-          x="16.3"
-          y="12.6"
-          width="3.1"
-          height="3.1"
-          rx="0.5"
-          className="logo-clay-pixel [animation-delay:0.2s]"
-        />
-        <rect
-          x="20"
-          y="12.6"
-          width="3.1"
-          height="3.1"
-          rx="0.5"
-          className="logo-clay-pixel [animation-delay:0.28s]"
-        />
-        <rect
-          x="23.7"
-          y="12.6"
-          width="3.1"
-          height="3.1"
-          rx="0.5"
-          className="logo-clay-pixel [animation-delay:0.36s]"
-        />
-      </g>
+    <svg
+      viewBox="-2.01 1.9 44.13 29.2"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {/* Incident ray */}
+      <path d="M0.09 21.70L9.20 19.00" stroke="currentColor" />
+      {/* Dispersed rays: Clay, Gold, Slate */}
+      <path
+        d="M23.60 16.69L39.44 17.80"
+        stroke={mono ? "currentColor" : "var(--color-clay, #d96346)"}
+      />
+      <path
+        d="M24.80 19.00L40.02 23.51"
+        stroke={mono ? "currentColor" : "var(--color-gold, #cba666)"}
+      />
+      <path
+        d="M26.00 21.31L39.89 29.00"
+        stroke={mono ? "currentColor" : "var(--color-slate, #899fcc)"}
+      />
+      {/* Prism glass triangle */}
+      <path d="M17 4L30 29L4 29Z" stroke="currentColor" />
     </svg>
   );
 }
 
-/** The mark on its ink tile, as used in the header, footer and favicon. */
-export function LogoTile({ className = "h-8 w-8" }: { className?: string }) {
+/** The mark standalone or in its container for header and footer. */
+export function LogoTile({ className = "h-7 w-7" }: { className?: string }) {
   return (
-    <span
-      className={`inline-flex shrink-0 items-center justify-center rounded-[22%] bg-ink p-1.5 text-paper ${className}`}
-    >
+    <span className={`inline-flex shrink-0 items-center justify-center text-ink dark:text-bone ${className}`}>
       <LogoMark className="h-full w-full" />
     </span>
   );
 }
 
-/** "forthe.tech" with the clay full stop. */
+/**
+ * "forthe.tech" in DM Sans 600 with the clay full stop.
+ * Governed strictly by brand guidelines: lower case name, full stop in clay.
+ */
 export function Wordmark({ className = "" }: { className?: string }) {
   return (
-    <span className={`font-serif leading-none ${className}`}>
-      forthe<span className="text-accent-ink">.</span>tech
+    <span className={`font-sans font-semibold tracking-[-0.03em] leading-none ${className}`}>
+      forthe<span className="text-[var(--color-clay,#d96346)]">.</span>tech
     </span>
   );
 }

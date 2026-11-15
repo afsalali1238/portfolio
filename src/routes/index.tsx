@@ -9,7 +9,7 @@ import { seo, DEFAULT_DESCRIPTION } from "../lib/site";
 export const Route = createFileRoute("/")({
   head: () =>
     seo({
-      title: "forthe.tech — builds by Afsal Ali",
+      title: "forthe.tech — For the tech.",
       description: DEFAULT_DESCRIPTION,
       path: "/",
       image: "/og/home.png",

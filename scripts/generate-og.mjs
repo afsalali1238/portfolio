@@ -151,7 +151,7 @@ const items = [
     size: 150,
     sub: "Documenting what happens when the wall between having an idea and building it disappears.",
     url: "www.forthe.tech",
-    right: `${projects.length} builds · Afsal Ali · Dubai`,
+    right: `${projects.length} builds · Dubai`,
   },
   {
     id: "works",
@@ -169,7 +169,7 @@ const items = [
     size: 120,
     sub: "The wall between having an idea and building it came down. Since then, I’ve been building for the tech.",
     url: "www.forthe.tech/about",
-    right: "Afsal Ali · Dubai",
+    right: "forthe.tech · Dubai",
   },
   ...projects.map((p) => ({
     id: p.id,
@@ -187,7 +187,7 @@ const items = [
     size: d.title.length > 20 ? 104 : 124,
     sub: d.subtitle,
     url: `www.forthe.tech${d.path}`,
-    right: `${d.readTime} · Afsal Ali`,
+    right: `${d.readTime} · forthe.tech`,
   })),
   {
     id: "thesis",
@@ -196,7 +196,7 @@ const items = [
     size: 120,
     sub: "Curiosity enters. Craft bends it.\nReality catches the colour.",
     url: "www.forthe.tech/thesis",
-    right: "Afsal Ali · Dubai",
+    right: "forthe.tech · Dubai",
   },
 ];
 

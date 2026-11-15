@@ -62,13 +62,26 @@ export function Icon({
 
 export function Brand() {
   return (
-    <a href="/" className="brand" aria-label="For the tech, home">
-      <svg viewBox="0 0 34 34" fill="none" aria-hidden="true">
-        <path d="m17 4 13 25H4L17 4Z" stroke="currentColor" strokeWidth=".9" />
-        <path d="M0 19h12l22 9M12 19l22 4M12 19l22-1" stroke="currentColor" strokeWidth=".8" />
+    <a href="/" className="brand" aria-label="forthe.tech — home">
+      <svg
+        viewBox="-2.01 1.9 44.13 29.2"
+        fill="none"
+        aria-hidden="true"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {/* Incident ray */}
+        <path d="M0.09 21.70L9.20 19.00" stroke="currentColor" />
+        {/* Dispersed rays: Clay, Gold, Slate */}
+        <path d="M23.60 16.69L39.44 17.80" stroke="var(--color-clay, #d96346)" />
+        <path d="M24.80 19.00L40.02 23.51" stroke="var(--color-gold, #cba666)" />
+        <path d="M26.00 21.31L39.89 29.00" stroke="var(--color-slate, #899fcc)" />
+        {/* Prism glass triangle */}
+        <path d="M17 4L30 29L4 29Z" stroke="currentColor" />
       </svg>
       <span>
-        for the tech<span className="brand-period">.</span>
+        forthe<span className="brand-period">.</span>tech
       </span>
     </a>
   );
