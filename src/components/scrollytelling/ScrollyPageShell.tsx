@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from "react";
+import { SiteHeader } from "../site/SiteHeader";
 
 export function ScrollyPageShell({ children }: { children: ReactNode }) {
   useEffect(() => {
@@ -10,6 +11,7 @@ export function ScrollyPageShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="page-shell">
+      <SiteHeader />
       <a
         className="skip-link"
         href="#discussion"

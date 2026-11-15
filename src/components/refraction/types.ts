@@ -35,11 +35,11 @@ export type SpectrumBand = {
  * the Cauchy reference band; the other indices rise as their wavelengths shorten.
  */
 export const SPECTRAL_BANDS: readonly SpectrumBand[] = [
-  { id: "red", label: "Red", wavelengthNm: 680, color: "#ef4444", outcome: "Perception" },
-  { id: "amber", label: "Amber", wavelengthNm: 590, color: "#f59e0b", outcome: "Empathy" },
-  { id: "emerald", label: "Emerald", wavelengthNm: 520, color: "#10b981", outcome: "Craft" },
-  { id: "cyan", label: "Cyan", wavelengthNm: 480, color: "#0ea5e9", outcome: "Rigor" },
-  { id: "violet", label: "Violet", wavelengthNm: 410, color: "#a855f7", outcome: "Becoming" },
+  { id: "red", label: "Clay", wavelengthNm: 680, color: "#d96346", outcome: "Perception" },
+  { id: "amber", label: "Ochre", wavelengthNm: 610, color: "#d28e54", outcome: "Empathy" },
+  { id: "emerald", label: "Gold", wavelengthNm: 560, color: "#cba666", outcome: "Craft" },
+  { id: "cyan", label: "Soft Slate", wavelengthNm: 490, color: "#a7b5d2", outcome: "Rigor" },
+  { id: "violet", label: "Slate", wavelengthNm: 430, color: "#899fcc", outcome: "Becoming" },
 ] as const;
 
 export const SPEED_OF_LIGHT = 299_792_458;

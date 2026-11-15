@@ -51,7 +51,7 @@ function projectSchema(p: Project) {
 }
 
 export const Route = createFileRoute("/works/$id")({
-  loader: ({ params }) => {
+  loader: ({ params }: { params: { id: string } }) => {
     const project = getProjectById(params.id);
     if (!project) {
       throw notFound();

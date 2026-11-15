@@ -74,10 +74,15 @@ export function SiteHeader() {
           <Link
             to="/"
             className="group flex items-center gap-3 rounded-md py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
-            aria-label="for the tech. — home"
+            aria-label="for the tech. by Afsal Ali — home"
           >
             <LogoTile className="h-8 w-10 transition-opacity duration-150 group-hover:opacity-85" />
-            <Wordmark className="text-xl sm:text-2xl" />
+            <div className="flex items-baseline gap-2">
+              <Wordmark className="text-xl sm:text-2xl" />
+              <span className="hidden font-mono text-xs text-[#9a9ea5] sm:inline">
+                / Afsal Ali
+              </span>
+            </div>
           </Link>
 
           <nav aria-label="Site" className="hidden items-center gap-1 md:flex">
@@ -143,10 +148,13 @@ export function SiteHeader() {
           to="/"
           onClick={handleClose}
           className="mb-6 flex min-h-11 items-center gap-3 rounded-md border-b border-white/[0.08] pb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
-          aria-label="for the tech. — home"
+          aria-label="for the tech. by Afsal Ali — home"
         >
           <LogoTile className="h-8 w-10" />
-          <Wordmark className="text-xl" />
+          <div className="flex items-baseline gap-1.5">
+            <Wordmark className="text-xl" />
+            <span className="font-mono text-[11px] text-[#9a9ea5]">/ Afsal Ali</span>
+          </div>
         </Link>
         {NAV_LINKS.map((l) => (
           <Link

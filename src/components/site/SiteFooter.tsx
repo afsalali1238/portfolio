@@ -116,11 +116,14 @@ export function SiteFooter() {
           <div className="flex flex-col gap-4 text-xs md:flex-row md:items-center md:justify-between">
             <Link
               to="/"
-              className="flex min-h-11 items-center gap-2 text-ink"
-              aria-label="for the tech. — home"
+              className="flex min-h-11 items-center gap-2 text-ink group"
+              aria-label="for the tech. by Afsal Ali — home"
             >
               <LogoTile className="h-7 w-9" />
-              <Wordmark className="text-lg" />
+              <div className="flex items-baseline gap-1.5">
+                <Wordmark className="text-lg" />
+                <span className="font-mono text-[11px] text-[#9a9ea5]">/ Afsal Ali</span>
+              </div>
             </Link>
             <nav
               aria-label="Footer"

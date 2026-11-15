@@ -72,13 +72,13 @@ function TheManBehindPage() {
           <SectionReveal className="space-y-4">
             <div className="flex items-center gap-3.5 font-mono text-xs uppercase tracking-[0.12em] text-grey">
               <span aria-hidden="true" className="h-px w-[34px] shrink-0 bg-white/20" />
-              <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="inline-block h-2 w-2 rounded-full bg-clay animate-pulse" />
               Contact &amp; Identity
             </div>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div>
                 <h1 className="font-serif text-5xl leading-[1.05] tracking-tight text-ink md:text-6xl">
-                  The Man Behind.
+                  The Man <span className="italic text-ink-soft">Behind.</span>
                 </h1>
                 <p className="mt-2 text-base text-ink-soft">
                   Builder, operator, and experimenter based in Dubai.
@@ -92,7 +92,7 @@ function TheManBehindPage() {
                   <span>Dubai, United Arab Emirates</span>
                 </div>
                 <div className="flex items-center gap-2 text-ink-mute">
-                  <Clock className="h-3.5 w-3.5 text-emerald-500" />
+                  <Clock className="h-3.5 w-3.5 text-clay" />
                   <span>GST (UTC+4):</span>
                   <DubaiLiveClock />
                 </div>
@@ -110,7 +110,7 @@ function TheManBehindPage() {
         <Container className="max-w-5xl mt-12">
           {/* Builder Manifesto Quote */}
           <SectionReveal>
-            <p className="font-serif text-xl italic text-ink-soft border-l-2 border-emerald-500/60 pl-5 py-2 leading-relaxed">
+            <p className="font-serif text-xl italic text-ink-soft border-l-2 border-clay/60 pl-5 py-2 leading-relaxed">
               &ldquo;Giving an operations guy modern AI tools is like handing a chimpanzee an AK-47:
               zero committees, lethal execution speed, and software built purely out of
               curiosity.&rdquo;
@@ -149,8 +149,8 @@ function TheManBehindPage() {
                   >
                     {copied ? (
                       <>
-                        <Check className="h-4 w-4 text-emerald-500" />
-                        <span className="text-emerald-500">Email Copied!</span>
+                        <Check className="h-4 w-4 text-clay" />
+                        <span className="text-clay">Email Copied!</span>
                       </>
                     ) : (
                       <>
@@ -162,7 +162,7 @@ function TheManBehindPage() {
                 </div>
 
                 <div className="border-t rule-hair pt-4 text-xs text-ink-mute flex items-center gap-2">
-                  <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="inline-block h-2 w-2 rounded-full bg-clay animate-pulse" />
                   <span>Available for collaborations &amp; architecture advisory.</span>
                 </div>
               </div>

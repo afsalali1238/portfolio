@@ -53,7 +53,7 @@ export function FeaturedWorks() {
               id="featured-heading"
               className="mt-2 font-serif text-4xl leading-[1.05] tracking-tight text-ink sm:text-5xl"
             >
-              Made for someone.
+              Made for <span className="italic text-ink-soft">someone.</span>
             </h2>
           </div>
           <Link
