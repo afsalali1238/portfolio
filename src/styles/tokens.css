@@ -1,50 +1,69 @@
 :root {
-  /* brand tokens from forthe.tech brand guide v1 */
+  /* forthe.tech — Dark Obsidian optical laboratory system */
   --ink: #0b0c0e;
   --bone: #eeeae1;
   --clay: #d96346;
   --gold: #cba666;
   --slate: #899fcc;
   --clay-deep: #ae4024;
+  --ochre: #d28e54;
+  --ochre-deep: #9e5b26;
+  --soft-slate: #a7b5d2;
+  --soft-slate-deep: #5e7298;
   --gold-deep: #906a21;
   --slate-deep: #496297;
   --grey: #9a9ea5;
   --line: #55585e;
 
-  /* type */
+  /* Typography */
   --font-display: "Instrument Serif", Georgia, serif;
   --font-sans: "DM Sans Variable", "DM Sans", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 
-  /* light theme (bone ground) */
-  --bg: #eeeae1; /* page: bone */
-  --bg-raised: #e6e1d6; /* cards, inputs */
-  --fg: #0b0c0e; /* primary text: ink */
-  --fg-muted: #55585e; /* secondary text: line */
-  --fg-faint: #6e7279; /* labels */
-  --hairline: rgba(11, 12, 14, 0.14);
-  --lit: #ae4024; /* clay deep on light ground */
-  --color-clay: #ae4024;
-  --color-gold: #906a21;
-  --color-slate: #496297;
-  --focus: #0b0c0e;
-}
-.dark,
-.page-shell {
-  /* dark theme (ink ground) */
-  --bg: #0b0c0e; /* page: ink */
-  --bg-raised: #131418;
-  --fg: #eeeae1; /* primary text: bone */
-  --fg-muted: #9a9ea5; /* secondary text: grey */
-  --fg-faint: #6e7279;
-  --hairline: rgba(205, 211, 221, 0.14);
-  --lit: #d96346; /* clay on ink */
+  /* Obsidian surfaces */
+  --bg-obsidian: #0b0c0e;
+  --bg-surface: rgba(255, 255, 255, 0.03);
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --hairline-token: rgba(255, 255, 255, 0.08);
+  --text-bone: #eeeae1;
+  --text-slate: #9a9ea5;
+  --text-faint: #55585e;
+  --bg: var(--bg-obsidian);
+  --bg-raised: var(--bg-surface);
+  --fg: var(--text-bone);
+  --fg-muted: var(--text-slate);
+  --fg-faint: var(--text-faint);
+  --hairline: var(--hairline-token);
+  --reticle: rgba(205, 211, 221, 0.07);
+  --lit: #d96346;
   --color-clay: #d96346;
   --color-gold: #cba666;
   --color-slate: #899fcc;
   --focus: #eeeae1;
-  /* spectrum: 3 rays - clay, gold, slate */
   --spectrum-1: #d96346;
   --spectrum-2: #cba666;
   --spectrum-3: #899fcc;
+  color-scheme: dark;
+}
+
+/* Keep the historic `.dark` utility variant compatible with the fixed dark brand system. */
+.dark,
+.page-shell {
+  --bg: #0b0c0e;
+  --bg-raised: rgba(255, 255, 255, 0.03);
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --fg: #eeeae1;
+  --fg-muted: #9a9ea5;
+  --fg-faint: var(--text-faint);
+  --hairline: rgba(255, 255, 255, 0.08);
+  --reticle: rgba(205, 211, 221, 0.07);
+  --lit: #d96346;
+  --color-clay: #d96346;
+  --color-gold: #cba666;
+  --color-slate: #899fcc;
+  --focus: #eeeae1;
+  --spectrum-1: #d96346;
+  --spectrum-2: #cba666;
+  --spectrum-3: #899fcc;
+  color-scheme: dark;
 }

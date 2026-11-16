@@ -663,3 +663,113 @@
   color: var(--color-paper);
   font-size: 0.875rem;
 }
+/* Dark Obsidian Optical Lab — shared ledger and navigation refinements */
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+  color-scheme: dark;
+}
+
+.site-header {
+  background: rgba(11, 12, 14, 0.88);
+  border-bottom-color: var(--hairline);
+  backdrop-filter: blur(14px);
+}
+
+.header-nav a {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.header-nav a:hover,
+.header-nav a.is-current,
+.header-nav a[data-status="active"] {
+  color: var(--fg);
+}
+
+.header-nav a.is-current::after,
+.header-nav a[data-status="active"]::after {
+  background: var(--clay);
+}
+
+.footer-contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+}
+
+.gst-clock {
+  color: var(--fg-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+[data-hero-tiles] {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+[data-hero-tile] {
+  border-color: var(--hairline);
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+[data-hero-tile]:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-hero] .hero-wash {
+  background: radial-gradient(
+    75% 80% at 68% 52%,
+    rgba(203, 166, 102, 0.035) 0%,
+    rgba(137, 159, 204, 0.018) 42%,
+    transparent 100%
+  );
+}
+
+@media (max-width: 767px) {
+  [data-hero] .hero-wash {
+    background: radial-gradient(95% 60% at 82% 16%, rgba(203, 166, 102, 0.035) 0%, transparent 78%);
+  }
+}
+
+/* Consistent drafting hairlines and surfaces on the archive pages. */
+.chip,
+.card-row,
+.site-footer,
+.footer-bottom {
+  border-color: var(--hairline);
+}
+
+.t-article {
+  max-width: 680px;
+}
+
+.t-article > p:first-of-type::first-letter {
+  float: left;
+  padding: 0.04em 0.1em 0 0;
+  color: var(--clay);
+  font-family: var(--font-display);
+  font-size: 3.1em;
+  line-height: 0.78;
+}
+
+@media (max-width: 767px) {
+  .header-nav {
+    gap: 14px;
+  }
+
+  .header-nav a {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+  }
+}

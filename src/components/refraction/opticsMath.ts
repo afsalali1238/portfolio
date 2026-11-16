@@ -19,7 +19,8 @@ const RED_WAVELENGTH_UM = 0.68;
  * spread from 680 nm to 410 nm, with the table bands landing at approximately +0.000, +0.008,
  * +0.016, +0.023, and +0.040. The scale falls to zero in vacuum.
  */
-const CAUCHY_COEFFICIENT_UM2 = 0.01057;
+export const DEFAULT_CAUCHY_B_UM2 = 0.01057;
+export const DEFAULT_CAUCHY_C_UM4 = 0;
 const MAX_INTERNAL_BOUNCES = 4;
 
 export const add = (a: Vec2, b: Vec2): Vec2 => ({ x: a.x + b.x, y: a.y + b.y });
@@ -187,26 +188,47 @@ export function refract(
 }
 
 /**
- * Cauchy dispersion with a red reference band. The mathematical form is n = base + C / λ²;
- * anchoring to the red band makes the user-facing density control mean exactly n at 680 nm.
- * The C coefficient scales with density so n = 1.000 remains a true vacuum (no false spectrum).
+ * Two-term Cauchy dispersion, n(λ) = A + B/λ² + C/λ⁴, with λ in micrometres.
+ * The red reference band anchors A to the user-facing density control at 680 nm. Coefficients
+ * scale with material density so n = 1.000 remains a true vacuum with no false spectrum.
  */
-export function cauchyRefractiveIndex(baseIndex: number, wavelengthNm: number): number {
+export function cauchyRefractiveIndex(
+  baseIndex: number,
+  wavelengthNm: number,
+  coefficientB = DEFAULT_CAUCHY_B_UM2,
+  coefficientC = DEFAULT_CAUCHY_C_UM4,
+): number {
   const density = Math.max(VACUUM_REFRACTIVE_INDEX, baseIndex);
   const wavelengthUm = Math.max(0.001, wavelengthNm / 1000);
   const craftScale =
     (density - VACUUM_REFRACTIVE_INDEX) / (CROWN_GLASS_REFRACTIVE_INDEX - VACUUM_REFRACTIVE_INDEX);
-  const wavelengthTerm =
-    1 / (wavelengthUm * wavelengthUm) - 1 / (RED_WAVELENGTH_UM * RED_WAVELENGTH_UM);
+  const inverseSquare = 1 / wavelengthUm ** 2;
+  const inverseFourth = inverseSquare ** 2;
+  const redInverseSquare = 1 / RED_WAVELENGTH_UM ** 2;
+  const redInverseFourth = redInverseSquare ** 2;
+  const dispersion =
+    coefficientB * (inverseSquare - redInverseSquare) +
+    coefficientC * (inverseFourth - redInverseFourth);
 
-  return density + Math.max(0, craftScale) * CAUCHY_COEFFICIENT_UM2 * wavelengthTerm;
+  return density + Math.max(0, craftScale) * dispersion;
 }
 
-export function dispersionForDensity(baseIndex: number): number {
-  const red = cauchyRefractiveIndex(baseIndex, SPECTRAL_BANDS[0].wavelengthNm);
+export function dispersionForDensity(
+  baseIndex: number,
+  coefficientB = DEFAULT_CAUCHY_B_UM2,
+  coefficientC = DEFAULT_CAUCHY_C_UM4,
+): number {
+  const red = cauchyRefractiveIndex(
+    baseIndex,
+    SPECTRAL_BANDS[0].wavelengthNm,
+    coefficientB,
+    coefficientC,
+  );
   const violet = cauchyRefractiveIndex(
     baseIndex,
     SPECTRAL_BANDS[SPECTRAL_BANDS.length - 1].wavelengthNm,
+    coefficientB,
+    coefficientC,
   );
   return violet - red;
 }

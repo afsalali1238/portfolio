@@ -99,26 +99,30 @@ export function Works({
                   search={(prev) => ({ ...prev, view: undefined })}
                   replace
                   resetScroll={false}
-                  className={`inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 font-medium transition-colors ${
-                    viewMode === "grid" ? "bg-ink text-paper" : "hover:is-lit text-ink-mute"
+                  className={`inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 font-mono text-[10px] tracking-[0.14em] transition-colors ${
+                    viewMode === "grid"
+                      ? "border border-white/20 bg-white/10 text-[#EEEAE1]"
+                      : "text-[#9A9EA5] hover:bg-white/[0.04] hover:text-[#EEEAE1]"
                   }`}
                   aria-pressed={viewMode === "grid"}
                 >
                   <LayoutGrid className="h-3.5 w-3.5" />
-                  <span>Visual gallery</span>
+                  <span>GRID</span>
                 </Link>
                 <Link
                   to="/works"
                   search={(prev) => ({ ...prev, view: "table" as const })}
                   replace
                   resetScroll={false}
-                  className={`inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 font-medium transition-colors ${
-                    viewMode === "table" ? "bg-ink text-paper" : "hover:is-lit text-ink-mute"
+                  className={`inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 font-mono text-[10px] tracking-[0.14em] transition-colors ${
+                    viewMode === "table"
+                      ? "border border-white/20 bg-white/10 text-[#EEEAE1]"
+                      : "text-[#9A9EA5] hover:bg-white/[0.04] hover:text-[#EEEAE1]"
                   }`}
                   aria-pressed={viewMode === "table"}
                 >
                   <List className="h-3.5 w-3.5" />
-                  <span>Index table</span>
+                  <span>TABLE</span>
                 </Link>
               </div>
 
@@ -193,11 +197,11 @@ export function Works({
                         >
                           <span
                             className="h-1.5 w-1.5 rounded-full"
-                            style={{ backgroundColor: "var(--fg)" }}
+                            style={{ backgroundColor: "var(--clay)" }}
                           />
                           <span
-                            className="capitalize text-xs font-medium"
-                            style={{ color: "var(--bg)" }}
+                            className="font-mono text-[10px] uppercase tracking-[0.1em]"
+                            style={{ color: "var(--fg)" }}
                           >
                             {isMobile ? "Phone build" : "Web build"}
                           </span>
@@ -205,14 +209,11 @@ export function Works({
 
                         {/* Status Badge */}
                         {p.status && (
-                          <div
-                            className="absolute right-3 top-3 rounded-full px-3 py-1 text-xs font-medium capitalize"
-                            style={{
-                              backgroundColor: "rgba(238,234,225,0.95)",
-                              color: "var(--fg)",
-                              border: "1px solid var(--hairline)",
-                            }}
-                          >
+                          <div className="absolute right-3 top-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#0B0C0E]/90 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-[#EEEAE1]">
+                            <span
+                              className="h-1.5 w-1.5 rounded-full"
+                              style={{ backgroundColor: p.live ? "#D96346" : "#899FCC" }}
+                            />
                             {p.status}
                           </div>
                         )}

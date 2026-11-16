@@ -82,12 +82,18 @@ export function LogoMark({ className = "h-6 w-6", small = false, mono = false }:
 }
 
 /** The mark standalone or in its container for header and footer. */
-export function LogoTile({ className = "h-7 w-7" }: { className?: string }) {
+export function LogoTile({
+  className = "h-7 w-7",
+  small = false,
+}: {
+  className?: string;
+  small?: boolean;
+}) {
   return (
     <span
       className={`inline-flex shrink-0 items-center justify-center text-ink dark:text-bone ${className}`}
     >
-      <LogoMark className="h-full w-full" />
+      <LogoMark className="h-full w-full" small={small} />
     </span>
   );
 }

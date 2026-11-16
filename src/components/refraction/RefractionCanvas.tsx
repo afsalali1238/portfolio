@@ -38,13 +38,13 @@ type RefractionCanvasProps = {
 };
 
 const EMPTY_PALETTE: CanvasPalette = {
-  paper: "#f7f5ee",
-  paperDeep: "#efebe1",
-  ink: "#302b25",
-  inkSoft: "#5b534a",
-  inkMute: "#887f74",
-  rule: "#d7d0c4",
-  accent: "#a6552d",
+  paper: "#0b0c0e",
+  paperDeep: "#131418",
+  ink: "#eeeae1",
+  inkSoft: "#9a9ea5",
+  inkMute: "#55585e",
+  rule: "rgba(255,255,255,0.08)",
+  accent: "#d96346",
 };
 
 function lineToBounds(origin: Vec2, direction: Vec2, width: number, height: number): Vec2 {
@@ -115,13 +115,13 @@ function readPalette(): CanvasPalette {
   const token = (name: string, fallback: string) =>
     styles.getPropertyValue(name).trim() || fallback;
   return {
-    paper: token("--paper", EMPTY_PALETTE.paper),
-    paperDeep: token("--paper-deep", EMPTY_PALETTE.paperDeep),
-    ink: token("--ink", EMPTY_PALETTE.ink),
-    inkSoft: token("--ink-soft", EMPTY_PALETTE.inkSoft),
-    inkMute: token("--ink-mute", EMPTY_PALETTE.inkMute),
-    rule: token("--rule", EMPTY_PALETTE.rule),
-    accent: token("--accent-ink", EMPTY_PALETTE.accent),
+    paper: token("--bg", EMPTY_PALETTE.paper),
+    paperDeep: token("--bg-raised", EMPTY_PALETTE.paperDeep),
+    ink: token("--fg", EMPTY_PALETTE.ink),
+    inkSoft: token("--fg-muted", EMPTY_PALETTE.inkSoft),
+    inkMute: token("--fg-faint", EMPTY_PALETTE.inkMute),
+    rule: token("--hairline", EMPTY_PALETTE.rule),
+    accent: token("--lit", EMPTY_PALETTE.accent),
   };
 }
 
@@ -210,7 +210,7 @@ export function RefractionCanvas({
 
     const draw = () => {
       const controls = controlsRef.current;
-      const density = clamp(controls.density, 1, 2.4);
+      const density = clamp(controls.density, 1, 2.417);
       const beamAngleDegrees = clamp(controls.beamAngleDegrees, -30, 30);
       const direction = {
         x: Math.cos(radians(beamAngleDegrees)),
@@ -250,9 +250,22 @@ export function RefractionCanvas({
             origin,
             direction,
             vertices,
-            cauchyRefractiveIndex(density, band.wavelengthNm),
+            cauchyRefractiveIndex(density, band.wavelengthNm, controls.cauchyB, controls.cauchyC),
             band,
           ),
+        );
+        const probeBand = {
+          ...SPECTRAL_BANDS[2],
+          label: "Probe wavelength",
+          wavelengthNm: controls.wavelengthNm,
+          color: palette.accent,
+        };
+        const probeTrace = traceSpectralRay(
+          origin,
+          direction,
+          vertices,
+          cauchyRefractiveIndex(density, controls.wavelengthNm, controls.cauchyB, controls.cauchyC),
+          probeBand,
         );
         const referenceTrace = traces[0];
         if (referenceTrace.entry) {
@@ -263,7 +276,7 @@ export function RefractionCanvas({
 
         isInternalReflection = traces.some((trace) => trace.isInternalReflection);
         hasEscapingSpectrum = traces.some((trace) => trace.didExit);
-        const dispersion = dispersionForDensity(density);
+        const dispersion = dispersionForDensity(density, controls.cauchyB, controls.cauchyC);
 
         if (didHitSurface) {
           if (dispersion < 0.0001) {
@@ -271,6 +284,7 @@ export function RefractionCanvas({
           } else {
             traces.forEach((trace) => drawTrace(context, trace, width, height));
           }
+          if (probeTrace.entry) drawTrace(context, probeTrace, width, height, 0.98);
         }
 
         if (isInternalReflection) status = "total-internal-reflection";
@@ -350,7 +364,10 @@ export function RefractionCanvas({
         incidentAngleDegrees: incidentAngle,
         density,
         velocity,
-        dispersion: controls.surfaceMode === "prism" ? dispersionForDensity(density) : 0,
+        dispersion:
+          controls.surfaceMode === "prism"
+            ? dispersionForDensity(density, controls.cauchyB, controls.cauchyC)
+            : 0,
         isInternalReflection,
         didHitSurface,
         status,
@@ -360,6 +377,9 @@ export function RefractionCanvas({
         controls.surfaceMode,
         density.toFixed(3),
         beamAngleDegrees.toFixed(1),
+        controls.cauchyB.toFixed(5),
+        controls.cauchyC.toFixed(6),
+        controls.wavelengthNm.toFixed(0),
         didHitSurface ? "hit" : "miss",
         isInternalReflection ? "tir" : "pass",
       ].join("|");

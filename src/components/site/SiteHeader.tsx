@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Moon, Sun, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Container } from "../layout/Container";
 import { LogoTile, Wordmark } from "./LogoMark";
@@ -11,29 +11,7 @@ const NAV_LINKS = [
   { label: "The Man Behind", to: "/the-man-behind" },
 ] as const;
 
-function useTheme() {
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    setIsDark(document.documentElement.classList.contains("dark"));
-  }, []);
-
-  const toggle = () => {
-    const next = !isDark;
-    setIsDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    try {
-      localStorage.setItem("theme", next ? "dark" : "light");
-    } catch {
-      /* private mode: theme still applies for this visit */
-    }
-  };
-
-  return [isDark, toggle] as const;
-}
-
 export function SiteHeader() {
-  const [isDark, toggleTheme] = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -85,42 +63,30 @@ export function SiteHeader() {
     menuTriggerRef.current?.focus();
   };
 
-  const themeLabel = isDark ? "Switch to light theme" : "Switch to dark theme";
-
   return (
     <>
       <header className="site-header">
         <Container className="container">
           <Link to="/" className="brand" aria-label="forthe.tech — home">
-            <LogoTile className="h-[29px] w-[29px]" />
-            <Wordmark className="text-[20px] font-semibold tracking-[-0.7px]" />
+            <LogoTile className="h-6 w-6" small />
+            <Wordmark className="text-[20px] font-semibold tracking-[-0.03em]" />
           </Link>
 
           <nav aria-label="Site" className="header-nav">
             {NAV_LINKS.map((l) => (
-              <Link key={l.to} to={l.to} className="group" data-status="active">
+              <Link
+                key={l.to}
+                to={l.to}
+                activeProps={{ className: "group is-current" }}
+                inactiveProps={{ className: "group" }}
+                aria-label={l.label}
+              >
                 {l.label}
               </Link>
             ))}
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="header-actions"
-              aria-label={themeLabel}
-            >
-              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </button>
           </nav>
 
           <div className="header-actions md:hidden">
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="header-actions"
-              aria-label={themeLabel}
-            >
-              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </button>
             <button
               ref={menuTriggerRef}
               type="button"

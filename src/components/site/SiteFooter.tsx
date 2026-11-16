@@ -2,7 +2,29 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 import { Container } from "../layout/Container";
 import { LogoTile, Wordmark } from "./LogoMark";
-import { AUTHOR } from "../../lib/site";
+import { useEffect, useState } from "react";
+
+function GSTClock() {
+  const [time, setTime] = useState("");
+
+  useEffect(() => {
+    const update = () =>
+      setTime(
+        new Intl.DateTimeFormat("en-GB", {
+          timeZone: "Asia/Dubai",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hourCycle: "h23",
+        }).format(new Date()),
+      );
+    update();
+    const timer = window.setInterval(update, 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return <time className="gst-clock">{time || "--:--:--"} GST (UTC+4)</time>;
+}
 
 export function SiteFooter() {
   return (
@@ -11,7 +33,7 @@ export function SiteFooter() {
         <div className="footer-main">
           <div className="footer-brand-group">
             <Link to="/" className="footer-brand" aria-label="forthe.tech — home">
-              <LogoTile className="h-6 w-6" />
+              <LogoTile className="h-6 w-6" small />
               <Wordmark className="text-[17px]" />
             </Link>
             <p className="footer-tagline">Independent thought, made real.</p>
@@ -35,7 +57,13 @@ export function SiteFooter() {
             </Link>
           </nav>
 
-          <div className="footer-contact">here@forthe.tech · Dubai · GST (UTC+4)</div>
+          <div className="footer-contact">
+            <span>here@forthe.tech</span>
+            <span aria-hidden="true"> · </span>
+            <span>25.2048° N / 55.2708° E</span>
+            <span aria-hidden="true"> · </span>
+            <GSTClock />
+          </div>
         </div>
 
         <div className="footer-bottom">
