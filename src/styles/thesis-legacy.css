@@ -1,0 +1,38 @@
+/* Historic six-part manifesto presentation, scoped so the rest of the site stays on-brand. */
+.thesis-legacy {
+  --bg: #eeeae1;
+  --bg-raised: #e6e1d6;
+  --fg: #0b0c0e;
+  --fg-muted: #55585e;
+  --fg-faint: #6e7279;
+  --hairline: rgba(11, 12, 14, 0.14);
+  --lit: #ae4024;
+  --color-clay: #ae4024;
+  --color-gold: #906a21;
+  --color-slate: #496297;
+  --focus: #0b0c0e;
+  color-scheme: light;
+}
+
+.thesis-legacy .page-shell {
+  --bg: #eeeae1;
+  --bg-raised: #e6e1d6;
+  --fg: #0b0c0e;
+  --fg-muted: #55585e;
+  --fg-faint: #6e7279;
+  --hairline: rgba(11, 12, 14, 0.14);
+  --lit: #ae4024;
+  --color-clay: #ae4024;
+  --color-gold: #906a21;
+  --color-slate: #496297;
+  --focus: #0b0c0e;
+  color-scheme: light;
+}
+
+.thesis-legacy .grain-overlay {
+  display: none;
+}
+
+.thesis-legacy .grain {
+  background-image: none;
+}
