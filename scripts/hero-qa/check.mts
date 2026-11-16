@@ -10,19 +10,16 @@
  * engine's own contribution, with no type. The composited stills come from compose.mts (or,
  * with a browser, tools/hero-qa.mjs).
  *
- * Pins the things that have broken this effect before, plus the contracts of the current
- * composition:
+ * Pins the current three-ray optical-lab composition and the interactions that matter:
  *
- *   1. Continuity: every strand's P(0) is the dispersion origin, exactly.
- *   2. Coverage: the fan reaches all four edges of the section.
- *   3. Optics: the resting ray is a real refraction (or TIR then refraction), entry and exit are
- *      parametrised on the facets the trace names, and the source is outside the entry plane.
- *   4. Composition: the beam enters at the frame edge, crosses a headline line, and is painted
- *      *before* the dissolve while everything crisp around the glass is painted after it.
- *   5. The wave: the illustrated ripple is visible, bounded by its envelope, and exactly zero at
- *      both ends, so it lands on the hinge the tracer computed.
- *   6. Interaction: strands bend toward the pointer and never overshoot it; inside the glass the
- *      catch releases and the fan follows the traced exit.
+ *   1. Continuity: each of the three brand rays begins at the dispersion origin.
+ *   2. Spectrum: clay, gold, and slate stay in calibrated angular order; no legacy ghost fan.
+ *   3. Optics: Snell refraction, traced facet contacts, and the source outside the entry plane.
+ *   4. Composition: the frame-edge beam crosses the headline behind its dissolve; crisp glass
+ *      and spectral exit rays stay clear of the text.
+ *   5. The beam ripple is bounded and exactly zero at both ends, preserving the traced hinge.
+ *   6. Interaction: nearby rays bend toward the pointer, release over glass, and follow the
+ *      traced exit when the light source is moved.
  */
 import assert from "node:assert/strict";
 import { createCanvas } from "@napi-rs/canvas";
@@ -140,23 +137,26 @@ for (const file of files) {
     }
   });
 
-  check("the field is full-bleed: targets reach all four edges", () => {
-    const xsRel = geo.targets.map((t) => t.x / geo.heroW);
-    const ysRel = geo.targets.map((t) => t.y / geo.heroH);
-    const edges = {
-      left: xsRel.some((x) => x < 0.02),
-      right: xsRel.some((x) => x > 0.98),
-      top: ysRel.some((y) => y < 0.02),
-      bottom: ysRel.some((y) => y > 0.98),
-    };
-    assert.ok(edges.left && edges.right && edges.top && edges.bottom, JSON.stringify(edges));
+  check("the optical field is exactly the three calibrated brand rays", () => {
+    assert.equal(BANDS.length, 3, "the lab must emit only clay, gold, and slate");
+    assert.deepEqual(BANDS.map((band) => band.name), ["clay", "gold", "slate"]);
+    assert.deepEqual(BANDS.map((band) => band.dark), [[217, 99, 70], [203, 166, 102], [137, 159, 204]]);
+    assert.equal(geo.specs.length, 3, "legacy ghost or extra spectral lanes returned");
+    assert.deepEqual(geo.specs.map((strand) => strand.band), [0, 1, 2]);
+    assert.ok(geo.specs.every((strand) => !strand.ghost), "a decorative ghost ray returned");
+    assert.deepEqual(geo.specs.map((strand) => Math.round((strand.angle * 180) / Math.PI)), [4, 17, 29]);
+    assert.ok(
+      geo.strands.every((strand) => near(strand.root.x, geo.exit.x, 0.01) && near(strand.root.y, geo.exit.y, 0.01)),
+      "a brand ray detached from the traced exit",
+    );
   });
 
-  check("the sweep is a fan, not a wedge", () => {
-    // Desktop opens ~330°; portrait deliberately faces the empty side of the page.
-    const minimum = geo.mobile ? 140 : 240;
+  check("the brand spectrum stays a restrained, ordered wedge", () => {
     const span = geo.sweep.to - geo.sweep.from;
-    assert.ok(span >= minimum, `sweep is only ${span}° (needs ${minimum}°)`);
+    assert.ok(span >= 20 && span <= 30, `calibrated spectrum spans ${span}° rather than 20°–30°`);
+    for (let i = 1; i < geo.specs.length; i++) {
+      assert.ok(geo.specs[i].angle > geo.specs[i - 1].angle, `ray ${i} reversed spectral order`);
+    }
   });
 
   check("entry and exit ride the facets the trace names (parametric, not free-floating)", () => {
@@ -245,11 +245,19 @@ for (const file of files) {
       inside,
       `glass is clipped: left ${geo.leftV.x.toFixed(0)}, right ${geo.rightV.x.toFixed(0)} of ${geo.heroW}, apex ${geo.topV.y.toFixed(0)}`,
     );
-    // The triangle's half-width is exactly size / 2, so this also checks that the size really
-    // is what the frames show.
+    // The prism is a 55° crown-glass isosceles triangle. `prismSize` is its sloping side,
+    // not the full base width as it was in the older equilateral-fan composition.
+    const expectedBase = 2 * geo.prismSize * Math.sin((27.5 * Math.PI) / 180);
     assert.ok(
-      near(geo.rightV.x - geo.topV.x, geo.prismSize / 2, 0.5),
-      "the prism's half-width does not match its size",
+      near(geo.rightV.x - geo.leftV.x, expectedBase, 0.5),
+      `55° prism base is ${geo.rightV.x - geo.leftV.x}px, expected ${expectedBase}px`,
+    );
+    const side = (a: { x: number; y: number }, b: { x: number; y: number }) =>
+      Math.hypot(b.x - a.x, b.y - a.y);
+    assert.ok(
+      near(side(geo.topV, geo.leftV), geo.prismSize, 0.5) &&
+        near(side(geo.topV, geo.rightV), geo.prismSize, 0.5),
+      "the prism's sloping sides do not match its optical size",
     );
     const column = layout.container.right - layout.container.left;
     const relative = (geo.prismCenter.x - layout.container.left) / (column || 1);
@@ -401,21 +409,19 @@ for (const file of files) {
       peak >= amplitude * 0.6,
       `peak ripple ${peak.toFixed(1)}px of a ${amplitude.toFixed(1)}px envelope: the wave is not visible`,
     );
-    // A hairline nobody can see is what the previous pass shipped: 0.4 px. Below ~6 px on a
-    // desktop the crest is indistinguishable from the beam's own bloom.
-    assert.ok(
-      amplitude >= (geo.mobile ? 4 : 6),
-      `ripple amplitude ${amplitude.toFixed(1)}px is not visible`,
-    );
+    // The amplitude is clamped to a five-pixel floor in the engine: subtle at layout scale,
+    // but measurable rather than an invisible subpixel wiggle.
+    assert.ok(amplitude >= 5, `ripple amplitude ${amplitude.toFixed(1)}px is below the 5px floor`);
   });
 
-  check("the prism is an equilateral triangle built on its own centroid", () => {
+  check("the 55° prism is an isosceles triangle built on its own centroid", () => {
     const e1 = Math.hypot(geo.rightV.x - geo.topV.x, geo.rightV.y - geo.topV.y);
     const e2 = Math.hypot(geo.leftV.x - geo.rightV.x, geo.leftV.y - geo.rightV.y);
     const e3 = Math.hypot(geo.topV.x - geo.leftV.x, geo.topV.y - geo.leftV.y);
     assert.ok(
-      near(e1, e2, 0.5) && near(e2, e3, 0.5),
-      `edges ${e1.toFixed(1)}/${e2.toFixed(1)}/${e3.toFixed(1)}`,
+      near(e1, e3, 0.5) && near(e1, geo.prismSize, 0.5) &&
+        near(e2, 2 * geo.prismSize * Math.sin((27.5 * Math.PI) / 180), 0.5),
+      `55° crown-glass sides/base ${e1.toFixed(1)}/${e2.toFixed(1)}/${e3.toFixed(1)}`,
     );
     const cx = (geo.topV.x + geo.leftV.x + geo.rightV.x) / 3;
     const cy = (geo.topV.y + geo.leftV.y + geo.rightV.y) / 3;
@@ -432,20 +438,12 @@ for (const file of files) {
     );
   });
 
-  check("no strand is allowed to shout over the copy", () => {
-    // Ghosts carry the copy-crossing beams at a fraction of the weight; anything damped by a
-    // quiet rect must still be visible, or the fan reads as cut off at the type.
-    assert.ok(
-      geo.specs.some((strand) => strand.ghost),
-      "the field has no quiet-side strands",
-    );
+  check("the three rays use only their assigned clay, gold, and slate bands", () => {
+    assert.deepEqual(geo.specs.map((strand) => strand.band), [0, 1, 2]);
     for (const strand of geo.specs) {
-      assert.ok(
-        strand.alpha > 0 && strand.alpha <= 1,
-        `strand ${strand.index} alpha ${strand.alpha}`,
-      );
-      if (strand.dir.x < -0.15)
-        assert.ok(strand.alpha <= 0.12, `left-side strand ${strand.index} is too bright`);
+      assert.ok(strand.alpha > 0 && strand.alpha <= 1, `ray ${strand.index} alpha ${strand.alpha}`);
+      assert.ok(!strand.ghost, `ray ${strand.index} is an unexpected ghost`);
+      assert.ok(strand.dir.x > 0, `brand ray ${strand.index} points backward through the prism`);
     }
   });
 
@@ -468,14 +466,12 @@ for (const file of files) {
       "the prime line is a ghost — it has to be the loudest stroke, not the quietest",
     );
     assert.ok(prime.ribbon > 0, "the prime line is a hairline");
-    // Desktop: out of the glass horizontally. Portrait: straight down the page.
-    const target = ((geo.mobile ? 92 : 0) * Math.PI) / 180;
-    const off = Math.abs(
-      Math.atan2(Math.sin(prime.angle - target), Math.cos(prime.angle - target)),
-    );
+    const calibrated = geo.specs.some((strand) => strand.index === prime.index);
+    assert.ok(calibrated, "the prime line is outside the three-ray spectrum");
     assert.ok(
-      off < (20 * Math.PI) / 180,
-      `prime lane is ${((off * 180) / Math.PI).toFixed(0)}° off target`,
+      prime.angle >= (geo.sweep.from * Math.PI) / 180 &&
+        prime.angle <= (geo.sweep.to * Math.PI) / 180,
+      `prime lane ${((prime.angle * 180) / Math.PI).toFixed(1)}° is outside the calibrated spectrum`,
     );
   });
 
@@ -495,7 +491,7 @@ for (const file of files) {
     }
   });
 
-  check("the glass stays clear: crossings open past the rim, only the hinge enters at rest", () => {
+  check("resting brand rays leave through the traced facet without re-entering glass", () => {
     // The gates are computed while the buffers are filled, so a paint has to land first.
     const canvas = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
     ray.paintStill(canvas.getContext("2d") as never);
@@ -532,7 +528,7 @@ for (const file of files) {
         assert.equal(gate, 0, `strand ${i} was cut but only grazes the body`);
       }
     }
-    assert.ok(crossings >= 3, `only ${crossings} lanes cross the body — the clip is not exercised`);
+    assert.equal(crossings, 0, `${crossings} resting brand rays cross through the prism body`);
 
     const drawing = live.restingDrawing;
     assert.equal(drawing.internalLegs.length, 0, "rest paints internal traced legs");
@@ -568,7 +564,12 @@ for (const file of files) {
   check("the current catches the pointer, and never overshoots it", () => {
     const canvas = createCanvas(Math.round(layout.heroW), Math.round(layout.heroH));
     const ctx = canvas.getContext("2d") as never;
-    const pointer = { x: geo.heroW * 0.5, y: geo.heroH * 0.78 };
+    // Probe near the calibrated spectrum, not at a legacy full-frame fan coordinate. The
+    // portrait ray exits the short stage quickly, so keep its probe close to the hinge.
+    const probeAt = geo.mobile ? 0.1 : 0.55;
+    const onRay = ray.sampleStrand(0, probeAt);
+    const normal = geo.normals[0];
+    const pointer = { x: onRay.x + normal.x * 90, y: onRay.y + normal.y * 90 };
 
     const idle = createHeroRay();
     idle.setTheme(capture.dark);

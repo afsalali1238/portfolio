@@ -306,10 +306,11 @@ export type HeroGeometry = {
   /**
    * Where the composition put the beam's landing on the left facet:
    * "left-run" = it crosses the hero from the left edge (wide screens),
-   * "corner-rise" = it rises from the lower-left into the corner glass (portrait).
-   * Both are a straight approach; neither is a reroute.
+   * "corner-rise" = it rises from the lower-left into corner glass without a stage,
+   * "stage-run" = it enters the measured centerpiece stage from the left.
+   * All three are straight approaches; none is a reroute.
    */
-  entryMode: "left-run" | "corner-rise";
+  entryMode: "left-run" | "corner-rise" | "stage-run";
   /** resting parameter on the left facet, top → bottom */
   entryU: number;
   /** the beam's approach angle in radians (screen space, y down) */
@@ -1126,8 +1127,11 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const { heroW, heroH, thesisLine } = snapshot;
     const mobile = heroW < PORTRAIT_MAX_W;
     const stage = snapshot.mobileStage;
+    // The stage is visible below the `lg` breakpoint (1024px), including landscape tablets
+    // that are wider than the portrait geometry breakpoint. Respect the measured DOM stage
+    // whenever it is present instead of assuming every staged layout is narrow/mobile.
     const hasStage = Boolean(
-      mobile && stage && stage.right - stage.left > 60 && stage.bottom - stage.top > 60,
+      stage && stage.right - stage.left > 60 && stage.bottom - stage.top > 60,
     );
 
     /**
@@ -1620,7 +1624,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       hit,
       exit,
       source,
-      entryMode: mobile ? "corner-rise" : "left-run",
+      entryMode: hasStage ? "stage-run" : mobile ? "corner-rise" : "left-run",
       entryU,
       beamAngle,
       restOptics,
