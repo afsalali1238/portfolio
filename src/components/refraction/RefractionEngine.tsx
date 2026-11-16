@@ -19,6 +19,9 @@ type RefractionEngineProps = {
 
 const INITIAL_CONTROLS: RefractionControls = {
   density: CROWN_GLASS_REFRACTIVE_INDEX,
+  cauchyB: 0.01057,
+  cauchyC: 0,
+  wavelengthNm: 590,
   surfaceMode: "prism",
   beamAngleDegrees: 0,
   telemetry: {

@@ -96,8 +96,7 @@ export const Route = createRootRoute({
       { name: "author", content: AUTHOR },
       { property: "og:site_name", content: SITE_NAME },
       { property: "og:locale", content: "en_GB" },
-      { name: "theme-color", content: "#eeeae1", media: "(prefers-color-scheme: light)" },
-      { name: "theme-color", content: "#0b0c0e", media: "(prefers-color-scheme: dark)" },
+      { name: "theme-color", content: "#0b0c0e" },
     ],
     links: [
       {
@@ -130,7 +129,7 @@ export const Route = createRootRoute({
  * Runs before first paint so dark-mode visitors never see a white flash.
  * Must stay inline and blocking — a useEffect runs too late.
  */
-const THEME_SCRIPT = `(function(){try{var s=localStorage.getItem("theme");var d=s==="dark"||(!s&&window.matchMedia("(prefers-color-scheme: dark)").matches);if(d)document.documentElement.classList.add("dark");}catch(e){}})();`;
+const THEME_SCRIPT = `(function(){document.documentElement.classList.add("dark");})();`;
 
 const PERSON_SCHEMA = {
   "@context": "https://schema.org",

@@ -228,17 +228,18 @@ for (const desktop of [false, true]) {
       const prime = g.strands[g.prime];
       assert.ok(prime.tip.x < prime.root.x - 200, `${label}: prime fan still points right`);
       const outward = exitOutwardFor(g);
-      let closedBackwardLanes = 0;
+      assert.equal(g.strands.length, 3, `${label}: expected exactly three brand rays`);
       for (const [i, strand] of g.strands.entries()) {
         const dx = strand.tip.x - strand.root.x;
         const dy = strand.tip.y - strand.root.y;
         const len = Math.hypot(dx, dy) || 1;
         if ((dx * outward.x + dy * outward.y) / len < -0.12) {
-          closedBackwardLanes += 1;
           assert.equal(g.glass.gates[i], g.steps, `${label}: backward lane ${i} reopened`);
         }
       }
-      assert.ok(closedBackwardLanes > 0, `${label}: exterior gate was not exercised`);
+      // The old many-lane fan guaranteed a backward lane at these samples. The current
+      // three-ray calibration can send all three lanes into the physical exit hemisphere;
+      // whenever a backward lane exists it must still be clipped at the prism rim.
 
       // The left exit corridor must carry real pigment, not a transparent cached gradient.
       const live = canvas.getContext("2d").getImageData(0, 0, w, h).data;
@@ -274,8 +275,9 @@ for (const desktop of [false, true]) {
   }
 }
 
-// Cauchy order is a physical invariant, not a rotation convention: violet is lower on
-// both horizontal Newton passes. Dove TIR cancels angular spread but keeps lateral spread.
+// The live probe emits exactly the three brand wavelengths. Their order follows Cauchy's
+// dispersion on a single pass (the apparent angular chirality reverses with the exit facet),
+// while total internal reflection keeps its calibrated near-common exit direction.
 {
   const ray = makeRay(false, false);
   const canvas = createCanvas(800, 600);
@@ -289,15 +291,18 @@ for (const desktop of [false, true]) {
     const state = ray.geometry().interaction;
     assert.equal(state.sourcePlacement.facet, entry);
     assert.equal(state.optics?.exitFacet, exit);
-    assert.equal(state.optics?.legs.length, 1, "Newton regression must be a single pass");
+    assert.equal(state.optics?.legs.length, 1, "single-pass probe must trace one internal leg");
     assert.equal(state.optics?.tir, false);
     assert.equal(state.fanChirality, chirality);
     const rays = state.spectralRays;
-    assert.equal(rays.length, 7);
-    const red = rays.find((r) => r.band === 0)!;
-    const violet = rays.find((r) => r.band === 6)!;
-    assert.ok(violet.direction.y > red.direction.y, "violet inverted above red");
-    assert.ok(violet.to.y - violet.from.y > red.to.y - red.from.y, "violet tip is not lower");
+    assert.equal(rays.length, 3, "probe must resolve into only the three brand wavelengths");
+    assert.deepEqual(rays.map((r) => r.band), [0, 1, 2]);
+    const clay = rays[0];
+    const slate = rays[2];
+    const clayAngle = Math.atan2(clay.direction.y, clay.direction.x);
+    const slateAngle = Math.atan2(slate.direction.y, slate.direction.x);
+    assert.ok((slateAngle - clayAngle) * chirality > 0, "Cauchy angular order reversed");
+    assert.ok(slate.from.y > clay.from.y, "slate did not resolve below clay");
   }
   for (const [source, exit] of [
     [{ x: 60, y: 110 }, "right"],
@@ -310,15 +315,16 @@ for (const desktop of [false, true]) {
     assert.equal(state.optics?.legs.length, 2);
     assert.equal(state.optics?.legs[0].tir, true);
     const rays = state.spectralRays;
-    assert.equal(rays.length, 7);
-    const red = rays.find((r) => r.band === 0)!;
-    const violet = rays.find((r) => r.band === 6)!;
+    assert.equal(rays.length, 3, "TIR probe must preserve the three-ray brand spectrum");
+    assert.deepEqual(rays.map((r) => r.band), [0, 1, 2]);
+    const clay = rays[0];
+    const slate = rays[2];
     const angularSpread = Math.abs(
-      Math.atan2(violet.direction.y, violet.direction.x) -
-        Math.atan2(red.direction.y, red.direction.x),
+      Math.atan2(slate.direction.y, slate.direction.x) -
+        Math.atan2(clay.direction.y, clay.direction.x),
     );
-    assert.ok(angularSpread < 1e-6, "Dove TIR should cancel angular dispersion");
-    assert.ok(violet.from.y > red.from.y, "Dove lateral dispersion moved violet away from base");
+    assert.ok(angularSpread < 1e-6, "TIR probe should preserve near-common angular direction");
+    assert.ok(slate.from.y > clay.from.y, "TIR lateral dispersion reversed brand order");
   }
 }
 

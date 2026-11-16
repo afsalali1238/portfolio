@@ -83,8 +83,10 @@ function TheManBehindPage() {
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
               <div>
-                <h1 className="t-display-1">The Man Behind.</h1>
-                <p className="t-lede mt-2">Builder, operator, and experimenter based in Dubai.</p>
+                <h1 className="t-display-1">
+                  The Man <em>Behind.</em>
+                </h1>
+                <p className="t-lede mt-2">Operator dossier &amp; verified public ledger.</p>
               </div>
 
               {/* Location & Time badge */}
@@ -222,7 +224,7 @@ function TheManBehindPage() {
                       className="inline-block h-2 w-2 rounded-full"
                       style={{ backgroundColor: "var(--lit)", animation: "pulse 2s infinite" }}
                     />
-                    <span>Available for collaborations & architecture advisory.</span>
+                    <span>Available for advisory &amp; architecture</span>
                   </p>
                 </div>
               </div>

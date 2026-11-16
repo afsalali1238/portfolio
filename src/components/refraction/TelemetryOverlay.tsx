@@ -1,4 +1,5 @@
 import { useEffect, useRef, type FormEvent, type MutableRefObject } from "react";
+import { cauchyRefractiveIndex } from "./opticsMath";
 import {
   MATERIAL_PRESETS,
   SPECTRAL_BANDS,
@@ -48,10 +49,15 @@ export function TelemetryOverlay({
   const velocityRef = useRef<HTMLOutputElement>(null);
   const dispersionRef = useRef<HTMLOutputElement>(null);
   const densityValueRef = useRef<HTMLOutputElement>(null);
+  const bValueRef = useRef<HTMLOutputElement>(null);
+  const cValueRef = useRef<HTMLOutputElement>(null);
+  const wavelengthValueRef = useRef<HTMLOutputElement>(null);
+  const wavelengthIndexRef = useRef<HTMLOutputElement>(null);
+  const beamAngleValueRef = useRef<HTMLOutputElement>(null);
   const statusRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    if (!showHud || typeof window === "undefined") return;
+    if ((!showHud && !showControls) || typeof window === "undefined") return;
     let rafId = 0;
     let lastUpdate = -Infinity;
 
@@ -68,6 +74,21 @@ export function TelemetryOverlay({
           dispersionRef.current.textContent = `Δ ${telemetry.dispersion.toFixed(3)}`;
         if (densityValueRef.current)
           densityValueRef.current.textContent = `n = ${telemetry.density.toFixed(3)}`;
+        const controls = controlsRef.current;
+        if (bValueRef.current) bValueRef.current.textContent = controls.cauchyB.toFixed(5);
+        if (cValueRef.current) cValueRef.current.textContent = controls.cauchyC.toFixed(6);
+        if (wavelengthValueRef.current)
+          wavelengthValueRef.current.textContent = `${controls.wavelengthNm.toFixed(0)} nm`;
+        if (beamAngleValueRef.current)
+          beamAngleValueRef.current.textContent = `${controls.beamAngleDegrees.toFixed(1)}°`;
+        if (wavelengthIndexRef.current) {
+          wavelengthIndexRef.current.textContent = cauchyRefractiveIndex(
+            controls.density,
+            controls.wavelengthNm,
+            controls.cauchyB,
+            controls.cauchyC,
+          ).toFixed(4);
+        }
         if (statusRef.current) {
           statusRef.current.textContent = statusCopy[telemetry.status];
           statusRef.current.dataset.alert = telemetry.isInternalReflection ? "true" : "false";
@@ -79,7 +100,7 @@ export function TelemetryOverlay({
 
     rafId = window.requestAnimationFrame(update);
     return () => window.cancelAnimationFrame(rafId);
-  }, [controlsRef, showHud]);
+  }, [controlsRef, showHud, showControls]);
 
   const handleDensityInput = (event: FormEvent<HTMLInputElement>) => {
     const density = Number(event.currentTarget.value);
@@ -135,6 +156,18 @@ export function TelemetryOverlay({
                   <output ref={dispersionRef}>—</output>
                 </dd>
               </div>
+              <div>
+                <dt className="uppercase tracking-[0.1em] text-ink-mute">probe λ</dt>
+                <dd className="mt-0.5 text-sm text-ink">
+                  <output ref={wavelengthValueRef}>590 nm</output>
+                </dd>
+              </div>
+              <div>
+                <dt className="uppercase tracking-[0.1em] text-ink-mute">n(λ)</dt>
+                <dd className="mt-0.5 text-sm text-ink">
+                  <output ref={wavelengthIndexRef}>1.5200</output>
+                </dd>
+              </div>
             </dl>
 
             <div className="mt-2 border-t rule-hair pt-2">
@@ -176,8 +209,8 @@ export function TelemetryOverlay({
                 id="refraction-density"
                 type="range"
                 min="1"
-                max="2.4"
-                step="0.005"
+                max="2.417"
+                step="0.001"
                 defaultValue={controlsRef.current.density}
                 onInput={handleDensityInput}
                 className="mt-3 h-2 w-full cursor-ew-resize accent-[var(--accent-ink)]"
@@ -223,6 +256,99 @@ export function TelemetryOverlay({
             </div>
           </div>
 
+          <div className="mt-5 grid gap-4 border-t rule-hair pt-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <label
+                htmlFor="refraction-angle"
+                className="flex items-baseline justify-between gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-ink"
+              >
+                <span>Incident angle θ₁</span>
+                <output ref={beamAngleValueRef}>0.0°</output>
+              </label>
+              <input
+                id="refraction-angle"
+                type="range"
+                min="-30"
+                max="30"
+                step="0.5"
+                defaultValue={controlsRef.current.beamAngleDegrees}
+                onInput={(event) => {
+                  controlsRef.current.beamAngleDegrees = Number(event.currentTarget.value);
+                }}
+                className="mt-2 h-2 w-full cursor-ew-resize accent-[#D96346]"
+                aria-label="Incident beam angle"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="refraction-cauchy-b"
+                className="flex items-baseline justify-between gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-ink"
+              >
+                <span>Cauchy B · μm²</span>
+                <output ref={bValueRef}>{controlsRef.current.cauchyB.toFixed(5)}</output>
+              </label>
+              <input
+                id="refraction-cauchy-b"
+                type="range"
+                min="0"
+                max="0.03"
+                step="0.00001"
+                defaultValue={controlsRef.current.cauchyB}
+                onInput={(event) => {
+                  controlsRef.current.cauchyB = Number(event.currentTarget.value);
+                }}
+                className="mt-2 h-2 w-full cursor-ew-resize accent-[#CBA666]"
+                aria-label="Cauchy B coefficient"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="refraction-cauchy-c"
+                className="flex items-baseline justify-between gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-ink"
+              >
+                <span>Cauchy C · μm⁴</span>
+                <output ref={cValueRef}>{controlsRef.current.cauchyC.toFixed(6)}</output>
+              </label>
+              <input
+                id="refraction-cauchy-c"
+                type="range"
+                min="0"
+                max="0.001"
+                step="0.000001"
+                defaultValue={controlsRef.current.cauchyC}
+                onInput={(event) => {
+                  controlsRef.current.cauchyC = Number(event.currentTarget.value);
+                }}
+                className="mt-2 h-2 w-full cursor-ew-resize accent-[#899FCC]"
+                aria-label="Cauchy C coefficient"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="refraction-wavelength"
+                className="flex items-baseline justify-between gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-ink"
+              >
+                <span>Probe wavelength λ</span>
+                <output ref={wavelengthValueRef}>
+                  {controlsRef.current.wavelengthNm.toFixed(0)} nm
+                </output>
+              </label>
+              <input
+                id="refraction-wavelength"
+                type="range"
+                min="410"
+                max="680"
+                step="1"
+                defaultValue={controlsRef.current.wavelengthNm}
+                onInput={(event) => {
+                  controlsRef.current.wavelengthNm = Number(event.currentTarget.value);
+                }}
+                className="mt-2 h-2 w-full cursor-ew-resize accent-[#D96346]"
+                aria-label="Probe wavelength in nanometres"
+              />
+            </div>
+          </div>
+
           <div className="mt-5 border-t rule-hair pt-3">
             <div
               className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]"
@@ -264,6 +390,10 @@ export function TelemetryOverlay({
               </div>
             ))}
           </div>
+          <p className="mt-3 border-t rule-hair pt-3 font-mono text-[11px] text-ink-soft">
+            <span className="mr-4 text-[#D96346]">sin θ₂ = (n₁ / n₂) sin θ₁</span>
+            <span>n(λ) = A + B / λ² + C / λ⁴</span>
+          </p>
         </section>
       )}
     </>

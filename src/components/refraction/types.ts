@@ -105,6 +105,10 @@ export type RefractionTelemetry = {
 /** Mutable live values shared by the canvas and DOM HUD without frame-by-frame React renders. */
 export type RefractionControls = {
   density: number;
+  /** Cauchy coefficients in μm² and μm⁴, respectively. */
+  cauchyB: number;
+  cauchyC: number;
+  wavelengthNm: number;
   surfaceMode: SurfaceMode;
   beamAngleDegrees: number;
   telemetry: RefractionTelemetry;
