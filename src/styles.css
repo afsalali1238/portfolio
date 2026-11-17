@@ -354,6 +354,12 @@
   .header-nav {
     display: flex;
   }
+
+  /* The complete navigation is already visible at this width. The drawer trigger has no desktop
+     function and must not duplicate the navigation or create conflicting header silhouettes. */
+  .header-actions {
+    display: none;
+  }
 }
 .header-nav a {
   font-family: var(--font-sans);

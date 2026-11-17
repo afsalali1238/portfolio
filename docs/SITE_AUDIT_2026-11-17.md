@@ -67,8 +67,9 @@ The work in this change set makes the new identity authoritative and resolves th
    - Made it a keyboard-focusable `mailto:` action with a touch-friendly target.
 
 7. **The Thesis used its own header implementation.** Its layout, brand scale, navigation styling, and mobile drawer could drift from every other route.
-   - Replaced it with the same shared `SiteHeader` used across the public site.
+   - Replaced it with the exact shared `SiteHeader` used across the public site, with no thesis-specific adapter left in the route.
    - Removed thesis-only header overrides so shared navigation remains the single standard.
+   - Hid the drawer trigger at desktop widths, where the complete navigation is already visible; it remains available only on mobile.
 
 ### Sharing and metadata
 

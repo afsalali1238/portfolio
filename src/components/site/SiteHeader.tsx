@@ -76,7 +76,7 @@ export function SiteHeader() {
             <Wordmark className="h-[18px] w-auto" />
           </Link>
 
-          <nav aria-label="Site" className="header-nav hidden md:flex">
+          <nav aria-label="Site" className="header-nav">
             {NAV_LINKS.map((l) => (
               <Link
                 key={l.to}
@@ -97,7 +97,7 @@ export function SiteHeader() {
             Start a conversation
           </a>
 
-          <div className="header-actions md:hidden">
+          <div className="header-actions">
             <button
               ref={menuTriggerRef}
               type="button"
