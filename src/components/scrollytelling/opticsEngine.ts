@@ -45,11 +45,11 @@ export function cauchyIndex(wavelengthNm: number) {
 }
 
 export const SPECTRUM = [
-  { name: "Red", wavelength: 680, color: "#fb675c", rgb: "251,103,92" },
-  { name: "Amber", wavelength: 590, color: "#efbc69", rgb: "239,188,105" },
-  { name: "Emerald", wavelength: 520, color: "#94d4a0", rgb: "148,212,160" },
-  { name: "Cyan", wavelength: 480, color: "#84d6e8", rgb: "132,214,232" },
-  { name: "Violet", wavelength: 410, color: "#ad95ec", rgb: "173,149,236" },
+  { name: "Clay", wavelength: 680, color: "#d96346", rgb: "217,99,70" },
+  { name: "Ochre", wavelength: 610, color: "#d28e54", rgb: "210,142,84" },
+  { name: "Gold", wavelength: 560, color: "#cba666", rgb: "203,166,102" },
+  { name: "Soft Slate", wavelength: 490, color: "#a7b5d2", rgb: "167,181,210" },
+  { name: "Slate", wavelength: 430, color: "#899fcc", rgb: "137,159,204" },
 ] as const;
 
 const cross = (a: Vec2, b: Vec2) => a.x * b.y - a.y * b.x;

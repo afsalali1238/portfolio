@@ -84,7 +84,9 @@ export function DiscussionFooter() {
         ? "instant"
         : "smooth",
     });
-    document.querySelector<HTMLElement>(".site-header .brand")?.focus({ preventScroll: true });
+    document
+      .querySelector<HTMLElement>(".thesis-brand, .site-header .brand")
+      ?.focus({ preventScroll: true });
   };
   return (
     <footer className="discussion-footer" id="discussion" tabIndex={-1}>

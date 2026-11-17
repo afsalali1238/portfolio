@@ -7,6 +7,8 @@ import { THESIS_PUBLISHED_AT } from "../components/scrollytelling/story";
 import "../styles/app.css";
 import "../styles/compact.css";
 import "../styles/accessibility.css";
+import "../styles/thesis-immersive.css";
+import "../styles/thesis-interactive-field.css";
 
 const PATH = "/thesis";
 
@@ -15,7 +17,7 @@ const MANIFESTO_SCHEMA = {
   "@type": "Article",
   headline: "The Refraction of Thought: A Manifesto of Light, Friction, Effort, and Becoming",
   description:
-    "A foundational manifesto on light, friction, craft, and human becoming: why an idea in your head proves nothing until it collides with the dense glass of honest effort.",
+    "A seven-movement manifesto on light, friction, craft, and human becoming: why an idea in your head proves nothing until it collides with the dense glass of honest effort.",
   author: {
     "@type": "Person",
     name: AUTHOR,
@@ -40,10 +42,11 @@ export const Route = createFileRoute("/thesis")({
     ...seo({
       title: "The Refraction of Thought: A Manifesto · forthe.tech",
       description:
-        "Curiosity enters. Craft bends it. Reality catches the colour. An interactive manifesto on ideas, the work, and finding the right medium.",
+        "A thesis in seven movements. Curiosity enters. Craft bends it. Reality catches the colour.",
       path: PATH,
       image: "/og/thesis.png",
-      imageAlt: "A cream-coloured forthe.tech card introducing The Refraction of Thought.",
+      imageAlt:
+        "A cream-coloured forthe.tech social card for The Refraction of Thought, a thesis in seven movements.",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(MANIFESTO_SCHEMA) }],
