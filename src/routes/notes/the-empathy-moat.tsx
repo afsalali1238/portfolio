@@ -34,7 +34,7 @@ export const Route = createFileRoute("/notes/the-empathy-moat")({
       description:
         "Why building for someone you love beats every synthetic product persona and corporate metrics deck ever written.",
       path: PATH,
-      image: "/og/home.png",
+      image: "/og/the-empathy-moat.png",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],

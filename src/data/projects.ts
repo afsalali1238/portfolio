@@ -11,6 +11,8 @@ export type Project = {
   live?: string;
   github?: string;
   for: string;
+  /** Concise ownership statement shown in the case-study overview. */
+  role?: string;
   featured?: boolean;
   platform?: Platform;
   problem?: string;
@@ -47,6 +49,7 @@ export const projects: Project[] = [
     name: "Doomscholar",
     year: "2026",
     for: "Learning",
+    role: "Product concept, interaction design & engineering",
     featured: true,
     tags: ["EdTech", "Mental Models", "Spaced Repetition", "Audio"],
     blurb:
@@ -102,6 +105,7 @@ export const projects: Project[] = [
     name: "kinē",
     year: "2026",
     for: "Patients",
+    role: "Product strategy, UX, interface & front-end engineering",
     featured: true,
     tags: ["Healthcare", "3D", "Physio", "Bilingual"],
     blurb:
@@ -149,6 +153,7 @@ export const projects: Project[] = [
     name: "Provia",
     year: "2025",
     for: "Wife",
+    role: "Learning experience, product design & engineering",
     tags: ["Healthcare", "Gamified", "PWA"],
     blurb:
       "Gamified 45-day exam prep for Gulf pharmacy licensing — DHA, MOH, DOH mastery in structured sprints.",

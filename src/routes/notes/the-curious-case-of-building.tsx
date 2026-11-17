@@ -34,7 +34,7 @@ export const Route = createFileRoute("/notes/the-curious-case-of-building")({
       description:
         "The wall between having an idea and building it just came down. This is what happens when you build out of pure curiosity.",
       path: PATH,
-      image: "/og/home.png",
+      image: "/og/the-curious-case-of-building.png",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],

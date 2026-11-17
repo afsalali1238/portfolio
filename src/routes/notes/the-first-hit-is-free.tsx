@@ -34,7 +34,7 @@ export const Route = createFileRoute("/notes/the-first-hit-is-free")({
       description:
         "AI, usage limits, and the unfinished horse: why cognitive offloading feels like genius until the rate limit hits.",
       path: PATH,
-      image: "/og/home.png",
+      image: "/og/the-first-hit-is-free.png",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],

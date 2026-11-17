@@ -63,9 +63,6 @@
 }
 
 @media (max-height: 520px) and (orientation: landscape) {
-  .page-shell .site-header {
-    height: 59px;
-  }
   .instrument-meta {
     top: 77px;
   }
@@ -243,21 +240,6 @@
 }
 
 @media (max-width: 360px) {
-  .page-shell .site-header {
-    left: 21px;
-    right: 21px;
-    gap: 8px;
-  }
-  .page-shell .site-header .brand > span {
-    font-size: 16px;
-  }
-  .page-shell .site-header .brand > svg {
-    width: 21px;
-    height: 21px;
-  }
-  .header-nav {
-    margin-right: 4px;
-  }
   .read-button {
     font-size: 12px;
     gap: 5px;

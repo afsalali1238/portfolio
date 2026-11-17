@@ -38,8 +38,8 @@ function NotesIndexPage() {
               <SectionReveal key={d.number}>
                 <Link
                   to={d.path}
-                  className="card-row group"
-                  style={{ padding: "24px 0", borderRadius: "0" }}
+                  className="card-row group flex-col items-start gap-3"
+                  style={{ padding: "24px 0", borderRadius: "0", borderBottom: "none" }}
                 >
                   <div
                     className="flex flex-wrap items-center justify-between gap-2 t-label"

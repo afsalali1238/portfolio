@@ -114,9 +114,11 @@ export const Route = createRootRoute({
         crossOrigin: "anonymous",
       },
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
-      { rel: "icon", href: "/favicon.ico", sizes: "any" },
-      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      { rel: "icon", href: "/favicon.svg?v=2", type: "image/svg+xml" },
+      { rel: "icon", href: "/favicon.png?v=2", type: "image/png", sizes: "32x32" },
+      { rel: "icon", href: "/favicon.ico?v=2", sizes: "any" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png?v=2", sizes: "180x180" },
+      { rel: "manifest", href: "/site.webmanifest" },
     ],
   }),
   shellComponent: RootShell,
@@ -133,12 +135,13 @@ const THEME_SCRIPT = `(function(){document.documentElement.classList.add("dark")
 
 const PERSON_SCHEMA = {
   "@context": "https://schema.org",
-  "@type": "Organization",
+  "@type": "Person",
   name: AUTHOR,
   url: SITE_URL,
-  logo: `${SITE_URL}/brand/svg/mark_on-ink-colour.svg`,
+  image: `${SITE_URL}/brand/avatar-dark-800.png`,
+  jobTitle: "Independent product maker",
   description:
-    "Documenting what happens when the wall between having an idea and building it disappears. Small software, applied AI tools, and quiet experiments.",
+    "An independent product maker in Dubai, turning real-world friction into focused software, applied AI tools, and quiet experiments.",
   email: "mailto:here@forthe.tech",
   sameAs: [
     "https://github.com/afsalali1238",

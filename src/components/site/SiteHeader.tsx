@@ -67,12 +67,16 @@ export function SiteHeader() {
     <>
       <header className="site-header">
         <Container className="container">
-          <Link to="/" className="brand" aria-label="forthe.tech — home">
-            <LogoTile className="h-6 w-6" small />
-            <Wordmark className="text-[20px] font-semibold tracking-[-0.03em]" />
+          <Link
+            to="/"
+            className="brand rounded-md py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            aria-label="forthe.tech — home"
+          >
+            <LogoTile className="h-7 w-7" small />
+            <Wordmark className="h-[18px] w-auto" />
           </Link>
 
-          <nav aria-label="Site" className="header-nav">
+          <nav aria-label="Site" className="header-nav hidden md:flex">
             {NAV_LINKS.map((l) => (
               <Link
                 key={l.to}
@@ -86,12 +90,19 @@ export function SiteHeader() {
             ))}
           </nav>
 
+          <a
+            href="mailto:here@forthe.tech?subject=Project%20enquiry%20via%20forthe.tech"
+            className="header-contact-cta hidden lg:inline-flex"
+          >
+            Start a conversation
+          </a>
+
           <div className="header-actions md:hidden">
             <button
               ref={menuTriggerRef}
               type="button"
               onClick={() => setMobileOpen((v) => !v)}
-              className="header-actions"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-md text-ink-mute transition-colors hover:bg-paper-deep hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav"
@@ -117,6 +128,8 @@ export function SiteHeader() {
         role="dialog"
         aria-modal="true"
         aria-label="Navigation menu"
+        aria-hidden={!mobileOpen}
+        inert={!mobileOpen}
         className={`fixed bottom-0 right-0 top-0 z-50 flex w-72 flex-col gap-1 border-l rule-hair bg-paper px-8 pt-20 shadow-none transition-transform duration-200 ease-out md:hidden ${
           mobileOpen ? "translate-x-0" : "translate-x-full"
         }`}
@@ -136,8 +149,15 @@ export function SiteHeader() {
           className="mb-6 flex items-center gap-3 border-b rule-hair pb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-md"
         >
           <LogoTile className="h-8 w-8" />
-          <Wordmark className="text-2xl" />
+          <Wordmark className="h-6 w-auto" />
         </Link>
+        <a
+          href="mailto:here@forthe.tech?subject=Project%20enquiry%20via%20forthe.tech"
+          onClick={handleClose}
+          className="mb-5 inline-flex min-h-11 items-center justify-center rounded-md bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+        >
+          Start a conversation
+        </a>
         {NAV_LINKS.map((l) => (
           <Link
             key={l.to}

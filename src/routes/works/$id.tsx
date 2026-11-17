@@ -147,14 +147,13 @@ function ProjectCaseStudy() {
               </div>
               <div>
                 <div className="t-label" style={{ color: "var(--fg-faint)" }}>
-                  STACK
+                  ROLE
                 </div>
                 <div
                   className="t-num"
                   style={{ fontSize: "16px", color: "var(--fg)", marginTop: "8px" }}
                 >
-                  {(project.stack || project.tags).slice(0, 3).join(" · ")}
-                  {(project.stack || project.tags).length > 3 && " …"}
+                  {project.role ?? "Independent product maker"}
                 </div>
               </div>
             </div>
@@ -162,6 +161,18 @@ function ProjectCaseStudy() {
             {/* Title & Lede */}
             <h1 className="t-display-1">{project.name}</h1>
             <p className="t-lede mt-6">{project.blurb}</p>
+
+            {project.outcome && (
+              <aside
+                aria-label="Observed outcome"
+                className="mt-7 border-l-2 border-[var(--clay)] py-1 pl-4"
+              >
+                <p className="t-label" style={{ color: "var(--fg-muted)" }}>
+                  Observed outcome
+                </p>
+                <p className="t-body mt-2">{project.outcome}</p>
+              </aside>
+            )}
 
             {/* Primary Action Buttons */}
             <div
@@ -216,15 +227,6 @@ function ProjectCaseStudy() {
               </SectionReveal>
             )}
 
-            {/* Outcome */}
-            {project.outcome && (
-              <SectionReveal className="space-y-4">
-                <p className="t-label">03 ── THE OUTCOME</p>
-                <h2 className="t-display-2">The real result.</h2>
-                <p className="t-body">{project.outcome}</p>
-              </SectionReveal>
-            )}
-
             {/* What I Learned */}
             {project.learned && (
               <SectionReveal className="space-y-4">
@@ -236,7 +238,7 @@ function ProjectCaseStudy() {
                     paddingBottom: "8px",
                   }}
                 >
-                  <p className="t-label">04 ── WHAT I LEARNED</p>
+                  <p className="t-label">03 ── WHAT I LEARNED</p>
                   <p className="t-display-3" style={{ fontStyle: "italic" }}>
                     "{project.learned}"
                   </p>
@@ -247,7 +249,7 @@ function ProjectCaseStudy() {
             {/* Key Highlights */}
             {project.highlights && project.highlights.length > 0 && (
               <SectionReveal className="space-y-4">
-                <p className="t-label">05 ── HIGHLIGHTS</p>
+                <p className="t-label">04 ── HIGHLIGHTS</p>
                 <h2 className="t-display-2">Concrete capabilities.</h2>
                 <ul className="space-y-3 pt-2">
                   {project.highlights.map((h: string, i: number) => (
@@ -272,7 +274,7 @@ function ProjectCaseStudy() {
                   borderRadius: "4px",
                 }}
               >
-                <p className="t-label">06 ── TECHNICAL STACK</p>
+                <p className="t-label">05 ── TECHNICAL STACK</p>
                 <h2 className="t-display-3">Tools and dependencies.</h2>
                 <div className="flex flex-wrap gap-2 pt-2">
                   {((project.stack || project.tags) as string[]).map((tech: string) => (
@@ -295,7 +297,7 @@ function ProjectCaseStudy() {
                     borderRadius: "4px",
                   }}
                 >
-                  <p className="t-label">07 ── RELATED ESSAYS & DISPATCHES</p>
+                  <p className="t-label">06 ── RELATED ESSAYS & DISPATCHES</p>
                   <h2 className="t-display-3">Read the deeper thesis.</h2>
                   <p className="t-small" style={{ color: "var(--fg-muted)" }}>
                     The operational context, design philosophy, and lessons behind this build:
@@ -334,6 +336,32 @@ function ProjectCaseStudy() {
               </SectionReveal>
             )}
           </div>
+
+          <SectionReveal className="mt-16">
+            <section
+              aria-labelledby="case-study-contact-heading"
+              className="grid gap-6 rounded-md border p-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
+              style={{ borderColor: "var(--hairline)", backgroundColor: "var(--bg-raised)" }}
+            >
+              <div>
+                <p className="t-label">START A CONVERSATION</p>
+                <h2 id="case-study-contact-heading" className="t-display-3 mt-2">
+                  Building something with similar complexity?
+                </h2>
+                <p className="t-small mt-2 max-w-2xl" style={{ color: "var(--fg-muted)" }}>
+                  I&rsquo;m available for product thinking, interaction design, and implementation
+                  on focused digital tools.
+                </p>
+              </div>
+              <a
+                href="mailto:here@forthe.tech?subject=Project%20enquiry%20via%20forthe.tech"
+                className="btn-primary group justify-center md:justify-self-end"
+              >
+                Start a conversation
+                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </a>
+            </section>
+          </SectionReveal>
 
           {/* Next / Previous Project Footer — hairline rows */}
           <div

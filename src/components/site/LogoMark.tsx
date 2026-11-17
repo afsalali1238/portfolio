@@ -1,87 +1,39 @@
-/**
- * forthe.tech Brand Guide v1
- * Mark: Light in, bent twice by glass, drawn as it behaves in a prism.
- * Glass: n 1.505 at 590 nm, apex 55°.
- * Beam enters rising 16.5°, runs level inside, leaves falling.
- * Rays leave at -4°, -16.5°, -29°: red (clay) bent least, slate most.
- * Nothing is drawn inside the glass: clear glass shows no beam.
- * Below 24 px use the small cut (stroke 3.1).
- * Wordmark: DM Sans 600, lower case, full stop in clay.
- */
-
 interface LogoMarkProps {
   className?: string;
-  /** Force small cut (recommended for display below 24px) */
+  /** Uses the simplified cut intended for small renderings. */
   small?: boolean;
-  /** Force monochrome rendering using currentColor */
+  /** Uses the single-colour version of the mark. */
   mono?: boolean;
 }
 
+/**
+ * The current forthe.tech identity.
+ *
+ * The brand pack is the single source of truth for this mark. Keeping it as an image rather than
+ * redrawing the geometry in React prevents the header, favicon, social assets, and future exports
+ * drifting into different versions of the logo.
+ */
 export function LogoMark({ className = "h-6 w-6", small = false, mono = false }: LogoMarkProps) {
-  if (small) {
-    return (
-      <svg
-        viewBox="0.42 1.45 41.22 30.1"
-        fill="none"
-        className={className}
-        aria-hidden="true"
-        strokeWidth="3.1"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {/* Incident ray */}
-        <path d="M2.97 20.84L9.20 19.00" stroke="currentColor" />
-        {/* Dispersed rays: Clay, Gold, Slate */}
-        <path
-          d="M23.28 16.07L37.84 17.09"
-          stroke={mono ? "currentColor" : "var(--color-clay, #d96346)"}
-        />
-        <path
-          d="M24.80 19.00L38.79 23.14"
-          stroke={mono ? "currentColor" : "var(--color-gold, #cba666)"}
-        />
-        <path
-          d="M26.32 21.93L39.09 29.00"
-          stroke={mono ? "currentColor" : "var(--color-slate, #899fcc)"}
-        />
-        {/* Prism glass triangle */}
-        <path d="M17 4L30 29L4 29Z" stroke="currentColor" />
-      </svg>
-    );
-  }
+  const src = mono
+    ? "/brand/mark-paper-mono.svg"
+    : small
+      ? "/brand/mark-16cut-paper.svg"
+      : "/brand/mark-paper.svg";
 
   return (
-    <svg
-      viewBox="-2.01 1.9 44.13 29.2"
-      fill="none"
-      className={className}
+    <img
+      src={src}
+      width={32}
+      height={32}
+      className={`block h-full w-full object-contain ${className}`}
+      alt=""
       aria-hidden="true"
-      strokeWidth="2.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      {/* Incident ray */}
-      <path d="M0.09 21.70L9.20 19.00" stroke="currentColor" />
-      {/* Dispersed rays: Clay, Gold, Slate */}
-      <path
-        d="M23.60 16.69L39.44 17.80"
-        stroke={mono ? "currentColor" : "var(--color-clay, #d96346)"}
-      />
-      <path
-        d="M24.80 19.00L40.02 23.51"
-        stroke={mono ? "currentColor" : "var(--color-gold, #cba666)"}
-      />
-      <path
-        d="M26.00 21.31L39.89 29.00"
-        stroke={mono ? "currentColor" : "var(--color-slate, #899fcc)"}
-      />
-      {/* Prism glass triangle */}
-      <path d="M17 4L30 29L4 29Z" stroke="currentColor" />
-    </svg>
+      draggable={false}
+    />
   );
 }
 
-/** The mark standalone or in its container for header and footer. */
+/** The standalone mark, sized by the calling component. */
 export function LogoTile({
   className = "h-7 w-7",
   small = false,
@@ -90,22 +42,23 @@ export function LogoTile({
   small?: boolean;
 }) {
   return (
-    <span
-      className={`inline-flex shrink-0 items-center justify-center text-ink dark:text-bone ${className}`}
-    >
-      <LogoMark className="h-full w-full" small={small} />
+    <span className={`inline-flex shrink-0 items-center justify-center ${className}`}>
+      <LogoMark small={small} />
     </span>
   );
 }
 
-/**
- * "forthe.tech" in DM Sans 600 with the clay full stop.
- * Governed strictly by brand guidelines: lower case name, full stop in clay.
- */
-export function Wordmark({ className = "" }: { className?: string }) {
+/** Official outlined wordmark from the brand pack, for use on the dark site surface. */
+export function Wordmark({ className = "h-5 w-auto" }: { className?: string }) {
   return (
-    <span className={`font-sans font-semibold tracking-[-0.03em] leading-none ${className}`}>
-      forthe<span className="text-[var(--color-clay,#d96346)]">.</span>tech
-    </span>
+    <img
+      src="/brand/wordmark-paper.svg"
+      width={370}
+      height={100}
+      className={`brand-wordmark block aspect-[3.704/1] max-w-full object-contain ${className}`}
+      alt=""
+      aria-hidden="true"
+      draggable={false}
+    />
   );
 }

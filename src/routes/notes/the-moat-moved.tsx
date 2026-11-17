@@ -34,7 +34,7 @@ export const Route = createFileRoute("/notes/the-moat-moved")({
       description:
         "Ideas were cheap. Then building was. Now even being first is. Why customer loyalty is dead, and why cash-flow survival is the only surviving moat.",
       path: PATH,
-      image: "/og/home.png",
+      image: "/og/the-moat-moved.png",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],
