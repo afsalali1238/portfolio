@@ -12,14 +12,12 @@ const repo = path.resolve(__dirname, "..");
 const { projects } = await import(pathToFileURL(path.join(repo, "src/data/projects.ts")).href);
 const { DISPATCHES } = await import(pathToFileURL(path.join(repo, "src/data/dispatches.ts")).href);
 
-const fontDir = path.join(repo, "node_modules/@fontsource");
-const ff = (f) =>
-  "data:font/woff2;base64," + fs.readFileSync(path.join(fontDir, f)).toString("base64");
-
-// Clean 50px favicon tile
-const fav = fs
-  .readFileSync(path.join(repo, "public/favicon.svg"), "utf8")
-  .replace("<svg ", '<svg width="50" height="50" ');
+const font = (relativePath) =>
+  "data:font/woff2;base64," +
+  fs.readFileSync(path.join(repo, "node_modules", relativePath)).toString("base64");
+const brandLockup =
+  "data:image/svg+xml;base64," +
+  fs.readFileSync(path.join(repo, "public/brand/svg/lockup_on-ink-colour.svg")).toString("base64");
 
 const esc = (s) =>
   String(s || "")
@@ -38,38 +36,40 @@ function builtForLabel(forWho) {
 const css = `
 @font-face {
   font-family: 'Instrument Serif';
-  src: url(${ff("instrument-serif/files/instrument-serif-latin-400-normal.woff2")}) format('woff2');
+  src: url(${font("@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff2")}) format('woff2');
   font-weight: 400;
   font-style: normal;
 }
 @font-face {
   font-family: 'Instrument Serif';
-  src: url(${ff("instrument-serif/files/instrument-serif-latin-400-italic.woff2")}) format('woff2');
+  src: url(${font("@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff2")}) format('woff2');
   font-weight: 400;
   font-style: italic;
 }
 @font-face {
-  font-family: 'Inter';
-  src: url(${ff("inter/files/inter-latin-400-normal.woff2")}) format('woff2');
-  font-weight: 400;
+  font-family: 'DM Sans';
+  src: url(${font("@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2")}) format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
 }
 @font-face {
-  font-family: 'Inter';
-  src: url(${ff("inter/files/inter-latin-500-normal.woff2")}) format('woff2');
-  font-weight: 500;
+  font-family: 'IBM Plex Mono';
+  src: url(${font("@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2")}) format('woff2');
+  font-weight: 400;
+  font-style: normal;
 }
 * { box-sizing: border-box; }
-body { margin: 0; padding: 0; background: #F8F6F0; }
+body { margin: 0; padding: 0; background: #0B0C0E; }
 .card {
   width: 1200px;
   height: 630px;
-  background: #F8F6F0;
-  color: #16100C;
+  background: #0B0C0E;
+  color: #EEEAE1;
   padding: 64px 72px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  font-family: 'Inter', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   position: relative;
   overflow: hidden;
 }
@@ -81,17 +81,19 @@ body { margin: 0; padding: 0; background: #F8F6F0; }
 .brand {
   display: flex;
   align-items: center;
-  gap: 16px;
-  font-family: 'Instrument Serif', serif;
-  font-size: 40px;
-  color: #16100C;
 }
-.dot { color: #A8471B; }
+.brand img {
+  display: block;
+  width: 252px;
+  height: auto;
+}
 .kick {
-  font-size: 22px;
-  color: #6E6762;
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
+  color: #9A9EA5;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 h1 {
   font-family: 'Instrument Serif', serif;
@@ -99,22 +101,24 @@ h1 {
   margin: 0;
   line-height: 0.95;
   letter-spacing: -0.01em;
-  color: #16100C;
+  color: #EEEAE1;
 }
 p {
   margin: 18px 0 0;
   font-size: 28px;
   line-height: 1.4;
-  color: #38322D;
+  color: #EEEAE1;
   max-width: 980px;
 }
 .foot {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  font-size: 22px;
-  color: #6E6762;
-  border-top: 2px solid #C6C4BE;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: #9A9EA5;
+  border-top: 1px solid #55585E;
   padding-top: 22px;
 }
 `;
@@ -128,7 +132,7 @@ const renderHtml = ({ kicker, title, sub, url, right, size = 120 }) => `<!doctyp
 <body>
   <div class="card">
     <div class="top">
-      <div class="brand">${fav}<span>forthe<span class="dot">.</span>tech</span></div>
+      <div class="brand"><img src="${brandLockup}" alt="forthe.tech"></div>
       <div class="kick">${esc(kicker)}</div>
     </div>
     <div class="mid">
@@ -191,7 +195,7 @@ const items = [
   })),
   {
     id: "thesis",
-    kicker: "A thesis in six movements",
+    kicker: "A thesis in seven movements",
     title: "The Refraction\nof Thought.",
     size: 120,
     sub: "Curiosity enters. Craft bends it.\nReality catches the colour.",

@@ -46,7 +46,7 @@ export const Route = createFileRoute("/thesis")({
       path: PATH,
       image: "/og/thesis.png",
       imageAlt:
-        "A cream-coloured forthe.tech social card for The Refraction of Thought, a thesis in seven movements.",
+        "An ink-coloured forthe.tech social card for The Refraction of Thought, a thesis in seven movements.",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(MANIFESTO_SCHEMA) }],
