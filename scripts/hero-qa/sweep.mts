@@ -32,7 +32,6 @@ import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHeroRay, type Ctx } from "../../src/components/sections/hero-ray.ts";
-import { forPeopleCount, liveCount, projectCount, sourceCount } from "../../src/data/projects.ts";
 import type { LayoutSnapshot } from "../../src/components/sections/hero-layout.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -97,9 +96,8 @@ const theme = (dark: boolean) => ({
  *   thesis     mt-2 · 7.5vw / 3rem / 3.2rem / 3.3rem / 3.4rem, leading-[1.02], italic
  *   lede       max-w-md · text-base md:text-lg · leading-relaxed
  *   CTAs       pt-2 · min-h-11 · flex-col gap-3 sm:flex-row
- *   stage      visible below lg · h-60 sm:h-70 · centered optical centerpiece
- *   tiles      mt-12 sm:mt-14 · grid-cols-2 md:grid-cols-4 · gap-3 sm:gap-4 · pt-2
- *   tile       min-h-104 p-4 · value text-3xl sm:text-4xl · mono uppercase label
+ *   tiles      mt-12 sm:mt-14 · p-4 sm:p-6 · grid-cols-2 md:grid-cols-4 · gap-3 sm:gap-4
+ *   tile       p-3.5 sm:p-4 · value text-3xl sm:text-4xl leading-none · label mt-2.5 text-xs
  *
  * If Hero.tsx's type scale changes, this table is what has to change with it — that coupling is
  * the price of reviewing a layout without a browser, and it is why the calibration table below
@@ -112,21 +110,25 @@ const scale = (vw: number) => {
   const xl = vw >= 1280;
   return {
     pad: md ? 40 : 24,
-    pt: md ? 48 : sm ? 32 : 24,
-    pb: md ? 56 : sm ? 48 : 40,
+    pt: md ? 96 : sm ? 64 : 48,
+    pb: md ? 64 : 48,
     h1: xl ? 108.8 : lg ? 96 : md ? 88 : sm ? 73.6 : vw * 0.115,
     thesis: xl ? 54.4 : lg ? 52.8 : md ? 51.2 : sm ? 48 : vw * 0.075,
     lede: md ? 18 : 16,
     gridGap: 48,
     spacerH: 360,
     tileGap: sm ? 16 : 12,
+    tilePad: sm ? 16 : 14,
+    panelPad: sm ? 24 : 16,
     tileCols: md ? 4 : 2,
     tilesTop: sm ? 56 : 48,
   };
 };
 
-const LEDE = "Documenting what happens when the wall between having an idea and building it disappears.";
-const LEDE_NARROW = LEDE;
+const LEDE =
+  "Documenting what happens when the wall between having an idea and building it disappears. Sixteen quiet tools, public code, and honest field notes.";
+const LEDE_NARROW =
+  "Documenting what happens when the wall between having an idea and building it disappears. Twelve quiet tools, public code, and honest field notes.";
 
 const metrics = createCanvas(8, 8).getContext("2d") as unknown as SKRSContext2D;
 const textWidth = (text: string, font: string, tracking = 0) => {
@@ -198,14 +200,6 @@ function modelLayout(vw: number): LayoutSnapshot {
     thesisTop + (lh2 - (thesisFm.ascent + thesisFm.descent)) / 2 + thesisFm.ascent;
   y += lh2 + 24;
 
-  // Hero.tsx exposes the interactive optical stage below the `lg` breakpoint. It sits between
-  // the thesis and lede; omitting it made this synthetic layout report false beam/body-copy
-  // intersections and mis-sized the tablet composition.
-  const mobileStage: Rect | null = vw < 1024
-    ? { left, top: y, right: left + copyWidth, bottom: y + (sm ? 280 : 240) }
-    : null;
-  if (mobileStage) y = mobileStage.bottom + 24;
-
   const ledeWidth = Math.min(448, copyWidth);
   const ledeLines = wrap(LEDE, ledeFont, ledeWidth);
   const lede: Rect = {
@@ -216,7 +210,7 @@ function modelLayout(vw: number): LayoutSnapshot {
   };
   y = lede.bottom + 24;
 
-  // CTA row: pt-2, then one row of buttons from 640px or two stacked rows below it.
+  // CTA row: pt-2, then one row of two 44px buttons (sm) or two stacked rows.
   const ctaTop = y + 8;
   const buttonWidth = (label: string) => textWidth(label, `500 14px "Inter Medium"`) + 48 + 16;
   const cta: Rect = sm
@@ -228,29 +222,28 @@ function modelLayout(vw: number): LayoutSnapshot {
           Math.min(copyWidth, buttonWidth("See the builds") + 12 + buttonWidth("Read the notes")),
         bottom: ctaTop + 44,
       }
-    : { left, top: ctaTop, right, bottom: ctaTop + 44 + 12 + 44 };
+    : { left, top: ctaTop, right: right, bottom: ctaTop + 44 + 12 + 44 };
 
   const copyHeight = cta.bottom - s.pt;
   const rowHeight = lg ? Math.max(copyHeight, s.spacerH) : copyHeight;
-  const tilesTop = s.pt + rowHeight + s.tilesTop + 8; // the tile grid's pt-2
+  const tilesTop = s.pt + rowHeight + s.tilesTop;
 
-  // Four individual min-h-104 stat links, grid-cols-2 then md:grid-cols-4; there is no
-  // enclosing panel in the shipped Hero.
+  // Stat panel: p-4 sm:p-6, grid-cols-2 md:grid-cols-4, gap-3 sm:gap-4.
   const cols = s.tileCols;
-  const tileHeight = 104;
-  const tileGap = s.tileGap;
-  const tileWidth = (contentWidth - tileGap * (cols - 1)) / cols;
+  const tileWidth = (contentWidth - s.panelPad * 2 - s.tileGap * (cols - 1)) / cols;
+  const valueHeight = sm ? 36 : 30;
+  const tileHeight = s.tilePad * 2 + valueHeight + 10 + 18;
   const rows = Math.ceil(4 / cols);
-  const tilesHeight = rows * tileHeight + tileGap * (rows - 1);
+  const panelHeight = s.panelPad * 2 + rows * tileHeight + s.tileGap * (rows - 1);
   const tiles = Array.from({ length: 4 }, (_, i) => {
     const r = Math.floor(i / cols);
     const c = i % cols;
-    const x = left + c * (tileWidth + tileGap);
-    const top = tilesTop + r * (tileHeight + tileGap);
+    const x = left + s.panelPad + c * (tileWidth + s.tileGap);
+    const top = tilesTop + s.panelPad + r * (tileHeight + s.tileGap);
     // `hero-layout` reports tiles left → right, then top → bottom.
     return { x, top, bottom: top + tileHeight, cx: x + tileWidth / 2, width: tileWidth };
   });
-  const heroH = tilesTop + tilesHeight + s.pb;
+  const heroH = tilesTop + panelHeight + s.pb;
 
   const textRects = [headline, thesis, lede, cta];
   const QUIET = 10;
@@ -277,7 +270,6 @@ function modelLayout(vw: number): LayoutSnapshot {
     columns: Array.from({ length: 12 }, (_, i) => left + (contentWidth * (i + 1)) / 12),
     textRects,
     ledger: { quietRects, baselines: [], balance: 0.5 },
-    mobileStage,
   };
 }
 
@@ -360,28 +352,38 @@ const drawType = (ctx: SKRSContext2D, layout: LayoutSnapshot, dark: boolean) => 
   }
 
   if (layout.tiles.length) {
-    const values = [projectCount, liveCount, sourceCount, forPeopleCount];
-    const labels = ["Total shipped", "Live deployments", "Open source", "For people"];
+    const pad = smOf(layout.heroW) ? 24 : 16;
+    const top = Math.min(...layout.tiles.map((x) => x.top)) - pad;
+    const bottom = Math.max(...layout.tiles.map((x) => x.bottom)) + pad;
+    const left = Math.min(...layout.tiles.map((x) => x.x)) - pad;
+    const right = Math.max(...layout.tiles.map((x) => x.x + x.width)) + pad;
+    ctx.beginPath();
+    ctx.rect(left, top, right - left, bottom - top);
+    ctx.fillStyle = t.paperDeep;
+    ctx.fill();
+    ctx.strokeStyle = t.rule;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    // DOM order, which is what the 2-column grid paints.
+    const values = ["16", "13", "10", "8"];
+    const labels = [
+      "Total shipped",
+      "Live on the internet",
+      "Open source",
+      "For wife, friends, me",
+    ];
     layout.tiles.forEach((tile, i) => {
-      ctx.beginPath();
-      ctx.roundRect(tile.x, tile.top, tile.width, tile.bottom - tile.top, 8);
-      ctx.fillStyle = "rgba(255,255,255,0.02)";
-      ctx.fill();
-      ctx.strokeStyle = "rgba(255,255,255,0.10)";
-      ctx.lineWidth = 1;
-      ctx.stroke();
       ctx.font = `${layout.heroW >= 640 ? 36 : 30}px "Instrument Serif"`;
       ctx.fillStyle = t.ink;
-      ctx.fillText(String(values[i] ?? 0).padStart(2, "0"), tile.x + 16, tile.top + 44);
-      ctx.font = `500 11px "Inter Medium"`;
+      ctx.fillText(values[i] ?? "", tile.x + 6, tile.top + (layout.heroW >= 640 ? 38 : 34));
+      ctx.font = `500 ${layout.heroW >= 640 ? 12 : 11}px "Inter Medium"`;
       ctx.fillStyle = t.inkMute;
-      ctx.fillText(labels[i] ?? "", tile.x + 16, tile.bottom - 16);
-      ctx.font = `11px "Inter Medium"`;
-      ctx.fillStyle = t.inkMute;
-      ctx.fillText(`0${i + 1}  →`, tile.x + tile.width - 46, tile.top + 23);
+      ctx.fillText(labels[i] ?? "", tile.x + 6, tile.bottom - 10);
     });
   }
 };
+
+const smOf = (vw: number) => vw >= 640;
 
 /* -------------------------------------------------------------------- main */
 
@@ -409,8 +411,7 @@ const positionalArgs = process.argv.slice(2).filter((arg) => !arg.startsWith("--
 const only = positionalArgs[0];
 const selected = only ? VIEWPORTS.filter((v) => v.name.startsWith(only)) : VIEWPORTS;
 
-/* Historical calibration: these snapshots predate the current mobile stage and hero spacing.
-   Keep them visible as context, but do not treat their deltas as assertions or current captures. */
+/* Calibration: the model against the real captures. */
 const measuredDir = join(here, "data");
 const measured = readdirSync(measuredDir)
   .filter((f) => f.startsWith("layout-"))
@@ -426,7 +427,7 @@ const calibration = measured.map((capture) => {
     thesisRight: [L.thesisLine.right, M.thesisLine.right] as const,
   };
 });
-console.log("current layout model vs archived pre-stage captures (px, diagnostic only):");
+console.log("model vs measured capture (px):");
 for (const row of calibration) {
   const d = (pair: readonly [number, number]) =>
     `${pair[0].toFixed(0)} → ${pair[1].toFixed(0)} (${(pair[1] - pair[0] >= 0 ? "+" : "") + (pair[1] - pair[0]).toFixed(0)})`;
@@ -593,20 +594,6 @@ for (const vp of selected) {
         label,
         `glass is clipped: [${glassBox.left.toFixed(0)},${glassBox.top.toFixed(0)}] → [${glassBox.right.toFixed(0)},${glassBox.bottom.toFixed(0)}] in ${W}x${H}`,
       );
-    }
-    if (layout.mobileStage) {
-      if (g.entryMode !== "stage-run") {
-        fail(label, `measured centerpiece stage ignored (entry mode: ${g.entryMode})`);
-      }
-      if (
-        p === 0 &&
-        (glassBox.left < layout.mobileStage.left ||
-          glassBox.right > layout.mobileStage.right ||
-          glassBox.top < layout.mobileStage.top ||
-          glassBox.bottom > layout.mobileStage.bottom)
-      ) {
-        fail(label, "resting prism does not fit inside the measured optical stage");
-      }
     }
 
     const shared = layout.textRects.filter(

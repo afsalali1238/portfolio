@@ -1,22 +1,76 @@
 /**
- * Precision optical bench for the forthe.tech hero.
+ * hero-ray — the drawing engine behind the hero's dispersion field.
  *
- * A neutral 16.5° incident beam meets a 55° crown-glass prism (n ≈ 1.52), then resolves into
- * exactly three calibrated brand rays: Clay, Gold, and Slate. The exit paths are continuous,
- * low-amplitude wavefronts; no plasma, branching strikes, particle fog, or flare effects are
- * painted. A quiet reticle, hairline registration marks, and restrained facet reflections give
- * the scene its drafting-bench character.
+ * Phase 8 composition: one beam crosses the page, the glass bends it, the page dissolves it.
  *
- * Geometry is measured from the live DOM through LayoutSnapshot. Canvas uses a y-down
- * convention for the outgoing rays, while the documented optical angles use the conventional
- * y-up frame. The incident field envelope is zero at its source and facet contact, so its
- * illustrated ripple never moves the physical optical hinge.
+ *   light enters from the left edge of the hero
+ *     → it travels across the composition, passing *behind* the headline
+ *     → it strikes the left facet of a glass prism
+ *     → it travels through the glass as one neutral ray
+ *     → colours appear only as the light leaves the glass
+ *     → and that point disperses in every direction that has room,
+ *       growing from specks of dust into whole strands of light,
+ *       until the strands cross the entire section and leave the frame.
  *
- * The beam is drawn before the text dissolve to preserve legibility; glass and exit rays are
- * painted afterward. Softness comes from cached gradients rather than canvas shadow blur.
+ * ## The beam: one ray, one illustrated field
  *
- * This module remains DOM-free. Ctx is a structural subset of CanvasRenderingContext2D so the
- * optical drawing can be exercised by the browser renderer and headless tooling alike.
+ * The incident beam has two separable things on it, and keeping them apart is what makes the
+ * page honest:
+ *
+ *   1. **The optical axis** is a *straight* ray from the source to the live entry point on the
+ *      left facet. Light travels in a straight line in a uniform medium, so every optical
+ *      quantity comes from this axis: the angle of incidence, the hinge on the facet, Snell's
+ *      law inside the glass, the Fresnel ghost. It is the only thing the physics sees.
+ *   2. **The visible ripple** around that axis is an illustration of the electromagnetic field,
+ *      not the path a photon takes. A page-scale drawing cannot be literal here: visible light
+ *      is ~400–700 nm, some six orders of magnitude below one pixel, so the drawn wavelength is
+ *      magnified accordingly and the drawn amplitude is a stylistic exaggeration. Its envelope
+ *      is exactly zero at the source and at the facet, so the ripple can never detach the beam
+ *      from its origin or land anywhere but on the hinge.
+ *
+ * The colour is generated at the exit facet, never in the incident beam: the light that enters
+ * the glass is neutral warm-white on ink and neutral silver on paper.
+ *
+ * The resting ray is a *traced* ray, not a composed chord: `buildGeometry` runs the same
+ * `tracePrism` the pointer uses, so the internal leg is refracted at rest too. The full-bleed
+ * fan around the exit remains an artistic exaggeration (see BANDS and the sweep below).
+ *
+ * What changed in this revision, and why:
+ *
+ *   1. **Full-bleed.** The dispersion is no longer a wedge pinned to the right third of the
+ *      page. The core is the section's centrepiece and the fan sweeps ~250° around it, so
+ *      strands reach the top edge, the right edge, the bottom edge and both left corners.
+ *      Myriad faint ghost strands cross the copy so the field never reads as "cut off at
+ *      the left".
+ *   2. **Dot → dots → line.** Every strand is born as a single point of light and coalesces:
+ *      sparse specks, then denser specks, then dashes, then a continuous filament. That
+ *      continuum is what makes it look like light finding its path instead of a fan of
+ *      vector lines.
+ *   3. **A prism that reads as glass.** Three shaded faces, a real rim (ink edge + inner
+ *      white), a single neutral ray through the glass, a caustic pool under the base and
+ *      glints at the vertices. Dispersion begins at the exit.
+ *   4. **The current catches the cursor.** Strands within reach bend toward the pointer, and
+ *      the nearest ones throw a jittered filament at it. Inside the glass the catch releases,
+ *      and a Snell/Fresnel ray trace takes over instead.
+ *
+ * Three invariants this file exists to protect:
+ *
+ *   1. Layout-derived geometry. Every position comes from a LayoutSnapshot measured off the
+ *      real DOM (see ./hero-layout). Nothing is a percentage of the section — except the
+ *      sweep of the fan, which is a direction, not a position.
+ *   2. Continuity. Each strand's displacement envelope E(s) = sin(πs)^0.85 is exactly 0 at
+ *      both ends, so P(0) is the exit point to the last float and no tip detaches. The beam's
+ *      ripple obeys the same rule against its own axis.
+ *   3. Legibility. The dissolve thins everything that crosses a type box — including the beam,
+ *      which is painted *before* it — so light can pass behind the words without ever costing
+ *      one of them its contrast. The facet contact is painted after it, so the hinge stays
+ *      crisp where there is no type to protect.
+ *
+ * No canvas shadow blur anywhere: every soft edge is a gradient or a cached sprite, and every
+ * geometry-dependent background gradients are cached per geometry version and theme.
+ *
+ * The engine is framework-free and DOM-free (Ctx is a structural subset of the browser's
+ * CanvasRenderingContext2D) so the same code paints in React and renders headlessly.
  */
 
 import type { LayoutSnapshot } from "./hero-layout";
@@ -24,18 +78,33 @@ import type { LayoutSnapshot } from "./hero-layout";
 const TAU = Math.PI * 2;
 const DEG = Math.PI / 180;
 
-/** Samples per ray; enough for silky curvature without overworking the canvas. */
+/** Samples per strand. 48 is smooth at 1400 px of throw and cheap at 26 strands. */
 const STRAND_STEPS = 48;
 /** Lane overshoot as a fraction: tips must leave the frame, not stop inside it. */
 const OVERSHOOT = 1.06;
-/** One uninterrupted ray per chromatic band. */
-const BAND_STRANDS = 1;
+/** Strands per hue. Three gives each band a spine plus a pair of satellites. */
+const BAND_STRANDS = 3;
 /** Hard ceiling on the buffer pool (bands × strands + ghosts). */
-const MAX_STRANDS = 8;
+const MAX_STRANDS = 28;
 
-/** Continuous colored paths; the wave envelope supplies motion, not dashes or particle noise. */
+/**
+ * The dot → line continuum, as a staircase of stroke patterns along the strand.
+ *
+ * Each row is a stretch of the strand (fractions of its length) drawn with its own dash
+ * pattern. A zero-length dash with a round cap is a dot, so the first three rows read as
+ * specks that get denser and closer to touching; by the fifth row they are dashes, and the
+ * last row is a continuous filament. The ranges deliberately overlap a little — the alpha
+ * ramp in the strand gradient does the blending, so the seams never show.
+ */
 type Region = { from: number; to: number; dash: [number, number] | null; width: number };
-const REGIONS: readonly Region[] = [{ from: 0, to: 1, dash: null, width: 1.8 }];
+const REGIONS: readonly Region[] = [
+  { from: 0.0, to: 0.062, dash: [0.01, 17], width: 1.35 },
+  { from: 0.052, to: 0.118, dash: [0.01, 12], width: 1.45 },
+  { from: 0.108, to: 0.186, dash: [0.01, 8.5], width: 1.5 },
+  { from: 0.176, to: 0.272, dash: [7, 6], width: 1.25 },
+  { from: 0.262, to: 0.4, dash: [14, 4], width: 1.1 },
+  { from: 0.39, to: 1.0, dash: null, width: 1 },
+];
 
 /* --------------------------------------------------------------- plasma constants */
 
@@ -102,7 +171,7 @@ const BEAM_WAVE = {
   /** … and settles onto the facet: exactly zero at s = 1, so the hinge is never tugged */
   fadeOut: 0.2,
   /** amplitude as a fraction of the run, clamped: ~19 px at 1440, ~7 px on a phone */
-  amplitudeOfRun: 0.009,
+  amplitudeOfRun: 0.021,
   amplitudeMin: 5,
   amplitudeMax: 19,
 } as const;
@@ -125,8 +194,8 @@ const BEAM_WAVE = {
  * Portrait rises at 14°, which lands well inside the window where the ray refracts out of the
  * right facet.
  */
-const BEAM_ANGLE_WIDE = 16.5 * DEG;
-const BEAM_ANGLE_PORTRAIT = -16.5 * DEG;
+const BEAM_ANGLE_WIDE = 13 * DEG;
+const BEAM_ANGLE_PORTRAIT = -14 * DEG;
 
 /** Pointer hover eases the beam: this is the time constant, ms. */
 const BEAM_HOVER_TAU_MS = 160;
@@ -178,7 +247,7 @@ const rgba = (c: Rgb, a: number) =>
 /** Paper and ink, print-graded. Kept local: the field never borrows the text tokens. */
 const PAPER: Rgb = [247, 244, 238];
 /** Dark-theme paper matched to the ambient-lit copy plane so stencils leave neither halo nor cutout. */
-const DARK_PAPER: Rgb = [11, 12, 14];
+const DARK_PAPER: Rgb = [19, 14, 10];
 const INK: Rgb = [27, 24, 21];
 
 export type BandSpec = {
@@ -204,50 +273,109 @@ export type BandSpec = {
   flagship?: boolean;
 };
 
-/** The official three-ray brand spectrum, in top-to-bottom visual order. */
+/**
+ * Seven bands, red → violet, clay carrying the light. Hue reads as pigment on paper and as
+ * light on ink; clay is the only band allowed to be heavy.
+ */
 export const BANDS: readonly BandSpec[] = [
+  {
+    name: "clay-lead",
+    light: [174, 64, 36],
+    lightAlpha: 0.65,
+    dark: [217, 99, 70],
+    darkAlpha: 0.85,
+    width: 1.4,
+    amplitude: 8.5,
+    cycles: 0.95,
+    hz: 0.17,
+    ribbon: 18,
+    ribbonAlpha: 0.075,
+    plasma: 0.8,
+  },
+  {
+    name: "clay-warm",
+    light: [185, 75, 42],
+    lightAlpha: 0.72,
+    dark: [224, 110, 78],
+    darkAlpha: 0.9,
+    width: 1.6,
+    amplitude: 9.5,
+    cycles: 0.9,
+    hz: 0.16,
+    ribbon: 22,
+    ribbonAlpha: 0.085,
+    plasma: 0.85,
+  },
   {
     name: "clay",
     light: [174, 64, 36],
-    lightAlpha: 0.95,
+    lightAlpha: 0.92,
     dark: [217, 99, 70],
-    darkAlpha: 0.95,
-    width: 1.8,
-    amplitude: 1.1,
-    cycles: 0.72,
-    hz: 0.12,
-    ribbon: 4,
-    ribbonAlpha: 0.025,
-    plasma: 0,
+    darkAlpha: 1,
+    width: 2.0,
+    amplitude: 11,
+    cycles: 0.82,
+    hz: 0.15,
+    ribbon: 26,
+    ribbonAlpha: 0.1,
+    plasma: 0.9,
     flagship: true,
+  },
+  {
+    name: "ochre",
+    light: [165, 95, 38],
+    lightAlpha: 0.75,
+    dark: [210, 142, 84],
+    darkAlpha: 0.9,
+    width: 1.6,
+    amplitude: 9.5,
+    cycles: 0.95,
+    hz: 0.18,
+    ribbon: 22,
+    ribbonAlpha: 0.085,
+    plasma: 0.85,
   },
   {
     name: "gold",
     light: [144, 106, 33],
-    lightAlpha: 0.95,
+    lightAlpha: 0.88,
     dark: [203, 166, 102],
-    darkAlpha: 0.95,
-    width: 1.8,
-    amplitude: 1,
-    cycles: 0.72,
-    hz: 0.12,
-    ribbon: 4,
-    ribbonAlpha: 0.025,
-    plasma: 0,
+    darkAlpha: 0.98,
+    width: 2.0,
+    amplitude: 9,
+    cycles: 1.0,
+    hz: 0.2,
+    ribbon: 25,
+    ribbonAlpha: 0.095,
+    plasma: 0.9,
+  },
+  {
+    name: "soft-slate",
+    light: [115, 128, 160],
+    lightAlpha: 0.72,
+    dark: [167, 181, 210],
+    darkAlpha: 0.88,
+    width: 1.6,
+    amplitude: 8,
+    cycles: 1.08,
+    hz: 0.22,
+    ribbon: 20,
+    ribbonAlpha: 0.08,
+    plasma: 0.85,
   },
   {
     name: "slate",
     light: [73, 98, 151],
-    lightAlpha: 0.95,
+    lightAlpha: 0.88,
     dark: [137, 159, 204],
-    darkAlpha: 0.95,
-    width: 1.8,
-    amplitude: 0.9,
-    cycles: 0.72,
-    hz: 0.12,
-    ribbon: 4,
-    ribbonAlpha: 0.025,
-    plasma: 0,
+    darkAlpha: 0.98,
+    width: 2.0,
+    amplitude: 7.5,
+    cycles: 1.15,
+    hz: 0.19,
+    ribbon: 25,
+    ribbonAlpha: 0.095,
+    plasma: 0.9,
   },
 ];
 
@@ -306,11 +434,10 @@ export type HeroGeometry = {
   /**
    * Where the composition put the beam's landing on the left facet:
    * "left-run" = it crosses the hero from the left edge (wide screens),
-   * "corner-rise" = it rises from the lower-left into corner glass without a stage,
-   * "stage-run" = it enters the measured centerpiece stage from the left.
-   * All three are straight approaches; none is a reroute.
+   * "corner-rise" = it rises from the lower-left into the corner glass (portrait).
+   * Both are a straight approach; neither is a reroute.
    */
-  entryMode: "left-run" | "corner-rise" | "stage-run";
+  entryMode: "left-run" | "corner-rise";
   /** resting parameter on the left facet, top → bottom */
   entryU: number;
   /** the beam's approach angle in radians (screen space, y down) */
@@ -1127,11 +1254,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const { heroW, heroH, thesisLine } = snapshot;
     const mobile = heroW < PORTRAIT_MAX_W;
     const stage = snapshot.mobileStage;
-    // The stage is visible below the `lg` breakpoint (1024px), including landscape tablets
-    // that are wider than the portrait geometry breakpoint. Respect the measured DOM stage
-    // whenever it is present instead of assuming every staged layout is narrow/mobile.
     const hasStage = Boolean(
-      stage && stage.right - stage.left > 60 && stage.bottom - stage.top > 60,
+      mobile && stage && stage.right - stage.left > 60 && stage.bottom - stage.top > 60,
     );
 
     /**
@@ -1203,10 +1327,9 @@ export function createHeroRay(options: HeroRayOptions = {}) {
             Math.max(140, heroW - 24 - layout.copyRight - Math.max(16, heroW * 0.022)),
           );
 
-    // Isosceles crown-glass prism, apex up (55° apex angle), anchored at its centroid.
-    const triangleHeight = prismSize * Math.cos(27.5 * DEG);
-    const r = (triangleHeight * 2) / 3;
-    const halfW = prismSize * Math.sin(27.5 * DEG);
+    // Equilateral prism, apex up. Circumradius r = size / √3, half-width r·cos30°.
+    const r = prismSize / Math.sqrt(3);
+    const halfW = r * 0.866;
 
     /**
      * The composition hangs off one point: **where the beam lands on the left facet**.
@@ -1440,9 +1563,18 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     }
     const scrollBand = { up: upRoom, down: downRoom };
 
-    // The three exit rays occupy a calibrated 4°–29° drafting range. Their exact optical
-    // angles are applied below in brand order; this range is retained in telemetry/debug data.
-    const sweep = { from: 4, to: 29 };
+    /**
+     * The sweep. On desktop the fan opens from up-left (-166°) through the right (0°) to
+     * down-left (+164°): 330° of dispersion, which is what puts light on the top edge, the
+     * bottom edge, the right edge and both left corners without aiming bands at the words.
+     * Portrait screens turn the same fan to face the empty right-hand side — the copy is full
+     * width there, so "the empty side" means the margin *beside* the words, not the whole page.
+     */
+    const sweep = hasStage
+      ? { from: -42, to: 105 }
+      : mobile
+        ? { from: 12, to: 178 }
+        : { from: -166, to: 164 };
     const count = BANDS.length * BAND_STRANDS;
 
     const quiet = layout.ledger.quietRects;
@@ -1502,7 +1634,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const dir = { x: Math.cos(spec.angle), y: Math.sin(spec.angle) };
       const band = BANDS[spec.band];
       const reach = rayExit(core, dir, heroW, heroH);
-      const spine = !spec.ghost && spec.index % BAND_STRANDS === BAND_STRANDS - 1;
+      const spine = !spec.ghost && spec.index % BAND_STRANDS === 1;
       return {
         index: spec.index,
         band: spec.band,
@@ -1547,21 +1679,37 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
     const strands: Strand[] = [];
     for (let i = 0; i < count; i++) {
+      const uniform = i / (count - 1);
+      // Push the spacing toward the middle of the sweep: the strands that leave the frame
+      // quickly are the ones with room to be seen, so they get the company.
+      const eased =
+        0.5 + (Math.sign(uniform - 0.5) * Math.pow(Math.abs(uniform - 0.5) * 2, 1.3)) / 2;
       const band = Math.min(BANDS.length - 1, Math.floor(i / BAND_STRANDS));
       // A little angular scatter so the fan never reads as a protractor…
-      // Dispersion values use the optical y-up convention; Canvas uses y-down.
-      const calibratedAngles = [-4, -16.5, -29] as const;
+      const jitter = (hash(i * 13 + 7, 3) - 0.5) * 3.4;
       strands.push(
         makeStrand({
           index: i,
           band,
-          angle: -calibratedAngles[band] * DEG,
+          angle: (lerp(sweep.from, sweep.to, eased) + jitter) * DEG,
           ghost: false,
         }),
       );
     }
 
-    // No ghost lanes: the spectrum contains exactly the three brand rays.
+    // …plus three ghosts that cross the copy itself. They are far too faint to compete with
+    // the type, and they are what stops the left half of the hero from looking abandoned.
+    const ghostAngles = hasStage ? [175, 195] : mobile ? [196] : [171, 199];
+    for (const [k, degrees] of ghostAngles.entries()) {
+      strands.push(
+        makeStrand({
+          index: count + k,
+          band: k === 1 ? 4 : 2,
+          angle: degrees * DEG,
+          ghost: true,
+        }),
+      );
+    }
 
     /**
      * The prime line: the one strand that grows out of the dot.
@@ -1609,7 +1757,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         }
       }
       const from = best?.from ?? { x: tile.cx, y: tile.top - 46 };
-      grounds.push({ from, to: { x: tile.cx, y: tile.top - 6 }, band: best?.band ?? 0 });
+      grounds.push({ from, to: { x: tile.cx, y: tile.top - 6 }, band: best?.band ?? 2 });
     }
 
     geo = {
@@ -1624,7 +1772,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       hit,
       exit,
       source,
-      entryMode: hasStage ? "stage-run" : mobile ? "corner-rise" : "left-run",
+      entryMode: mobile ? "corner-rise" : "left-run",
       entryU,
       beamAngle,
       restOptics,
@@ -1974,13 +2122,13 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     far.addColorStop(1, isDark ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.045)");
     farFaceGrad = far;
 
-    const warm = isDark ? BANDS[0].dark : BANDS[0].light;
+    const warm = isDark ? BANDS[2].dark : BANDS[2].light;
     const ambRadius = Math.hypot(heroW, heroH) * 0.95;
     const ambCore = shift(geo.core);
     const amb = ctx.createRadialGradient(ambCore.x, ambCore.y, 0, ambCore.x, ambCore.y, ambRadius);
-    amb.addColorStop(0, rgba(warm, isDark ? 0.055 : 0.035));
-    amb.addColorStop(0.32, rgba(warm, isDark ? 0.025 : 0.016));
-    amb.addColorStop(0.68, rgba(warm, isDark ? 0.008 : 0.005));
+    amb.addColorStop(0, rgba(warm, isDark ? 0.12 : 0.075));
+    amb.addColorStop(0.32, rgba(warm, isDark ? 0.055 : 0.036));
+    amb.addColorStop(0.68, rgba(warm, isDark ? 0.018 : 0.012));
     amb.addColorStop(1, rgba(warm, 0));
     ambientGrad = amb;
 
@@ -2022,7 +2170,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
    * instead of following a decorative curve.
    */
   const beamEnvelope = (s: number) =>
-    Math.pow(Math.max(0, Math.sin(Math.PI * clamp(s, 0, 1)), 0), 0.85);
+    smoothstep(0, BEAM_WAVE.fadeIn, s) * smoothstep(1, 1 - BEAM_WAVE.fadeOut, s);
 
   /**
    * Transverse displacement of the illustrated field at s ∈ [0, 1], in px.
@@ -2033,8 +2181,12 @@ export function createHeroRay(options: HeroRayOptions = {}) {
    */
   const beamOffset = (s: number, amp: number) => {
     const phase = time * TAU * BEAM_WAVE.hz;
-    const wave = Math.sin(TAU * BEAM_WAVE.cycles * s - phase + 0.7);
-    return wave * amp * beamEnvelope(s);
+    const wave =
+      Math.sin(TAU * BEAM_WAVE.cycles * s - phase + 0.7) +
+      Math.sin(TAU * BEAM_WAVE.harmonicCycles * s - phase * 1.7 + 2.1) * BEAM_WAVE.harmonic;
+    // Normalised by the harmonic sum, so `amp` is a true bound: the crest can reach it and
+    // never exceed it. That is what lets the corridor be asserted instead of estimated.
+    return (wave / (1 + BEAM_WAVE.harmonic)) * amp * beamEnvelope(s);
   };
 
   /** A point on the illustrated beam. `s = 1` is the live entry point, by construction. */
@@ -2177,12 +2329,12 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       return;
     }
     const core = fanOrigin ?? shift(geo.core);
-    const warm = isDark ? BANDS[0].dark : BANDS[0].light;
+    const warm = isDark ? BANDS[2].dark : BANDS[2].light;
     const radius = Math.hypot(heroW, heroH) * 0.95;
     const g = ctx.createRadialGradient(core.x, core.y, 0, core.x, core.y, radius);
-    g.addColorStop(0, rgba(warm, isDark ? 0.055 : 0.035));
-    g.addColorStop(0.32, rgba(warm, isDark ? 0.025 : 0.016));
-    g.addColorStop(0.68, rgba(warm, isDark ? 0.008 : 0.005));
+    g.addColorStop(0, rgba(warm, isDark ? 0.12 : 0.075));
+    g.addColorStop(0.32, rgba(warm, isDark ? 0.055 : 0.036));
+    g.addColorStop(0.68, rgba(warm, isDark ? 0.018 : 0.012));
     g.addColorStop(1, rgba(warm, 0));
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, heroW, heroH);
@@ -2235,41 +2387,6 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       ctx.lineTo(x + sx * tick, y);
       ctx.stroke();
     }
-
-    // Astronomical drafting reticle centered on the glass, with a second registration crosshair
-    // at the incident hinge. The two range rings and degree marks stay intentionally faint.
-    const center = geo.prismCenter;
-    const innerRadius = geo.prismSize * 0.4;
-    const outerRadius = geo.prismSize * 0.8;
-    ctx.strokeStyle = "rgba(205,211,221,0.07)";
-    ctx.lineWidth = 0.7;
-    for (const radius of [innerRadius, outerRadius]) {
-      ctx.beginPath();
-      ctx.arc(center.x, center.y, radius, 0, TAU);
-      ctx.stroke();
-    }
-    for (let degree = 0; degree < 360; degree += 10) {
-      const angle = degree * DEG;
-      const major = degree % 30 === 0;
-      const from = outerRadius - (major ? 8 : 4);
-      ctx.beginPath();
-      ctx.moveTo(center.x + Math.cos(angle) * from, center.y + Math.sin(angle) * from);
-      ctx.lineTo(
-        center.x + Math.cos(angle) * outerRadius,
-        center.y + Math.sin(angle) * outerRadius,
-      );
-      ctx.stroke();
-    }
-    const drawCrosshair = (point: Vec, size: number) => {
-      ctx.beginPath();
-      ctx.moveTo(point.x - size, point.y);
-      ctx.lineTo(point.x + size, point.y);
-      ctx.moveTo(point.x, point.y - size);
-      ctx.lineTo(point.x, point.y + size);
-      ctx.stroke();
-    };
-    drawCrosshair(center, 7);
-    drawCrosshair(geo.hit, 5);
 
     // Baseline ticks: short marks off the left of each line's ink.
     ctx.strokeStyle = rule(0.1);
@@ -2421,6 +2538,34 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     }
     if (ctx.setLineDash) ctx.setLineDash([]);
 
+    // White-hot filament: only the clay spine carries one, and only past the halfway mark —
+    // that is where the dispersion's centre of energy reads as light rather than pigment.
+    if (band.flagship && !strand.ghost) {
+      traceRange(ctx, buf, Math.max(door, Math.round(0.55 * STRAND_STEPS)), STRAND_STEPS);
+      ctx.strokeStyle = isDark ? "rgba(255,252,246,0.85)" : "rgba(255,255,255,0.6)";
+      ctx.globalAlpha = clamp(alpha * 0.4, 0, 1);
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+      ctx.strokeStyle = gradient;
+    }
+
+    // A packet of current travelling outward: short, bright, and fast enough to read as
+    // movement at the edge of vision.
+    if (!strand.ghost && index % 2 === 0) {
+      const speed = 0.075 + hash(index * 7 + 3, 21) * 0.055;
+      const p = (time * speed + hash(index * 11 + 5, 23)) % 1;
+      const head = Math.round(p * STRAND_STEPS);
+      const tail = Math.max(door, head - 4);
+      if (head - tail >= 2 && tail > door && p > 0.06) {
+        traceRange(ctx, buf, tail, head);
+        ctx.strokeStyle = isDark ? "rgba(255,252,246,0.95)" : rgba(mix(colour, INK, 0.2), 1);
+        ctx.globalAlpha = clamp(alpha * 0.55 * Math.sin(Math.PI * p), 0, 1);
+        ctx.lineWidth = 1.1 * strand.width;
+        ctx.stroke();
+        ctx.strokeStyle = gradient;
+      }
+    }
+
     ctx.globalAlpha = 1;
   };
 
@@ -2442,7 +2587,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const buf = strandBufs[geo.prime];
     if (!strand || !buf) return;
     // Clay, whatever band the prime lane landed on: this is the accent stroke of the hero.
-    const band = BANDS[0];
+    const band = BANDS[2];
     const colour = isDark ? band.dark : band.light;
     const origin = fanOrigin ?? shift(geo.core);
     const dir = liveStrandDir(strand, strandDirScratch);
@@ -2658,6 +2803,61 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   };
 
   /**
+   * Tesla plasma, braided over the spine of each band.
+   *
+   * A discharge is angular: current takes the shortest path between strike points, so the
+   * channel is a polyline through a handful of anchors with a large lateral offset and only a
+   * pixel of micro-jitter — not a smooth sine displaced sideways. Jitter is quantised to a
+   * 24 fps bucket so the crackle snaps instead of shimmering, and every value comes from a
+   * hash: no allocation and no Math.random inside a frame.
+   */
+  const drawPlasma = (ctx: Ctx) => {
+    if (!geo) return;
+    const frame = jitterFrame;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    for (let i = 0; i < geo.strands.length; i++) {
+      const strand = geo.strands[i];
+      if (strand.ribbon <= 0) continue;
+      const band = BANDS[strand.band];
+      const buf = strandBufs[i];
+      const gate = gates[i] ?? 0;
+      if (gate >= STRAND_STEPS) continue;
+      const dir = liveStrandDir(strand, strandDirScratch);
+      const lane = liveStrandLength(strand, fanOrigin ?? geo.core, dir);
+      const nx = -dir.y;
+      const ny = dir.x;
+      const colour = isDark ? band.dark : band.light;
+      const weight =
+        band.plasma * (isDark ? 0.95 : 0.86) * (1 + surgeEnergy * 0.3) * bandVoice(strand.band);
+      const base = (isDark ? band.darkAlpha : band.lightAlpha) * weight * strand.alpha;
+      const strikeAmp = clamp(lane * 0.035, 5, 15);
+
+      // --- smooth optical beam path
+      ctx.beginPath();
+      ctx.moveTo(buf[gate * 2], buf[gate * 2 + 1]);
+      for (let k = gate + 1; k < STRAND_STEPS; k++) {
+        ctx.lineTo(buf[k * 2], buf[k * 2 + 1]);
+      }
+
+      // Spectral emission glow
+      ctx.strokeStyle = rgba(colour, 1);
+      ctx.globalAlpha = clamp(base * (isDark ? 0.22 : 0.18), 0, 1);
+      ctx.lineWidth = isDark ? 4.5 : 3.6;
+      ctx.stroke();
+
+      // Refracted core filament: crisp optical ray
+      ctx.strokeStyle = isDark ? "rgba(255,252,246,0.92)" : rgba(mix(colour, INK, 0.35), 0.95);
+      ctx.globalAlpha = clamp(base * (isDark ? 0.55 : 0.45), 0, 1);
+      ctx.lineWidth = 0.95;
+      ctx.stroke();
+    }
+
+    ctx.globalAlpha = 1;
+  };
+
+  /**
    * Layer — the incident beam.
    *
    * Four parts, each doing one job:
@@ -2680,7 +2880,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
    */
   /** Source seed and instrument-like ignition, all behind the type stencil. */
   const drawIgnition = (ctx: Ctx) => {
-    const warm = isDark ? BANDS[0].dark : BANDS[0].light;
+    const warm = isDark ? BANDS[2].dark : BANDS[2].light;
     if (pinned && bang.age >= 80) {
       const glow = ctx.createRadialGradient(
         pinnedSource.x,
@@ -2911,7 +3111,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const rest = geo.restOptics;
     const hit = liveHit ?? shift(geo.hit);
     const exit = fanOrigin ?? shift(geo.exit);
-    const warm = isDark ? BANDS[0].dark : BANDS[0].light;
+    const warm = isDark ? BANDS[2].dark : BANDS[2].light;
     const activeFacet = pinned ? pinnedFacet : "left";
     const litA = activeFacet === "base" ? leftV : topV;
     const litB = activeFacet === "left" ? leftV : rightV;
@@ -2943,8 +3143,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const poolY = rightV.y + prismSize * 0.11;
     const poolR = prismSize * 0.58;
     const pool = ctx.createRadialGradient(poolX, poolY, 0, poolX, poolY, poolR);
-    pool.addColorStop(0, rgba(warm, (isDark ? 0.055 : 0.035) * (1 + pointerInGlass * 0.25)));
-    pool.addColorStop(0.45, rgba(warm, isDark ? 0.02 : 0.012));
+    pool.addColorStop(0, rgba(warm, (isDark ? 0.2 : 0.14) * (1 + pointerInGlass * 0.7)));
+    pool.addColorStop(0.45, rgba(warm, isDark ? 0.07 : 0.05));
     pool.addColorStop(1, rgba(warm, 0));
     ctx.fillStyle = pool;
     ctx.beginPath();
@@ -3133,7 +3333,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const source = liveSource ?? geo.source;
       const entry = liveHit ?? shift(geo.hit);
       const entryFacet = pinned ? pinnedFacet : "left";
-      return [0.65, 0.55, 0.43].flatMap((wavelength, band) => {
+      return [0.65, 0.61, 0.59, 0.55, 0.5, 0.46, 0.43].flatMap((wavelength, band) => {
         const index = 1.4868 + 0.004 / wavelength ** 2;
         const traced = tracePrism(source, entry, topV, leftV, rightV, entryFacet, index);
         if (!traced.exitFacet) return [];
@@ -3175,7 +3375,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     // angle; never alter tracePrism or silently defeat its total-reflection guard.
     const sinInternal = resting && last.tir ? Math.sign(signedSin) * 0.42 : signedSin;
     const origin = scrollEase > 0 ? last.to : geo.exit;
-    return [0.65, 0.55, 0.43].flatMap((wavelength, band) => {
+    return [0.65, 0.61, 0.59, 0.55, 0.5, 0.46, 0.43].flatMap((wavelength, band) => {
       const index = 1.4868 + 0.004 / wavelength ** 2;
       const sinOut = index * sinInternal;
       if (Math.abs(sinOut) >= 1) return [];
@@ -3230,7 +3430,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   const drawEntrySpark = (ctx: Ctx) => {
     if (!geo) return;
     const hit = liveHit ?? shift(geo.hit);
-    const warm = isDark ? BANDS[0].dark : BANDS[0].light;
+    const warm = isDark ? BANDS[2].dark : BANDS[2].light;
     const impact = bang.age >= 380 && bang.age < 700 ? 1 - (bang.age - 380) / 320 : 0;
     const r = 6.5 * (1 + impact * 1.4 + surgeEnergy * 0.4);
     ctx.globalAlpha = Math.max(fieldLight(), impact);
@@ -3253,21 +3453,79 @@ export function createHeroRay(options: HeroRayOptions = {}) {
    */
   const drawCore = (ctx: Ctx) => {
     if (!geo) return;
+    const { prismSize } = geo;
+    ctx.globalAlpha = fieldLight();
     const exit = fanOrigin ?? shift(geo.exit);
-    const clay = isDark ? BANDS[0].dark : BANDS[0].light;
-    const halo = ctx.createRadialGradient(exit.x, exit.y, 0, exit.x, exit.y, 8);
-    halo.addColorStop(0, "rgba(238,234,225,0.72)");
-    halo.addColorStop(0.3, rgba(clay, 0.22));
-    halo.addColorStop(1, rgba(clay, 0));
-    ctx.fillStyle = halo;
+    const pulse = 1 + Math.sin(time * TAU * 1.5) * 0.05 + surgeEnergy * 0.5;
+    const warm = isDark ? BANDS[2].dark : BANDS[2].light;
+    const voice = isDark ? 1 : 0.94;
+
+    const coronaR = prismSize * (0.24 + surgeEnergy * 0.12);
+    const corona = ctx.createRadialGradient(exit.x, exit.y, 0, exit.x, exit.y, coronaR);
+    const bandAlpha = isDark ? BANDS[2].darkAlpha : BANDS[2].lightAlpha;
+    corona.addColorStop(0, rgba(warm, bandAlpha * 0.18 * voice));
+    corona.addColorStop(0.5, rgba(warm, bandAlpha * 0.05 * voice));
+    corona.addColorStop(1, rgba(warm, 0));
+    ctx.fillStyle = corona;
     ctx.beginPath();
-    ctx.arc(exit.x, exit.y, 8, 0, TAU);
+    ctx.arc(exit.x, exit.y, coronaR, 0, TAU);
     ctx.fill();
 
-    ctx.fillStyle = "#eeeae1";
+    const r = prismSize * 0.12 * pulse;
+    const bloom = ctx.createRadialGradient(exit.x, exit.y, 0, exit.x, exit.y, r);
+    bloom.addColorStop(0, "rgba(255,255,252,0.88)");
+    bloom.addColorStop(0.25, rgba(warm, isDark ? 0.45 : 0.35));
+    bloom.addColorStop(0.6, rgba(warm, isDark ? 0.1 : 0.06));
+    bloom.addColorStop(1, rgba(warm, 0));
+    ctx.fillStyle = bloom;
     ctx.beginPath();
-    ctx.arc(exit.x, exit.y, 2.5, 0, TAU);
+    ctx.arc(exit.x, exit.y, r, 0, TAU);
     ctx.fill();
+
+    // A pair of thin subtle flares crossing at the optical emission point.
+    const flare = prismSize * (0.18 + surgeEnergy * 0.1);
+    for (const [ax, ay, alpha] of [
+      [1, 0, 0.22],
+      [0, 1, 0.14],
+    ] as const) {
+      const gradient = ctx.createLinearGradient(
+        exit.x - ax * flare,
+        exit.y - ay * flare,
+        exit.x + ax * flare,
+        exit.y + ay * flare,
+      );
+      gradient.addColorStop(0, rgba(warm, 0));
+      gradient.addColorStop(0.5, rgba(warm, alpha));
+      gradient.addColorStop(1, rgba(warm, 0));
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(exit.x - ax * flare, exit.y - ay * flare);
+      ctx.lineTo(exit.x + ax * flare, exit.y + ay * flare);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = "rgba(255,255,255,0.99)";
+    ctx.beginPath();
+    ctx.arc(exit.x, exit.y, 2.4 * pulse, 0, TAU);
+    ctx.fill();
+
+    for (let k = 0; k < 4; k++) {
+      const orbit = prismSize * (0.13 + k * 0.032);
+      const angle = time * TAU * (0.085 + k * 0.021) + k * 1.7;
+      const alpha = 0.5 - k * 0.09;
+      ctx.fillStyle = isDark ? `rgba(255,252,246,${alpha})` : rgba(BANDS[2].light, alpha * 0.9);
+      ctx.beginPath();
+      ctx.arc(
+        exit.x + Math.cos(angle) * orbit,
+        exit.y + Math.sin(angle) * orbit * 0.72,
+        1.1 - k * 0.12,
+        0,
+        TAU,
+      );
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
   };
 
   /** Layer — grounding filaments: the field is reasoned onto the catalogue, one per tile. */
@@ -3349,7 +3607,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   const drawCatch = (ctx: Ctx) => {
     if (!geo || pointerEase <= 0.02 || catches.length === 0) return;
     const near = [...catches].sort((a, b) => a.distance - b.distance).slice(0, 2);
-    const charge = isDark ? "rgba(255,252,246,0.95)" : rgba(mix(BANDS[0].light, INK, 0.15), 1);
+    const charge = isDark ? "rgba(255,252,246,0.95)" : rgba(mix(BANDS[2].light, INK, 0.15), 1);
 
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -3520,7 +3778,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const t = age / SURGE_LIFE_MS;
       const energy = Math.pow(1 - t, 1.6);
       const radius = 12 + Math.pow(t, 0.62) * 190;
-      const warm = isDark ? BANDS[surge.seed % 3 === 0 ? 0 : 2].dark : BANDS[0].light;
+      const warm = isDark ? BANDS[surge.seed % 3 === 0 ? 0 : 2].dark : BANDS[2].light;
 
       const front = (r: number, width: number, haze: number, coreA: number, seed: number) => {
         ctx.beginPath();
@@ -3638,7 +3896,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const quiet = isQuiet(point.x, point.y);
       if (quiet > 0.65) continue;
       ctx.globalAlpha = 0.5 * fade * packetGate * (1 - quiet) * (1 + surgeEnergy * 0.6);
-      ctx.fillStyle = isDark ? "rgba(255,252,246,0.95)" : rgba(BANDS[0].light, 0.95);
+      ctx.fillStyle = isDark ? "rgba(255,252,246,0.95)" : rgba(BANDS[2].light, 0.95);
       ctx.beginPath();
       ctx.arc(point.x, point.y, 1.4, 0, TAU);
       ctx.fill();
@@ -3780,7 +4038,8 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         for (let i = 0; i < geo.strands.length; i++) {
           if (!geo.strands[i].ghost) drawStrand(ctx, i);
         }
-        // Three uninterrupted, low-amplitude wavefronts; no forks, sparks, or growth flare.
+        drawPlasma(ctx);
+        drawPrime(ctx);
         break;
       }
       // The incident beam — behind the type, see above.
@@ -3815,8 +4074,21 @@ export function createHeroRay(options: HeroRayOptions = {}) {
             ctx.clip();
             drawBeam(ctx);
             ctx.restore();
+            if (bang.age >= 120 && bang.age < 380) {
+              const offset = beamOffset(end, beamAmplitude(axis.len));
+              const x = axis.source.x + axis.dx * end + axis.nx * offset,
+                y = axis.source.y + axis.dy * end + axis.ny * offset;
+              const glow = ctx.createRadialGradient(x, y, 0, x, y, 12);
+              glow.addColorStop(0, isDark ? "rgba(255,255,250,0.95)" : "rgba(120,88,65,0.9)");
+              glow.addColorStop(1, "rgba(220,150,100,0)");
+              ctx.fillStyle = glow;
+              ctx.beginPath();
+              ctx.arc(x, y, 12, 0, TAU);
+              ctx.fill();
+            }
           }
         }
+        drawIgnition(ctx);
         break;
       }
       // Type is thinned here; everything below is painted after it.
@@ -3828,20 +4100,23 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       case "glass": {
         drawGlass(ctx);
         drawSpectralExit(ctx);
+        drawEntrySpark(ctx);
         break;
       }
       // The core, then the filaments that ground the fan on the catalogue.
       case "core": {
         drawCore(ctx);
+        drawGrounds(ctx);
         break;
       }
       // The current reaching for the cursor, then the click wavefronts.
       case "interaction": {
-        // The bench remains calm while the prism is steered; no cursor arcs or click bursts.
+        drawCatch(ctx);
+        drawSurges(ctx);
         break;
       }
       case "atmosphere": {
-        // Quiet field: drafting geometry is carried by the plate, not particle noise.
+        drawAtmosphere(ctx);
         break;
       }
     }
