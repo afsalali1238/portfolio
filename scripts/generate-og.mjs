@@ -17,7 +17,7 @@ const font = (relativePath) =>
   fs.readFileSync(path.join(repo, "node_modules", relativePath)).toString("base64");
 const brandLockup =
   "data:image/svg+xml;base64," +
-  fs.readFileSync(path.join(repo, "public/brand/svg/lockup_on-ink-colour.svg")).toString("base64");
+  fs.readFileSync(path.join(repo, "public/brand/lockup-paper.svg")).toString("base64");
 
 const esc = (s) =>
   String(s || "")
@@ -167,13 +167,13 @@ const items = [
     right: `${projects.filter((p) => p.live).length} live · ${projects.filter((p) => p.github).length} open source`,
   },
   {
-    id: "about",
-    kicker: "Origin",
-    title: "What is forthe.tech?",
-    size: 120,
-    sub: "The wall between having an idea and building it came down. Since then, I’ve been building for the tech.",
-    url: "www.forthe.tech/about",
-    right: "forthe.tech · Dubai",
+    id: "the-man-behind",
+    kicker: "Operator dossier",
+    title: "The Man Behind.",
+    size: 124,
+    sub: "The builder behind forthe.tech — an operations-minded maker building focused tools in Dubai.",
+    url: "www.forthe.tech/the-man-behind",
+    right: "Dubai · UTC+4",
   },
   ...projects.map((p) => ({
     id: p.id,

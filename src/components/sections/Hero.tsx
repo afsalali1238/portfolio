@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Container } from "../layout/Container";
 import { projectCount, liveCount, forPeopleCount, sourceCount } from "../../data/projects";
@@ -123,6 +123,9 @@ export function Hero() {
               edge of the italic, the lede and the CTA row is what decides where the glass
               settles. Widening any of them pushes the whole picture back to the right. */}
           <div className="lg:col-span-7 space-y-6" data-hero-copy>
+            <p className="t-label" style={{ color: "var(--fg-muted)" }}>
+              Afsal Ali · Independent product maker · Dubai
+            </p>
             <h1 id="hero-heading" className="font-serif tracking-tight">
               <span className="block text-[11.5vw] leading-[0.88] text-ink sm:text-[4.6rem] md:text-[5.5rem] lg:text-[6rem] xl:text-[6.8rem]">
                 <RevealWord delay={0.05}>For the tech.</RevealWord>
@@ -189,8 +192,8 @@ export function Hero() {
 
             {/* max-w-md keeps the paragraph while clearing the glass's band. */}
             <p className="max-w-md text-base leading-relaxed text-ink-soft md:text-lg">
-              Documenting what happens when the wall between having an idea and building it
-              disappears.
+              I turn real-world friction into focused product concepts, interfaces, and working
+              software — then document what holds up in real life.
             </p>
 
             {/* `sm:w-fit`: the row's box is measured, so it must not be wider than its buttons. */}
@@ -202,22 +205,22 @@ export function Hero() {
                 to="/works"
                 className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-ink px-6 text-paper transition-all duration-150 hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
               >
-                See the builds
+                Explore selected work
                 <ArrowRight
                   className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1"
                   aria-hidden="true"
                 />
               </Link>
-              <Link
-                to="/notes"
+              <a
+                href="mailto:here@forthe.tech?subject=Project%20enquiry%20via%20forthe.tech"
                 className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-md border rule-hair bg-paper px-6 text-ink transition-all duration-150 hover:bg-paper-deep hover:border-ink/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               >
-                Read the notes
-                <ArrowRight
-                  className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1"
+                Start a conversation
+                <ArrowUpRight
+                  className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   aria-hidden="true"
                 />
-              </Link>
+              </a>
             </div>
           </div>
 

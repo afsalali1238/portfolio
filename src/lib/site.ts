@@ -8,9 +8,9 @@ import { projectCount, numberWord } from "../data/projects";
 
 export const SITE_URL = "https://www.forthe.tech";
 export const SITE_NAME = "forthe.tech";
-export const AUTHOR = "forthe.tech";
+export const AUTHOR = "Afsal Ali";
 
-export const DEFAULT_DESCRIPTION = `Documenting what happens when the wall between having an idea and building it disappears. ${numberWord(projectCount)} builds, made in Dubai for the people around us.`;
+export const DEFAULT_DESCRIPTION = `Afsal Ali is an independent product maker in Dubai, turning real-world friction into focused software. ${numberWord(projectCount)} documented builds, made for the people around us.`;
 
 type SeoInput = {
   title: string;

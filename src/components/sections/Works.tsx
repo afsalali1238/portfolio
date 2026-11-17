@@ -76,11 +76,12 @@ export function Works({
         <SectionReveal>
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="t-label">II ── CATALOGUE</p>
+              <p className="t-label">II ── WORKING PORTFOLIO</p>
               <h1 className="t-display-1 mt-2">The builds.</h1>
               <p className="t-lede mt-3 max-w-xl">
-                {numberWord(projectCount)} quiet tools, clinical companions, and experiments.{" "}
-                {numberWord(sourceCount)} have public source code.
+                {numberWord(projectCount)} focused tools, clinical companions, and experiments —
+                each made around a real person or practical friction. {numberWord(sourceCount)} have
+                public source code.
               </p>
             </div>
 
@@ -167,26 +168,25 @@ export function Works({
 
               return (
                 <li key={p.id}>
-                  <Link
-                    to="/works/$id"
-                    params={{ id: p.id }}
+                  <article
                     className="group flex h-full flex-col justify-between overflow-hidden rounded-lg"
                     style={{
                       border: "1px solid var(--hairline)",
                       backgroundColor: "var(--bg)",
-                      transition: "all 150ms",
+                      transition: "border-color 150ms, background-color 150ms",
                     }}
                   >
                     <div>
                       {/* Media Container with Phone/Desktop Frame Preview */}
-                      <div
-                        className="relative block aspect-[16/10] overflow-hidden border-b"
+                      <Link
+                        to="/works/$id"
+                        params={{ id: p.id }}
+                        aria-label={`Read ${p.name} case study`}
+                        className="relative block aspect-[16/10] overflow-hidden border-b focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ink"
                         style={{
                           borderColor: "var(--hairline)",
                           backgroundColor: "var(--bg-raised)",
                         }}
-                        tabIndex={-1}
-                        aria-hidden="true"
                       >
                         <CardPoster src={posterSrc} isMobile={isMobile} />
 
@@ -217,7 +217,7 @@ export function Works({
                             {p.status}
                           </div>
                         )}
-                      </div>
+                      </Link>
 
                       {/* Card Content */}
                       <div className="p-6">
@@ -313,7 +313,7 @@ export function Works({
                         )}
                       </div>
                     </div>
-                  </Link>
+                  </article>
                 </li>
               );
             })}

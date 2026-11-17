@@ -34,7 +34,7 @@ export const Route = createFileRoute("/notes/the-whatsapp-operating-system")({
       description:
         "What building NxtDoorChef and Kasper in Dubai taught me about local trust, disintermediation, and the death of platform taxes.",
       path: PATH,
-      image: "/og/home.png",
+      image: "/og/the-whatsapp-operating-system.png",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],

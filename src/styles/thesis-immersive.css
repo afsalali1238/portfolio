@@ -405,7 +405,7 @@
   }
 
   .thesis-page .reading-flow *,
-  .thesis-page .thesis-site-header * {
+  .thesis-page .site-header * {
     color: CanvasText !important;
     border-color: CanvasText !important;
     text-shadow: none !important;

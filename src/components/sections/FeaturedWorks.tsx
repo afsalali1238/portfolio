@@ -18,10 +18,13 @@ export function FeaturedWorks() {
       <Container>
         <SectionReveal className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="t-label">I ── FEATURED</p>
+            <p className="t-label">I ── SELECTED WORK</p>
             <h2 id="featured-heading" className="t-display-2 mt-2">
-              Made for someone.
+              Built close to the problem.
             </h2>
+            <p className="t-small mt-3 max-w-xl" style={{ color: "var(--fg-muted)" }}>
+              Three case studies on turning a specific person&rsquo;s friction into useful software.
+            </p>
           </div>
           <Link
             to="/works"
@@ -34,7 +37,6 @@ export function FeaturedWorks() {
 
         <ul className="mt-10 space-y-4 md:grid md:grid-cols-3 md:gap-6 md:space-y-0">
           {featured.map((p) => {
-            const isMobile = p.media?.kind === "mobile" || p.platform === "pwa";
             return (
               <li key={p.id}>
                 <Link
@@ -68,6 +70,17 @@ export function FeaturedWorks() {
                       <p className="t-small" style={{ color: "var(--fg-muted)" }}>
                         {p.blurb}
                       </p>
+                      {p.outcome && (
+                        <p
+                          className="t-small border-l-2 border-ink/70 pl-3"
+                          style={{ color: "var(--fg)" }}
+                        >
+                          <span className="mr-1 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-mute">
+                            Observed outcome
+                          </span>
+                          {p.outcome}
+                        </p>
+                      )}
                     </div>
                     <div className="inline-flex items-center gap-1.5 t-label">
                       <span>Read case study</span>

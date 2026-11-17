@@ -34,7 +34,7 @@ export const Route = createFileRoute("/notes/the-energy-ledger")({
       description:
         "Every time an AI says 'hello' back to you, an electric bulb could have run for minutes. When tokens are physical IOUs of energy, aimless prompting becomes a moral issue.",
       path: PATH,
-      image: "/og/home.png",
+      image: "/og/the-energy-ledger.png",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],

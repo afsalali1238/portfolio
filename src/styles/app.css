@@ -15,37 +15,39 @@
 .page-shell * {
   box-sizing: border-box;
 }
-.page-shell button,
-.page-shell input,
-.page-shell textarea {
+/* Scope the reader reset to its content. The shared site header retains the global navigation
+   system on this route, rather than inheriting a second button/link implementation. */
+.page-shell main button,
+.page-shell main input,
+.page-shell main textarea {
   font: inherit;
 }
-.page-shell button,
-.page-shell a {
+.page-shell main button,
+.page-shell main a {
   -webkit-tap-highlight-color: transparent;
 }
-.page-shell button {
+.page-shell main button {
   color: inherit;
   cursor: pointer;
   border: 0;
   background: none;
   padding: 0;
 }
-.page-shell a {
+.page-shell main a {
   color: inherit;
   text-decoration: none;
 }
-.page-shell button:disabled {
+.page-shell main button:disabled {
   cursor: default;
 }
-.page-shell button:focus-visible,
-.page-shell a:focus-visible,
-.page-shell input:focus-visible,
-.page-shell textarea:focus-visible {
+.page-shell main button:focus-visible,
+.page-shell main a:focus-visible,
+.page-shell main input:focus-visible,
+.page-shell main textarea:focus-visible {
   outline: 2px solid var(--paper);
   outline-offset: 4px;
 }
-.page-shell button:focus:not(:focus-visible) {
+.page-shell main button:focus:not(:focus-visible) {
   outline: none;
 }
 .page-shell ::selection {
@@ -126,56 +128,6 @@
   opacity: 0.035;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.84' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath filter='url(%23grain)' opacity='.6' d='M0 0h180v180H0z'/%3E%3C/svg%3E");
   background-size: 180px 180px;
-}
-.page-shell .site-header {
-  position: absolute;
-  top: 0;
-  left: 4.5%;
-  right: 4.5%;
-  height: 94px;
-  border-bottom: 1px solid var(--hairline);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  z-index: 6;
-}
-.page-shell .site-header::before {
-  content: "";
-  position: absolute;
-  inset: -20px -5vw auto;
-  height: 140px;
-  background: linear-gradient(var(--bg) 55%, transparent);
-  z-index: -1;
-  pointer-events: none;
-}
-.page-shell .brand {
-  display: inline-flex;
-  gap: 12px;
-  align-items: center;
-  white-space: nowrap;
-  color: var(--fg);
-}
-.page-shell .brand > svg {
-  width: 29px;
-  height: 29px;
-}
-.page-shell .brand > span {
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.7px;
-}
-.page-shell .brand-period {
-  margin-left: 1px;
-  color: var(--color-clay, #d96346);
-}
-.header-nav {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  gap: 38px;
 }
 .current-page {
   display: flex;
@@ -1472,9 +1424,6 @@
   .instrument-meta {
     font-size: 12px;
   }
-  .header-nav {
-    gap: 24px;
-  }
   .progress-label {
     display: none;
   }
@@ -1483,9 +1432,6 @@
   }
 }
 @media (max-height: 760px) and (min-width: 1024px) {
-  .page-shell .site-header {
-    height: 77px;
-  }
   .instrument-meta {
     top: 98px;
   }
@@ -1583,18 +1529,6 @@
   }
 }
 @media (max-width: 1023px) {
-  .page-shell .site-header {
-    left: 5%;
-    right: 5%;
-    height: 85px;
-  }
-  .header-nav {
-    position: static;
-    transform: none;
-    gap: 25px;
-    margin-left: auto;
-    margin-right: 26px;
-  }
   .current-page {
     font-size: 12px;
   }
@@ -1604,13 +1538,6 @@
   .sound-button {
     font-size: 12px;
     padding: 10px 12px;
-  }
-  .brand > span {
-    font-size: 19px;
-  }
-  .brand > svg {
-    width: 25px;
-    height: 25px;
   }
   .instrument-meta {
     left: 5%;
@@ -1795,27 +1722,6 @@
   }
 }
 @media (max-width: 600px) {
-  .page-shell .site-header {
-    left: 24px;
-    right: 24px;
-    height: 76px;
-    gap: 10px;
-  }
-  .page-shell .brand {
-    gap: 8px;
-  }
-  .page-shell .brand > span {
-    font-size: 18px;
-    letter-spacing: -0.6px;
-  }
-  .page-shell .brand > svg {
-    width: 24px;
-    height: 24px;
-  }
-  .header-nav {
-    margin-right: 7px;
-    margin-left: auto;
-  }
   .current-page {
     display: none;
   }
@@ -2362,9 +2268,6 @@
   }
   .instrument-meta {
     top: 91px;
-  }
-  .page-shell .site-header {
-    height: 70px;
   }
   .beat h1 {
     font-size: 54px;

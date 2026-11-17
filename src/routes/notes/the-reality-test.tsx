@@ -34,7 +34,7 @@ export const Route = createFileRoute("/notes/the-reality-test")({
       description:
         "Building is safe because it only involves you. Finding customers is brutal because they have zero bias toward your baby.",
       path: PATH,
-      image: "/og/home.png",
+      image: "/og/the-reality-test.png",
       type: "article",
     }),
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ARTICLE_SCHEMA) }],
