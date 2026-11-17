@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from "react";
+import { ThesisHeader } from "./ThesisHeader";
 
 export function ScrollyPageShell({ children }: { children: ReactNode }) {
   useEffect(() => {
@@ -9,7 +10,8 @@ export function ScrollyPageShell({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div className="page-shell">
+    <div className="page-shell thesis-page">
+      <ThesisHeader />
       <a
         className="skip-link"
         href="#discussion"

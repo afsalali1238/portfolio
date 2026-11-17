@@ -12,34 +12,33 @@ import type { ProjectFilter } from "../../data/filters";
  * Governed strictly by brand guidelines: tokens only, 150ms hover, 6px radius, no drop shadow.
  */
 function StatLink({
+  id,
   label,
   value,
   filterKey,
 }: {
+  id: string;
   label: string;
-  value: string;
+  value: number;
   filterKey: ProjectFilter;
 }) {
   return (
     <Link
       to="/works"
       search={filterKey === "all" ? {} : { filter: filterKey }}
-      className="group flex flex-col justify-between rounded-md p-3.5 sm:p-4 text-left transition-colors duration-150 hover:bg-paper-deep/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+      className="group flex min-h-[104px] flex-col justify-between rounded-lg border border-white/10 bg-white/[0.02] p-4 text-left transition-all duration-150 hover:border-white/25 hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EEEAE1]"
       aria-label={`${value} builds — ${label}. See them.`}
       data-hero-tile
     >
       <div className="flex items-baseline justify-between">
-        <span className="font-serif text-3xl sm:text-4xl leading-none text-ink transition-colors duration-150 group-hover:text-accent-ink">
-          {value}
+        <span className="font-serif text-3xl leading-none text-[#EEEAE1] transition-colors duration-150 group-hover:text-[#D96346] sm:text-4xl">
+          {String(value).padStart(2, "0")}
         </span>
-        <span
-          aria-hidden="true"
-          className="text-xs text-ink-mute opacity-0 transition-all duration-150 group-hover:opacity-100 group-hover:translate-x-0.5"
-        >
-          →
+        <span className="font-mono text-[10px] text-[#55585E] transition-colors group-hover:text-[#9A9EA5]">
+          {id} <span aria-hidden="true">→</span>
         </span>
       </div>
-      <span className="mt-2.5 block text-xs font-medium text-ink-mute transition-colors duration-150 group-hover:text-ink">
+      <span className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[#9A9EA5]">
         {label}
       </span>
     </Link>
@@ -229,18 +228,11 @@ export function Hero() {
         </div>
 
         {/* Shipped & verified metrics — stat tiles that pre-filter the catalogue */}
-        <div
-          data-hero-tiles
-          className="mt-12 sm:mt-14 grid grid-cols-2 gap-3 sm:gap-4 rounded-lg bg-paper/[0.08] p-4 sm:p-6 backdrop-blur-[1.5px] text-sm md:grid-cols-4 border rule-hair shadow-xs"
-        >
-          <StatLink label="Total shipped" value={String(projectCount)} filterKey="all" />
-          <StatLink label="Live on the internet" value={String(liveCount)} filterKey="live" />
-          <StatLink label="Open source" value={String(sourceCount)} filterKey="oss" />
-          <StatLink
-            label="For wife, friends, me"
-            value={String(forPeopleCount)}
-            filterKey="for-people"
-          />
+        <div data-hero-tiles className="mt-12 grid grid-cols-2 gap-3 pt-2 sm:mt-14 sm:grid-cols-4">
+          <StatLink id="01" label="Total shipped" value={projectCount} filterKey="all" />
+          <StatLink id="02" label="Live deployments" value={liveCount} filterKey="live" />
+          <StatLink id="03" label="Open source" value={sourceCount} filterKey="oss" />
+          <StatLink id="04" label="For people" value={forPeopleCount} filterKey="for-people" />
         </div>
 
         {/* Quiet drafting-margin control: zero height shift (sits inside section pb-10..pb-14),
