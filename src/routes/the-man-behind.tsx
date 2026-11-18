@@ -1,21 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Container } from "../components/layout/Container";
 import { SectionReveal } from "../components/animations/SectionReveal";
 import { PageShell } from "../components/site/PageShell";
 import { MatrixSilhouette } from "../components/sections/MatrixSilhouette";
-import { seo, AUTHOR } from "../lib/site";
-import {
-  Mail,
-  Copy,
-  Check,
-  ArrowUpRight,
-  Clock,
-  MapPin,
-  MessageSquare,
-  Github,
-  BookOpen,
-} from "lucide-react";
+import { seo } from "../lib/site";
+import { Mail, Copy, Check, ArrowUpRight, Github, BookOpen } from "lucide-react";
 
 export const Route = createFileRoute("/the-man-behind")({
   head: () => ({
@@ -30,34 +20,6 @@ export const Route = createFileRoute("/the-man-behind")({
   component: TheManBehindPage,
 });
 
-function DubaiLiveClock() {
-  const [timeStr, setTimeStr] = useState<string>("");
-
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const formatted = now.toLocaleTimeString("en-US", {
-        timeZone: "Asia/Dubai",
-        hour12: true,
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      });
-      setTimeStr(formatted);
-    };
-
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <span className="tabular-nums" style={{ color: "var(--fg)", fontWeight: "500" }}>
-      {timeStr || "Loading GST..."}
-    </span>
-  );
-}
-
 function TheManBehindPage() {
   const [copied, setCopied] = useState(false);
   const email = "here@forthe.tech";
@@ -71,96 +33,18 @@ function TheManBehindPage() {
   return (
     <PageShell>
       <div className="pb-24 pt-10 md:pt-14">
-        {/* 1. Header Title & Location Section - Instrument page (dark-only) */}
-        <Container className="max-w-5xl">
-          <SectionReveal className="space-y-4">
-            <p className="t-label" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <span
-                className="inline-block h-2 w-2 rounded-full bg-live"
-                style={{ backgroundColor: "var(--lit)", animation: "pulse 2s infinite" }}
-              />
-              Contact & Identity
-            </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              <div>
-                <h1 className="t-display-1">
-                  The Man <em>Behind.</em>
-                </h1>
-                <p className="t-lede mt-2">Operator dossier &amp; verified public ledger.</p>
-              </div>
-
-              {/* Location & Time badge */}
-              <div
-                style={{
-                  border: "1px solid var(--hairline)",
-                  backgroundColor: "var(--bg-raised)",
-                  padding: "16px",
-                  borderRadius: "4px",
-                }}
-              >
-                <div
-                  className="t-label"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    color: "var(--fg-muted)",
-                  }}
-                >
-                  <MapPin className="h-3.5 w-3.5" style={{ color: "var(--fg)" }} />
-                  <span>Dubai, United Arab Emirates</span>
-                </div>
-                <div
-                  className="t-label mt-2"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    color: "var(--fg-muted)",
-                  }}
-                >
-                  <Clock className="h-3.5 w-3.5" style={{ color: "var(--lit)" }} />
-                  <span>GST (UTC+4):</span>
-                  <DubaiLiveClock />
-                </div>
-              </div>
-            </div>
-          </SectionReveal>
-        </Container>
+        <h1 className="sr-only">The Man Behind</h1>
 
         {/* 2. Full-Bleed Borderless Matrix Experience (No box, edge-to-edge immersion) */}
-        <div
-          className="mt-8 relative w-full overflow-hidden"
-          style={{ backgroundColor: "var(--bg)" }}
-        >
+        <div className="relative w-full overflow-hidden" style={{ backgroundColor: "var(--bg)" }}>
           <MatrixSilhouette />
         </div>
 
         {/* 3. Post-Matrix Content & Direct Reach */}
         <Container className="max-w-5xl mt-12">
-          {/* Builder Manifesto Quote */}
-          <SectionReveal>
-            <p
-              className="t-display-3"
-              style={{
-                fontStyle: "italic",
-                color: "var(--fg-muted)",
-                borderLeft: "2px solid var(--lit)",
-                paddingLeft: "24px",
-                paddingTop: "8px",
-                paddingBottom: "8px",
-                margin: "0",
-              }}
-            >
-              &ldquo;Giving an operations guy modern AI tools is like handing a chimpanzee an AK-47:
-              zero committees, lethal execution speed, and software built purely out of
-              curiosity.&rdquo;
-            </p>
-          </SectionReveal>
-
           {/* Contact Channels & Direct Reach */}
           <div
-            className="mt-12"
+            className="mt-0"
             style={{ display: "grid", gridTemplateColumns: "1fr", gap: "32px" }}
           >
             {/* Left: Email & Direct Connect */}
