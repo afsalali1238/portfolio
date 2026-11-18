@@ -64,10 +64,10 @@
 .flow-opening {
   min-height: 100vh;
   min-height: 100svh;
-  padding: 106px 0 72px;
+  padding: clamp(72px, 9vh, 96px) 0 72px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
 }
 .flow-kicker,
 .flow-chapter-label,
