@@ -1093,13 +1093,6 @@
   padding: 35px 0;
   border-top: 1px solid var(--hairline);
 }
-.page-shell .site-footer > .brand > span {
-  font-size: 17px;
-}
-.page-shell .site-footer > .brand > svg {
-  width: 24px;
-  height: 24px;
-}
 .page-shell .site-footer > span {
   font: 12px var(--mono);
   letter-spacing: 1px;
@@ -2111,21 +2104,11 @@
     padding: 27px 0;
     align-items: center;
   }
-  .page-shell .site-footer > .brand > span {
-    font-size: 15px;
-  }
-  .page-shell .site-footer > .brand > svg {
-    width: 21px;
-    height: 21px;
-  }
   .page-shell .site-footer > .text-link {
     font-size: 12px;
     gap: 9px;
     max-width: 140px;
     text-align: right;
-  }
-  .page-shell .site-footer .brand {
-    gap: 7px;
   }
   .reading-dialog {
     width: calc(100% - 20px);

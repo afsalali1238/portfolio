@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 import { Container } from "../layout/Container";
-import { LogoTile, Wordmark } from "./LogoMark";
+import { Lockup } from "./LogoMark";
 import { useEffect, useState } from "react";
 
 function GSTClock() {
@@ -59,10 +59,9 @@ export function SiteFooter() {
             <Link
               to="/"
               className="footer-brand rounded-md py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
-              aria-label="forthe.tech — home"
+              aria-label="for the tech. — home"
             >
-              <LogoTile className="h-7 w-7" small />
-              <Wordmark className="h-[15px] w-auto" />
+              <Lockup height={26} />
             </Link>
             <p className="footer-tagline">Independent thought, made real.</p>
           </div>

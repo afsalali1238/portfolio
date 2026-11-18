@@ -15,9 +15,10 @@ const { DISPATCHES } = await import(pathToFileURL(path.join(repo, "src/data/disp
 const font = (relativePath) =>
   "data:font/woff2;base64," +
   fs.readFileSync(path.join(repo, "node_modules", relativePath)).toString("base64");
+// Brand Guide v1 · Versions: colour on ink is the primary version for share cards.
 const brandLockup =
   "data:image/svg+xml;base64," +
-  fs.readFileSync(path.join(repo, "public/brand/lockup-paper.svg")).toString("base64");
+  fs.readFileSync(path.join(repo, "public/brand/svg/lockup_on-ink-colour.svg")).toString("base64");
 
 const esc = (s) =>
   String(s || "")
@@ -84,8 +85,9 @@ body { margin: 0; padding: 0; background: #0B0C0E; }
 }
 .brand img {
   display: block;
-  width: 252px;
-  height: auto;
+  /* 40 px lockup = 30 px wordmark type; clear space X ≈ 21 px is kept by the card padding. */
+  height: 40px;
+  width: auto;
 }
 .kick {
   color: #9A9EA5;
@@ -103,6 +105,9 @@ h1 {
   letter-spacing: -0.01em;
   color: #EEEAE1;
 }
+h1 em {
+  font-style: italic;
+}
 p {
   margin: 18px 0 0;
   font-size: 28px;
@@ -116,7 +121,7 @@ p {
   align-items: flex-end;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 14px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   color: #9A9EA5;
   border-top: 1px solid #55585E;
   padding-top: 22px;
@@ -136,7 +141,9 @@ const renderHtml = ({ kicker, title, sub, url, right, size = 120 }) => `<!doctyp
       <div class="kick">${esc(kicker)}</div>
     </div>
     <div class="mid">
-      <h1 style="font-size: ${size}px;">${esc(title).replace(/\n/g, "<br>")}</h1>
+      <h1 style="font-size: ${size}px;">${esc(title)
+        .replace(/\*(.+?)\*/g, "<em>$1</em>")
+        .replace(/\n/g, "<br>")}</h1>
       ${sub ? `<p>${esc(sub).replace(/\n/g, "<br>")}</p>` : ""}
     </div>
     <div class="foot">
@@ -151,7 +158,8 @@ const items = [
   {
     id: "home",
     kicker: "The Curious Issue — Vol. I",
-    title: "For the tech.",
+    // Guide §5: the name is always lower case, full stop included.
+    title: "for the tech.",
     size: 150,
     sub: "Documenting what happens when the wall between having an idea and building it disappears.",
     url: "www.forthe.tech",
@@ -196,7 +204,7 @@ const items = [
   {
     id: "thesis",
     kicker: "A thesis in seven movements",
-    title: "The Refraction\nof Thought.",
+    title: "The Refraction\nof *Thought.*",
     size: 120,
     sub: "Curiosity enters. Craft bends it.\nReality catches the colour.",
     url: "www.forthe.tech/thesis",

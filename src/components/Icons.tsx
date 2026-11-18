@@ -1,3 +1,4 @@
+import { Lockup } from "./site/LogoMark";
 import type { CSSProperties } from "react";
 
 export function Icon({
@@ -64,27 +65,10 @@ export function Brand() {
   return (
     <a
       href="/"
-      className="brand inline-flex items-center gap-3 rounded-md py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#eeeae1]"
-      aria-label="forthe.tech — home"
+      className="brand inline-flex items-center rounded-md py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#eeeae1]"
+      aria-label="for the tech. — home"
     >
-      <img
-        src="/brand/mark-16cut-paper.svg"
-        width={32}
-        height={32}
-        className="h-6 w-6 object-contain"
-        alt=""
-        aria-hidden="true"
-        draggable={false}
-      />
-      <img
-        src="/brand/wordmark-paper.svg"
-        width={370}
-        height={100}
-        className="h-[17px] w-auto object-contain"
-        alt=""
-        aria-hidden="true"
-        draggable={false}
-      />
+      <Lockup height={26} />
     </a>
   );
 }

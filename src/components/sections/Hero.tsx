@@ -128,7 +128,7 @@ export function Hero() {
             </p>
             <h1 id="hero-heading" className="font-serif tracking-tight">
               <span className="block text-[11.5vw] leading-[0.88] text-ink sm:text-[4.6rem] md:text-[5.5rem] lg:text-[6rem] xl:text-[6.8rem]">
-                <RevealWord delay={0.05}>For the tech.</RevealWord>
+                <RevealWord delay={0.05}>for the tech.</RevealWord>
               </span>
               <span
                 data-hero-thesis

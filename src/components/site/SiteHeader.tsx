@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Container } from "../layout/Container";
-import { LogoTile, Wordmark } from "./LogoMark";
+import { Lockup } from "./LogoMark";
 
 const NAV_LINKS = [
   { label: "Work", to: "/works" },
@@ -70,10 +70,9 @@ export function SiteHeader() {
           <Link
             to="/"
             className="brand rounded-md py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
-            aria-label="forthe.tech — home"
+            aria-label="for the tech. — home"
           >
-            <LogoTile className="h-7 w-7" small />
-            <Wordmark className="h-[18px] w-auto" />
+            <Lockup height={28} />
           </Link>
 
           <nav aria-label="Site" className="header-nav">
@@ -146,10 +145,10 @@ export function SiteHeader() {
         <Link
           to="/"
           onClick={handleClose}
-          className="mb-6 flex items-center gap-3 border-b rule-hair pb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-md"
+          aria-label="for the tech. — home"
+          className="mb-6 flex items-center border-b rule-hair pb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-md"
         >
-          <LogoTile className="h-8 w-8" />
-          <Wordmark className="h-6 w-auto" />
+          <Lockup height={30} />
         </Link>
         <a
           href="mailto:here@forthe.tech?subject=Project%20enquiry%20via%20forthe.tech"

@@ -75,7 +75,7 @@ export function FeaturedWorks() {
                           className="t-small border-l-2 border-ink/70 pl-3"
                           style={{ color: "var(--fg)" }}
                         >
-                          <span className="mr-1 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-mute">
+                          <span className="mr-1 font-mono text-[12px] uppercase tracking-[0.12em] text-ink-mute">
                             Observed outcome
                           </span>
                           {p.outcome}

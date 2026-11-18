@@ -1,15 +1,12 @@
 :root {
-  /* forthe.tech — Dark Obsidian optical laboratory system */
+  /* forthe.tech — Brand Guide v1 palette (design/brand). Mirrors src/lib/brand.ts.
+     Ink and bone carry the page; colour appears only in the mark and the full stop. */
   --ink: #0b0c0e;
   --bone: #eeeae1;
   --clay: #d96346;
   --gold: #cba666;
   --slate: #899fcc;
   --clay-deep: #ae4024;
-  --ochre: #d28e54;
-  --ochre-deep: #9e5b26;
-  --soft-slate: #a7b5d2;
-  --soft-slate-deep: #5e7298;
   --gold-deep: #906a21;
   --slate-deep: #496297;
   --grey: #9a9ea5;
@@ -27,7 +24,8 @@
   --hairline-token: rgba(255, 255, 255, 0.08);
   --text-bone: #eeeae1;
   --text-slate: #9a9ea5;
-  --text-faint: #55585e;
+  /* Guide: grey is for labels on ink; line (#55585e) is for rules and outlines only. */
+  --text-faint: #9a9ea5;
   --bg: var(--bg-obsidian);
   --bg-raised: var(--bg-surface);
   --fg: var(--text-bone);
@@ -35,7 +33,8 @@
   --fg-faint: var(--text-faint);
   --hairline: var(--hairline-token);
   --reticle: rgba(205, 211, 221, 0.07);
-  --lit: #d96346;
+  /* UI emphasis stays in bone. Clay is reserved for the mark and the wordmark's full stop. */
+  --lit: #eeeae1;
   --color-clay: #d96346;
   --color-gold: #cba666;
   --color-slate: #899fcc;
@@ -57,7 +56,8 @@
   --fg-faint: var(--text-faint);
   --hairline: rgba(255, 255, 255, 0.08);
   --reticle: rgba(205, 211, 221, 0.07);
-  --lit: #d96346;
+  /* UI emphasis stays in bone. Clay is reserved for the mark and the wordmark's full stop. */
+  --lit: #eeeae1;
   --color-clay: #d96346;
   --color-gold: #cba666;
   --color-slate: #899fcc;

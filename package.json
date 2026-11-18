@@ -12,7 +12,7 @@
     "preview": "nitro preview --port 4173",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "tsx --test src/components/fieldNotes.test.ts src/components/refraction/opticsMath.test.ts src/components/scrollytelling/opticsEngine.test.ts src/components/scrollytelling/runtimeMath.test.ts src/components/scrollytelling/soundDirector.test.ts src/components/scrollytelling/story.test.ts",
+    "test": "tsx --test src/lib/brand.test.ts src/components/fieldNotes.test.ts src/components/refraction/opticsMath.test.ts src/components/scrollytelling/opticsEngine.test.ts src/components/scrollytelling/runtimeMath.test.ts src/components/scrollytelling/soundDirector.test.ts src/components/scrollytelling/story.test.ts",
     "audit:thesis:accessibility": "node tools/thesis-accessibility.mjs",
     "audit:thesis:layout": "node tools/thesis-layout.mjs",
     "audit:thesis:contrast": "node tools/thesis-contrast.mjs",

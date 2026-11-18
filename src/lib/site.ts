@@ -12,6 +12,12 @@ export const AUTHOR = "Afsal Ali";
 
 export const DEFAULT_DESCRIPTION = `Afsal Ali is an independent product maker in Dubai, turning real-world friction into focused software. ${numberWord(projectCount)} documented builds, made for the people around us.`;
 
+/**
+ * Bump when the share cards are regenerated (scripts/generate-og.mjs) so LinkedIn, X, Slack and
+ * WhatsApp re-fetch the image instead of serving their cached copy of the old card.
+ */
+export const OG_IMAGE_VERSION = "brand-v1";
+
 type SeoInput = {
   title: string;
   description: string;
@@ -36,7 +42,7 @@ export function seo({
   type = "website",
 }: SeoInput) {
   const url = `${SITE_URL}${path}`;
-  const img = `${SITE_URL}${image}`;
+  const img = `${SITE_URL}${image}${image.includes("?") ? "&" : "?"}v=${OG_IMAGE_VERSION}`;
   return {
     meta: [
       { title },

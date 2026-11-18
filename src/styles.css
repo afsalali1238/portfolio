@@ -239,39 +239,6 @@
   animation: reveal-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Hero cells are "built" once on first paint, one after another (logo guide, 07: the row is
-   built one cell at a time). CSS, not JS, so it never waits for hydration. Only defined when
-   the visitor hasn't asked for less motion, so reduced motion gets the finished grid. */
-@media (prefers-reduced-motion: no-preference) {
-  @keyframes cell-build {
-    from {
-      background-color: var(--color-paper-deep);
-      border-color: transparent;
-      color: transparent;
-    }
-  }
-  .cell-build {
-    animation: cell-build 0.2s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-    animation-delay: calc(0.45s + var(--i, 0) * 0.04s);
-  }
-
-  /* Logo guide 07: the clay pixel row is built outward on first paint. */
-  @keyframes pixel-build {
-    from {
-      opacity: 0;
-      transform: scale(0.4);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-  .logo-clay-pixel {
-    transform-origin: 16px 14px;
-    animation: pixel-build 0.25s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-  }
-}
-
 /* Marquee runs on a CSS animation, not a JS transform, so hover can actually pause it. */
 @keyframes marquee-scroll {
   from {
@@ -329,21 +296,12 @@
   justify-content: space-between;
   height: 100%;
 }
+/* The lockup is one drawing; clear space (X = wordmark cap height ≈ 0.52 × lockup height) is
+   provided by the 88 px bar and the nav gap. */
 .site-header .brand {
   display: inline-flex;
-  gap: 12px;
   align-items: center;
-  white-space: nowrap;
-  color: var(--fg);
-}
-.site-header .brand > svg {
-  width: 29px;
-  height: 29px;
-}
-.site-header .brand > span {
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.7px;
+  flex-shrink: 0;
 }
 .header-nav {
   display: none;
@@ -353,12 +311,6 @@
 @media (min-width: 768px) {
   .header-nav {
     display: flex;
-  }
-
-  /* The complete navigation is already visible at this width. The drawer trigger has no desktop
-     function and must not duplicate the navigation or create conflicting header silhouettes. */
-  .header-actions {
-    display: none;
   }
 }
 .header-nav a {
@@ -372,21 +324,34 @@
 .header-nav a[data-status="active"] {
   color: var(--fg);
 }
+.header-nav a {
+  position: relative;
+}
+/* Out of flow so the current item stays on the same baseline as its neighbours. */
 .header-nav a[data-status="active"]::after {
   content: "";
-  display: block;
-  width: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -8px;
   height: 1px;
   background: var(--fg);
-  margin-top: 6px;
 }
 .header-nav a:hover::after {
-  background: var(--lit);
+  background: var(--fg);
 }
 .header-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+/* The complete navigation is visible from 768 px, so the drawer trigger has no desktop function.
+   This must come after the base rule above: at equal specificity the later rule wins, and when it
+   sat before it the hamburger stayed visible on desktop. */
+@media (min-width: 768px) {
+  .header-actions {
+    display: none;
+  }
 }
 .header-contact-cta {
   min-height: 40px;
@@ -396,9 +361,9 @@
   border-radius: 999px;
   padding: 0 16px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--fg);
   transition:
@@ -407,8 +372,8 @@
     color 160ms;
 }
 .header-contact-cta:hover {
-  border-color: var(--clay);
-  background: var(--clay);
+  border-color: var(--fg);
+  background: var(--fg);
   color: var(--bg);
 }
 .header-contact-cta:focus-visible {
@@ -445,44 +410,42 @@
 }
 .footer-main {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 20px;
+  gap: 24px 40px;
+}
+.footer-tagline,
+.footer-links a,
+.footer-contact > * {
+  white-space: nowrap;
 }
 .footer-brand {
   display: inline-flex;
-  gap: 12px;
   align-items: center;
-  color: var(--fg);
-}
-.footer-brand > svg {
-  width: 24px;
-  height: 24px;
-}
-.footer-brand > span {
-  font-size: 17px;
 }
 .footer-tagline {
   font: 12px var(--font-mono);
-  letter-spacing: 1px;
+  letter-spacing: 0.12em;
   color: var(--fg-faint);
 }
 .footer-links {
   display: flex;
-  gap: 32px;
+  flex-wrap: wrap;
+  gap: 0 28px;
 }
 .footer-links a {
   font: 12px var(--font-mono);
-  letter-spacing: 1px;
+  letter-spacing: 0.12em;
   color: var(--fg-faint);
   transition: color 160ms;
 }
 .footer-links a:hover {
-  color: var(--lit);
+  color: var(--fg);
 }
 .footer-contact {
   font: 12px var(--font-mono);
-  letter-spacing: 1px;
+  letter-spacing: 0.12em;
   color: var(--fg-faint);
 }
 .footer-bottom {
@@ -494,7 +457,7 @@
   justify-content: space-between;
   gap: 16px;
   font: 12px var(--font-mono);
-  letter-spacing: 1px;
+  letter-spacing: 0.12em;
   color: var(--fg-faint);
 }
 
@@ -517,7 +480,7 @@
     color 160ms;
 }
 .btn-primary:hover {
-  background: var(--lit);
+  background: color-mix(in oklch, var(--fg) 84%, var(--bg));
 }
 .btn-secondary {
   display: inline-flex;
@@ -591,7 +554,7 @@
   border: 1px solid var(--hairline);
   border-radius: 999px;
   font: 12px var(--font-mono);
-  letter-spacing: 1px;
+  letter-spacing: 0.12em;
   color: var(--fg-faint);
   background: transparent;
   transition:
@@ -639,7 +602,7 @@
   align-items: center;
   gap: 16px;
   font: 12px var(--font-mono);
-  letter-spacing: 1.3px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--fg-faint);
 }
@@ -717,9 +680,9 @@ body {
 
 .header-nav a {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 400;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--fg-muted);
 }
@@ -732,7 +695,7 @@ body {
 
 .header-nav a.is-current::after,
 .header-nav a[data-status="active"]::after {
-  background: var(--clay);
+  background: var(--fg);
 }
 
 .footer-contact {
@@ -795,19 +758,8 @@ body {
 .t-article > p:first-of-type::first-letter {
   float: left;
   padding: 0.04em 0.1em 0 0;
-  color: var(--clay);
+  color: var(--fg);
   font-family: var(--font-display);
   font-size: 3.1em;
   line-height: 0.78;
-}
-
-@media (max-width: 767px) {
-  .header-nav {
-    gap: 14px;
-  }
-
-  .header-nav a {
-    font-size: 9px;
-    letter-spacing: 0.1em;
-  }
 }

@@ -1,31 +1,40 @@
-interface LogoMarkProps {
-  className?: string;
-  /** Uses the simplified cut intended for small renderings. */
-  small?: boolean;
-  /** Uses the single-colour version of the mark. */
-  mono?: boolean;
-}
+import {
+  BRAND_ASPECT,
+  BRAND_ASSETS,
+  LOCKUP_MIN_TYPE_PX,
+  MARK_MIN_PX,
+  MARK_SMALL_CUT_BELOW_PX,
+  WORDMARK,
+  type BrandVersion,
+} from "../../lib/brand";
 
 /**
- * The current forthe.tech identity.
+ * forthe.tech identity primitives (Brand Guide v1).
  *
- * The brand pack is the single source of truth for this mark. Keeping it as an image rather than
- * redrawing the geometry in React prevents the header, favicon, social assets, and future exports
- * drifting into different versions of the logo.
+ * Every drawing comes from the generated pack in /brand/svg, which is built from src/lib/brand.ts.
+ * Components size by height in CSS pixels, so the guide's size rules can be enforced here rather
+ * than remembered at each call site.
  */
-export function LogoMark({ className = "h-6 w-6", small = false, mono = false }: LogoMarkProps) {
-  const src = mono
-    ? "/brand/mark-paper-mono.svg"
-    : small
-      ? "/brand/mark-16cut-paper.svg"
-      : "/brand/mark-paper.svg";
 
+interface MarkProps {
+  /** Rendered height in CSS px. Below 24 px the small cut is used; 16 px is the floor. */
+  height: number;
+  version?: BrandVersion;
+  className?: string;
+}
+
+/** The prism alone. Use where the name is close by. */
+export function LogoMark({ height, version = "on-ink-colour", className = "" }: MarkProps) {
+  const h = Math.max(height, MARK_MIN_PX);
+  const small = h < MARK_SMALL_CUT_BELOW_PX;
+  const width = Math.round(h * (small ? BRAND_ASPECT.markSmall : BRAND_ASPECT.mark));
   return (
     <img
-      src={src}
-      width={32}
-      height={32}
-      className={`block h-full w-full object-contain ${className}`}
+      src={small ? BRAND_ASSETS.markSmall(version) : BRAND_ASSETS.mark(version)}
+      width={width}
+      height={h}
+      style={{ width, height: h }}
+      className={`block shrink-0 ${className}`}
       alt=""
       aria-hidden="true"
       draggable={false}
@@ -33,29 +42,50 @@ export function LogoMark({ className = "h-6 w-6", small = false, mono = false }:
   );
 }
 
-/** The standalone mark, sized by the calling component. */
-export function LogoTile({
-  className = "h-7 w-7",
-  small = false,
-}: {
-  className?: string;
-  small?: boolean;
-}) {
+/**
+ * Horizontal lockup: mark and wordmark as one drawing, so their proportion and spacing can't drift.
+ * `height` is the drawing's height; the wordmark's type size is about 0.75 × that.
+ */
+export function Lockup({ height, version = "on-ink-colour", className = "" }: MarkProps) {
+  const typePx = (height * 1000) / 1340;
+  if (typePx < LOCKUP_MIN_TYPE_PX) {
+    // Guide §5: no lockup below 14 px type; use the mark alone.
+    return <LogoMark height={height} version={version} className={className} />;
+  }
+  const width = Math.round(height * BRAND_ASPECT.lockup);
   return (
-    <span className={`inline-flex shrink-0 items-center justify-center ${className}`}>
-      <LogoMark small={small} />
-    </span>
+    <img
+      src={BRAND_ASSETS.lockup(version)}
+      width={width}
+      height={height}
+      style={{ width, height }}
+      className={`block shrink-0 ${className}`}
+      alt=""
+      aria-hidden="true"
+      draggable={false}
+    />
   );
 }
 
-/** Official outlined wordmark from the brand pack, for use on the dark site surface. */
-export function Wordmark({ className = "h-5 w-auto" }: { className?: string }) {
+/** The outlined wordmark alone, sized by cap height so it can sit on a text baseline. */
+export function Wordmark({
+  capHeight,
+  version = "on-ink-colour",
+  className = "",
+}: {
+  capHeight: number;
+  version?: BrandVersion;
+  className?: string;
+}) {
+  const height = Math.round((capHeight * 780) / WORDMARK.capHeight);
+  const width = Math.round(height * BRAND_ASPECT.wordmark);
   return (
     <img
-      src="/brand/wordmark-paper.svg"
-      width={370}
-      height={100}
-      className={`brand-wordmark block aspect-[3.704/1] max-w-full object-contain ${className}`}
+      src={BRAND_ASSETS.wordmark(version)}
+      width={width}
+      height={height}
+      style={{ width, height }}
+      className={`block shrink-0 ${className}`}
       alt=""
       aria-hidden="true"
       draggable={false}

@@ -68,7 +68,7 @@ function StoryPaper({
           </button>
         ) : (
           <a className="reading-home-link" href="/">
-            For the tech.
+            for the tech.
           </a>
         )}
       </header>
