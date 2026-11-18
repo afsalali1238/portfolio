@@ -169,7 +169,6 @@ for (const vp of VIEWPORTS) {
       push(document.querySelector("[data-hero-copy] p"), "lede", "body");
       const ctas = [...document.querySelectorAll("[data-hero-copy] a")];
       push(ctas[0], "cta (filled)", "body");
-      push(ctas[1], "cta (outline)", "body");
       [...document.querySelectorAll("[data-hero-tile]")].forEach((tile, i) => {
         const spans = [...tile.querySelectorAll("span")].filter(
           (span) => span.getAttribute("aria-hidden") !== "true",

@@ -337,32 +337,6 @@ function ProjectCaseStudy() {
             )}
           </div>
 
-          <SectionReveal className="mt-16">
-            <section
-              aria-labelledby="case-study-contact-heading"
-              className="grid gap-6 rounded-md border p-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
-              style={{ borderColor: "var(--hairline)", backgroundColor: "var(--bg-raised)" }}
-            >
-              <div>
-                <p className="t-label">START A CONVERSATION</p>
-                <h2 id="case-study-contact-heading" className="t-display-3 mt-2">
-                  Building something with similar complexity?
-                </h2>
-                <p className="t-small mt-2 max-w-2xl" style={{ color: "var(--fg-muted)" }}>
-                  I&rsquo;m available for product thinking, interaction design, and implementation
-                  on focused digital tools.
-                </p>
-              </div>
-              <a
-                href="mailto:here@forthe.tech?subject=Project%20enquiry%20via%20forthe.tech"
-                className="btn-primary group justify-center md:justify-self-end"
-              >
-                Start a conversation
-                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </a>
-            </section>
-          </SectionReveal>
-
           {/* Next / Previous Project Footer — hairline rows */}
           <div
             className="mt-16"

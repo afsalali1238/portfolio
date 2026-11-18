@@ -353,33 +353,6 @@
     display: none;
   }
 }
-.header-contact-cta {
-  min-height: 40px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--hairline);
-  border-radius: 999px;
-  padding: 0 16px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--fg);
-  transition:
-    border-color 160ms,
-    background 160ms,
-    color 160ms;
-}
-.header-contact-cta:hover {
-  border-color: var(--fg);
-  background: var(--fg);
-  color: var(--bg);
-}
-.header-contact-cta:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 3px;
-}
 .header-actions button {
   width: 44px;
   height: 44px;

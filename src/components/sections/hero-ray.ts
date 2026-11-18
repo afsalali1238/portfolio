@@ -247,7 +247,7 @@ const rgba = (c: Rgb, a: number) =>
 /** Paper and ink, print-graded. Kept local: the field never borrows the text tokens. */
 const PAPER: Rgb = [247, 244, 238];
 /** Dark-theme paper matched to the ambient-lit copy plane so stencils leave neither halo nor cutout. */
-const DARK_PAPER: Rgb = [19, 14, 10];
+const DARK_PAPER: Rgb = [12, 12, 14];
 const INK: Rgb = [27, 24, 21];
 
 export type BandSpec = {
@@ -279,10 +279,10 @@ export type BandSpec = {
  */
 export const BANDS: readonly BandSpec[] = [
   {
-    name: "clay-lead",
+    name: "clay-tint",
     light: [174, 64, 36],
     lightAlpha: 0.65,
-    dark: [217, 99, 70],
+    dark: [222, 133, 109],
     darkAlpha: 0.85,
     width: 1.4,
     amplitude: 8.5,
@@ -293,10 +293,10 @@ export const BANDS: readonly BandSpec[] = [
     plasma: 0.8,
   },
   {
-    name: "clay-warm",
-    light: [185, 75, 42],
+    name: "clay",
+    light: [174, 64, 36],
     lightAlpha: 0.72,
-    dark: [224, 110, 78],
+    dark: [217, 99, 70],
     darkAlpha: 0.9,
     width: 1.6,
     amplitude: 9.5,
@@ -322,10 +322,10 @@ export const BANDS: readonly BandSpec[] = [
     flagship: true,
   },
   {
-    name: "ochre",
-    light: [165, 95, 38],
+    name: "gold-tint",
+    light: [144, 106, 33],
     lightAlpha: 0.75,
-    dark: [210, 142, 84],
+    dark: [212, 183, 133],
     darkAlpha: 0.9,
     width: 1.6,
     amplitude: 9.5,
@@ -350,10 +350,10 @@ export const BANDS: readonly BandSpec[] = [
     plasma: 0.9,
   },
   {
-    name: "soft-slate",
-    light: [115, 128, 160],
+    name: "slate-tint",
+    light: [73, 98, 151],
     lightAlpha: 0.72,
-    dark: [167, 181, 210],
+    dark: [162, 178, 209],
     darkAlpha: 0.88,
     width: 1.6,
     amplitude: 8,
@@ -2079,7 +2079,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     const source = scrollBucket === 0 ? geo.source : (liveSource ?? geo.source);
     const hit = scrollBucket === 0 ? geo.hit : (liveHit ?? shift(geo.hit));
     const b = ctx.createLinearGradient(source.x, source.y, hit.x, hit.y);
-    const silver: Rgb = isDark ? [255, 251, 241] : [105, 99, 90];
+    const silver: Rgb = isDark ? [248, 247, 244] : [105, 99, 90];
     b.addColorStop(0, rgba(silver, 0.6));
     b.addColorStop(0.2, rgba(silver, 0.9));
     b.addColorStop(1, rgba(silver, 1));
@@ -2122,14 +2122,13 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     far.addColorStop(1, isDark ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.045)");
     farFaceGrad = far;
 
-    const warm = isDark ? BANDS[2].dark : BANDS[2].light;
-    const ambRadius = Math.hypot(heroW, heroH) * 0.95;
+    const ambRadius = Math.hypot(heroW, heroH) * 0.45; // was 0.95, keeps it near the prism
     const ambCore = shift(geo.core);
     const amb = ctx.createRadialGradient(ambCore.x, ambCore.y, 0, ambCore.x, ambCore.y, ambRadius);
-    amb.addColorStop(0, rgba(warm, isDark ? 0.12 : 0.075));
-    amb.addColorStop(0.32, rgba(warm, isDark ? 0.055 : 0.036));
-    amb.addColorStop(0.68, rgba(warm, isDark ? 0.018 : 0.012));
-    amb.addColorStop(1, rgba(warm, 0));
+    amb.addColorStop(0, "rgba(217,99,70,0.07)"); // clay
+    amb.addColorStop(0.3, "rgba(203,166,102,0.04)"); // gold
+    amb.addColorStop(0.6, "rgba(137,159,204,0.02)"); // slate
+    amb.addColorStop(1, "rgba(137,159,204,0)");
     ambientGrad = amb;
 
     cacheKey = key;
@@ -2329,13 +2328,12 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       return;
     }
     const core = fanOrigin ?? shift(geo.core);
-    const warm = isDark ? BANDS[2].dark : BANDS[2].light;
-    const radius = Math.hypot(heroW, heroH) * 0.95;
+    const radius = Math.hypot(heroW, heroH) * 0.45; // was 0.95, keeps it near the prism
     const g = ctx.createRadialGradient(core.x, core.y, 0, core.x, core.y, radius);
-    g.addColorStop(0, rgba(warm, isDark ? 0.12 : 0.075));
-    g.addColorStop(0.32, rgba(warm, isDark ? 0.055 : 0.036));
-    g.addColorStop(0.68, rgba(warm, isDark ? 0.018 : 0.012));
-    g.addColorStop(1, rgba(warm, 0));
+    g.addColorStop(0, "rgba(217,99,70,0.07)"); // clay
+    g.addColorStop(0.3, "rgba(203,166,102,0.04)"); // gold
+    g.addColorStop(0.6, "rgba(137,159,204,0.02)"); // slate
+    g.addColorStop(1, "rgba(137,159,204,0)");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, heroW, heroH);
   };
@@ -2349,8 +2347,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
   const paintPlate = (ctx: Ctx) => {
     if (!geo || !layout) return;
     const { heroH } = geo;
-    const ink = isDark ? 248 : 27;
-    const rule = (a: number) => (isDark ? `rgba(${ink},246,240,${a})` : `rgba(27,24,21,${a})`);
+    const rule = (a: number) => (isDark ? `rgba(248,247,244,${a})` : `rgba(27,24,21,${a})`);
 
     ctx.globalAlpha = 1;
     ctx.lineCap = "butt";
@@ -2542,7 +2539,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
     // that is where the dispersion's centre of energy reads as light rather than pigment.
     if (band.flagship && !strand.ghost) {
       traceRange(ctx, buf, Math.max(door, Math.round(0.55 * STRAND_STEPS)), STRAND_STEPS);
-      ctx.strokeStyle = isDark ? "rgba(255,252,246,0.85)" : "rgba(255,255,255,0.6)";
+      ctx.strokeStyle = isDark ? "rgba(248,247,244,0.85)" : "rgba(255,255,255,0.6)";
       ctx.globalAlpha = clamp(alpha * 0.4, 0, 1);
       ctx.lineWidth = 0.6;
       ctx.stroke();
@@ -2558,7 +2555,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const tail = Math.max(door, head - 4);
       if (head - tail >= 2 && tail > door && p > 0.06) {
         traceRange(ctx, buf, tail, head);
-        ctx.strokeStyle = isDark ? "rgba(255,252,246,0.95)" : rgba(mix(colour, INK, 0.2), 1);
+        ctx.strokeStyle = isDark ? "rgba(248,247,244,0.95)" : rgba(mix(colour, INK, 0.2), 1);
         ctx.globalAlpha = clamp(alpha * 0.55 * Math.sin(Math.PI * p), 0, 1);
         ctx.lineWidth = 1.1 * strand.width;
         ctx.stroke();
@@ -2629,7 +2626,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
 
     // White-hot core, on ink. On paper it would vanish into the cream, so light theme keeps
     // the saturated clay and only adds a hairline of pale ink-mixed light.
-    ctx.strokeStyle = isDark ? "rgba(255,252,246,0.9)" : rgba(mix(colour, INK, 0.18), 1);
+    ctx.strokeStyle = isDark ? "rgba(248,247,244,0.9)" : rgba(mix(colour, INK, 0.18), 1);
     ctx.globalAlpha = clamp(voice * (isDark ? 0.65 : 0.8), 0, 1);
     ctx.lineWidth = 0.9;
     ctx.stroke();
@@ -2988,7 +2985,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
         placedHitY !== hit.y
       ) {
         placedBeamGrad = ctx.createLinearGradient(source.x, source.y, hit.x, hit.y);
-        const silver: Rgb = isDark ? [255, 251, 241] : [105, 99, 90];
+        const silver: Rgb = isDark ? [248, 247, 244] : [105, 99, 90];
         placedBeamGrad.addColorStop(0, rgba(silver, 0.6));
         placedBeamGrad.addColorStop(0.2, rgba(silver, 0.9));
         placedBeamGrad.addColorStop(1, rgba(silver, 1));
@@ -3514,7 +3511,7 @@ export function createHeroRay(options: HeroRayOptions = {}) {
       const orbit = prismSize * (0.13 + k * 0.032);
       const angle = time * TAU * (0.085 + k * 0.021) + k * 1.7;
       const alpha = 0.5 - k * 0.09;
-      ctx.fillStyle = isDark ? `rgba(255,252,246,${alpha})` : rgba(BANDS[2].light, alpha * 0.9);
+      ctx.fillStyle = isDark ? `rgba(248,247,244,${alpha})` : rgba(BANDS[2].light, alpha * 0.9);
       ctx.beginPath();
       ctx.arc(
         exit.x + Math.cos(angle) * orbit,
