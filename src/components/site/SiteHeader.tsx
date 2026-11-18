@@ -89,13 +89,6 @@ export function SiteHeader() {
             ))}
           </nav>
 
-          <a
-            href="mailto:here@forthe.tech?subject=Project%20enquiry%20via%20forthe.tech"
-            className="header-contact-cta hidden lg:inline-flex"
-          >
-            Start a conversation
-          </a>
-
           <div className="header-actions">
             <button
               ref={menuTriggerRef}
@@ -150,13 +143,6 @@ export function SiteHeader() {
         >
           <Lockup height={30} />
         </Link>
-        <a
-          href="mailto:here@forthe.tech?subject=Project%20enquiry%20via%20forthe.tech"
-          onClick={handleClose}
-          className="mb-5 inline-flex min-h-11 items-center justify-center rounded-md bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
-        >
-          Start a conversation
-        </a>
         {NAV_LINKS.map((l) => (
           <Link
             key={l.to}

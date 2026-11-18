@@ -89,8 +89,8 @@ const browser = await chromium.launch(
 
   const heroStops = stops.filter((s) => s.inHero);
   check(
-    "every hero control is reachable by Tab (2 CTAs + 4 stat tiles + light control)",
-    heroStops.length === 7,
+    "every hero control is reachable by Tab (1 CTA + 4 stat tiles + light control)",
+    heroStops.length === 6,
     `${heroStops.length} hero stops: ${heroStops.map((s) => s.tag).join(", ")}`,
   );
   check(

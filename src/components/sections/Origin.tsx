@@ -20,11 +20,6 @@ export function Origin({ isPage = false }: { isPage?: boolean }) {
 
           <div className="space-y-5 t-body" style={{ color: "var(--fg-muted)" }}>
             <p>
-              The wall between having an idea and building it came down. I&rsquo;ve been walking
-              through the gap ever since.
-            </p>
-
-            <p>
               I work a full-time operations role in Dubai. I can&rsquo;t follow every launch, so I
               filter. I watch what ships, study how things work, and build focused tools.
               That&rsquo;s how I learn.

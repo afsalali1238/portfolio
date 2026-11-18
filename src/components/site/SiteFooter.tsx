@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight } from "lucide-react";
 import { Container } from "../layout/Container";
 import { Lockup } from "./LogoMark";
 import { useEffect, useState } from "react";
@@ -30,30 +29,6 @@ export function SiteFooter() {
   return (
     <footer id="contact" className="site-footer">
       <Container className="container">
-        <section
-          aria-labelledby="footer-conversation-heading"
-          className="footer-conversation grid gap-6 border-b pb-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
-          style={{ borderColor: "var(--hairline)" }}
-        >
-          <div>
-            <p className="t-label">START A CONVERSATION</p>
-            <h2 id="footer-conversation-heading" className="t-display-3 mt-2 max-w-2xl">
-              Have a difficult problem worth making simpler?
-            </h2>
-            <p className="t-small mt-3 max-w-xl" style={{ color: "var(--fg-muted)" }}>
-              I work across product thinking, interaction design, and implementation to make focused
-              tools for real people.
-            </p>
-          </div>
-          <a
-            href="mailto:here@forthe.tech?subject=Project%20enquiry%20via%20forthe.tech"
-            className="btn-primary group justify-center md:justify-self-end"
-          >
-            Start a conversation
-            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-          </a>
-        </section>
-
         <div className="footer-main">
           <div className="footer-brand-group">
             <Link
