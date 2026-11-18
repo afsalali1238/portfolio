@@ -100,7 +100,7 @@ export function Works({
                   search={(prev) => ({ ...prev, view: undefined })}
                   replace
                   resetScroll={false}
-                  className={`inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 font-mono text-[10px] tracking-[0.14em] transition-colors ${
+                  className={`inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 font-mono text-[12px] tracking-[0.12em] transition-colors ${
                     viewMode === "grid"
                       ? "border border-white/20 bg-white/10 text-[#EEEAE1]"
                       : "text-[#9A9EA5] hover:bg-white/[0.04] hover:text-[#EEEAE1]"
@@ -115,7 +115,7 @@ export function Works({
                   search={(prev) => ({ ...prev, view: "table" as const })}
                   replace
                   resetScroll={false}
-                  className={`inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 font-mono text-[10px] tracking-[0.14em] transition-colors ${
+                  className={`inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 font-mono text-[12px] tracking-[0.12em] transition-colors ${
                     viewMode === "table"
                       ? "border border-white/20 bg-white/10 text-[#EEEAE1]"
                       : "text-[#9A9EA5] hover:bg-white/[0.04] hover:text-[#EEEAE1]"
@@ -197,22 +197,26 @@ export function Works({
                         >
                           <span
                             className="h-1.5 w-1.5 rounded-full"
-                            style={{ backgroundColor: "var(--clay)" }}
+                            style={{ backgroundColor: "var(--fg)" }}
                           />
                           <span
-                            className="font-mono text-[10px] uppercase tracking-[0.1em]"
+                            className="font-mono text-[12px] uppercase tracking-[0.12em]"
                             style={{ color: "var(--fg)" }}
                           >
-                            {isMobile ? "Phone build" : "Web build"}
+                            {isMobile ? "Phone" : "Web"}
                           </span>
                         </div>
 
                         {/* Status Badge */}
                         {p.status && (
-                          <div className="absolute right-3 top-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#0B0C0E]/90 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-[#EEEAE1]">
+                          <div className="absolute right-3 top-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#0B0C0E]/90 px-3 py-1 font-mono text-[12px] uppercase tracking-[0.12em] text-[#EEEAE1]">
                             <span
                               className="h-1.5 w-1.5 rounded-full"
-                              style={{ backgroundColor: p.live ? "#D96346" : "#899FCC" }}
+                              style={
+                                p.live
+                                  ? { backgroundColor: "var(--fg)" }
+                                  : { border: "1px solid var(--fg-muted)" }
+                              }
                             />
                             {p.status}
                           </div>

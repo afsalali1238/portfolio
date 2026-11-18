@@ -18,6 +18,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 
 import { PageShell } from "../components/site/PageShell";
 import { SITE_URL, SITE_NAME, AUTHOR, DEFAULT_DESCRIPTION } from "../lib/site";
+import { BRAND_ASSETS } from "../lib/brand";
 
 function NotFoundComponent() {
   return (
@@ -114,10 +115,10 @@ export const Route = createRootRoute({
         crossOrigin: "anonymous",
       },
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.svg?v=2", type: "image/svg+xml" },
-      { rel: "icon", href: "/favicon.png?v=2", type: "image/png", sizes: "32x32" },
-      { rel: "icon", href: "/favicon.ico?v=2", sizes: "any" },
-      { rel: "apple-touch-icon", href: "/apple-touch-icon.png?v=2", sizes: "180x180" },
+      { rel: "icon", href: "/favicon.svg?v=3", type: "image/svg+xml" },
+      { rel: "icon", href: "/favicon.png?v=3", type: "image/png", sizes: "32x32" },
+      { rel: "icon", href: "/favicon.ico?v=3", sizes: "any" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png?v=3", sizes: "180x180" },
       { rel: "manifest", href: "/site.webmanifest" },
     ],
   }),
@@ -138,7 +139,7 @@ const PERSON_SCHEMA = {
   "@type": "Person",
   name: AUTHOR,
   url: SITE_URL,
-  image: `${SITE_URL}/brand/avatar-dark-800.png`,
+  image: `${SITE_URL}${BRAND_ASSETS.avatar}`,
   jobTitle: "Independent product maker",
   description:
     "An independent product maker in Dubai, turning real-world friction into focused software, applied AI tools, and quiet experiments.",

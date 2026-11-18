@@ -165,7 +165,7 @@ function ProjectCaseStudy() {
             {project.outcome && (
               <aside
                 aria-label="Observed outcome"
-                className="mt-7 border-l-2 border-[var(--clay)] py-1 pl-4"
+                className="mt-7 border-l-2 border-[var(--fg)] py-1 pl-4"
               >
                 <p className="t-label" style={{ color: "var(--fg-muted)" }}>
                   Observed outcome
