@@ -63,10 +63,13 @@ check(
     (await metaContent('meta[property="og:type"]')) === "article" &&
     (await metaContent('meta[name="description"]'))?.includes("colour"),
 );
+// seo() appends a cache-busting ?v= query — compare the path, not the exact string.
+const socialImageUrl = await metaContent('meta[property="og:image"]');
+const socialImageTwitterUrl = await metaContent('meta[name="twitter:image"]');
 check(
   "social cards have a titled image and alternative text",
-  (await metaContent('meta[property="og:image"]')) === "https://www.forthe.tech/og/thesis.png" &&
-    (await metaContent('meta[name="twitter:image"]')) === "https://www.forthe.tech/og/thesis.png" &&
+  socialImageUrl?.startsWith("https://www.forthe.tech/og/thesis.png") &&
+    socialImageTwitterUrl?.startsWith("https://www.forthe.tech/og/thesis.png") &&
     Boolean(socialImageAlt) &&
     (await metaContent('meta[name="twitter:image:alt"]')) === socialImageAlt,
 );
@@ -90,51 +93,49 @@ check(
   "skip link reaches the private notebook",
   (await page.locator(".discussion-footer:focus").count()) === 1,
 );
+check(
+  "chapter index retires over the notebook",
+  await page
+    .waitForFunction(
+      () => document.querySelector(".chapter-rail")?.getAttribute("data-visible") === "false",
+      null,
+      { timeout: 5_000 },
+    )
+    .then(() => true)
+    .catch(() => false),
+);
 
-const railButtons = page.locator(".chapter-rail .rail-stop");
-if (await railButtons.count()) {
-  await railButtons.first().focus();
-  await page.keyboard.press("ArrowDown");
-  check(
-    "chapter rail supports arrow navigation",
-    await railButtons.nth(1).evaluate((element) => element === document.activeElement),
-  );
-} else {
-  check("chapter rail supports arrow navigation", false, "no rail buttons found");
-}
+// The native immersive essay replaced the pinned stage: seven labelled movement
+// sections plus a prologue are the current chapter structure.
+const movements = page.locator(".flow-movement");
+check(
+  "essay exposes seven labelled movements",
+  (await movements.count()) === 7 &&
+    (await page.locator(".flow-movement[aria-labelledby]").count()) === 7 &&
+    (await page.locator(".flow-opening h1").count()) === 1,
+);
 
-const readingButton = page.getByRole("button", { name: /read the words/i });
-if (await readingButton.count()) {
-  await readingButton.first().click();
-  check("reading view opens", (await page.locator("dialog[open]").count()) === 1);
-  check(
-    "reading view preserves editorial footnotes and the physics note",
-    (await page.locator("dialog[open] .reading-footnote").count()) === 5 &&
-      (await page
-        .locator("dialog[open] .reading-note")
-        .getByText(/Light can refract at a boundary/)
-        .count()) === 1,
-  );
-  check(
-    "reading view starts and keeps focus inside",
-    await page.evaluate(() => {
-      const dialog = document.querySelector("dialog[open]");
-      return !!dialog && dialog.contains(document.activeElement);
-    }),
-  );
-  await page.keyboard.press("Shift+Tab");
-  check(
-    "Shift+Tab stays inside reading view",
-    await page.evaluate(() => {
-      const dialog = document.querySelector("dialog[open]");
-      return !!dialog && dialog.contains(document.activeElement);
-    }),
-  );
-  await page.keyboard.press("Escape");
-  check("Escape closes reading view", (await page.locator("dialog[open]").count()) === 0);
-} else {
-  check("reading view opens", false, "Read the words button not found");
-}
+// The chapter index is real anchors (works without JS), one active stop at a time.
+check(
+  "chapter index links the prologue and all seven movements",
+  (await page.locator(".chapter-rail a.rail-stop").count()) === 8 &&
+    (await page.locator('.chapter-rail a[href="#prologue"]').count()) === 1 &&
+    (await page.locator('.chapter-rail a[href="#movement-07"]').count()) === 1 &&
+    (await page.locator('.chapter-rail [aria-current="step"]').count()) === 1,
+);
+
+// The optical field is an optional enhancement: its control must be named, and the
+// essay must not depend on it.
+const fieldAction = page.getByRole("button", { name: /release the spectrum/i });
+check(
+  "optical field control has an accessible name",
+  (await fieldAction.count()) === 1 && Boolean(await fieldAction.getAttribute("aria-describedby")),
+);
+check(
+  "essay remains readable without the optical field",
+  (await page.locator(".flow-copy p").count()) > 10 &&
+    (await page.locator(".flow-footnote").count()) >= 4,
+);
 
 const noteText = "A private note for the automated accessibility test.";
 const form = page.locator(".thought-form");
@@ -219,23 +220,23 @@ reducedPage.on("pageerror", (error) =>
 await reducedPage.goto(PAGE_URL, { waitUntil: "networkidle", timeout: 60_000 });
 await reducedPage.evaluate(() => document.fonts.ready);
 check(
-  "reduced-motion view is visible",
-  await reducedPage.locator(".reduced-motion-view").isVisible(),
+  "reduced-motion reading flow is visible",
+  await reducedPage.locator(".reading-flow").isVisible(),
 );
 check(
-  "reduced-motion canvas and scroll stage are absent",
-  !(await reducedPage.locator(".optics-canvas:visible").count()) &&
-    !(await reducedPage.locator(".scroll-track:visible").count()),
+  "reduced-motion removes the optical canvas and field controls",
+  (await reducedPage.locator("canvas").count()) === 0 &&
+    (await reducedPage.locator(".field-gesture-zone").count()) === 0 &&
+    (await reducedPage.locator(".flow-field-action").count()) === 0,
 );
 check(
-  "reduced-motion still includes all six movements",
-  (await reducedPage.locator(".reduced-motion-view .reading-chapter").count()) === 6,
+  "reduced-motion still includes all seven movements",
+  (await reducedPage.locator(".flow-movement").count()) === 7,
 );
 check(
-  "reduced-motion view contains the author and date",
-  (await reducedPage.locator(".reduced-motion-view .reading-byline").innerText()).includes(
-    "forthe.tech",
-  ) && (await reducedPage.locator(".reduced-motion-view .reading-byline time").count()) === 1,
+  "reduced-motion keeps the physics note and closing links",
+  (await reducedPage.getByText(/Light can refract at a boundary/).count()) === 1 &&
+    (await reducedPage.locator(".flow-next-step").count()) === 2,
 );
 check(
   "reduced-motion does not lock document scrolling",
@@ -253,12 +254,23 @@ const noScriptContext = await browser.newContext({
 });
 const noScriptPage = await noScriptContext.newPage();
 await noScriptPage.goto(PAGE_URL, { waitUntil: "networkidle", timeout: 60_000 });
-const noScriptReader = noScriptPage.locator(".no-script-reader");
+// The essay is server-rendered: without JavaScript the reader still gets the full
+// text; only the local notebook form degrades (with a noscript explanation).
+const noScriptReader = noScriptPage.locator(".reading-flow");
 check("no-script reading fallback is visible", await noScriptReader.isVisible());
 check(
-  "no-script reading fallback includes footnotes and the physics note",
-  (await noScriptReader.getByText("NOTHING → SOMETHING").count()) === 1 &&
-    (await noScriptReader.getByText(/Light can refract at a boundary/).count()) === 1,
+  "no-script reading fallback includes the movements and the physics note",
+  (await noScriptPage.locator(".flow-movement").count()) === 7 &&
+    (await noScriptPage.getByText(/Light can refract at a boundary/).count()) === 1,
+);
+check(
+  "no-script chapter index renders as plain anchors",
+  (await noScriptPage.locator('.chapter-rail a.rail-stop[href^="#movement-"]').count()) === 7 &&
+    (await noScriptPage.locator('.chapter-rail a[href="#prologue"]').count()) === 1,
+);
+check(
+  "no-script notebook explains that field notes need JavaScript",
+  (await noScriptPage.getByText(/Field notes need JavaScript/).count()) === 1,
 );
 await noScriptContext.close();
 await browser.close();

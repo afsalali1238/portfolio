@@ -1,13 +1,21 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import type { OpticsHandle } from "./OpticsCanvas";
+import { CHAPTERS } from "./story";
 import { clamp } from "./opticsEngine";
 
 const INTERACTION_ENERGY_FLOOR = 0.02;
 const INTERACTION_ENERGY_DECAY = 2.4;
 
+const SECTION_SELECTOR = ".flow-opening, .flow-movement, .flow-closing";
+
 /**
  * Maps native document reading progress onto the optical field. The field stays idle while the
  * reader reads, then briefly wakes for an intentional drag or spectrum release.
+ *
+ * Progress is anchored to the essay's own sections, not to raw document height: each section is
+ * stretched across its chapter window in `story.ts`, so the field's timeline follows the text at
+ * any viewport. (A linear document-height mapping lagged the copy by up to half a movement —
+ * the spectrum only arrived after "The Spectrum" had been read.)
  */
 export function useReadingAtmosphere({
   root,
@@ -20,6 +28,8 @@ export function useReadingAtmosphere({
   const tilt = useRef(0);
   const energy = useRef(0);
   const scheduleDraw = useRef<() => void>(() => {});
+  const anchors = useRef<{ top: number; height: number }[]>([]);
+  const anchorKey = useRef("");
 
   const steer = useCallback((nextTilt: number) => {
     tilt.current = clamp(nextTilt, -0.72, 0.72);
@@ -46,11 +56,47 @@ export function useReadingAtmosphere({
     let reduced = motionMedia.matches;
     let forcedColors = contrastMedia.matches;
 
+    const invalidateAnchors = () => {
+      anchorKey.current = "";
+    };
+
+    // Section offsets in reader-relative pixels. Re-measured only when the layout
+    // signature changes (resize, font swap) — never per frame.
+    const measureAnchors = () => {
+      const key = `${rootElement.offsetHeight}:${window.innerWidth}x${window.innerHeight}`;
+      if (key === anchorKey.current && anchors.current.length) return;
+      anchorKey.current = key;
+      const rootTop = rootElement.getBoundingClientRect().top + window.scrollY;
+      anchors.current = [...rootElement.querySelectorAll<HTMLElement>(SECTION_SELECTOR)].map(
+        (element) => {
+          const rect = element.getBoundingClientRect();
+          return { top: rect.top + window.scrollY - rootTop, height: rect.height };
+        },
+      );
+    };
+
     const readingProgress = () => {
-      const rect = rootElement.getBoundingClientRect();
-      const start = window.scrollY + rect.top;
-      const span = Math.max(rootElement.offsetHeight - window.innerHeight, 1);
-      return clamp((window.scrollY - start) / span, 0, 1);
+      measureAnchors();
+      const sections = anchors.current;
+      const readerY = -rootElement.getBoundingClientRect().top;
+      if (!sections.length) return 0;
+
+      let index = 0;
+      for (let i = sections.length - 1; i >= 0; i--) {
+        if (readerY >= sections[i].top) {
+          index = i;
+          break;
+        }
+      }
+      const current = sections[index];
+      const next = sections[index + 1];
+      const span = next ? next.top - current.top : current.height;
+      const local = span > 0 ? clamp((readerY - current.top) / span, 0, 1) : 0;
+
+      // The closing note sits past the seventh movement: hold the final field state.
+      const chapter = CHAPTERS[index];
+      if (!chapter) return 1;
+      return clamp(chapter.start + local * (chapter.end - chapter.start), 0, 1);
     };
 
     const draw = (now: number) => {
@@ -95,7 +141,10 @@ export function useReadingAtmosphere({
       },
       { threshold: 0 },
     );
-    const resize = () => schedule();
+    const resize = () => {
+      invalidateAnchors();
+      schedule();
+    };
 
     observer.observe(rootElement);
     window.addEventListener("scroll", schedule, { passive: true });
@@ -104,7 +153,10 @@ export function useReadingAtmosphere({
     motionMedia.addEventListener("change", preference);
     contrastMedia.addEventListener("change", preference);
     preference();
-    void document.fonts.ready.then(schedule);
+    void document.fonts.ready.then(() => {
+      invalidateAnchors();
+      schedule();
+    });
 
     return () => {
       if (frame) cancelAnimationFrame(frame);

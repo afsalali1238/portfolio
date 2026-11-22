@@ -154,7 +154,9 @@ const PERSON_SCHEMA = {
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en-GB">
+    // The site is always dark: render `dark` in the SSR markup so hydration matches,
+    // while the inline THEME_SCRIPT below still guards the pre-paint frame.
+    <html lang="en-GB" className="dark">
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <HeadContent />

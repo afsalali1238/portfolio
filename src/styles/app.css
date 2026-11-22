@@ -16,24 +16,28 @@
   box-sizing: border-box;
 }
 /* Scope the reader reset to its content. The shared site header retains the global navigation
-   system on this route, rather than inheriting a second button/link implementation. */
-.page-shell main button,
-.page-shell main input,
-.page-shell main textarea {
+   system on this route, rather than inheriting a second button/link implementation.
+   Scoped to `.immersive-reader` (not `main`) so the notebook form and footer keep their own
+   button/link styling — a `main`-wide reset outranked every component class. */
+.immersive-reader button,
+.immersive-reader input,
+.immersive-reader textarea {
   font: inherit;
 }
 .page-shell main button,
 .page-shell main a {
   -webkit-tap-highlight-color: transparent;
 }
-.page-shell main button {
+.immersive-reader button {
   color: inherit;
-  cursor: pointer;
   border: 0;
   background: none;
   padding: 0;
 }
-.page-shell main a {
+.page-shell main button {
+  cursor: pointer;
+}
+.immersive-reader a {
   color: inherit;
   text-decoration: none;
 }
@@ -589,13 +593,30 @@
   color: #dededc;
 }
 .chapter-rail {
-  position: absolute;
+  /* Fixed so the index stays viewport-centred through the whole native reading
+     flow (the legacy rail was absolute inside the pinned stage). */
+  position: fixed;
   right: 4.5%;
   top: 50%;
   transform: translateY(-42%);
   width: 33px;
   z-index: 5;
   --rail-progress: 0;
+  transition: opacity 0.25s ease;
+}
+/* Retires over the notebook, where it would only compete with the form. */
+.chapter-rail[data-visible="false"] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+/* The reader-wide link reset is more specific than `.rail-stop`: keep the index greys. */
+.chapter-rail .rail-stop {
+  color: #656c78;
+}
+.chapter-rail .rail-stop:hover,
+.chapter-rail .rail-stop:focus-visible {
+  color: var(--fg);
 }
 .rail-caption,
 .rail-end {
@@ -1008,7 +1029,10 @@
   display: flex;
   gap: 26px;
   align-items: center;
-  background: var(--bg-raised);
+  /* Solid bone CTA in the site's button language (see .btn-primary). The original
+     `bg-raised`/`bg` pair was a light-theme leftover: dark text on a near-black
+     surface, which axe correctly flags the moment the reset stops clobbering it. */
+  background: var(--fg);
   color: var(--bg);
   padding: 15px 18px;
   font-size: 12px;
@@ -1016,7 +1040,7 @@
   transition: background 0.2s;
 }
 .submit-thought:hover {
-  background: var(--fg);
+  background: color-mix(in oklch, var(--fg) 84%, var(--bg));
 }
 .form-notice {
   min-height: 25px;
@@ -1937,39 +1961,10 @@
     font-size: 12px;
     padding-bottom: 9px;
   }
+  /* The mobile column is full-bleed: a fixed index would sit on the surface cards.
+     In-flow movement labels and the top progress bar carry orientation here. */
   .chapter-rail {
-    right: 13px;
-    width: 20px;
-    top: 49%;
-    transform: translateY(-39%);
-  }
-  .rail-stop {
-    height: 32px;
-    font-size: 12px;
-    width: 25px;
-  }
-  .rail-dot {
-    width: 2px;
-    height: 2px;
-  }
-  .rail-line {
-    left: 2.5px;
-  }
-  .rail-numeral {
-    margin-left: 9px;
-  }
-  .rail-origin .rail-numeral {
-    font-size: 12px;
-  }
-  .rail-caption,
-  .rail-end,
-  .rail-label {
     display: none;
-  }
-  .rail-stop[data-active="true"] .rail-dot {
-    box-shadow:
-      0 0 0 2px #0b0c0e,
-      0 0 0 2.6px #727780;
   }
   .telemetry {
     display: none;

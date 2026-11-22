@@ -20,8 +20,9 @@
   width: 100%;
   height: 100vh;
   height: 100svh;
-  margin-bottom: -100vh;
-  margin-bottom: -100svh;
+  /* No negative margin here: a negative bottom margin extends the sticky element's
+     constraint box past the reader, which kept the optical field pinned over the
+     discussion footer. The essay below overlaps the stage instead (see .reading-flow). */
   overflow: hidden;
   background: #0b0c0e;
   z-index: 0;
@@ -53,6 +54,11 @@
 .reading-flow {
   position: relative;
   z-index: 1;
+  /* Pull the essay up over the in-flow sticky stage. Unlike a negative margin on the
+     stage itself, this keeps the stage's constraint box inside the reader, so the
+     field scrolls away exactly where the essay ends. */
+  margin-top: -100vh;
+  margin-top: -100svh;
   padding-bottom: clamp(88px, 12vw, 180px);
 }
 .flow-opening,
@@ -64,6 +70,8 @@
 .flow-opening {
   min-height: 100vh;
   min-height: 100svh;
+  /* Anchor seeks land at the page's natural hero position, clear of the sticky header. */
+  scroll-margin-top: 88px;
   padding: clamp(72px, 9vh, 96px) 0 72px;
   display: flex;
   flex-direction: column;
@@ -170,7 +178,7 @@
   font: italic clamp(27px, 2vw, 33px)/1.22 var(--serif);
   letter-spacing: -0.01em;
 }
-.flow-copy > p.flow-closing {
+.flow-copy > p.flow-closing-thought {
   max-width: 480px;
   margin-top: 31px;
   color: #f0eae1;
@@ -283,6 +291,10 @@
     height: 100svh;
     margin: 0;
   }
+  /* The stage is fixed (out of flow), so the essay must not pull itself up. */
+  .reading-flow {
+    margin-top: 0;
+  }
   .immersive-reader .site-header-minimal {
     left: 24px;
     right: 24px;
@@ -350,7 +362,7 @@
     margin-top: 25px;
     font-size: 28px;
   }
-  .flow-copy > p.flow-closing,
+  .flow-copy > p.flow-closing-thought,
   .flow-copy > p.flow-signature {
     font-size: 29px;
   }
@@ -383,6 +395,13 @@
   .flow-invitation svg {
     animation: none;
   }
+}
+
+/* The notebook is an opaque page laid over the dark room: the spectrum may run to the
+   edge of the essay, but it must never cross the form. (On mobile the stage is fixed,
+   so without this the field would bleed through the footer for the rest of the page.) */
+.thesis-page .discussion-footer {
+  background: var(--bg);
 }
 
 /* This small footer label is part of the thesis page and needs AA contrast against its dark base. */
