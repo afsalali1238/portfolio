@@ -31,13 +31,9 @@ function renderSegments(segments: readonly StorySegment[]) {
   return segments.map((segment, index) => (
     <Fragment key={`${segment.text}-${index}`}>
       {segment.breakBefore && <br />}
-      {segment.emphasis ? (
-        <em>{segment.breakBefore ? segment.text.trimStart() : segment.text}</em>
-      ) : segment.breakBefore ? (
-        segment.text.trimStart()
-      ) : (
-        segment.text
-      )}
+      {/* Keep the authored space after <br>: it collapses visually but matters for
+          textContent (screen readers, copy-paste, search scrapers). */}
+      {segment.emphasis ? <em>{segment.text}</em> : segment.text}
     </Fragment>
   ));
 }

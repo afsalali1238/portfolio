@@ -1,6 +1,7 @@
 import { Fragment, useRef, type PointerEvent as ReactPointerEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { Icon } from "../Icons";
+import { ChapterRail } from "./ChapterRail";
 import { OpticsCanvas, type OpticsHandle } from "./OpticsCanvas";
 import { useReadingAtmosphere } from "./useReadingAtmosphere";
 import {
@@ -16,13 +17,10 @@ function renderSegments(segments: readonly StorySegment[]) {
   return segments.map((segment, index) => (
     <Fragment key={`${segment.text}-${index}`}>
       {segment.breakBefore && <br />}
-      {segment.emphasis ? (
-        <em>{segment.breakBefore ? segment.text.trimStart() : segment.text}</em>
-      ) : segment.breakBefore ? (
-        segment.text.trimStart()
-      ) : (
-        segment.text
-      )}
+      {/* Keep the authored space after <br>: browsers collapse it visually at the line
+          start, but dropping it made the textContent read "Refractionof" for
+          screen readers, copy-paste, and search scrapers. */}
+      {segment.emphasis ? <em>{segment.text}</em> : segment.text}
     </Fragment>
   ));
 }
@@ -31,7 +29,9 @@ function paragraphClass(kind: ParagraphKind) {
   if (kind === "body") return undefined;
   if (kind === "lead") return "flow-lead";
   if (kind === "emphasis") return "flow-emphasis";
-  if (kind === "closing") return "flow-closing";
+  // NOT `flow-closing` — that class belongs to the closing <footer> section and would
+  // hand every closing thought its 58vh min-height and section padding.
+  if (kind === "closing") return "flow-closing-thought";
   if (kind === "signature") return "flow-signature";
   return "flow-italic";
 }
@@ -93,9 +93,10 @@ export function ImmersiveReader() {
           <span>Drag to bend the ray</span>
         </div>
       )}
+      <ChapterRail />
 
       <article className="reading-flow" aria-labelledby="thesis-title">
-        <section className="flow-opening">
+        <section className="flow-opening" id="prologue">
           <p className="flow-kicker">{PROLOGUE.eyebrow}</p>
           <h1 id="thesis-title">{renderSegments(PROLOGUE.heading)}</h1>
           <p className="flow-deck">
